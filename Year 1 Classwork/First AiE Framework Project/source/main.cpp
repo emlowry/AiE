@@ -4,7 +4,7 @@
  * Date Created:      September 10, 2013
  * Description:       Main function for the Pong program.
  * Last Modified:     September 17, 2013
- * Last Modification: Print scores to the screen, separate code.
+ * Last Modification: Refactoring.
  ******************************************************************************/
 
 #include "AIE.h"
@@ -21,13 +21,15 @@
 using namespace std;
 
 const char* BACKGROUND_TEXTURE_NAME = "./images/tennis_court.png";
+const float FAST_SPEED = 3000.0f;
 const int LEFT_PLAYER_LOSES_X = 200;
 const Sprite::Vector LEFT_PLAYER_START_POSITION = {240,396};
 const int LEFT_SCORE_X = 100;
-const int MIN_Y = 147;
 const int MAX_Y = 645;
+const float MEDIUM_SPEED = 2000.0f;
+const int MIN_Y = 147;
 const char* SCORE_FORMAT = "%s: %d";
-const int SCORE_Y = 80;
+const int SCORE_Y = 700;
 const float SLOW_SPEED = 1000.0f;
 const int RIGHT_PLAYER_LOSES_X = 1000;
 const Sprite::Vector RIGHT_PLAYER_START_POSITION = {960,396};
@@ -43,19 +45,41 @@ enum GameState
 	END
 };
 
-void DrawGame(const float ac_fSpeed,
+enum Speed
+{
+	SLOW,
+	MEDIUM,
+	FAST
+};
+
+enum HumanPlayers
+{
+	LEFT,
+	RIGHT,
+	BOTH
+};
+
+float GetSpeed(const Speed ac_eSpeed);
+
+void PlayGame(const Speed ac_eSpeed,
+			  float& a_rfPlayTime,
 			  Sprite& a_roBackground,
 			  Player& a_roLeftPlayer,
 			  Player& a_roRightPlayer,
 			  Ball& a_roBall);
 
-bool PlayerWins(Ball& a_roBall,
+bool PlayerScores(Ball& a_roBall,
+				  Player& a_roLeftPlayer,
+				  Player& a_roRightPlayer,
+				  Player*& a_rpoServingPlayer);
+
+bool PlayerWins(const Player& ac_roLeftPlayer, const Player& ac_roPlayer);
+
+void StartMatch(const HumanPlayers ac_eHumanPlayers,
+				float& a_rfPlayTime,
 				Player& a_roLeftPlayer,
 				Player& a_roRightPlayer,
-				Player*& a_rpoServingPlayer,
-				GameState& a_reGameState);
-
-void PlayGame(Ball& a_roBall, Player& a_roLeftPlayer, Player& a_roRightPlayer);
+				Player*& a_rpoServingPlayer);
 
 int main( int argc, char* argv[] )
 {	
@@ -72,12 +96,12 @@ int main( int argc, char* argv[] )
 	Player oRightPlayer(oBall, Player::RIGHT, RIGHT_PLAYER_START_POSITION, MIN_Y, MAX_Y);
 	Sprite* apoSprites[4] = { &oBackgroundSprite, &oLeftPlayer, &oRightPlayer, &oBall };
 
-	oLeftPlayer.SetMode(Player::AI);
-	oRightPlayer.SetMode(Player::AI);
-	Player* poServingPlayer = (rand()%2 == 0) ? &oLeftPlayer : &oRightPlayer;
-	float fSpeed = SLOW_SPEED;
+	Player* poServingPlayer = NULL;
+	Speed eGameSpeed = MEDIUM;
+	HumanPlayers eHumanPlayers = BOTH;
 
-	GameState eCurrentState = START_ROUND;
+	GameState eCurrentState = START_MATCH;
+	float fPlayTime = 0.0f;
 	
 	do 
 	{
@@ -86,28 +110,21 @@ int main( int argc, char* argv[] )
 		switch(eCurrentState)
 		{
 			// there should be a state here for choosing speed and which player(s) are AI controlled
+
 		case START_MATCH:
-		{
-			oLeftPlayer.Reset();
-			oRightPlayer.Reset();
+			StartMatch(eHumanPlayers, fPlayTime, oLeftPlayer, oRightPlayer, poServingPlayer);
 			eCurrentState = START_ROUND;
-		}
 
 		case START_ROUND:
-		{
 			poServingPlayer->Serve();
 			eCurrentState = GAME_STATE;
 			break;
-		}
 		
 		case GAME_STATE:
-		{
-			DrawGame(fSpeed, oBackgroundSprite, oLeftPlayer, oRightPlayer, oBall);
-			if (PlayerWins(oBall, oLeftPlayer, oRightPlayer, poServingPlayer, eCurrentState))
-				break;
-			PlayGame(oBall, oLeftPlayer, oRightPlayer);
+			PlayGame(eGameSpeed, fPlayTime, oBackgroundSprite, oLeftPlayer, oRightPlayer, oBall);
+			if (PlayerScores(oBall, oLeftPlayer, oRightPlayer, poServingPlayer))
+				eCurrentState = PlayerWins(oLeftPlayer, oRightPlayer) ? START_MATCH : START_ROUND;
 			break;
-		}
 
 		// there should be a state here for choosing whether or not to continue
 
@@ -127,20 +144,52 @@ int main( int argc, char* argv[] )
 	return 0;
 }
 
-void DrawGame(const float ac_fSpeed,
+float GetSpeed(const Speed ac_eSpeed)
+{
+	float fSpeed = MEDIUM_SPEED;
+	switch(ac_eSpeed)
+	{
+	case FAST:
+		fSpeed = FAST_SPEED;
+		break;
+	case SLOW:
+		fSpeed = SLOW_SPEED;
+		break;
+	case MEDIUM:
+	default:
+		// speed is already set to medium
+		break;
+	}
+	return fSpeed;
+}
+
+void PlayGame(const Speed ac_eSpeed,
+			  float& a_rfPlayTime,
 			  Sprite& a_roBackground,
 			  Player& a_roLeftPlayer,
 			  Player& a_roRightPlayer,
 			  Ball& a_roBall)
 {
-	float fDeltaT = GetDeltaTime();
+	// Update Sprite Positions and Draw
 	ClearScreen();
+	float fDeltaT = GetDeltaTime();
+	a_rfPlayTime += fDeltaT;	// keep track of total time for the match
 	Sprite* apoGameSprites[] = { &a_roBackground, &a_roLeftPlayer, &a_roRightPlayer, &a_roBall };
 	for each (Sprite* poSprite in apoGameSprites)
 	{
-		poSprite->Update(fDeltaT * ac_fSpeed);
+		poSprite->Update(fDeltaT * GetSpeed(ac_eSpeed));
 		poSprite->Draw();
 	}
+
+	// Find and react to collisions
+	if (a_roBall.CanRebound(MIN_Y, MAX_Y))
+		a_roBall.BounceY();
+	if (a_roLeftPlayer.CanHit())
+		a_roLeftPlayer.Hit();
+	if (a_roRightPlayer.CanHit())
+		a_roRightPlayer.Hit();
+
+	// Draw scores
 	char acScoreString[15];
 	sprintf_s(acScoreString, 15, SCORE_FORMAT, a_roLeftPlayer.GetPlayerName(), a_roLeftPlayer.GetScore());
 	DrawString(acScoreString, LEFT_SCORE_X, SCORE_Y);
@@ -148,39 +197,56 @@ void DrawGame(const float ac_fSpeed,
 	DrawString(acScoreString, RIGHT_SCORE_X, SCORE_Y);
 }
 
-bool PlayerWins(Ball& a_roBall,
-				Player& a_roLeftPlayer,
-				Player& a_roRightPlayer,
-				Player*& a_rpoServingPlayer,
-				GameState& a_reGameState)
+bool PlayerScores(Ball& a_roBall,
+				  Player& a_roLeftPlayer,
+				  Player& a_roRightPlayer,
+				  Player*& a_rpoServingPlayer)
 {
 	float fBallX = a_roBall.GetPosition().x;
-	if ((fBallX < LEFT_PLAYER_LOSES_X) || (fBallX > RIGHT_PLAYER_LOSES_X))
+	if ((fBallX < LEFT_PLAYER_LOSES_X) || (RIGHT_PLAYER_LOSES_X < fBallX))
 	{
-		// right player wins
 		a_rpoServingPlayer = (fBallX < LEFT_PLAYER_LOSES_X) ? &a_roRightPlayer : &a_roLeftPlayer;
 		a_rpoServingPlayer->IncrementScore();
 		a_roBall.Hide();
-		unsigned int uiLeftScore = a_roLeftPlayer.GetScore();
-		unsigned int uiRightScore = a_roRightPlayer.GetScore();
-		if ((max(uiLeftScore, uiRightScore) >= 4) && (abs((int)uiLeftScore - (int)uiRightScore) >= 2))
-			a_reGameState = START_MATCH;
-		else
-			a_reGameState = START_ROUND;
 		return true;
 	}
 	return false;
 }
 
-void PlayGame(Ball& a_roBall, Player& a_roLeftPlayer, Player& a_roRightPlayer)
+bool PlayerWins(const Player& ac_roLeftPlayer, const Player& ac_roRightPlayer)
 {
-	if (a_roBall.CanRebound(MIN_Y, MAX_Y))
-		a_roBall.BounceY();
-	if (a_roLeftPlayer.CanHit())
-		a_roLeftPlayer.Hit();
-	if (a_roRightPlayer.CanHit())
-		a_roRightPlayer.Hit();
+	unsigned int uiLeftScore = ac_roLeftPlayer.GetScore();
+	unsigned int uiRightScore = ac_roRightPlayer.GetScore();
+	return ((max(uiLeftScore, uiRightScore) >= 4) &&
+			(abs((int)uiLeftScore - (int)uiRightScore) >= 2));
 }
+
+void StartMatch(const HumanPlayers ac_eHumanPlayers,
+				float& a_rfPlayTime,
+				Player& a_roLeftPlayer,
+				Player& a_roRightPlayer,
+				Player*& a_rpoServingPlayer)
+{
+	a_roLeftPlayer.Reset();
+	a_roRightPlayer.Reset();
+	a_roLeftPlayer.SetMode(ac_eHumanPlayers != RIGHT ? Player::HUMAN : Player::AI);
+	a_roRightPlayer.SetMode(ac_eHumanPlayers != LEFT ? Player::HUMAN : Player::AI);
+	switch(ac_eHumanPlayers)
+	{
+	case LEFT:
+		a_rpoServingPlayer = &a_roRightPlayer;
+		break;
+	case RIGHT:
+		a_rpoServingPlayer = &a_roLeftPlayer;
+		break;
+	case BOTH:
+	default:
+		a_rpoServingPlayer = (rand()%2 == 0) ? &a_roLeftPlayer : &a_roRightPlayer;
+		break;
+	}
+	a_rfPlayTime = 0.0f;
+}
+
 
 
 
