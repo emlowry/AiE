@@ -1,11 +1,11 @@
-/******************************************************************************
- * File:              Ball.h
- * Author:            Elizabeth Lowry
- * Date Created:      September 11, 2013
- * Description:       Definitions for the class that handles the ball sprite.
- * Last Modified:     September 16, 2013
- * Last Modification: Added GetDiameter function.
- ******************************************************************************/
+/**************************************************************************************************
+ * File:               Ball.h
+ * Author:             Elizabeth Lowry
+ * Date Created:       September 11, 2013
+ * Description:        Definitions for the class that handles the ball sprite.
+ * Last Modified:      September 16, 2013
+ * Last Modification:  Added GetDiameter function.
+ **************************************************************************************************/
 
 #ifndef _BALL_H_
 #define _BALL_H_
@@ -30,7 +30,7 @@ public:
 
 private:
 	static const unsigned int DEFAULT_BALL_DIAMETER = 20;
-	static const char* const BALL_TEXTURE_NAME;
+	static const char* const BALL_TEXTURE_NAME;	// "./images/tennis_ball.png"
 
 	Vector m_oPosition;
 	float m_fRotation;

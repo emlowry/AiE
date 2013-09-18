@@ -1,11 +1,11 @@
-/******************************************************************************
- * File:              Sprite.h
- * Author:            Elizabeth Lowry
- * Date Created:      September 11, 2013
- * Description:       Definitions for the class that handles a drawable object.
- * Last Modified:     September 11, 2013
- * Last Modification: Moved code in from main.cpp.
- ******************************************************************************/
+/**************************************************************************************************
+ * File:               Sprite.h
+ * Author:             Elizabeth Lowry
+ * Date Created:       September 11, 2013
+ * Description:        Definitions for the class that handles a drawable object.
+ * Last Modified:      September 11, 2013
+ * Last Modification:  Moved code in from main.cpp.
+ **************************************************************************************************/
 
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
@@ -20,7 +20,7 @@ public:
 		float y;
 	};
 
-	static const Vector DEFAULT_POSITION;
+	static const Vector DEFAULT_POSITION;	// {0.0, 0.0}
 
 	Sprite(const char* ac_pcName,
 		   const unsigned int ac_uiWidth,

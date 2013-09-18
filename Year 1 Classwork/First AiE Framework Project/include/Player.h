@@ -1,11 +1,11 @@
-/******************************************************************************
- * File:              Player.h
- * Author:            Elizabeth Lowry
- * Date Created:      September 11, 2013
- * Description:       Definitions for the class that handles a player sprite.
- * Last Modified:     September 16, 2013
- * Last Modification: Added Hit and SetDirectionProvider functions.
- ******************************************************************************/
+/**************************************************************************************************
+ * File:               Player.h
+ * Author:             Elizabeth Lowry
+ * Date Created:       September 11, 2013
+ * Description:        Definitions for the class that handles a player sprite.
+ * Last Modified:      September 16, 2013
+ * Last Modification:  Added Hit and SetDirectionProvider functions.
+ **************************************************************************************************/
 
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
@@ -58,16 +58,16 @@ private:
 
 	// due to the art used, the sprite is a bit larger than the actual paddle area
 	static const unsigned int LEFT_DOWN_KEY = 'S';
-	static const char* const LEFT_PLAYER_NAME;
-	static const char* const LEFT_TEXTURE_NAME;
+	static const char* const LEFT_PLAYER_NAME;	// "Serena"
+	static const char* const LEFT_TEXTURE_NAME;	// "./images/serena_williams.png"
 	static const unsigned int LEFT_UP_KEY = 'W';
 	static const unsigned int PADDLE_HEIGHT = 100;
 	static const unsigned int PADDLE_WIDTH = 50;
 	static const unsigned int PLAYER_HEIGHT = 130;
 	static const unsigned int PLAYER_WIDTH = 70;
 	static const unsigned int RIGHT_DOWN_KEY = KEY_DOWN;
-	static const char* const RIGHT_PLAYER_NAME;
-	static const char* const RIGHT_TEXTURE_NAME;
+	static const char* const RIGHT_PLAYER_NAME;	// "Venus"
+	static const char* const RIGHT_TEXTURE_NAME;	// "./images/venus_williams.png"
 	static const unsigned int RIGHT_UP_KEY = KEY_UP;
 
 	const int mc_iMaxY;

@@ -1,11 +1,11 @@
-/******************************************************************************
- * File:              Player.cpp
- * Author:            Elizabeth Lowry
- * Date Created:      September 11, 2013
- * Description:       Implementation for methods of the Player class.
- * Last Modified:     September 17, 2013
- * Last Modification: Adjusted BallIsIncoming function.
- ******************************************************************************/
+/**************************************************************************************************
+ * File:               Player.cpp
+ * Author:             Elizabeth Lowry
+ * Date Created:       September 11, 2013
+ * Description:        Implementation for methods of the Player class.
+ * Last Modified:      September 17, 2013
+ * Last Modification:  Adjusted BallIsIncoming function.
+ **************************************************************************************************/
 
 #include "Player.h"
 #include "AIE.h"

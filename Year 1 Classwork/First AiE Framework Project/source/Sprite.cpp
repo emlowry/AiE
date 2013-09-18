@@ -1,11 +1,11 @@
-/******************************************************************************
- * File:              Sprite.cpp
- * Author:            Elizabeth Lowry
- * Date Created:      September 11, 2013
- * Description:       Implementations for methods of the Sprite class.
- * Last Modified:     September 11, 2013
- * Last Modification: Creation.
- ******************************************************************************/
+/**************************************************************************************************
+ * File:               Sprite.cpp
+ * Author:             Elizabeth Lowry
+ * Date Created:       September 11, 2013
+ * Description:        Implementations for methods of the Sprite class.
+ * Last Modified:      September 11, 2013
+ * Last Modification:  Creation.
+ **************************************************************************************************/
 
 #include "Sprite.h"
 #include "AIE.h"

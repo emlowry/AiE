@@ -1,11 +1,11 @@
-/******************************************************************************
- * File:              Ball.cpp
- * Author:            Elizabeth Lowry
- * Date Created:      September 16, 2013
- * Description:       Implementations for methods of the Ball class.
- * Last Modified:     September 16, 2013
- * Last Modification: Creation.
- ******************************************************************************/
+/**************************************************************************************************
+ * File:               Ball.cpp
+ * Author:             Elizabeth Lowry
+ * Date Created:       September 16, 2013
+ * Description:        Implementations for methods of the Ball class.
+ * Last Modified:      September 16, 2013
+ * Last Modification:  Creation.
+ **************************************************************************************************/
 
 #include "Ball.h"
 #include "AIE.h"
