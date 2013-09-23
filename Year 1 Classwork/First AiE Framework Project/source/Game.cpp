@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       September 17, 2013
  * Description:        Implementations for methods of the Game class.
- * Last Modified:      September 18, 2013
- * Last Modification:  Removed GetSpeed function, added comments.
+ * Last Modified:      September 23, 2013
+ * Last Modification:  Added pause state.
  ******************************************************************************/
 
 #include "Game.h"
@@ -19,6 +19,29 @@
 const char* const Game::BACKGROUND_TEXTURE_NAME = "./images/tennis_court.png";
 const char* const Game::GAME_TITLE = "Pong, starring Venus and Serena Williams!";
 const Sprite::XYPair Game::LEFT_PLAYER_START_POSITION = {240,396};
+const int Game::MENU_KEYS[MENU_KEY_COUNT] =
+{
+	KEY_ESC,
+	KEY_HOME,
+	KEY_END,
+	KEY_BACKSPACE
+};
+const int Game::PAUSE_KEYS[PAUSE_KEY_COUNT] =
+{
+	KEY_PAUSE,
+	KEY_ESC,
+	KEY_HOME,
+	KEY_END,
+	KEY_BACKSPACE,
+	KEY_SPACE,
+	KEY_ENTER
+};
+const int Game::RESUME_KEYS[RESUME_KEY_COUNT] =
+{
+	KEY_PAUSE,
+	KEY_SPACE,
+	KEY_ENTER
+};
 const Sprite::XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
 const char* const Game::SCORE_FORMAT = "%s: %d";
 const char* const Game::TIME_FORMAT = "%d:%02d:%03d";
@@ -85,6 +108,13 @@ Game::GameState Game::CheckForWinners( bool a_bBackgroundMatch )
 	return PLAY_GAME;
 }
 
+// Draw the pause screen.  This only needs to be done once, since nothing on
+// screen is updated while paused.
+void Game::DrawPauseScreen()
+{
+	// TODO
+}
+
 // Draw scores and time
 void Game::DrawScores( bool a_bBackgroundMatch )
 {
@@ -148,6 +178,21 @@ void Game::FormatPlayTime( char* a_pcBuffer,
 			   uiMilliseconds );
 }
 
+// If at least one of the given keys is pressed, return true
+bool Game::IsOneOfTheseKeysDown( const int* const ac_pciKeys,
+								 const unsigned int ac_uiKeyCount )
+{
+	const int* pciKey = ac_pciKeys;
+	for( unsigned int ui = 0; ui < ac_uiKeyCount; ++ui )
+	{
+		if( IsKeyDown( *pciKey++ ) )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 // Is the match over?  It's over when one player has at least 4 points and is
 //   ahead of the other by at least 2.
 bool Game::MatchOver() const
@@ -182,6 +227,10 @@ Game::GameState Game::Menu()
 //   collisions, and return the next game state.
 Game::GameState Game::PlayGame( bool a_bBackgroundMatch )
 {
+	if( IsOneOfTheseKeysDown( PAUSE_KEYS, PAUSE_KEY_COUNT ) )
+	{
+		return ENTER_PAUSE;
+	}
 	UpdateAndDrawSprites();
 	DrawScores( a_bBackgroundMatch );
 	CheckCollisions();
@@ -227,8 +276,7 @@ bool Game::Run()
 	case ENTER_MENU:
 		{
 			EnterMenu();
-			m_eState = MENU;	// ... then run the menu
-			break;
+			m_eState = MENU;	// ... then fall through to the menu
 		}
 
 	// Run the menu
@@ -243,16 +291,14 @@ bool Game::Run()
 	case START_MATCH:
 		{
 			StartMatch();
-			m_eState = START_ROUND;	// ... then start the first round
-			break;
+			m_eState = START_ROUND;	// ... then fall through to start a round
 		}
 
 	// Set up a round...
 	case START_ROUND:
 		{
 			StartRound();
-			m_eState = PLAY_GAME;	// ... then start playing
-			break;
+			m_eState = PLAY_GAME;	// ... then fall through to start playing
 		}
 		
 	// Play the game
@@ -260,6 +306,20 @@ bool Game::Run()
 		{
 			// either stay in PLAY_GAME or go to START_ROUND or ENTER_MENU
 			m_eState = PlayGame();
+			break;
+		}
+
+	// Draw the Pause screen...
+	case ENTER_PAUSE:
+		{
+			DrawPauseScreen();
+			m_eState = PAUSED;	// ... then fall through to the pause state proper
+		}
+
+	// Game is paused until the player presses ESC, SPACE, or ENTER
+	case PAUSED:
+		{
+			m_eState = WaitForUnpause();
 			break;
 		}
 
@@ -361,4 +421,25 @@ void Game::UpdateAndDrawSprites()
 		poSprite->Update( fDeltaT * m_eGameSpeed );
 		poSprite->Draw();
 	}
+}
+
+// Check for one of the key presses signalling the end of the paused state and
+// return the appropriate next game state.
+Game::GameState Game::WaitForUnpause()
+{
+	// If any of the keys for ending the game and returning to the menu are
+	// pressed, go to the menu without entering any scores.
+	if( IsOneOfTheseKeysDown( MENU_KEYS, MENU_KEY_COUNT ) )
+	{
+		return ENTER_MENU;
+	}
+	
+	// If any of the keys for resuming the game are pressed, go back to the game.
+	if( IsOneOfTheseKeysDown( RESUME_KEYS, RESUME_KEY_COUNT ) )
+	{
+		return PLAY_GAME;
+	}
+
+	// If none of those keys were pressed, remain paused.
+	return PAUSED;
 }

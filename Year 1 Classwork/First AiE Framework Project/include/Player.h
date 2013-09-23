@@ -66,18 +66,18 @@ private:
 	MotionDirection GetAIDirection() const;
 	MotionDirection GetHumanDirection() const;
 
-	static const unsigned int LEFT_DOWN_KEY = 'S';
+	static const int LEFT_DOWN_KEY = 'S';
 	static const char* const LEFT_PLAYER_NAME;	// "Serena"
 	static const char* const LEFT_TEXTURE_NAME;	// "./images/serena_williams.png"
-	static const unsigned int LEFT_UP_KEY = 'W';
+	static const int LEFT_UP_KEY = 'W';
 	static const unsigned int PADDLE_HEIGHT = 100;	// due to the art used, the
 	static const unsigned int PADDLE_WIDTH = 50;	// sprite is a bit larger
 	static const unsigned int PLAYER_HEIGHT = 130;	// than the actual paddle
 	static const unsigned int PLAYER_WIDTH = 70;	// area.
-	static const unsigned int RIGHT_DOWN_KEY = KEY_DOWN;
+	static const int RIGHT_DOWN_KEY = KEY_DOWN;
 	static const char* const RIGHT_PLAYER_NAME;	// "Venus"
 	static const char* const RIGHT_TEXTURE_NAME;	// "./images/venus_williams.png"
-	static const unsigned int RIGHT_UP_KEY = KEY_UP;
+	static const int RIGHT_UP_KEY = KEY_UP;
 
 	const int mc_iMaxY;
 	const int mc_iMinY;
