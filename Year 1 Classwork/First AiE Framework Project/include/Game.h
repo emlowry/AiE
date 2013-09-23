@@ -20,6 +20,9 @@ class Game
 {
 public:
 
+	// It would be better to use enum classes here so we won't have to worry
+	// about the names of enum constants, but Visual Studio 2010 doesn't support
+	// that feature of C++11.  >:-(
 	enum GameState
 	{
 		ENTER_MENU,
