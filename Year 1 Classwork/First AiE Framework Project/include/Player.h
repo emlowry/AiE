@@ -44,6 +44,7 @@ public:
 	unsigned int GetScore() const;
 	void Hit() const;
 	void IncrementScore();
+	void PrintScore( char* a_pcBuffer, unsigned int a_uiBufferSize );
 	void Reset();
 	void Serve() const;
 	void SetMode( Mode a_eMode );
@@ -78,6 +79,7 @@ private:
 	static const char* const RIGHT_PLAYER_NAME;	// "Venus"
 	static const char* const RIGHT_TEXTURE_NAME;	// "./images/venus_williams.png"
 	static const int RIGHT_UP_KEY = KEY_UP;
+	static const char* const SCORE_FORMAT;	// "%s: %d"
 
 	const int mc_iMaxY;
 	const int mc_iMinY;

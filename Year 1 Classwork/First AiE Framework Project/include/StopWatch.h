@@ -18,12 +18,13 @@ public:
 	StopWatch();
 
 	void Clear();
-	unsigned long GetTicks();
-	double GetMilliseconds();	// total elapsed milliseconds
-	double GetSeconds();		// total elapsed seconds
-	double GetMinutes();		// total elapsed minutes
-	double GetHours();			// total elapsed hours
-	void PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize);
+	unsigned long GetTicks() const;
+	double GetMilliseconds() const;	// total elapsed milliseconds
+	double GetSeconds() const;		// total elapsed seconds
+	double GetMinutes() const;		// total elapsed minutes
+	double GetHours() const;		// total elapsed hours
+	bool IsRunning() const;
+	void PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize) const;
 	void Start();
 	void Stop();
 
@@ -32,7 +33,7 @@ private:
 	// hours:minutes:seconds.milliseconds, or "%d:%02d:%02d.%03d" to be precise
 	static const char* const TIME_FORMAT;
 
-	bool m_bPaused;
+	bool m_bRunning;
 	unsigned long m_ulStartTime;
 	unsigned long m_ulTicksBeforeLastStop;
 

@@ -14,6 +14,7 @@
 #include "Sprite.h"
 #include "Ball.h"
 #include "Player.h"
+#include "StopWatch.h"
 
 // Handles the game as a whole.
 class Game
@@ -61,11 +62,8 @@ private:
 	void CheckCollisions();
 	GameState CheckForWinners( bool a_bBackgroundMatch );
 	void DrawPauseScreen();
-	void DrawScores( bool a_bBackgroundMatch );
+	void DrawScores( bool a_bDrawTime = true );
 	void EnterMenu();
-	static void FormatPlayTime( char* a_pcBuffer,
-								unsigned int a_uiBufferSize,
-								float a_fPlayTime );
 	static bool IsOneOfTheseKeysDown( const int* const ac_pciKeys,
 									  const unsigned int ac_uiKeyCount );
 	bool MatchOver() const;
@@ -98,9 +96,7 @@ private:
 	static const int RIGHT_PLAYER_LOSES_X = 1000;
 	static const Sprite::XYPair RIGHT_PLAYER_START_POSITION;	// {960,396}
 	static const int RIGHT_SCORE_X = 1000;
-	static const char* const SCORE_FORMAT;	// "%s: %d"
 	static const int SCORE_Y = 700;
-	static const char* const TIME_FORMAT;	// "%d:%02d:%03d"
 	static const int TIME_Y = 80;
 	static const int TIME_X = 550;
 	
@@ -109,7 +105,8 @@ private:
 	Speed m_eGameSpeed;
 	HumanPlayers m_eHumanPlayers;
 	Player m_oLeftPlayer;
-	float m_fPlayTime;	// How long has the current match been in progress?
+	bool m_bKeyPressed;	// Is it still the initial pause/unpause keypress?
+	StopWatch m_oPlayTime;	// How long has the current match been in progress?
 	Player m_oRightPlayer;
 	Player* m_poServingPlayer;	// Which player will serve the ball?
 	GameState m_eState;

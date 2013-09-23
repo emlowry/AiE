@@ -12,8 +12,8 @@
 #include "Ball.h"
 #include "Player.h"
 #include "AIE.h"
+#include "StopWatch.h"
 #include <algorithm>	// for std::max(int a, int b)
-#include <cstdio>	// for sprintf_s
 #include <cstdlib>	// for rand and abs
 
 const char* const Game::BACKGROUND_TEXTURE_NAME = "./images/tennis_court.png";
@@ -43,8 +43,6 @@ const int Game::RESUME_KEYS[RESUME_KEY_COUNT] =
 	KEY_ENTER
 };
 const Sprite::XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
-const char* const Game::SCORE_FORMAT = "%s: %d";
-const char* const Game::TIME_FORMAT = "%d:%02d:%03d";
 
 // Constructor
 Game::Game()
@@ -58,6 +56,7 @@ Game::Game()
 					 LEFT_PLAYER_START_POSITION,
 					 MIN_Y,
 					 MAX_Y ),
+	  m_bKeyPressed( false ),
 	  m_oRightPlayer( m_oBall,
 					  Player::RIGHT,
 					  RIGHT_PLAYER_START_POSITION,
@@ -66,7 +65,6 @@ Game::Game()
 	  m_poServingPlayer( RandomPlayer() ),
 	  m_eGameSpeed( MEDIUM ),
 	  m_eHumanPlayers( BOTH ),
-	  m_fPlayTime( 0.0f ),
 	  m_eState( START_MATCH )	// TODO: change this to ENTER_MENU once the menu has been implemented
 {
 	// Nothing else to do here, since all members either have a default
@@ -108,39 +106,50 @@ Game::GameState Game::CheckForWinners( bool a_bBackgroundMatch )
 	return PLAY_GAME;
 }
 
-// Draw the pause screen.  This only needs to be done once, since nothing on
-// screen is updated while paused.
+// Draw the pause screen.
 void Game::DrawPauseScreen()
 {
-	// TODO
+	// Clear the screen
+	ClearScreen();
+
+	// Draw the game sprites...
+	Sprite* apoGameSprites[] =
+	{
+		&m_oBackgroundSprite,
+		&m_oLeftPlayer,
+		&m_oRightPlayer,
+		&m_oBall
+	};
+	for each ( Sprite* poSprite in apoGameSprites )
+	{
+		poSprite->Draw();
+	}
+
+	// Draw scores and time
+	DrawScores();
+
+	// TODO: Draw "Paused" overlay
 }
 
 // Draw scores and time
-void Game::DrawScores( bool a_bBackgroundMatch )
+void Game::DrawScores( bool a_bDrawTime )
 {
 	// create a buffer to hold text
-	char acBuffer[15];
+	const unsigned int cuiBufferSize = 16;
+	char acBuffer[cuiBufferSize];
 
 	// Draw the left player's score
-	sprintf_s( acBuffer,
-			   15,
-			   SCORE_FORMAT,
-			   m_oLeftPlayer.GetPlayerName(),
-			   m_oLeftPlayer.GetScore() );
+	m_oLeftPlayer.PrintScore( acBuffer, cuiBufferSize );
 	DrawString( acBuffer, LEFT_SCORE_X, SCORE_Y );
 
 	// Draw the right player's score
-	sprintf_s( acBuffer,
-			   15,
-			   SCORE_FORMAT,
-			   m_oRightPlayer.GetPlayerName(),
-			   m_oRightPlayer.GetScore() );
+	m_oRightPlayer.PrintScore( acBuffer, cuiBufferSize );
 	DrawString( acBuffer, RIGHT_SCORE_X, SCORE_Y );
 
 	// If this is an actual game and not menu background, draw the match time
-	if ( !a_bBackgroundMatch )
+	if ( a_bDrawTime )
 	{
-		FormatPlayTime( acBuffer, 15, m_fPlayTime );
+		m_oPlayTime.PrintTime( acBuffer, cuiBufferSize );
 		DrawString( acBuffer, TIME_X, TIME_Y );
 	}
 }
@@ -149,7 +158,6 @@ void Game::DrawScores( bool a_bBackgroundMatch )
 void Game::EnterMenu()
 {
 	// Set up the AI-only game playing in the background
-	m_fPlayTime = 0.0f;
 	m_oLeftPlayer.Reset();
 	m_oRightPlayer.Reset();
 	m_oLeftPlayer.SetMode( Player::AI );
@@ -157,25 +165,6 @@ void Game::EnterMenu()
 	m_poServingPlayer = RandomPlayer();
 
 	// TODO: other menu startup tasks
-}
-
-// Write the time given in the float to the given char* string in
-//   "minute:second.millisecond" format
-void Game::FormatPlayTime( char* a_pcBuffer,
-						   unsigned int a_uiBufferSize,
-						   float a_fPlayTime )
-{
-	unsigned int uiMilliseconds = (unsigned int)( a_fPlayTime * 1000 );
-	unsigned int uiSeconds = uiMilliseconds / 1000;
-	uiMilliseconds %= 1000;
-	unsigned int uiMinutes = uiSeconds / 60;
-	uiSeconds %= 60;
-	sprintf_s( a_pcBuffer,
-			   a_uiBufferSize,
-			   TIME_FORMAT,
-			   uiMinutes,
-			   uiSeconds,
-			   uiMilliseconds );
 }
 
 // If at least one of the given keys is pressed, return true
@@ -207,7 +196,7 @@ bool Game::MatchOver() const
 Game::GameState Game::Menu()
 {
 	// Run the AI vs. AI match in the background. Don't show the time.
-	GameState eState = PlayGame( false );
+	GameState eState = PlayGame( true );
 	if ( eState != PLAY_GAME )
 	{
 		if( eState != START_ROUND )
@@ -219,6 +208,7 @@ Game::GameState Game::Menu()
 	}
 
 	// TODO: draw actual menu, return START_MATCH or END if appropriate.
+	m_bKeyPressed = false;
 
 	return MENU;
 }
@@ -227,12 +217,18 @@ Game::GameState Game::Menu()
 //   collisions, and return the next game state.
 Game::GameState Game::PlayGame( bool a_bBackgroundMatch )
 {
-	if( IsOneOfTheseKeysDown( PAUSE_KEYS, PAUSE_KEY_COUNT ) )
+	bool bPaused = IsOneOfTheseKeysDown( PAUSE_KEYS, PAUSE_KEY_COUNT );
+	if( !m_bKeyPressed && bPaused )
 	{
+		m_bKeyPressed = true;
 		return ENTER_PAUSE;
 	}
+	if( m_bKeyPressed && !bPaused)
+	{
+		m_bKeyPressed = false;
+	}
 	UpdateAndDrawSprites();
-	DrawScores( a_bBackgroundMatch );
+	DrawScores( !a_bBackgroundMatch );	// Only draw time in an actual game.
 	CheckCollisions();
 	return CheckForWinners( a_bBackgroundMatch );
 }
@@ -312,13 +308,14 @@ bool Game::Run()
 	// Draw the Pause screen...
 	case ENTER_PAUSE:
 		{
-			DrawPauseScreen();
+			m_oPlayTime.Stop();
 			m_eState = PAUSED;	// ... then fall through to the pause state proper
 		}
 
 	// Game is paused until the player presses ESC, SPACE, or ENTER
 	case PAUSED:
 		{
+			DrawPauseScreen();
 			m_eState = WaitForUnpause();
 			break;
 		}
@@ -387,7 +384,8 @@ void Game::StartMatch()
 	}
 
 	// Set the match time to zero
-	m_fPlayTime = 0.0f;
+	m_oPlayTime.Clear();
+	m_oPlayTime.Start();
 }
 
 // Perform all start-of-round tasks
@@ -399,10 +397,6 @@ void Game::StartRound()
 // Update sprite positions and draw them
 void Game::UpdateAndDrawSprites()
 {
-	// keep track of total time for the match
-	float fDeltaT = GetDeltaTime();
-	m_fPlayTime += fDeltaT;
-
 	// Clear the screen
 	ClearScreen();
 
@@ -416,6 +410,7 @@ void Game::UpdateAndDrawSprites()
 	};
 
 	// ... and loop through them to update and draw
+	float fDeltaT = GetDeltaTime();
 	for each ( Sprite* poSprite in apoGameSprites )
 	{
 		poSprite->Update( fDeltaT * m_eGameSpeed );
@@ -427,19 +422,38 @@ void Game::UpdateAndDrawSprites()
 // return the appropriate next game state.
 Game::GameState Game::WaitForUnpause()
 {
-	// If any of the keys for ending the game and returning to the menu are
-	// pressed, go to the menu without entering any scores.
-	if( IsOneOfTheseKeysDown( MENU_KEYS, MENU_KEY_COUNT ) )
+	bool bMenu = IsOneOfTheseKeysDown( MENU_KEYS, MENU_KEY_COUNT );
+	bool bPlay = IsOneOfTheseKeysDown( RESUME_KEYS, RESUME_KEY_COUNT );
+
+	// If the initial keypress isn't over, stay paused
+	if( m_bKeyPressed )
 	{
-		return ENTER_MENU;
+		// Check to see if it should be over
+		if( !bMenu && !bPlay )
+		{
+			m_bKeyPressed = false;
+		}
+		return PAUSED;
 	}
-	
-	// If any of the keys for resuming the game are pressed, go back to the game.
-	if( IsOneOfTheseKeysDown( RESUME_KEYS, RESUME_KEY_COUNT ) )
+
+	// If either a menu key or a resume key, but not one of both, is pressed...
+	if( bMenu != bPlay )
 	{
+		m_bKeyPressed = true;
+
+		// If any of the keys for ending the game and returning to the menu are
+		// pressed, go to the menu without entering any scores.
+		if( bMenu )
+		{
+			return ENTER_MENU;
+		}
+
+		// If any of the keys for resuming the game are pressed, go back to the
+		// game.
+		m_oPlayTime.Start();
 		return PLAY_GAME;
 	}
 
-	// If none of those keys were pressed, remain paused.
+	// Otherwise, remain paused.
 	return PAUSED;
 }

@@ -16,7 +16,7 @@ const char* const StopWatch::TIME_FORMAT = "%d:%02d:%02d.%03d";
 
 // Default constructor instantiates all members in initializer list
 StopWatch::StopWatch()
-	: m_bPaused( true ),
+	: m_bRunning( false ),
 	  m_ulStartTime( clock() ),
 	  m_ulTicksBeforeLastStop( 0 )
 {
@@ -30,67 +30,72 @@ void StopWatch::Clear()
 }
 
 // Get the total ticks this watch has been running (excluding time paused)
-unsigned long StopWatch::GetTicks()
+unsigned long StopWatch::GetTicks() const
 {
-	if( m_bPaused )
+	if( !m_bRunning )
 	{
 		return m_ulTicksBeforeLastStop;
 	}
-	
 	return clock() - m_ulStartTime + m_ulTicksBeforeLastStop;
 }
 
 // Get the total elapsed milliseconds this watch has been running
-double StopWatch::GetMilliseconds()
+double StopWatch::GetMilliseconds() const
+{
+	return ( (double)GetTicks() * 1000 ) / CLOCKS_PER_SEC;
+}
+
+// Get the total elapsed seconds this watch has been running
+double StopWatch::GetSeconds() const
 {
 	return (double)GetTicks() / CLOCKS_PER_SEC;
 }
 
-// Get the total elapsed seconds this watch has been running
-double StopWatch::GetSeconds()
-{
-	return (double)GetTicks() / (CLOCKS_PER_SEC * 1000);
-}
-
 // Get the total elapsed minutes this watch has been running
-double StopWatch::GetMinutes()
+double StopWatch::GetMinutes() const
 {
-	return (double)GetTicks() / (CLOCKS_PER_SEC * 60000);
+	return (double)GetTicks() / ( CLOCKS_PER_SEC * 60 );
 }
 
 // Get the total elapsed hours this watch has been running
-double StopWatch::GetHours()
+double StopWatch::GetHours() const
 {
-	return (double)GetTicks() / (CLOCKS_PER_SEC * 3600000);
+	return (double)GetTicks() / ( CLOCKS_PER_SEC * 3600 );
+}
+
+// Is the stopwatch currently stopped?
+bool StopWatch::IsRunning() const
+{
+	return m_bRunning;
 }
 
 // Print the time to a buffer in hours:minutes:seconds.milliseconds format
-void StopWatch::PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize
+void StopWatch::PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize ) const
 {
 	unsigned int uiMS =
 		(unsigned int)( (unsigned long)GetMilliseconds() % 1000 );
 	unsigned int uiS = (unsigned int)( (unsigned long)GetSeconds() % 60 );
 	unsigned int uiM = (unsigned int)( (unsigned long)GetMinutes() % 60 );
 	unsigned long ulH = (unsigned long)GetHours();
-	sprintf_s( a_pcBuffer, a_uiBufferSize, TIME_FORMAT, ulH, uiM, uiS, uiMS);
+	sprintf_s( a_pcBuffer, a_uiBufferSize, TIME_FORMAT, ulH, uiM, uiS, uiMS );
 }
 
 // Unpause the stopwatch
 void StopWatch::Start()
 {
-	if( m_bPaused)
+	if( !m_bRunning)
 	{
 		m_ulStartTime = clock();
+		m_bRunning = true;
 	}
-	m_bPaused = false;
 }
 
 // Pause the stopwatch
 void StopWatch::Stop()
 {
-	if( !m_bPaused )
+	if( m_bRunning )
 	{
 		m_ulTicksBeforeLastStop += clock() - m_ulStartTime;
+		m_bRunning = false;
 	}
-	m_bPaused = true;
 }

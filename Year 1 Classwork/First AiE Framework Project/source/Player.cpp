@@ -9,12 +9,14 @@
 
 #include "Player.h"
 #include "AIE.h"
+#include <cstdio>	// for sprintf_s
 #include <cstdlib>	// for rand
 
 const char* const Player::LEFT_PLAYER_NAME = "Serena";
 const char* const Player::LEFT_TEXTURE_NAME = "./images/serena_williams.png";
 const char* const Player::RIGHT_PLAYER_NAME = "Venus";
 const char* const Player::RIGHT_TEXTURE_NAME = "./images/venus_williams.png";
+const char* const Player::SCORE_FORMAT = "%s: %d";
 
 // Constructor instantiates all the members in the initializer list.
 Player::Player( Ball& a_roBall,
@@ -150,6 +152,16 @@ void Player::IncrementScore()
 	m_uiScore++;
 }
 
+// Write the player's score to a char array in "PlayerName: Score" format
+void Player::PrintScore( char* a_pcBuffer, unsigned int a_uiBufferSize )
+{
+	sprintf_s( a_pcBuffer,
+			   a_uiBufferSize,
+			   SCORE_FORMAT,
+			   GetPlayerName(),
+			   GetScore() );
+}
+
 // Serve the ball
 void Player::Serve() const
 {
@@ -248,26 +260,24 @@ Player::MotionDirection Player::GetHumanDirection() const
 	// Is the key indicating "up" for this side pressed?
 	bool bUp = IsKeyDown( mc_eSide == LEFT ? LEFT_UP_KEY : RIGHT_UP_KEY );
 
-	// If both or neither are pressed, don't move.
-	if ( bUp == bDown )
+	// If one or the other is pressed, but not both...
+	if ( bUp != bDown )
 	{
-		return NONE;
-	}
+		// If only the "up" key for this side is pressed, move up unless the
+		// player is already as far up as it can go.
+		float fMinY = mc_iMinY + ( (float)PADDLE_HEIGHT / 2 );
+		if (bUp && ( m_oPosition.y > fMinY ) )
+		{
+			return UP;
+		}
 
-	// If only the "up" key for this side is pressed, move up unless the player
-	// is already as far up as it can go.
-	float fMinY = mc_iMinY + ( (float)PADDLE_HEIGHT / 2 );
-	if (bUp && ( m_oPosition.y > fMinY ) )
-	{
-		return UP;
-	}
-
-	// If only the "down" key for this side is pressed, move down unless the
-	// player is already as far up as it can go.
-	float fMaxY = mc_iMaxY - ( (float)PADDLE_HEIGHT / 2 );
-	if (bDown && ( m_oPosition.y < fMaxY) )
-	{
-		return DOWN;
+		// If only the "down" key for this side is pressed, move down unless the
+		// player is already as far up as it can go.
+		float fMaxY = mc_iMaxY - ( (float)PADDLE_HEIGHT / 2 );
+		if (bDown && ( m_oPosition.y < fMaxY) )
+		{
+			return DOWN;
+		}
 	}
 
 	// Otherwise, don't move.
