@@ -30,7 +30,7 @@ public:
 
 private:
 
-	// hours:minutes:seconds.milliseconds, or "%d:%02d:%02d.%03d" to be precise
+	// Time: hours:minutes:seconds.milliseconds, or "Time: %d:%02d:%02d.%03d"
 	static const char* const TIME_FORMAT;
 
 	bool m_bRunning;

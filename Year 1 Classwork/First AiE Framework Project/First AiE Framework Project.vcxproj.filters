@@ -19,6 +19,7 @@
     <None Include="resources\images\serena_williams.png" />
     <None Include="resources\images\venus_williams.png" />
     <None Include="resources\images\tennis_ball.png" />
+    <None Include="resources\images\shade.png" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -39,6 +40,9 @@
     <ClCompile Include="source\StopWatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\HighScores.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AIE.h">
@@ -57,6 +61,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\StopWatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HighScores.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

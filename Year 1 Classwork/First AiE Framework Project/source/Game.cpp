@@ -8,17 +8,19 @@
  ******************************************************************************/
 
 #include "Game.h"
+#include "EnumsAndStructs.h"
 #include "Sprite.h"
 #include "Ball.h"
 #include "Player.h"
 #include "AIE.h"
 #include "StopWatch.h"
+#include "HighScores.h"
 #include <algorithm>	// for std::max(int a, int b)
 #include <cstdlib>	// for rand and abs
 
 const char* const Game::BACKGROUND_TEXTURE_NAME = "./images/tennis_court.png";
 const char* const Game::GAME_TITLE = "Pong, starring Venus and Serena Williams!";
-const Sprite::XYPair Game::LEFT_PLAYER_START_POSITION = {240,396};
+const XYPair Game::LEFT_PLAYER_START_POSITION = {240,396};
 const int Game::MENU_KEYS[MENU_KEY_COUNT] =
 {
 	KEY_ESC,
@@ -26,6 +28,9 @@ const int Game::MENU_KEYS[MENU_KEY_COUNT] =
 	KEY_END,
 	KEY_BACKSPACE
 };
+const char* const Game::OVERTIME_STRING =
+	"Time: It's over NINE-THOUSAAAND!!! (seconds)";
+const double Game::OVERTIME_SECONDS = 9000.0;	// What? Nine-thousand?!
 const int Game::PAUSE_KEYS[PAUSE_KEY_COUNT] =
 {
 	KEY_PAUSE,
@@ -36,20 +41,22 @@ const int Game::PAUSE_KEYS[PAUSE_KEY_COUNT] =
 	KEY_SPACE,
 	KEY_ENTER
 };
+const char* const Game::PAUSE_TEXTURE_NAME = "./images/shade.png";
 const int Game::RESUME_KEYS[RESUME_KEY_COUNT] =
 {
 	KEY_PAUSE,
 	KEY_SPACE,
 	KEY_ENTER
 };
-const Sprite::XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
+const XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
+const char* const Game::SHADE_TEXTURE_NAME = "./images/shade.png";
 
 // Constructor
 Game::Game()
 	: m_oBackgroundSprite( BACKGROUND_TEXTURE_NAME,
 						   SCREEN_WIDTH,
 						   SCREEN_HEIGHT,
-						   Sprite::DEFAULT_POSITION,
+						   DEFAULT_X_Y_PAIR,
 						   false ),
 	  m_oLeftPlayer( m_oBall,
 					 Player::LEFT,
@@ -62,6 +69,11 @@ Game::Game()
 					  RIGHT_PLAYER_START_POSITION,
 					  MIN_Y,
 					  MAX_Y ),
+	  m_oScreenShadeSprite( SHADE_TEXTURE_NAME,
+							SCREEN_WIDTH,
+							SCREEN_HEIGHT,
+							DEFAULT_X_Y_PAIR,
+							false ),
 	  m_poServingPlayer( RandomPlayer() ),
 	  m_eGameSpeed( MEDIUM ),
 	  m_eHumanPlayers( BOTH ),
@@ -89,7 +101,7 @@ void Game::CheckCollisions()
 }
 
 // return the next game state
-Game::GameState Game::CheckForWinners( bool a_bBackgroundMatch )
+GameState Game::CheckForWinners( bool a_bBackgroundMatch )
 {
 	if ( PlayerScores() )
 	{
@@ -97,7 +109,7 @@ Game::GameState Game::CheckForWinners( bool a_bBackgroundMatch )
 		{
 			if ( !a_bBackgroundMatch )
 			{
-				// TODO: submit scores
+				m_oHighScores.RecordScore();
 			}
 			return START_MATCH;	// TODO: change to ENTER_MENU once menu is implemented
 		}
@@ -118,7 +130,8 @@ void Game::DrawPauseScreen()
 		&m_oBackgroundSprite,
 		&m_oLeftPlayer,
 		&m_oRightPlayer,
-		&m_oBall
+		&m_oBall,
+		&m_oScreenShadeSprite
 	};
 	for each ( Sprite* poSprite in apoGameSprites )
 	{
@@ -128,14 +141,14 @@ void Game::DrawPauseScreen()
 	// Draw scores and time
 	DrawScores();
 
-	// TODO: Draw "Paused" overlay
+	// TODO: draw pause message
 }
 
 // Draw scores and time
-void Game::DrawScores( bool a_bDrawTime )
+void Game::DrawScores()
 {
 	// create a buffer to hold text
-	const unsigned int cuiBufferSize = 16;
+	const unsigned int cuiBufferSize = 20;
 	char acBuffer[cuiBufferSize];
 
 	// Draw the left player's score
@@ -146,8 +159,12 @@ void Game::DrawScores( bool a_bDrawTime )
 	m_oRightPlayer.PrintScore( acBuffer, cuiBufferSize );
 	DrawString( acBuffer, RIGHT_SCORE_X, SCORE_Y );
 
-	// If this is an actual game and not menu background, draw the match time
-	if ( a_bDrawTime )
+	// Draw the match time
+	if( m_oPlayTime.GetSeconds() > OVERTIME_SECONDS )
+	{
+		DrawString( OVERTIME_STRING, OVERTIME_X, TIME_Y );
+	}
+	else
 	{
 		m_oPlayTime.PrintTime( acBuffer, cuiBufferSize );
 		DrawString( acBuffer, TIME_X, TIME_Y );
@@ -193,7 +210,7 @@ bool Game::MatchOver() const
 }
 
 // Run the program while in the menu
-Game::GameState Game::Menu()
+GameState Game::Menu()
 {
 	// Run the AI vs. AI match in the background. Don't show the time.
 	GameState eState = PlayGame( true );
@@ -207,6 +224,9 @@ Game::GameState Game::Menu()
 		m_poServingPlayer->Serve();
 	}
 
+	// Shade the background match, since it's not the focus here.
+	m_oScreenShadeSprite.Draw();
+
 	// TODO: draw actual menu, return START_MATCH or END if appropriate.
 	m_bKeyPressed = false;
 
@@ -215,7 +235,7 @@ Game::GameState Game::Menu()
 
 // Update ball and player positions, draw everything, detect and react to
 //   collisions, and return the next game state.
-Game::GameState Game::PlayGame( bool a_bBackgroundMatch )
+GameState Game::PlayGame( bool a_bBackgroundMatch )
 {
 	bool bPaused = IsOneOfTheseKeysDown( PAUSE_KEYS, PAUSE_KEY_COUNT );
 	if( !m_bKeyPressed && bPaused )
@@ -228,7 +248,7 @@ Game::GameState Game::PlayGame( bool a_bBackgroundMatch )
 		m_bKeyPressed = false;
 	}
 	UpdateAndDrawSprites();
-	DrawScores( !a_bBackgroundMatch );	// Only draw time in an actual game.
+	DrawScores();
 	CheckCollisions();
 	return CheckForWinners( a_bBackgroundMatch );
 }
@@ -336,17 +356,19 @@ bool Game::Run()
 //   before the framework shuts down.
 void Game::Shutdown()
 {
-	Sprite* apoSprites[4] =
+	Sprite* apoSprites[] =
 	{
 		&m_oBackgroundSprite,
 		&m_oLeftPlayer,
 		&m_oRightPlayer,
-		&m_oBall
+		&m_oBall,
+		&m_oScreenShadeSprite
 	};
 	for each ( Sprite* poSprite in apoSprites )
 	{
 		poSprite->Destroy();
 	}
+	m_oHighScores.Shutdown();
 }
 
 // Set everything up for a new match
@@ -420,7 +442,7 @@ void Game::UpdateAndDrawSprites()
 
 // Check for one of the key presses signalling the end of the paused state and
 // return the appropriate next game state.
-Game::GameState Game::WaitForUnpause()
+GameState Game::WaitForUnpause()
 {
 	bool bMenu = IsOneOfTheseKeysDown( MENU_KEYS, MENU_KEY_COUNT );
 	bool bPlay = IsOneOfTheseKeysDown( RESUME_KEYS, RESUME_KEY_COUNT );

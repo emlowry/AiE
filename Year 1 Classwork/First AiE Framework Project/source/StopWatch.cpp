@@ -10,9 +10,10 @@
 #include "StopWatch.h"
 #include <ctime>
 #include <cstdio>	// for sprintf_s
+#include <cstring>	// for strcpy_s
 
-// hours:minutes:seconds.milliseconds
-const char* const StopWatch::TIME_FORMAT = "%d:%02d:%02d.%03d";
+// Time: hours:minutes:seconds.milliseconds
+const char* const StopWatch::TIME_FORMAT = "Time: %d:%02d:%02d.%03d";
 
 // Default constructor instantiates all members in initializer list
 StopWatch::StopWatch()
@@ -72,11 +73,11 @@ bool StopWatch::IsRunning() const
 // Print the time to a buffer in hours:minutes:seconds.milliseconds format
 void StopWatch::PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize ) const
 {
+	unsigned long ulH = (unsigned long)GetHours();
+	unsigned int uiM = (unsigned int)( (unsigned long)GetMinutes() % 60 );
+	unsigned int uiS = (unsigned int)( (unsigned long)GetSeconds() % 60 );
 	unsigned int uiMS =
 		(unsigned int)( (unsigned long)GetMilliseconds() % 1000 );
-	unsigned int uiS = (unsigned int)( (unsigned long)GetSeconds() % 60 );
-	unsigned int uiM = (unsigned int)( (unsigned long)GetMinutes() % 60 );
-	unsigned long ulH = (unsigned long)GetHours();
 	sprintf_s( a_pcBuffer, a_uiBufferSize, TIME_FORMAT, ulH, uiM, uiS, uiMS );
 }
 

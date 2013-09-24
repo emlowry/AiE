@@ -10,8 +10,6 @@
 #include "Sprite.h"
 #include "AIE.h"
 
-const Sprite::XYPair Sprite::DEFAULT_POSITION = {0.0, 0.0};
-
 // Constructor
 Sprite::Sprite( const char* const ac_pcName,
 				const unsigned int ac_uiWidth,

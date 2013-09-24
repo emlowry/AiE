@@ -4,28 +4,23 @@
  * Date Created:       September 11, 2013
  * Description:        Definitions for the class that handles a drawable object.
  * Last Modified:      September 18, 2013
- * Last Modification:  Renamed 2D coordinate/vector struct, added comments.
+ * Last Modification:  Moved XYPair to a separate header.
  ******************************************************************************/
 
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
+
+#include "EnumsAndStructs.h"
 
 // Handles a drawable object.
 class Sprite
 {
 public:
 
-	// Struct for storing coordinates or direction vectors on a 2D plane
-	struct XYPair
-	{
-		float x;
-		float y;
-	};
-
 	Sprite( const char* const ac_pcName,
 			const unsigned int ac_uiWidth,
 			const unsigned int ac_uiHeight,
-			const XYPair& a_oPosition = DEFAULT_POSITION,
+			const XYPair& a_oPosition = DEFAULT_X_Y_PAIR,
 			const bool ac_bDrawFromCenter = true );
 	Sprite( const Sprite& ac_roSprite );
 	virtual ~Sprite();
@@ -33,8 +28,6 @@ public:
 	void Destroy();
 	void Draw() const;	// if the sprite hasn't been destroyed, call DrawTasks()
 	virtual void Update( float a_fDeltaT );
-
-	static const XYPair DEFAULT_POSITION;	// {0.0, 0.0}
 
 protected:
 

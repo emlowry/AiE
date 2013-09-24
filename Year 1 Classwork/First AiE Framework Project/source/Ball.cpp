@@ -59,13 +59,13 @@ unsigned int Ball::GetDiameter() const
 }
 
 // Position accessor
-Sprite::XYPair Ball::GetPosition() const
+XYPair Ball::GetPosition() const
 {
 	return m_oPosition;
 }
 
 // Velocity accessor
-Sprite::XYPair Ball::GetVelocity() const
+XYPair Ball::GetVelocity() const
 {
 	return m_oVelocity;
 }

@@ -100,6 +100,7 @@
   <ItemGroup>
     <None Include="ReadMe.txt" />
     <None Include="resources\fonts\arial.fnt" />
+    <None Include="resources\images\shade.png" />
     <None Include="resources\images\serena_williams.png" />
     <None Include="resources\images\tennis_ball.png" />
     <None Include="resources\images\tennis_court.png" />
@@ -112,6 +113,7 @@
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Player.cpp" />
+    <ClCompile Include="source\HighScores.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\StopWatch.cpp" />
   </ItemGroup>
@@ -120,6 +122,7 @@
     <ClInclude Include="include\Ball.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\HighScores.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\StopWatch.h" />
   </ItemGroup>
