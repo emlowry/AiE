@@ -66,5 +66,8 @@
     <ClInclude Include="include\HighScores.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\EnumsAndStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
