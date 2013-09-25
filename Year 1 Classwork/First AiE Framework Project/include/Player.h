@@ -10,9 +10,9 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
-#include "Sprite.h"
-#include "Ball.h"
 #include "AIE.h"
+#include "Ball.h"
+#include "Sprite.h"
 
 class Player : public Sprite
 {

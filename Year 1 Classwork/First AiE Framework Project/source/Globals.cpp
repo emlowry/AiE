@@ -7,9 +7,9 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
-#include "Globals.h"
 #include "AIE.h"
-#include <cstring>
+#include "Globals.h"
+#include <cstring>  // for strlen, strcpy_s, and strtok_s
 
 // Draw a string with newline ('\n') characters in it
 void DrawMultilineString( const char* a_pcText,

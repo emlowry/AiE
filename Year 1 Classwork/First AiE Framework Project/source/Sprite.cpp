@@ -7,8 +7,8 @@
  * Last Modification:  Added comments.
  ******************************************************************************/
 
-#include "Sprite.h"
 #include "AIE.h"
+#include "Sprite.h"
 
 // Constructor
 Sprite::Sprite( const char* const ac_pcName,

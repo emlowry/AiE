@@ -4,13 +4,15 @@
  * Date Created:       September 23, 2013
  * Description:        Implementations for methods of the Scores class.
  * Last Modified:      September 24, 2013
- * Last Modification:  Starting to implement.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
+#include "AIE.h"
 #include "HighScores.h"
 #include "MatchScore.h"
 #include "StopWatch.h"
-#include "AIE.h"
+#include <cstdio>   // for sprintf_s
+#include <cstring>  // for strlen
 
 const XYPair HighScores::LIST_POSITION = {250,400};
 const char* const HighScores::SCORE_PREFIX = "#%d:   ";

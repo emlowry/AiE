@@ -7,8 +7,8 @@
  * Last Modification:  Formatting to meet coding standards.
  ******************************************************************************/
 
-#include "Player.h"
 #include "AIE.h"
+#include "Player.h"
 #include <cstdio>	// for sprintf_s
 #include <cstdlib>	// for rand
 

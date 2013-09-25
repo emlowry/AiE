@@ -8,8 +8,8 @@
  * Last Modification:  Created.
  ******************************************************************************/
 
-#include "MatchScore.h"
 #include "Globals.h"
+#include "MatchScore.h"
 #include "StopWatch.h"	// for StopWatch::Print
 #include <algorithm>	// for max
 #include <cstdio>	// for sprintf_s

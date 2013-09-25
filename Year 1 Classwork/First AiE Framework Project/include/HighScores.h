@@ -4,7 +4,7 @@
  * Date Created:       September 23, 2013
  * Description:        Definitions for the class that handles high score lists.
  * Last Modified:      September 24, 2013
- * Last Modification:  Created.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _HIGH_SCORES_H_
@@ -12,8 +12,8 @@
 
 #include "Globals.h"
 #include "MatchScore.h"
-#include "StopWatch.h"
 #include "Player.h"
+#include "StopWatch.h"
 #include <list>
 
 // Manages the game's high score lists

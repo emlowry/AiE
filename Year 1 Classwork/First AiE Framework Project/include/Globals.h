@@ -4,7 +4,7 @@
  * Date Created:       September 23, 2013
  * Description:        Definitions for global enums, structs, and functions.
  * Last Modified:      September 24, 2013
- * Last Modification:  Renamed from EnumsAndStructs, added a global function.
+ * Last Modification:  Added constant for distance between drawn lines of text.
  ******************************************************************************/
 
 #ifndef _GLOBALS_H_
@@ -58,10 +58,10 @@ bool IsOneOfTheseKeysDown( const int* const ac_pciKeys,
 						   const unsigned int ac_uiKeyCount );
 
 // How far between lines of text printed on the screen?
-const unsigned int LINE_SEPARATION = 50;
+const unsigned int LINE_SEPARATION = 40;
 
-// Which list are you looking at on the high score list?  Menu and HighScores
-// both need this
+// Which list are you looking at on the high score list?  Game, Menu, and
+// HighScores all need this.
 enum ScoreListType
 {
 	HIGH_SCORES,
@@ -69,12 +69,6 @@ enum ScoreListType
 	SLOW_LOSSES,
 
 	NUMBER_OF_SCORE_LIST_TYPES
-};
-const char* const SCORE_LIST_TYPE_STRINGS[NUMBER_OF_SCORE_LIST_TYPES] =
-{
-	"Highest Scores",
-	"Fastest Wins",
-	"Slowest Losses",
 };
 
 // How fast does the game run?  Game, Menu, and HighScores all need this.
@@ -85,18 +79,6 @@ enum Speed
 	FAST,
 
 	NUMBER_OF_SPEEDS
-};
-const unsigned int SPEED_FACTORS[NUMBER_OF_SPEEDS] =
-{
-	200,	// SLOW
-	400,	// MEDIUM
-	600,	// FAST
-};
-const char* const SPEED_STRINGS[NUMBER_OF_SPEEDS] =
-{
-	"Easy",
-	"Average",
-	"Hard",
 };
 
 // Struct for storing coordinates or direction vectors on a 2D plane.  Sprite,

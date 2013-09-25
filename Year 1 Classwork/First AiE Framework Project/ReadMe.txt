@@ -1,28 +1,37 @@
-========================================================================
-    AIE Basic Framework : First AiE Framework Project Project Overview
-========================================================================
+================================================================================
+                   PONG: Starring Venus and Serena Williams!
+================================================================================
 
-AIE Basic Framework has created this First AiE Framework Project project for you as a starting point.
+To play the game, compile this project in Microsoft Visual Studio 2010 (or
+later) on a computer with the AIE Static Framework installed, then either run it
+from Visual Studio or find the Pong_d.exe file in the project bin directory and
+run it directly.
 
-This file contains a summary of what you will find in each of the files that make up your project.
+On startup, you should see a menu that will allow you to select a difficulty
+level and decide whether the left player (Serena Williams), the right player
+(Venus Williams), or both should be controlled by keyboard input.
 
-First AiE Framework Project.vcxproj
-    This is the main project file for projects generated using an Application Wizard. 
-    It contains information about the version of the product that generated the file, and 
-    information about the platforms, configurations, and project features selected with the
-    Application Wizard.
+As the menu should tell you, the left player can be moved up and down using the
+'W' and 'S' keys on your keyboard, while the right player can be controlled
+using the UP and DOWN keys.  Begin the match by pressing the ENTER or SPACE key.
 
-First AiE Framework Project.vcxproj.filters
-    This is the filters file for VC++ projects generated using an Application Wizard. 
-    It contains information about the association between the files in your project 
-    and the filters. This association is used in the IDE to show grouping of files with
-    similar extensions under a specific node (for e.g. ".cpp" files are associated with the
-    "Source Files" filter).
+If a player fails to intercept the ball before it reaches the back of their
+side of the field, then the other player scores a point and will serve the ball
+to start the next round.  The match ends when one player has at least four
+points and is ahead of their opponent by at least two points.
 
-Sample.txt
-This is a sample template file.
+A match in progress can be paused using any of the ESCAPE, PAUSE/BREAK, HOME,
+END, BACKSPACE, ENTER, or SPACE keys.  From the paused screen, the game may
+either be resumed by pressing any of the PAUSE/BREAK, ENTER, or SPACE keys or
+cancelled using any of the ESCAPE, HOME, END, or BACKSPACE keys.
 
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
+A completed match may be entered into the list of high scores.  The top five
+scores for points earned by a human, fastest wins by a human, and slowest losses
+by a human, for each difficulty level, can be viewed from the High Scores tab of
+the main menu.
 
-/////////////////////////////////////////////////////////////////////////////
+Enjoy!
+
+================================================================================
+          ReadMe.txt created by Elizabeth Lowry on September 24, 2013
+================================================================================

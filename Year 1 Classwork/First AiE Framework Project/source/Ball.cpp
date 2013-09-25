@@ -7,8 +7,8 @@
  * Last Modification:  Added comments.
  ******************************************************************************/
 
-#include "Ball.h"
 #include "AIE.h"
+#include "Ball.h"
 
 const char* const Ball::BALL_TEXTURE_NAME = "./images/tennis_ball.png";
 

@@ -3,35 +3,61 @@
  * Author:             Elizabeth Lowry
  * Date Created:       September 17, 2013
  * Description:        Implementations for methods of the Game class.
- * Last Modified:      September 23, 2013
- * Last Modification:  Added pause state.
+ * Last Modified:      September 24, 2013
+ * Last Modification:  Added menu.
  ******************************************************************************/
 
+#include "AIE.h"
+#include "Ball.h"
 #include "Game.h"
 #include "Globals.h"
-#include "Sprite.h"
-#include "Ball.h"
-#include "Player.h"
-#include "AIE.h"
-#include "StopWatch.h"
 #include "HighScores.h"
+#include "Menu.h"
+#include "Player.h"
+#include "Sprite.h"
+#include "StopWatch.h"
 #include <algorithm>	// for std::max(int a, int b)
 #include <cstdlib>	// for rand and abs
 
+// String constants
 const char* const Game::BACKGROUND_TEXTURE_NAME = "./images/tennis_court.png";
 const char* const Game::GAME_TITLE = "PONG: Starring Venus and Serena Williams!";
+const char* const Game::OVERTIME_STRING =
+	"Time: It's over NINE-THOUSAAAND!!! (seconds)";
+const char* const Game::PAUSE_MESSAGE =
+	"                                           - PAUSED -\n \n"
+	"To resume play, press PAUSE/BREAK, SPACE, or ENTER.\n \n"
+	"                      To give up and return to the menu,\n"
+	"              press ESC, HOME, END, or BACKSPACE.";
+const char* const Game::SHADE_TEXTURE_NAME = "./images/shade.png";
+const char* const Game::TIME_PREFIX = "Time: ";
+
+// Float constants
+const double Game::OVERTIME_SECONDS = 9000.0;	// What? Nine-thousand?!
+
+// 2D Coordinate constants
 const XYPair Game::LEFT_PLAYER_START_POSITION = {240,396};
+const XYPair Game::OVERTIME_POSITION = {300,80};
+const XYPair Game::PAUSE_MESSAGE_POSITION = {235,250};
+const XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
+const XYPair Game::TIME_POSITION = {485,80};
+
+// Integer array constants
+const unsigned int Game::SPEED_FACTORS[NUMBER_OF_SPEEDS] =
+{
+	200,	// SLOW
+	400,	// MEDIUM
+	600,	// FAST
+};
+
+// Keyboard key array constants
 const int Game::MENU_KEYS[MENU_KEY_COUNT] =
 {
 	KEY_ESC,
 	KEY_HOME,
 	KEY_END,
-	KEY_BACKSPACE
+	KEY_BACKSPACE,
 };
-const XYPair Game::OVERTIME_POSITION = {300,80};
-const char* const Game::OVERTIME_STRING =
-	"Time: It's over NINE-THOUSAAAND!!! (seconds)";
-const double Game::OVERTIME_SECONDS = 9000.0;	// What? Nine-thousand?!
 const int Game::PAUSE_KEYS[PAUSE_KEY_COUNT] =
 {
 	KEY_PAUSE,
@@ -40,24 +66,14 @@ const int Game::PAUSE_KEYS[PAUSE_KEY_COUNT] =
 	KEY_END,
 	KEY_BACKSPACE,
 	KEY_SPACE,
-	KEY_ENTER
+	KEY_ENTER,
 };
-const char* const Game::PAUSE_MESSAGE =
-	"                                           - PAUSED -\n \n"
-	"To resume play, press PAUSE/BREAK, SPACE, or ENTER.\n \n"
-	"                      To give up and return to the menu,\n"
-	"              press ESC, HOME, END, or BACKSPACE.";
-const XYPair Game::PAUSE_MESSAGE_POSITION = {235,250};
 const int Game::RESUME_KEYS[RESUME_KEY_COUNT] =
 {
 	KEY_PAUSE,
 	KEY_SPACE,
-	KEY_ENTER
+	KEY_ENTER,
 };
-const XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
-const char* const Game::SHADE_TEXTURE_NAME = "./images/shade.png";
-const XYPair Game::TIME_POSITION = {485,80};
-const char* const Game::TIME_PREFIX = "Time: ";
 
 // Constructor
 Game::Game()
@@ -81,7 +97,11 @@ Game::Game()
 					 LEFT_PLAYER_START_POSITION,
 					 MIN_Y,
 					 MAX_Y ),
-	  m_bProgramStartup( true ),
+      m_oMenu( m_eDisplayScoreListType,
+               m_eGameSpeed,
+               m_oHighScores,
+               m_eHumanPlayers,
+               m_bKeyPressed ),
 	  m_oRightPlayer( m_oBall,
 					  Player::RIGHT,
 					  RIGHT_PLAYER_START_POSITION,
@@ -93,7 +113,7 @@ Game::Game()
 							DEFAULT_X_Y_PAIR,
 							false ),
 	  m_poServingPlayer( RandomPlayer() ),
-	  m_eState( START_MATCH )	// TODO: change this to ENTER_MENU once the menu has been implemented
+	  m_eState( ENTER_MENU )
 {
 	// Nothing else to do here, since all members either have a default
 	//   constructor or have been instantiated in the initializer list.
@@ -127,7 +147,7 @@ GameState Game::CheckForWinners( bool a_bBackgroundMatch )
 			{
 				m_oHighScores.RecordScore();
 			}
-			return START_MATCH;	// TODO: change to ENTER_MENU once menu is implemented
+			return ENTER_MENU;
 		}
 		return START_ROUND;
 	}
@@ -204,7 +224,8 @@ void Game::EnterMenu()
 	m_oRightPlayer.SetMode( Player::AI );
 	m_poServingPlayer = RandomPlayer();
 
-	// TODO: other menu startup tasks
+    // Menu startup tasks
+	m_oMenu.Enter();
 }
 
 // Is the match over?  It's over when one player has at least 4 points and is
@@ -218,7 +239,7 @@ bool Game::MatchOver() const
 }
 
 // Run the program while in the menu
-GameState Game::Menu()
+GameState Game::MenuState()
 {
 	// Run the AI vs. AI match in the background. Don't show the time.
 	GameState eState = PlayGame( true );
@@ -235,10 +256,7 @@ GameState Game::Menu()
 	// Shade the background match, since it's not the focus here.
 	m_oScreenShadeSprite.Draw();
 
-	// TODO: draw actual menu, return START_MATCH or END if appropriate.
-	m_bKeyPressed = false;
-
-	return MENU;
+	return m_oMenu.Run();
 }
 
 // Update ball and player positions, draw everything, detect and react to
@@ -307,7 +325,7 @@ bool Game::Run()
 	case MENU:
 		{
 			// either stay in MENU or go to END or START_MATCH
-			m_eState = Menu();
+			m_eState = MenuState();
 			break;
 		}
 

@@ -8,9 +8,8 @@
  ******************************************************************************/
 
 #include "StopWatch.h"
-#include <ctime>
 #include <cstdio>	// for sprintf_s
-#include <cstring>	// for strcpy_s
+#include <ctime>
 
 // Time: hours:minutes:seconds.milliseconds
 const char* const StopWatch::TIME_FORMAT = "%d:%02d:%02d.%03d";
