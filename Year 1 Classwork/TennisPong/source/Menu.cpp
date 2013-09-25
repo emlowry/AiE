@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       September 24, 2013
  * Description:        Implementations for methods of the Menu class.
- * Last Modified:      September 24, 2013
- * Last Modification:  Creation.
+ * Last Modified:      September 25, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "AIE.h"
@@ -14,15 +14,15 @@
 #include <cstdio>   // for sprintf_s
 
 // String constants
-const char* const Menu::EXIT_MESSAGE = "Are you sure you want to quit?\n \n"
+const char* const Menu::EXIT_MESSAGE = "       Are you sure you want to quit?\n \n"
                                        "Press ENTER, SPACE, ESC, or END\n"
-                                       "     to exit the program.";
+                                       "                 to exit the program.";
 const char* const Menu::LEFT_PLAYER_HINT =
     "Move Serena up with the W key and down with the S key.";
 const char* const Menu::PLAYER_HINT = "%s\n%s";
 const char* const Menu::PLAY_MESSAGE =
-    "          Press ENTER or SPACE to start a match!\n"
-    "     You win when you have at least four points and\n"
+    "        Press ENTER or SPACE to start a match!\n"
+    "    You win when you have at least four points and\n"
     "are ahead of the other player by at least two points.";
 const char* const Menu::RIGHT_PLAYER_HINT =
     "Move Venus up with the UP key and down with the DOWN key.";
@@ -30,37 +30,37 @@ const char* const Menu::RIGHT_PLAYER_HINT =
 // String array constants
 const char* const Menu::MENU_STATE_STRINGS[NUMBER_OF_MENU_STATES * 2] =
 {
-	" PLAY GAME   Scoreboard   Quit",
-	"[PLAY GAME]  Scoreboard   Quit",
-	" Play Game   SCOREBOARD   Quit",
-	" Play Game  [SCOREBOARD]  Quit",
-	" Play Game   Scoreboard   QUIT",
-	" Play Game   Scoreboard  [QUIT]",
+	" PLAY GAME    High Scores    Quit",
+	"[PLAY GAME]  High Scores    Quit",
+	" Play Game    HIGH SCORES    Quit",
+	" Play Game  [HIGH SCORES]  Quit",
+	" Play Game    High Scores    QUIT",
+	" Play Game    High Scores  [QUIT]",
 };
 const char* const Menu::PLAY_SETTING_STRINGS[NUMBER_OF_PLAY_SETTINGS] =
 {
-	"Difficulty:    %s\n \n"
-	"      Players:    %s",
+	"Difficulty:      %s\n \n"
+	" Players:      %s",
 
 	"Difficulty:  <-%s->\n \n"
-	"      Players:    %s",
+	" Players:      %s",
 
-	"Difficulty:    %s\n \n"
-	"      Players:  <-%s->",
+	"Difficulty:      %s\n \n"
+	" Players:  <-%s->",
 };
 const char* const Menu::SCORE_LIST_TYPE_STRINGS[NUMBER_OF_SCORE_LIST_TYPES] =
 {
-    "Highest Scores",
+    "Most Points",
     "Fastest Wins",
     "Slowest Losses",
 };
 const char* const Menu::SCORE_SETTING_STRINGS[NUMBER_OF_SCORE_SETTINGS] =
 {
-	"Difficulty:    %s\n \n"
-	"Score Type:    %s",
-    "Difficulty:  <-%s->\n \n"
-	"Score Type:    %s",
-	"Difficulty:    %s\n \n"
+	"     Difficulty:      %s\n \n"
+	"Score Type:      %s",
+    "     Difficulty:  <-%s->\n \n"
+	"Score Type:      %s",
+	"     Difficulty:      %s\n \n"
 	"Score Type:  <-%s->",
 };
 const char* const Menu::SPEED_STRINGS[NUMBER_OF_SPEEDS] =
@@ -73,18 +73,18 @@ const char* const Menu::SPEED_STRINGS[NUMBER_OF_SPEEDS] =
 // 2D Coordinate constants
 const XYPair Menu::EXIT_MESSAGE_LOCATION =
 {
-    350,
+    368,
     FIRST_LINE_Y + ( LINE_SEPARATION * 4 )
 };
-const XYPair Menu::MENU_STATE_STRING_LOCATION = { 480, FIRST_LINE_Y };
+const XYPair Menu::MENU_STATE_STRING_LOCATION = { 390, FIRST_LINE_Y };
 const XYPair Menu::PLAYER_HINT_LOCATION =
 {
-    240,
+    220,
     FIRST_LINE_Y + ( LINE_SEPARATION * 10 )
 };
 const XYPair Menu::PLAY_MESSAGE_LOCATION =
 {
-    300,
+    290,
     FIRST_LINE_Y + ( LINE_SEPARATION * 2 )
 };
 const XYPair Menu::PLAY_SETTINGS_LOCATION =
@@ -94,7 +94,7 @@ const XYPair Menu::PLAY_SETTINGS_LOCATION =
 };
 const XYPair Menu::SCORE_SETTINGS_LOCATION =
 {
-    500,
+    435,
     FIRST_LINE_Y + ( LINE_SEPARATION * 2 )
 };
 
@@ -195,10 +195,9 @@ void Menu::DrawPlayMenu()
                          (int)PLAY_MESSAGE_LOCATION.y );
 
     // Draw settings
-    const unsigned int uiBufferSize = PLAY_SETTINGS_BUFFER_SIZE;
-    char acBuffer[uiBufferSize];
+    char acBuffer[PLAY_SETTINGS_BUFFER_SIZE];
     sprintf_s( acBuffer,
-               uiBufferSize,
+               PLAY_SETTINGS_BUFFER_SIZE,
                PLAY_SETTING_STRINGS[m_ePlaySetting],
                SPEED_STRINGS[m_reGameSpeed],
                HUMAN_PLAYER_STRINGS[m_reHumanPlayers] );
@@ -208,7 +207,7 @@ void Menu::DrawPlayMenu()
 
     // Draw player control instructions
     sprintf_s( acBuffer,
-               uiBufferSize,
+               PLAY_SETTINGS_BUFFER_SIZE,
                PLAYER_HINT,
                m_reHumanPlayers != RIGHT ? LEFT_PLAYER_HINT : "",
                m_reHumanPlayers != LEFT ? RIGHT_PLAYER_HINT : "" );
@@ -224,11 +223,10 @@ void Menu::DrawScoresMenu()
     DrawMenuStateString( m_eScoreSetting == SCORE_MAIN );
 
     // Draw settings
-    const unsigned int uiBufferSize = SCORE_SETTINGS_BUFFER_SIZE;
-    char acBuffer[uiBufferSize];
+    char acBuffer[SCORE_SETTINGS_BUFFER_SIZE];
     sprintf_s( acBuffer,
-               uiBufferSize,
-               SCORE_SETTING_STRINGS[m_ePlaySetting],
+               SCORE_SETTINGS_BUFFER_SIZE,
+               SCORE_SETTING_STRINGS[m_eScoreSetting],
                SPEED_STRINGS[m_reGameSpeed],
                SCORE_LIST_TYPE_STRINGS[m_reDisplayListType] );
     DrawMultilineString( acBuffer,
@@ -260,6 +258,9 @@ void Menu::Enter()
     // Make sure the main menu is the initial focus.
     m_ePlaySetting = PLAY_MAIN;
     m_eScoreSetting = SCORE_MAIN;
+
+	// Most Points is the default high score list
+	m_reDisplayListType = HIGH_SCORES;
 }
 
 // Are any of the keys that interact with the menu pressed?
@@ -268,7 +269,13 @@ Menu::KeyPressAction Menu::GetKeyPressAction()
     // Are any of the keys physically down?
     bool bKeyDown = IsOneOfTheseKeysDown(PRESSABLE_KEYS, PRESSABLE_KEY_COUNT);
 
-    // Is this just the continuation of a prior keypress?
+	if( m_rbKeyPressed && bKeyDown )
+	{
+		m_rbKeyPressed = false;
+		m_rbKeyPressed = true;
+	}
+
+    // Is a prior keypress over?
     if( m_rbKeyPressed && !bKeyDown )
     {
         m_rbKeyPressed = false;
@@ -276,6 +283,9 @@ Menu::KeyPressAction Menu::GetKeyPressAction()
     // Or is it a new keypress?
     else if( !m_rbKeyPressed && bKeyDown )
     {
+		// It's a new keypress
+		m_rbKeyPressed = true;
+
         // Should we go to the exit screen?
         if( IsOneOfTheseKeysDown( EXIT_KEYS, EXIT_KEY_COUNT ) )
         {

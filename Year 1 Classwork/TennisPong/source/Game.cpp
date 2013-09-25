@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       September 17, 2013
  * Description:        Implementations for methods of the Game class.
- * Last Modified:      September 24, 2013
- * Last Modification:  Added menu.
+ * Last Modified:      September 25, 2013
+ * Last Modification:  Debugging menu.
  ******************************************************************************/
 
 #include "AIE.h"
@@ -223,6 +223,9 @@ void Game::EnterMenu()
 	m_oLeftPlayer.SetMode( Player::AI );
 	m_oRightPlayer.SetMode( Player::AI );
 	m_poServingPlayer = RandomPlayer();
+	m_poServingPlayer->Serve();
+	m_oPlayTime.Clear();
+	m_oPlayTime.Start();
 
     // Menu startup tasks
 	m_oMenu.Enter();
@@ -249,6 +252,7 @@ GameState Game::MenuState()
 		{
 			m_oLeftPlayer.Reset();
 			m_oRightPlayer.Reset();
+			m_oPlayTime.Clear();
 		}
 		m_poServingPlayer->Serve();
 	}
@@ -264,12 +268,12 @@ GameState Game::MenuState()
 GameState Game::PlayGame( bool a_bBackgroundMatch )
 {
 	bool bPaused = IsOneOfTheseKeysDown( PAUSE_KEYS, PAUSE_KEY_COUNT );
-	if( !m_bKeyPressed && bPaused )
+	if( !a_bBackgroundMatch && !m_bKeyPressed && bPaused )
 	{
 		m_bKeyPressed = true;
 		return ENTER_PAUSE;
 	}
-	if( m_bKeyPressed && !bPaused)
+	if( !a_bBackgroundMatch && m_bKeyPressed && !bPaused)
 	{
 		m_bKeyPressed = false;
 	}

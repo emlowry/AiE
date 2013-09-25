@@ -1,21 +1,3 @@
-NOTE:  As of September 25, 2013, this program has suddenly become unable to find
-the AiE Static Framework DLL file, despite repeated uninstall/reinstalls of the
-Framework, unless it's right there in the output bin directory.  Even then, it
-mysteriously crashes when calling the framework's Initialize function, so I
-can't debug anything.  Creating a new project and copying over the source,
-header, and image files fixes nothing.
-
-Due to this problem, I am unable to verify that the menu works as intended.  I
-do know that match scores are stored correctly after matches are won and that
-lists of scores display correctly when HighScores::Draw() is called, but whether
-or not the rest of the menu works I have no way of knowing.
-
-Because nothing is working properly, I have submitted only the files that I
-personally created, not any of the files generated or copied in by Visual Studio
-on project creation.
-
-Following is the original ReadMe file content:
-
 ================================================================================
                    PONG: Starring Venus and Serena Williams!
 ================================================================================

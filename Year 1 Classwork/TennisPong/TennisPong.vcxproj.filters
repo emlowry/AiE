@@ -2,11 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{c8559e49-3e5a-4d15-96eb-3535929dd10b}</UniqueIdentifier>
+      <UniqueIdentifier>{51ddfad0-615f-4779-86bf-6dee17bf58c3}</UniqueIdentifier>
       <Extensions>cpp;cxx;c</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{e91c2492-f823-4a8c-b590-9843b190563a}</UniqueIdentifier>
+      <UniqueIdentifier>{a16f1a9e-db4e-4730-a7a8-0f9d90c993c9}</UniqueIdentifier>
       <Extensions>hpp;h</Extensions>
     </Filter>
   </ItemGroup>
@@ -15,17 +15,29 @@
     <None Include="resources\fonts\arial.fnt" />
     <None Include="resources\shaders\StaticFW_Pixel.glsl" />
     <None Include="resources\shaders\StaticFW_Vertex.glsl" />
-    <None Include="resources\images\venus_williams.png" />
     <None Include="resources\images\serena_williams.png" />
+    <None Include="resources\images\venus_williams.png" />
     <None Include="resources\images\shade.png" />
     <None Include="resources\images\tennis_ball.png" />
     <None Include="resources\images\tennis_court.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\main.cpp">
+    <ClCompile Include="source\Ball.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\StopWatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\HighScores.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\MatchScore.cpp">
@@ -38,18 +50,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\HighScores.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Ball.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Globals.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

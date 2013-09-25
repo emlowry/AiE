@@ -14,7 +14,7 @@
 #include <cstdio>   // for sprintf_s
 #include <cstring>  // for strlen
 
-const XYPair HighScores::LIST_POSITION = {250,400};
+const XYPair HighScores::LIST_POSITION = {250,440};
 const char* const HighScores::SCORE_PREFIX = "#%d:   ";
 
 // Constructor instantiates most members in initializer list

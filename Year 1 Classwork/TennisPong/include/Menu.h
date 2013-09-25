@@ -94,7 +94,7 @@ private:
 	static const char* const SCORE_SETTING_STRINGS[NUMBER_OF_SCORE_SETTINGS];
     static const char* const SPEED_STRINGS[NUMBER_OF_SPEEDS];
 
-    static const int FIRST_LINE_Y = 155;
+    static const int FIRST_LINE_Y = 160;
 
     static const XYPair EXIT_MESSAGE_LOCATION;
     static const XYPair MENU_STATE_STRING_LOCATION;
@@ -110,7 +110,7 @@ private:
 	static const unsigned int PRESSABLE_KEY_COUNT = 12;
     static const unsigned int PLAY_SETTINGS_BUFFER_SIZE = 128;
     static const unsigned int RIGHT_KEY_COUNT = 2;
-    static const unsigned int SCORE_SETTINGS_BUFFER_SIZE = 42;
+    static const unsigned int SCORE_SETTINGS_BUFFER_SIZE = 64;
     static const unsigned int UP_KEY_COUNT = 2;
 
 

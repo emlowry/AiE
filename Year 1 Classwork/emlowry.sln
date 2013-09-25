@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "high_scores", "high_scores\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Formatting Excercise", "Formatting Excercise\Formatting Excercise.vcxproj", "{AC05DB6D-44D9-404E-A454-21C71772C772}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "Pong\Pong.vcxproj", "{977AFE47-8808-463E-A23F-4ECCB5109927}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TennisPong", "TennisPong\TennisPong.vcxproj", "{8FFBD4A3-3A60-4A63-937A-819442B2FB84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,10 +33,10 @@ Global
 		{AC05DB6D-44D9-404E-A454-21C71772C772}.Debug|Win32.Build.0 = Debug|Win32
 		{AC05DB6D-44D9-404E-A454-21C71772C772}.Release|Win32.ActiveCfg = Release|Win32
 		{AC05DB6D-44D9-404E-A454-21C71772C772}.Release|Win32.Build.0 = Release|Win32
-		{977AFE47-8808-463E-A23F-4ECCB5109927}.Debug|Win32.ActiveCfg = Debug|Win32
-		{977AFE47-8808-463E-A23F-4ECCB5109927}.Debug|Win32.Build.0 = Debug|Win32
-		{977AFE47-8808-463E-A23F-4ECCB5109927}.Release|Win32.ActiveCfg = Release|Win32
-		{977AFE47-8808-463E-A23F-4ECCB5109927}.Release|Win32.Build.0 = Release|Win32
+		{8FFBD4A3-3A60-4A63-937A-819442B2FB84}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8FFBD4A3-3A60-4A63-937A-819442B2FB84}.Debug|Win32.Build.0 = Debug|Win32
+		{8FFBD4A3-3A60-4A63-937A-819442B2FB84}.Release|Win32.ActiveCfg = Release|Win32
+		{8FFBD4A3-3A60-4A63-937A-819442B2FB84}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
