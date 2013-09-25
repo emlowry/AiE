@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scratchwork", "scratchwork\scratchwork.vcxproj", "{74D19649-C9EA-42AA-B45B-6744AA075576}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "First AiE Framework Project\First AiE Framework Project.vcxproj", "{151D699D-097F-4780-A1E5-6A8EEF1A91B1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "Pong\Pong.vcxproj", "{151D699D-097F-4780-A1E5-6A8EEF1A91B1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "text_adventure", "text_adventure\text_adventure.vcxproj", "{2D143C6F-8B9B-499F-867D-EF7CB7096956}"
 EndProject
