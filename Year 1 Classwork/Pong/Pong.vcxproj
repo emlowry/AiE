@@ -11,9 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{151D699D-097F-4780-A1E5-6A8EEF1A91B1}</ProjectGuid>
+    <ProjectGuid>{977AFE47-8808-463E-A23F-4ECCB5109927}</ProjectGuid>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <ProjectName>Pong</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -100,8 +99,8 @@
   <ItemGroup>
     <None Include="ReadMe.txt" />
     <None Include="resources\fonts\arial.fnt" />
-    <None Include="resources\images\shade.png" />
     <None Include="resources\images\serena_williams.png" />
+    <None Include="resources\images\shade.png" />
     <None Include="resources\images\tennis_ball.png" />
     <None Include="resources\images\tennis_court.png" />
     <None Include="resources\images\venus_williams.png" />
@@ -112,23 +111,23 @@
     <ClCompile Include="source\Ball.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\Globals.cpp" />
+    <ClCompile Include="source\HighScores.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\MatchScore.cpp" />
     <ClCompile Include="source\Menu.cpp" />
     <ClCompile Include="source\Player.cpp" />
-    <ClCompile Include="source\HighScores.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\StopWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
     <ClInclude Include="include\Ball.h" />
-    <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\Globals.h" />
+    <ClInclude Include="include\HighScores.h" />
     <ClInclude Include="include\MatchScore.h" />
     <ClInclude Include="include\Menu.h" />
     <ClInclude Include="include\Player.h" />
-    <ClInclude Include="include\HighScores.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\StopWatch.h" />
   </ItemGroup>

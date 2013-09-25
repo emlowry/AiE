@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scratchwork", "scratchwork\scratchwork.vcxproj", "{74D19649-C9EA-42AA-B45B-6744AA075576}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "Pong\Pong.vcxproj", "{151D699D-097F-4780-A1E5-6A8EEF1A91B1}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "text_adventure", "text_adventure\text_adventure.vcxproj", "{2D143C6F-8B9B-499F-867D-EF7CB7096956}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "high_scores", "high_scores\high_scores.vcxproj", "{E1C46F54-5757-4F86-9856-288C869570F6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Formatting Excercise", "Formatting Excercise\Formatting Excercise.vcxproj", "{AC05DB6D-44D9-404E-A454-21C71772C772}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pong", "Pong\Pong.vcxproj", "{977AFE47-8808-463E-A23F-4ECCB5109927}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,6 @@ Global
 		{74D19649-C9EA-42AA-B45B-6744AA075576}.Debug|Win32.Build.0 = Debug|Win32
 		{74D19649-C9EA-42AA-B45B-6744AA075576}.Release|Win32.ActiveCfg = Release|Win32
 		{74D19649-C9EA-42AA-B45B-6744AA075576}.Release|Win32.Build.0 = Release|Win32
-		{151D699D-097F-4780-A1E5-6A8EEF1A91B1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{151D699D-097F-4780-A1E5-6A8EEF1A91B1}.Debug|Win32.Build.0 = Debug|Win32
-		{151D699D-097F-4780-A1E5-6A8EEF1A91B1}.Release|Win32.ActiveCfg = Release|Win32
-		{151D699D-097F-4780-A1E5-6A8EEF1A91B1}.Release|Win32.Build.0 = Release|Win32
 		{2D143C6F-8B9B-499F-867D-EF7CB7096956}.Debug|Win32.ActiveCfg = Debug|Win32
 		{2D143C6F-8B9B-499F-867D-EF7CB7096956}.Debug|Win32.Build.0 = Debug|Win32
 		{2D143C6F-8B9B-499F-867D-EF7CB7096956}.Release|Win32.ActiveCfg = Release|Win32
@@ -37,6 +33,10 @@ Global
 		{AC05DB6D-44D9-404E-A454-21C71772C772}.Debug|Win32.Build.0 = Debug|Win32
 		{AC05DB6D-44D9-404E-A454-21C71772C772}.Release|Win32.ActiveCfg = Release|Win32
 		{AC05DB6D-44D9-404E-A454-21C71772C772}.Release|Win32.Build.0 = Release|Win32
+		{977AFE47-8808-463E-A23F-4ECCB5109927}.Debug|Win32.ActiveCfg = Debug|Win32
+		{977AFE47-8808-463E-A23F-4ECCB5109927}.Debug|Win32.Build.0 = Debug|Win32
+		{977AFE47-8808-463E-A23F-4ECCB5109927}.Release|Win32.ActiveCfg = Release|Win32
+		{977AFE47-8808-463E-A23F-4ECCB5109927}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
