@@ -10,7 +10,7 @@
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
 
-#include "EnumsAndStructs.h"
+#include "Globals.h"
 
 // Handles a drawable object.
 class Sprite

@@ -3,17 +3,20 @@
  * Author:             Elizabeth Lowry
  * Date Created:       September 23, 2013
  * Description:        Definitions for the class that handles high score lists.
- * Last Modified:      September 23, 2013
+ * Last Modified:      September 24, 2013
  * Last Modification:  Created.
  ******************************************************************************/
 
 #ifndef _HIGH_SCORES_H_
 #define _HIGH_SCORES_H_
 
-#include "EnumsAndStructs.h"
+#include "Globals.h"
+#include "MatchScore.h"
 #include "StopWatch.h"
 #include "Player.h"
+#include <list>
 
+// Manages the game's high score lists
 class HighScores
 {
 public:
@@ -22,31 +25,32 @@ public:
 				const Player& a_roRightPlayer,
 				const StopWatch& a_roPlayTime,
 				const Speed& a_reGameSpeed,
-				const HumanPlayers& a_reHumanPlayers );
+				const HumanPlayers& a_reHumanPlayers,
+				const ScoreListType& a_reDisplayListType );
 
 	void Draw() const;
 	void RecordScore();
-	void Shutdown();
 
 private:
 
-	struct Score
-	{
-		unsigned long long ticks;
-		unsigned int leftScore;
-		unsigned int rightScore;
-		char text[50];
-	};
+	typedef std::list<MatchScore> ScoreList;
 
-	static const unsigned int SCORE_TEXT_BUFFER_SIZE = 50;
-	// leftScore-rightScore \t time \t human players
-	static const char* const SCORE_TEXT_FORMAT;
+	void AddScoreToList( const MatchScore& ac_roScore,
+						 ScoreListType a_eListType );
+	unsigned int ScoreListIndex( const ScoreListType a_eListType ) const;
+
+	static const XYPair LIST_POSITION;
+	static const unsigned int SCORE_LIST_SIZE = 5;
+	static const char* const SCORE_PREFIX;	// "#%d:   "
 
 	const Player& m_roLeftPlayer;
 	const Player& m_roRightPlayer;
 	const StopWatch& m_roPlayTime;
 	const Speed& m_reGameSpeed;
 	const HumanPlayers& m_reHumanPlayers;
+	const ScoreListType& m_reDisplayListType;	// What type of list do we draw?
+
+	ScoreList m_aoScoreLists[NUMBER_OF_SPEEDS * NUMBER_OF_SCORE_LIST_TYPES];
 
 };
 

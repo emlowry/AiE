@@ -8,7 +8,7 @@
  ******************************************************************************/
 
 #include "Game.h"
-#include "EnumsAndStructs.h"
+#include "Globals.h"
 #include "Sprite.h"
 #include "Ball.h"
 #include "Player.h"
@@ -19,7 +19,7 @@
 #include <cstdlib>	// for rand and abs
 
 const char* const Game::BACKGROUND_TEXTURE_NAME = "./images/tennis_court.png";
-const char* const Game::GAME_TITLE = "Pong, starring Venus and Serena Williams!";
+const char* const Game::GAME_TITLE = "PONG: Starring Venus and Serena Williams!";
 const XYPair Game::LEFT_PLAYER_START_POSITION = {240,396};
 const int Game::MENU_KEYS[MENU_KEY_COUNT] =
 {
@@ -28,6 +28,7 @@ const int Game::MENU_KEYS[MENU_KEY_COUNT] =
 	KEY_END,
 	KEY_BACKSPACE
 };
+const XYPair Game::OVERTIME_POSITION = {300,80};
 const char* const Game::OVERTIME_STRING =
 	"Time: It's over NINE-THOUSAAAND!!! (seconds)";
 const double Game::OVERTIME_SECONDS = 9000.0;	// What? Nine-thousand?!
@@ -41,7 +42,12 @@ const int Game::PAUSE_KEYS[PAUSE_KEY_COUNT] =
 	KEY_SPACE,
 	KEY_ENTER
 };
-const char* const Game::PAUSE_TEXTURE_NAME = "./images/shade.png";
+const char* const Game::PAUSE_MESSAGE =
+	"                                           - PAUSED -\n \n"
+	"To resume play, press PAUSE/BREAK, SPACE, or ENTER.\n \n"
+	"                      To give up and return to the menu,\n"
+	"              press ESC, HOME, END, or BACKSPACE.";
+const XYPair Game::PAUSE_MESSAGE_POSITION = {235,250};
 const int Game::RESUME_KEYS[RESUME_KEY_COUNT] =
 {
 	KEY_PAUSE,
@@ -50,6 +56,8 @@ const int Game::RESUME_KEYS[RESUME_KEY_COUNT] =
 };
 const XYPair Game::RIGHT_PLAYER_START_POSITION = {960,396};
 const char* const Game::SHADE_TEXTURE_NAME = "./images/shade.png";
+const XYPair Game::TIME_POSITION = {485,80};
+const char* const Game::TIME_PREFIX = "Time: ";
 
 // Constructor
 Game::Game()
@@ -58,12 +66,22 @@ Game::Game()
 						   SCREEN_HEIGHT,
 						   DEFAULT_X_Y_PAIR,
 						   false ),
+	  m_eDisplayScoreListType( HIGH_SCORES ),
+	  m_eGameSpeed( MEDIUM ),
+	  m_oHighScores( m_oLeftPlayer,
+					 m_oRightPlayer,
+					 m_oPlayTime,
+					 m_eGameSpeed,
+					 m_eHumanPlayers,
+					 m_eDisplayScoreListType ),
+	  m_eHumanPlayers( BOTH ),
+	  m_bKeyPressed( false ),
 	  m_oLeftPlayer( m_oBall,
 					 Player::LEFT,
 					 LEFT_PLAYER_START_POSITION,
 					 MIN_Y,
 					 MAX_Y ),
-	  m_bKeyPressed( false ),
+	  m_bProgramStartup( true ),
 	  m_oRightPlayer( m_oBall,
 					  Player::RIGHT,
 					  RIGHT_PLAYER_START_POSITION,
@@ -75,8 +93,6 @@ Game::Game()
 							DEFAULT_X_Y_PAIR,
 							false ),
 	  m_poServingPlayer( RandomPlayer() ),
-	  m_eGameSpeed( MEDIUM ),
-	  m_eHumanPlayers( BOTH ),
 	  m_eState( START_MATCH )	// TODO: change this to ENTER_MENU once the menu has been implemented
 {
 	// Nothing else to do here, since all members either have a default
@@ -138,10 +154,12 @@ void Game::DrawPauseScreen()
 		poSprite->Draw();
 	}
 
-	// Draw scores and time
+	// Draw scores, time, and help message
 	DrawScores();
 
-	// TODO: draw pause message
+	DrawMultilineString( PAUSE_MESSAGE,
+						 (int)PAUSE_MESSAGE_POSITION.x,
+						 (int)PAUSE_MESSAGE_POSITION.y );
 }
 
 // Draw scores and time
@@ -162,12 +180,17 @@ void Game::DrawScores()
 	// Draw the match time
 	if( m_oPlayTime.GetSeconds() > OVERTIME_SECONDS )
 	{
-		DrawString( OVERTIME_STRING, OVERTIME_X, TIME_Y );
+		DrawString( OVERTIME_STRING,
+					(int)OVERTIME_POSITION.x,
+					(int)TIME_POSITION.y );
 	}
 	else
 	{
-		m_oPlayTime.PrintTime( acBuffer, cuiBufferSize );
-		DrawString( acBuffer, TIME_X, TIME_Y );
+		strcpy_s(acBuffer, cuiBufferSize, TIME_PREFIX);
+		unsigned int uiStartPrint = strlen(acBuffer);
+		m_oPlayTime.Print( acBuffer + uiStartPrint,
+						   cuiBufferSize - uiStartPrint );
+		DrawString( acBuffer, (int)TIME_POSITION.x, (int)TIME_POSITION.y );
 	}
 }
 
@@ -182,21 +205,6 @@ void Game::EnterMenu()
 	m_poServingPlayer = RandomPlayer();
 
 	// TODO: other menu startup tasks
-}
-
-// If at least one of the given keys is pressed, return true
-bool Game::IsOneOfTheseKeysDown( const int* const ac_pciKeys,
-								 const unsigned int ac_uiKeyCount )
-{
-	const int* pciKey = ac_pciKeys;
-	for( unsigned int ui = 0; ui < ac_uiKeyCount; ++ui )
-	{
-		if( IsKeyDown( *pciKey++ ) )
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 // Is the match over?  It's over when one player has at least 4 points and is
@@ -368,7 +376,6 @@ void Game::Shutdown()
 	{
 		poSprite->Destroy();
 	}
-	m_oHighScores.Shutdown();
 }
 
 // Set everything up for a new match
@@ -435,7 +442,7 @@ void Game::UpdateAndDrawSprites()
 	float fDeltaT = GetDeltaTime();
 	for each ( Sprite* poSprite in apoGameSprites )
 	{
-		poSprite->Update( fDeltaT * m_eGameSpeed );
+		poSprite->Update( fDeltaT * SPEED_FACTORS[m_eGameSpeed] );
 		poSprite->Draw();
 	}
 }

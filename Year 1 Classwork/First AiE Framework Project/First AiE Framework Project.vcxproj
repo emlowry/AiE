@@ -111,7 +111,10 @@
   <ItemGroup>
     <ClCompile Include="source\Ball.cpp" />
     <ClCompile Include="source\Game.cpp" />
+    <ClCompile Include="source\Globals.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\MatchScore.cpp" />
+    <ClCompile Include="source\Menu.cpp" />
     <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\HighScores.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
@@ -120,8 +123,10 @@
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
     <ClInclude Include="include\Ball.h" />
-    <ClInclude Include="include\EnumsAndStructs.h" />
+    <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\MatchScore.h" />
+    <ClInclude Include="include\Menu.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\HighScores.h" />
     <ClInclude Include="include\Sprite.h" />

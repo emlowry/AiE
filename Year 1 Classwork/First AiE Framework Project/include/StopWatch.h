@@ -24,7 +24,10 @@ public:
 	double GetMinutes() const;		// total elapsed minutes
 	double GetHours() const;		// total elapsed hours
 	bool IsRunning() const;
-	void PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize) const;
+	void Print( char* a_pcBuffer, unsigned int a_uiBufferSize) const;
+	static void Print( char* a_pcBuffer,
+					   unsigned int a_uiBufferSize,
+					   unsigned long a_ulTicks );
 	void Start();
 	void Stop();
 

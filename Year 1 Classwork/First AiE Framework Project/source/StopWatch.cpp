@@ -13,7 +13,7 @@
 #include <cstring>	// for strcpy_s
 
 // Time: hours:minutes:seconds.milliseconds
-const char* const StopWatch::TIME_FORMAT = "Time: %d:%02d:%02d.%03d";
+const char* const StopWatch::TIME_FORMAT = "%d:%02d:%02d.%03d";
 
 // Default constructor instantiates all members in initializer list
 StopWatch::StopWatch()
@@ -71,14 +71,25 @@ bool StopWatch::IsRunning() const
 }
 
 // Print the time to a buffer in hours:minutes:seconds.milliseconds format
-void StopWatch::PrintTime( char* a_pcBuffer, unsigned int a_uiBufferSize ) const
+// (static version)
+void StopWatch::Print( char* a_pcBuffer,
+					   unsigned int a_uiBufferSize,
+					   unsigned long a_ulTicks )
 {
-	unsigned long ulH = (unsigned long)GetHours();
-	unsigned int uiM = (unsigned int)( (unsigned long)GetMinutes() % 60 );
-	unsigned int uiS = (unsigned int)( (unsigned long)GetSeconds() % 60 );
+	unsigned long ulH = a_ulTicks / ( CLOCKS_PER_SEC * 3600 );
+	unsigned int uiM =
+		(unsigned int)( ( a_ulTicks / ( CLOCKS_PER_SEC * 60 ) ) % 60 );
+	unsigned int uiS = (unsigned int)( ( a_ulTicks / CLOCKS_PER_SEC ) % 60 );
 	unsigned int uiMS =
-		(unsigned int)( (unsigned long)GetMilliseconds() % 1000 );
+		(unsigned int)( ( ( a_ulTicks * 1000 ) / CLOCKS_PER_SEC ) % 1000 );
 	sprintf_s( a_pcBuffer, a_uiBufferSize, TIME_FORMAT, ulH, uiM, uiS, uiMS );
+}
+
+// Print the time to a buffer in hours:minutes:seconds.milliseconds format
+// (const version)
+void StopWatch::Print( char* a_pcBuffer, unsigned int a_uiBufferSize) const
+{
+	Print( a_pcBuffer, a_uiBufferSize, GetTicks() );
 }
 
 // Unpause the stopwatch

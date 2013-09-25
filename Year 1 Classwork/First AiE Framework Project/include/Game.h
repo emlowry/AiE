@@ -11,7 +11,7 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include "EnumsAndStructs.h"
+#include "Globals.h"
 #include "Sprite.h"
 #include "Ball.h"
 #include "Player.h"
@@ -27,7 +27,7 @@ public:
 	bool Run();
 	void Shutdown();
 	
-	// GAME_TITLE = "Pong, starring Venus and Serena Williams!"
+	// GAME_TITLE = "PONG: Starring Venus and Serena Williams!"
 	static const char* const GAME_TITLE;
 	static const int SCREEN_HEIGHT = 801;
 	static const int SCREEN_WIDTH = 1200;
@@ -39,8 +39,6 @@ private:
 	void DrawPauseScreen();
 	void DrawScores();
 	void EnterMenu();
-	static bool IsOneOfTheseKeysDown( const int* const ac_pciKeys,
-									  const unsigned int ac_uiKeyCount );
 	bool MatchOver() const;
 	GameState Menu();
 	GameState PlayGame( bool a_bBackgroundMatch = false );
@@ -64,12 +62,12 @@ private:
 	static const int MIN_Y = 147;
 	static const double OVERTIME_SECONDS;
 	static const char* const OVERTIME_STRING;
-	static const int OVERTIME_X = 300;
+	static const XYPair OVERTIME_POSITION;	// {300,80}
 	static const unsigned int PAUSE_KEY_COUNT = 7;
 	// KEY_PAUSE, KEY_ESC, KEY_HOME, KEY_END, KEY_BACKSPACE, KEY_SPACE, KEY_ENTER
 	static const int PAUSE_KEYS[PAUSE_KEY_COUNT];
-	// PAUSE_TEXTURE_NAME = "./images/pause_overlay.png"
-	static const char* const PAUSE_TEXTURE_NAME;
+	static const char* const PAUSE_MESSAGE;	// long-ass message - see .cpp
+	static const XYPair PAUSE_MESSAGE_POSITION;	// {225,150}
 	static const unsigned int RESUME_KEY_COUNT = 3;
 	// KEY_PAUSE, KEY_SPACE, KEY_ENTER
 	static const int RESUME_KEYS[RESUME_KEY_COUNT];
@@ -79,18 +77,20 @@ private:
 	static const int SCORE_Y = 700;
 	// SHADE_TEXTURE_NAME = "./images/shade.png"
 	static const char* const SHADE_TEXTURE_NAME;
-	static const int TIME_Y = 80;
-	static const int TIME_X = 485;
+	static const char* const TIME_PREFIX;	// "Time: "
+	static const XYPair TIME_POSITION;	// {485,80}
 	
 	Sprite m_oBackgroundSprite;
 	Ball m_oBall;
+	ScoreListType m_eDisplayScoreListType;	// Which high score list to display?
 	Speed m_eGameSpeed;
-	HumanPlayers m_eHumanPlayers;
-	Player m_oLeftPlayer;
-	bool m_bKeyPressed;	// Is it still the initial pause/unpause keypress?
-	StopWatch m_oPlayTime;	// How long has the current match been in progress?
-	Player m_oRightPlayer;
 	HighScores m_oHighScores;
+	HumanPlayers m_eHumanPlayers;
+	bool m_bKeyPressed;	// Is it still the initial pause/unpause keypress?
+	Player m_oLeftPlayer;
+	StopWatch m_oPlayTime;	// How long has the current match been in progress?
+	bool m_bProgramStartup;
+	Player m_oRightPlayer;
 	Sprite m_oScreenShadeSprite;	// dims the screen during pause and menu
 	Player* m_poServingPlayer;	// Which player will serve the ball?
 	GameState m_eState;
