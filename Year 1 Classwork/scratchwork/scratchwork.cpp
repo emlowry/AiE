@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <conio.h>
 
 using namespace std;
@@ -11,6 +12,7 @@ using namespace std;
 const char ESCAPE = 27;
 const char ENTER = 13;
 
+/*
 void PrintAsciiMan() {
 	cout << "\\o/\n I\n/ \\" << endl;
 }
@@ -102,6 +104,10 @@ struct ArmedPlayer
 	float smartBombChargePeriod;
 	unsigned int smartBombs;
 };
+/**/
+
+void expand( int*& a_raiArray, unsigned int& a_ruiCapacity );
+void sort( int* const ac_aiArray, const unsigned int ac_uiSize );
 
 int main(int argc, char* argv[])
 {
@@ -206,7 +212,6 @@ int main(int argc, char* argv[])
 							<< uiDigit << " digits, and "
 							<< uiSymbol << " symbols" << endl;
 	cout << "Password check: " << (bPassword ? "" : "in") << "valid password" << endl;
-/**/
 
 	cout << "Excercise 4: average of { ";
 	int aiValues[10];
@@ -222,13 +227,85 @@ int main(int argc, char* argv[])
 	for (unsigned int ui = 0; ui < 64; ui++)
 		aiGrid[ui/8][ui%8] = ui + 1;
 	DisplayTile(aiGrid);
+/**/
 
-	cout << endl << "Press any key to exit...";
+	unsigned int uiSize = 0;
+	unsigned int uiCapacity = 16;
+	int* aiValues = new int[uiCapacity];
+
+	cout << "Please enter a set of numbers separated by spaces: ";
+	string oInput = "";
+	while( oInput.empty() )
+	{
+		getline( cin, oInput );
+	}
+	istringstream oSin( oInput );
+	int iInput;
+	while( oSin >> iInput )
+	{
+		if( uiSize == uiCapacity )
+		{
+			expand( aiValues, uiCapacity );
+		}
+		aiValues[uiSize] = iInput;
+		++uiSize;
+	}
+	cout << endl << "Here are your numbers sorted in ascending order:" << endl;
+	sort( aiValues, uiSize );
+	for( int* pi = aiValues; pi != aiValues + uiSize; ++pi )
+	{
+		cout << (pi == aiValues ? "" : " ") << *pi;
+	}
+	delete[] aiValues;
+
+	cout << endl << endl << "Press any key to exit...";
 	getch();
 	/**/
 	return 0;
 }
 
+void expand( int*& a_raiArray, unsigned int& a_ruiCapacity )
+{
+	int* aiNewArray = new int[a_ruiCapacity * 2];
+	int* piNew = aiNewArray;
+	memcpy( aiNewArray, a_raiArray, a_ruiCapacity );
+	delete[] a_raiArray;
+	a_raiArray = aiNewArray;
+	a_ruiCapacity *= 2;
+}
+
+void sort( int* const ac_aiArray, const unsigned int ac_uiSize )
+{
+	if( ac_uiSize <= 1 )
+		return;
+	for( int* piCurrent = ac_aiArray;
+		 piCurrent < ac_aiArray + ac_uiSize - 1;
+		 ++piCurrent )
+	{
+		int* piSmallestFound = piCurrent + 1;
+		for( int* piCandidate = piSmallestFound + 1;
+			 piCandidate < ac_aiArray + ac_uiSize;
+			 ++piCandidate )
+		{
+			if( *piCandidate < *piSmallestFound )
+			{
+				piSmallestFound = piCandidate;
+			}
+		}
+		if( *piCurrent <= *piSmallestFound )
+		{
+			++piCurrent;
+		}
+		if( piSmallestFound != piCurrent )
+		{
+			int iValue = *piCurrent;
+			*piCurrent = *piSmallestFound;
+			*piSmallestFound = iValue;
+		}
+	}
+}
+
+/*
 void ExcerciseTwoFunction(char* a_pcString)
 {
 	for (unsigned int ui = 0; ui < strlen(a_pcString); ui++)
@@ -418,4 +495,4 @@ float Modulo(const float ca_fFirstNumber, const float ca_fSecondNumber)
 	cout << ca_fFirstNumber << " % " << ca_fSecondNumber << " = " << fResult << endl;
 	return fResult;
 }
-
+/**/
