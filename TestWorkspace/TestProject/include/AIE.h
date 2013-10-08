@@ -8,7 +8,11 @@
 #define _AIE_H_
 //////////////////////////////////////////////////////////////////////////
 
-#define DLLEXPORT __declspec(dllexport)
+#ifdef BUILD_DLL
+#define DLL_PORT __declspec(dllexport)
+#else
+#define DLL_PORT __declspec(dllimport)
+#endif
 
 
 typedef enum
@@ -116,71 +120,71 @@ struct SColour
 //////////////////////////////////////////////////////////////////////////
 // Call this function to initialise the framework
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT int			Initialise( int a_iWidth, int a_iHeight, bool a_bFullscreen = false, const char* a_pWindowTitle = nullptr );
+DLL_PORT int			Initialise( int a_iWidth, int a_iHeight, bool a_bFullscreen = false, const char* a_pWindowTitle = nullptr );
 //////////////////////////////////////////////////////////////////////////
 // This function should be called just prior to exiting your program
 // it will unload all the components of the AIE Framework that have been loaded
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT void			Shutdown();
+DLL_PORT void			Shutdown();
 //////////////////////////////////////////////////////////////////////////
 // This function is to be called each frame to update the current frame.
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT bool			FrameworkUpdate();
+DLL_PORT bool			FrameworkUpdate();
 //////////////////////////////////////////////////////////////////////////
 // Call this function to clear any content that has been rendered to the screen
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT void			ClearScreen();
+DLL_PORT void			ClearScreen();
 //////////////////////////////////////////////////////////////////////////
 // Call this function to Set the background colour
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT void			SetBackgroundColour( SColour a_BGColour );
+DLL_PORT void			SetBackgroundColour( SColour a_BGColour );
 //////////////////////////////////////////////////////////////////////////
 // Call this function to set the current render colour
 // this will cause any following calls to a draw function to have this colour
 // applied to those objects which are drawn
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT void			SetRenderColour(  SColour a_sColour );
-DLLEXPORT void			SetRenderColour( float a_fRed, float a_fGreen, float a_fBlue, float a_fAlpha = 1.f );
+DLL_PORT void			SetRenderColour(  SColour a_sColour );
+DLL_PORT void			SetRenderColour( float a_fRed, float a_fGreen, float a_fBlue, float a_fAlpha = 1.f );
 
 //////////////////////////////////////////////////////////////////////////
 // Basic Sprite creation and manipulation functionality
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT unsigned int	CreateSprite( const char* a_pTextureName, int a_iWidth, int a_iHeight, bool a_bDrawFromCenter = true, SColour a_sColour = SColour(0xFF,0xFF,0xFF,0xFF) );
-DLLEXPORT unsigned int	DuplicateSprite( unsigned int a_uiSpriteID );
-DLLEXPORT void			SetSpriteColour( unsigned int a_uiSpriteID, SColour& a_sColour );
-DLLEXPORT void			GetSpriteColour( unsigned int a_uiSpriteID, SColour& a_sColour );
-DLLEXPORT void			MoveSprite( unsigned int a_uiSpriteID, float a_fXPos, float a_fYPos );
-DLLEXPORT void			RotateSprite( unsigned int a_uiSpriteID, float a_fRotation );
-DLLEXPORT void			DestroySprite( unsigned int a_uiSpriteID );
-DLLEXPORT void			DrawSprite( unsigned int a_uiSpriteID );
-DLLEXPORT void			SetSpriteUVCoordinates( unsigned int a_uiSpriteID, float a_minUCoord, float a_minVCoord, float a_maxUCoord, float a_maxVCoord );
-DLLEXPORT void			GetSpriteUVCoordinates( unsigned int a_uiSpriteID, float& a_minUCoord, float& a_minVCoord, float& a_maxUCoord, float& a_maxVCoord );
-DLLEXPORT void			SetSpriteScale( unsigned int a_uiSpriteID, float& a_fSpriteWidth, float& a_fSpriteHeight );
-DLLEXPORT void			GetSpriteScale( unsigned int a_uiSpriteID, float& a_fSpriteWidth, float& a_fSpriteHeight );
+DLL_PORT unsigned int	CreateSprite( const char* a_pTextureName, int a_iWidth, int a_iHeight, bool a_bDrawFromCenter = true, SColour a_sColour = SColour(0xFF,0xFF,0xFF,0xFF) );
+DLL_PORT unsigned int	DuplicateSprite( unsigned int a_uiSpriteID );
+DLL_PORT void			SetSpriteColour( unsigned int a_uiSpriteID, SColour& a_sColour );
+DLL_PORT void			GetSpriteColour( unsigned int a_uiSpriteID, SColour& a_sColour );
+DLL_PORT void			MoveSprite( unsigned int a_uiSpriteID, float a_fXPos, float a_fYPos );
+DLL_PORT void			RotateSprite( unsigned int a_uiSpriteID, float a_fRotation );
+DLL_PORT void			DestroySprite( unsigned int a_uiSpriteID );
+DLL_PORT void			DrawSprite( unsigned int a_uiSpriteID );
+DLL_PORT void			SetSpriteUVCoordinates( unsigned int a_uiSpriteID, float a_minUCoord, float a_minVCoord, float a_maxUCoord, float a_maxVCoord );
+DLL_PORT void			GetSpriteUVCoordinates( unsigned int a_uiSpriteID, float& a_minUCoord, float& a_minVCoord, float& a_maxUCoord, float& a_maxVCoord );
+DLL_PORT void			SetSpriteScale( unsigned int a_uiSpriteID, float& a_fSpriteWidth, float& a_fSpriteHeight );
+DLL_PORT void			GetSpriteScale( unsigned int a_uiSpriteID, float& a_fSpriteWidth, float& a_fSpriteHeight );
 //////////////////////////////////////////////////////////////////////////
 // Basic Line Drawing Functionality
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT void			DrawLine( int a_iStartX, int a_iStartY, int a_iEndX, int a_iEndY );
-DLLEXPORT void			DrawLine( int a_iStartX, int a_iStartY, int a_iEndX, int a_iEndY, SColour a_sColour );
-DLLEXPORT void			DrawLine( int a_iStartX, int a_iStartY, int a_iEndX, int a_iEndY, SColour a_sStartColour, SColour a_sEndColour );
+DLL_PORT void			DrawLine( int a_iStartX, int a_iStartY, int a_iEndX, int a_iEndY );
+DLL_PORT void			DrawLine( int a_iStartX, int a_iStartY, int a_iEndX, int a_iEndY, SColour a_sColour );
+DLL_PORT void			DrawLine( int a_iStartX, int a_iStartY, int a_iEndX, int a_iEndY, SColour a_sStartColour, SColour a_sEndColour );
 
 //////////////////////////////////////////////////////////////////////////
 // Draws a String to the screen
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT void			DrawString( const char* a_pText, int a_iXPos, int a_iYPos, SColour a_sColour = SColour(0xFF,0xFF,0xFF,0xFF));
+DLL_PORT void			DrawString( const char* a_pText, int a_iXPos, int a_iYPos, SColour a_sColour = SColour(0xFF,0xFF,0xFF,0xFF));
 
 //////////////////////////////////////////////////////////////////////////
 // Input Handling Functionality
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT bool			IsKeyDown( int a_iKey );
-DLLEXPORT void			GetMouseLocation( int& a_iMouseX, int& a_iMouseY );
-DLLEXPORT bool			GetMouseButtonDown( int a_iMouseButtonToTest );
+DLL_PORT bool			IsKeyDown( int a_iKey );
+DLL_PORT void			GetMouseLocation( int& a_iMouseX, int& a_iMouseY );
+DLL_PORT bool			GetMouseButtonDown( int a_iMouseButtonToTest );
 
 
 //////////////////////////////////////////////////////////////////////////
 // Gets the Delta Time
 //////////////////////////////////////////////////////////////////////////
-DLLEXPORT float 		GetDeltaTime();
+DLL_PORT float 		GetDeltaTime();
 //////////////////////////////////////////////////////////////////////////
 #endif //_AIE_H_
 //////////////////////////////////////////////////////////////////////////
