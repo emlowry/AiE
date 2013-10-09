@@ -1,11 +1,11 @@
 /** ***************************************************************************
  * @file      LeakDebugLib.h
  * @author    Elizabeth Lowry
- * @date      October 7, 2013 - October 7, 2013
+ * @date      October 7, 2013 - October 8, 2013
  * @brief     Memory leak logging.
  * @details   The header file that defines the functions in the static library.
  * @par       Last Modification:
- *              Creation.
+ *              Adding some comments, default parameter values, and overloads.
  **************************************************************************** */
 
 #ifndef _LEAK_DEBUG_LIB_H_
@@ -18,17 +18,25 @@
 namespace LeakDebug
 {
 
-enum class LoggingFlags
+/**
+ * Flags indicating what events to log to an output stream.
+ */
+enum OutputFlags
 {
     NONE = 0,
 
-    FAILED_ALLOCATIONS = 1,
-    SUCCESSFUL_ALLOCATIONS = 2,
-    DEALLOCATIONS = 4,
-    ALLOCATIONS = FAILED_ALLOCATIONS + SUCCESSFUL_ALLOCATIONS,
-    SUCCESSFUL_OPERATIONS = SUCCESSFUL_ALLOCATIONS + DEALLOCATIONS,
+    // Individual things that can be logged are represented by powers of two so
+    // that they can be checked for in combined tags using bit logic.
+    FAILED_ALLOCATIONS = 1 << 0,
+    SUCCESSFUL_ALLOCATIONS = 1 << 1,
+    DEALLOCATIONS = 1 << 2,
 
-    ALL = ALLOCATIONS + DEALLOCATIONS
+    // The individual flags can be combined into flags representing more than
+    // one thing.
+    ALLOCATIONS = FAILED_ALLOCATIONS | SUCCESSFUL_ALLOCATIONS,
+    SUCCESSES = SUCCESSFUL_ALLOCATIONS | DEALLOCATIONS,
+    FAILURES = FAILED_ALLOCATIONS,
+    ALL = SUCCESSES | FAILURES
 };
 
 /**
@@ -47,17 +55,30 @@ struct Leak
  */
 typedef std::map< void*, Leak > LeakMap;
 
+// These are the functions exposed to library users.
+void _Delete( void* a_pMemory,
+              OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+              OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
+void _Delete( void* a_pMemory,
+              char* const a_pccFile,
+              unsigned int a_uiLine,
+              OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+              OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
 void _DumpLeaks( std::ostream& a_roOut );
 LeakMap _GetLeaks();
 void* _New( std::size_t a_iSize,
-                      const LoggingFlags ac_eClogFlags,
-                      const LoggingFlags ac_eCerrFlags,
-                      const bool a_bNoThrow = false ) throw( std::bad_alloc );
-void _Delete( void* a_pMemory,
-                        const LoggingFlags ac_eClogFlags,
-                        const LoggingFlags ac_eCerrFlags,
-                        const bool a_bNoThrow = false ) throw();
-void _StoreFileLine( char* a_pcFile, unsigned int a_iLine );
+            OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+            OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+            bool a_bNoThrow = false ) throw( std::bad_alloc );
+void* _New( std::size_t a_iSize,
+            char* const a_pccFile,
+            unsigned int a_uiLine,
+            OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+            OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+            bool a_bNoThrow = false ) throw( std::bad_alloc );
+std::ostream& operator<<( std::ostream& a_roOut, const Leak& ac_roLeak );
+void _StoreFileLine( char* const a_pccFile, unsigned int a_iLine ) throw();
+void _UnstoreFileLine() throw();
 
 }   // namespace LeakDebug
 
