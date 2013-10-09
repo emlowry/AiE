@@ -1,5 +1,5 @@
 /** ***************************************************************************
- * @file      LeakDebug.h
+ * @file      leak_debug.h
  * @author    Elizabeth Lowry
  * @date      October 7, 2013 - October 8, 2013
  * @brief     Memory leak logging.
@@ -19,9 +19,9 @@
 // Figure out whether or not to log allocations and deallocations.  Visual
 // Studio indicates debug mode by defining the _DEBUG flag, other compilers may
 // use different methods.  Edit the copy of this file in your project as needed.
-//#ifdef _DEBUG
+#ifdef _DEBUG
 #define LEAK_DEBUG_LOGGING
-//#endif  // _DEBUG
+#endif  // _DEBUG
 
 #include <iostream>
 #include <map>

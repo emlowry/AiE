@@ -1,5 +1,5 @@
 /** ***************************************************************************
- * @file      LeakDebugLib.h
+ * @file      LeakDebug.h
  * @author    Elizabeth Lowry
  * @date      October 7, 2013 - October 8, 2013
  * @brief     Memory leak logging.

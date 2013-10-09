@@ -1,5 +1,5 @@
 /** ***************************************************************************
- * @file      LeakDebugLib.cpp
+ * @file      LeakDebug.cpp
  * @author    Elizabeth Lowry
  * @date      October 7, 2013 - October 8, 2013
  * @brief     Memory leak logging.
@@ -8,7 +8,7 @@
  *              Implementations!
  **************************************************************************** */
 
-#include "LeakDebugLib.h"
+#include "LeakDebug.h"
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
