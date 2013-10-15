@@ -63,7 +63,7 @@ struct Leak
 {
     void* pointer;      //!< Address of the allocated memory.
     std::size_t size;   //!< Size in bytes of the block of allocated memory.
-    char* file;         //!< Name of the code file that allocated the memory.
+    const char* file;   //!< Name of the code file that allocated the memory.
     unsigned int line;  //!< Line of code on which the memory was allocated.
 };
 
@@ -71,10 +71,10 @@ struct Leak
 extern std::ostream& operator<<( std::ostream& a_roOut, const Leak& ac_roLeak );
 extern bool operator==( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
 extern bool operator!=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator<=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator>( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
 extern bool operator>=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
 extern bool operator<( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator>( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator<=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
 
 /**
  * A map of Leak structs describing allocated dynamic memory, keyed by address.
@@ -85,8 +85,8 @@ typedef std::map< void*, Leak > LeakMap;
 
 // The logging implementations are only imported from libLeakDebug.a when in
 // debug mode.
-extern void DebugDumpLeaks( std::ostream& a_roOut );
-extern LeakMap DebugGetLeaks();
+extern void DumpLeaks( std::ostream& a_roOut = std::cout );
+extern LeakMap GetLeaks();
 extern void* DebugNew( std::size_t a_iSize,
                        OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
                        OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
@@ -95,47 +95,14 @@ extern void DebugDelete( void* a_pMemory,
                          OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
                          OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
     throw();
-extern void DebugStoreFileLine( char* const a_pccFile, unsigned int a_iLine );
+extern void StoreFileLine( char* const a_pccFile, unsigned int a_iLine );
 
-#endif  // LEAK_DEBUG_LOGGING
-
-// These functions are included whether you're in debug or not, since they'll be
-// called from code that may or may not be in debug mode.  That said, they
-// should be empty if you're not in debug mode.
-
-/**
- * Prints a list of allocated dynamic memory to standard output, if debugging.
- */
-void DumpLeaks()
-{
-#ifdef LEAK_DEBUG_LOGGING
-    DebugDumpLeaks( std::cout );
-#endif  // LEAK_DEBUG_LOGGING
-}
-
-/**
- * Prints a list of allocated dynamic memory to the given stream, if debugging.
- * @param[out] a_roOut  Output stream to write to.
- */
-void DumpLeaks( std::ostream& a_roOut )
-{
-#ifdef LEAK_DEBUG_LOGGING
-    DebugDumpLeaks( a_roOut );
-#endif  // LEAK_DEBUG_LOGGING
-}
-
-/**
- * Provides a list of objects describing currently allocated dynamic memory.
- * @return  Memory leak structs keyed by address, if debugging (else empty map).
- */
-LeakMap GetLeaks()
-{
-#ifdef LEAK_DEBUG_LOGGING
-    return DebugGetLeaks();
 #else
-    return LeakMap();
+
+inline void DumpLeaks( std::ostream& a_roOut = std::cout ) {}
+#define GetLeaks LeakMap
+
 #endif  // LEAK_DEBUG_LOGGING
-}
 
 }   // namespace LeakDebug
 
@@ -206,9 +173,9 @@ void operator delete[]( void* a_pMemory, const std::nothrow_t& ) throw()
 
 // Macros replace simple new and delete calls so that the file and line of the
 // invocation are stored for the use of the logging implementation.
-#define new ( LeakDebug::DebugStoreFileLine( __FILE__, __LINE__ ), false ) \
+#define new ( LeakDebug::StoreFileLine( __FILE__, __LINE__ ), false ) \
             ? nullptr : new
-#define delete LeakDebug::DebugStoreFileLine( __FILE__, __LINE__ ), delete
+#define delete LeakDebug::StoreFileLine( __FILE__, __LINE__ ), delete
 
 #endif  // LEAK_DEBUG_LOGGING
 

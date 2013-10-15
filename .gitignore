@@ -12,21 +12,21 @@ tmp/
 *.swp
 *~.nib
 local.properties
-.classpath
-.settings/
-.loadpath
+#.classpath
+#.settings/
+#.loadpath
 
 # External tool builders
 .externalToolBuilders/
 
 # Locally stored "Eclipse launch configurations"
-*.launch
+#*.launch
 
 # CDT-specific
 #.cproject
 
 # PDT-specific
-.buildpath
+#.buildpath
 
 
 #################

@@ -9,8 +9,7 @@
  *              Creation.
  **************************************************************************** */
 
-#include "../gtest/gtest.h"
-#include "LeakDebug_externs.h"
+#include "externs/LeakDebug.h"
 #include "LeakDebugTest.h"
 
 /**
@@ -19,14 +18,14 @@
 void LeakDebugTest::Clear()
 {
     // make sure there are no pre-existing leaks
-    LeakDebug::LeakMap oLeaks = LeakDebug::DebugGetLeaks();
+    LeakDebug::LeakMap oLeaks = LeakDebug::GetLeaks();
     for( LeakDebug::LeakMap::value_type oEntry : oLeaks )
     {
         LeakDebug::DebugDelete(oEntry.second.pointer);
     }
 
     // make sure there is no stored line locations
-    LeakDebug::DebugUnstoreFileLine();
+    LeakDebug::UnstoreFileLine();
 }
 
 /**

@@ -1,15 +1,17 @@
 /** ***************************************************************************
- * @file      LeakDebug_externs.h
+ * @file      LeakDebug.h
  * @author    Elizabeth Lowry
- * @date      October 14, 2013 - October 14, 2013
- * @brief     Memory leak logging test fixture.
- * @details   Imports leak_debug.a library functions and structs for testing.
+ * @date      October 15, 2013 - October 15, 2013
+ * @brief     LeakDebug library functions.
+ * @details   Imports leak_debug library functions for testing.
  * @par       Last Modification:
  *              Creation.
  **************************************************************************** */
 
-#ifndef _LEAK_DEBUG_EXTERNS_H_
-#define _LEAK_DEBUG_EXTERNS_H_
+#ifndef _LEAK_DEBUG_H_
+#define _LEAK_DEBUG_H_
+
+#include "Leak.h"
 
 namespace LeakDebug
 {
@@ -35,31 +37,7 @@ enum OutputFlags
     ALL = SUCCESSES | FAILURES
 };
 
-/**
- * Describes a block of allocated dynamic memory and what line allocated it.
- */
-struct Leak
-{
-    void* pointer;      //!< Address of the allocated memory.
-    std::size_t size;   //!< Size in bytes of the block of allocated memory.
-    char* file;         //!< Name of the code file that allocated the memory.
-    unsigned int line;  //!< Line of code on which the memory was allocated.
-};
-
-// operators for the Leak struct
-extern std::ostream& operator<<( std::ostream& a_roOut, const Leak& ac_roLeak );
-extern bool operator==( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator!=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator<=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator>=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator<( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-extern bool operator>( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
-
-/**
- * A map of Leak structs describing allocated dynamic memory, keyed by address.
- */
-typedef std::map< void*, Leak > LeakMap;
-
+// library functions
 extern void DebugDelete( void* a_pMemory,
                          OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
                          OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
@@ -70,8 +48,6 @@ extern void DebugDelete( void* a_pMemory,
                          OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
                          OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
     throw();
-extern void DebugDumpLeaks( std::ostream& a_roOut );
-extern LeakMap DebugGetLeaks();
 extern void* DebugNew( std::size_t a_iSize,
                        OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
                        OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
@@ -82,10 +58,12 @@ extern void* DebugNew( std::size_t a_iSize,
                        OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
                        OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
                        bool a_bNoThrow = false ) throw( std::bad_alloc );
-extern void DebugStoreFileLine( char* const a_pccFile,
+extern void DumpLeaks( std::ostream& a_roOut );
+extern LeakMap GetLeaks();
+extern void StoreFileLine( char* const a_pccFile,
                                 unsigned int a_iLine ) throw();
-extern void DebugUnstoreFileLine() throw();
+extern void UnstoreFileLine() throw();
 
 }   // namespace LeakDebug
 
-#endif  // _LEAK_DEBUG_EXTERNS_H_
+#endif  // _LEAK_DEBUG_H_

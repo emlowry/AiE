@@ -8,8 +8,8 @@
  *              Creation.
  **************************************************************************** */
 
-#include "../gtest/gtest.h"
-#include "LeakDebug_externs.h"
-#include "LeakDebugTest.h"
+#include "externs/LeakDebug.h"
+#include "fixtures/LeakDebugTest.h"
+#include "gtest/gtest.h"
 
 ///TODO Write tests

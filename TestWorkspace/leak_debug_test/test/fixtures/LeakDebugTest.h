@@ -12,7 +12,7 @@
 #ifndef _LEAK_DEBUG_TEST_H_
 #define _LEAK_DEBUG_TEST_H_
 
-#include "../gtest/gtest.h"
+#include "gtest/gtest.h"
 
 /**
  * Handles clean-up tasks before and after each LeakDebug test.

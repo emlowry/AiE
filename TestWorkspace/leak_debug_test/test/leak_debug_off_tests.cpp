@@ -16,8 +16,8 @@
 #undef _DEBUG
 #endif
 
-#include "../gtest/gtest.h"
-#include "LeakDebugTest.h"
+#include "fixtures/LeakDebugTest.h"
+#include "gtest/gtest.h"
 #include "leak_debug.h"
 
 ///TODO Write tests

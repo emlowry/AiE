@@ -8,6 +8,7 @@
  *              Implementations!
  **************************************************************************** */
 
+#include "Leak.h"
 #include "LeakDebug.h"
 #include <cstdlib>
 #include <cstring>
@@ -103,7 +104,7 @@ void LeakDebug::DebugDelete( void* a_pMemory,
     DebugDelete( a_pMemory,
                  sg_oStoredFile.empty() ? acEmpty : &sg_oStoredFile[0],
                  sg_uiStoredLine, a_eClogFlags, a_eCerrFlags );
-    DebugUnstoreFileLine();
+    UnstoreFileLine();
 }
 
 /**
@@ -141,33 +142,6 @@ void LeakDebug::DebugDelete( void* a_pMemory,
 }
 
 /**
- * Prints a list of allocated dynamic memory to the given stream, if debugging.
- * @param[out] a_roOut  Output stream to write to.
- */
-void LeakDebug::DebugDumpLeaks( std::ostream& a_roOut )
-{
-    for( LeakMap::value_type oEntry : sg_oLeaks )
-    {
-        a_roOut << oEntry.second << std::endl;
-    }
-}
-
-/**
- * Provides a list of objects describing currently allocated dynamic memory.
- * @return  Memory leak structs keyed by address, if debugging (else empty map).
- */
-LeakDebug::LeakMap LeakDebug::DebugGetLeaks()
-{
-    // Deep copy the list of allocated memory.
-    LeakMap oCopy;
-    for( LeakMap::value_type oEntry : sg_oLeaks )
-    {
-        oCopy[ oEntry.first ] = oEntry.second;
-    }
-    return oCopy;
-}
-
-/**
  * Allocate a block of dynamic memory and log the allocation.
  * @param a_iSize       How much memory to allocate.
  * @param a_eClogFlags  What should be noted in the standard log stream?
@@ -191,13 +165,13 @@ void* LeakDebug::DebugNew( std::size_t a_iSize,
                       a_bNoThrow );
 
         // If allocation succeeded, clear stored filename and line, then return.
-        DebugUnstoreFileLine();
+        UnstoreFileLine();
         return toReturn;
     }
     catch( std::bad_alloc& oException )
     {
         // If allocation failed, clear stored filename and line, then throw up.
-        DebugUnstoreFileLine();
+        UnstoreFileLine();
         throw oException;
     }
 }
@@ -262,29 +236,30 @@ void* LeakDebug::DebugNew( std::size_t a_iSize,
 }
 
 /**
- * Stores a file name and line number for use by a subsequent _New or _Delete.
- * This way, _New() and _Delete() can be called from the code without having to
- * pass in parameters for file and line, which makes it easier to set up macros
- * calling redefined new and delete operators.
- * @see LeakDebug.h for macros that use this.
- * @param a_pccFile File from which a following _New or _Delete will originate.
- * @param a_iLine   Line from which a following _New or _Delete will originate.
+ * Prints a list of allocated dynamic memory to the given stream, if debugging.
+ * @param[out] a_roOut  Output stream to write to.
  */
-void LeakDebug::DebugStoreFileLine( char* const a_pccFile,
-                                    unsigned int a_iLine )
-    throw()
+void LeakDebug::DumpLeaks( std::ostream& a_roOut )
 {
-    sg_oStoredFile = a_pccFile;
-    sg_uiStoredLine = a_iLine;
+    for( LeakMap::value_type oEntry : sg_oLeaks )
+    {
+        a_roOut << oEntry.second << std::endl;
+    }
 }
 
 /**
- * Clear the file name and line number stored by _StoreFileLine().
+ * Provides a list of objects describing currently allocated dynamic memory.
+ * @return  Memory leak structs keyed by address, if debugging (else empty map).
  */
-void LeakDebug::DebugUnstoreFileLine() throw()
+LeakDebug::LeakMap LeakDebug::GetLeaks()
 {
-    sg_oStoredFile = "";
-    sg_uiStoredLine = 0;
+    // Deep copy the list of allocated memory.
+    LeakMap oCopy;
+    for( LeakMap::value_type oEntry : sg_oLeaks )
+    {
+        oCopy[ oEntry.first ] = oEntry.second;
+    }
+    return oCopy;
 }
 
 /**
@@ -315,11 +290,11 @@ void LeakDebug::LogAllocation( void* a_pPointer,
     }
 
     // Create a Leak struct.
-    char pcName[ strlen( a_pccFile ) + 1 ];
+    char* pcName = new char[ strlen( a_pccFile ) + 1 ];
     strcpy( pcName, a_pccFile );
     Leak oLeak = { a_pPointer, a_iSize, pcName, a_uiLine };
 
-    // Store the struct.
+    // Store a copy of the struct.
     sg_oLeaks[ a_pPointer ] = oLeak;
 
     // Output a success message to the appropriate streams.
@@ -371,201 +346,9 @@ void LeakDebug::LogDeallocation( void* a_pMemory,
                          OutputFlags::DEALLOCATIONS,
                          oLeak, "deallocated by ",
                          a_pccFile, "(", a_uiLine, ")" );
-}
 
-/**
- * Allows the printing of a Leak struct to an output stream via the << operator.
- * Format is "<size> bytes at <address> allocated by <file>(<line>)".
- * @param[out] a_roOut  The output stream to print to.
- * @param[in] ac_roLeak The struct to print describing a block of memory.
- * @return  A reference to the output stream.
- */
-std::ostream& LeakDebug::operator<<( std::ostream& a_roOut,
-                                     const Leak& ac_roLeak )
-{
-    a_roOut << ac_roLeak.size << " bytes at "
-            << ac_roLeak.pointer << " allocated by ";
-    if( strlen(ac_roLeak.file) > 0 )
-    {
-        a_roOut << ac_roLeak.file << "(" << ac_roLeak.line << ")";
-    }
-    else
-    {
-        a_roOut << "unknown";
-    }
-    return a_roOut;
-}
-
-/**
- * Leak equality.
- * Two Leak structs are equal if the values of all their fields are equal.
- * @param ac_roLeftLeak
- * @param ac_roRightLeak
- * @return true if the two Leak structs are equal.
- */
-bool LeakDebug::operator==( const Leak& ac_roLeftLeak,
-                            const Leak& ac_roRightLeak )
-{
-    return ( ac_roLeftLeak.pointer == ac_roRightLeak.pointer &&
-             ac_roLeftLeak.size == ac_roRightLeak.size &&
-             strcmp(ac_roLeftLeak.file, ac_roRightLeak.file) == 0 &&
-             ac_roLeftLeak.line == ac_roRightLeak.line );
-}
-
-/**
- * Leak inequality.
- * Two leak structs are not equal if any of their fields are not equal.
- * @param ac_roLeftLeak
- * @param ac_roRightLeak
- * @return true if the two leak structs are not equal.
- */
-bool LeakDebug::operator!=( const Leak& ac_roLeftLeak,
-                            const Leak& ac_roRightLeak )
-{
-    return ( ac_roLeftLeak.pointer != ac_roRightLeak.pointer ||
-             ac_roLeftLeak.size != ac_roRightLeak.size ||
-             strcmp(ac_roLeftLeak.file, ac_roRightLeak.file) != 0 ||
-             ac_roLeftLeak.line != ac_roRightLeak.line );
-}
-
-/**
- * Leak less-than-or-equal-to comparison.
- * One Leak struct is less than a second if the first of its fields with a
- * different value than the corresponding field in the second has a lesser value
- * than said corresponding field.
- * @param ac_roLeftLeak
- * @param ac_roRightLeak
- * @return true if the left Leak is less than or equal to the right Leak.
- */
-bool LeakDebug::operator<=( const Leak& ac_roLeftLeak,
-                            const Leak& ac_roRightLeak )
-{
-    // Check address first
-    if( ac_roLeftLeak.pointer < ac_roRightLeak.pointer )
-        return true;
-    if( ac_roLeftLeak.pointer > ac_roRightLeak.pointer )
-        return false;
-
-    // Check size next
-    if( ac_roLeftLeak.size < ac_roRightLeak.size )
-        return true;
-    if( ac_roLeftLeak.size > ac_roRightLeak.size )
-        return false;
-
-    // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
-    if( iCmp < 0 )
-        return true;
-    if( iCmp > 0 )
-        return false;
-
-    // If all of the above were equal, compare line number
-    return ac_roLeftLeak.line <= ac_roRightLeak.line;
-}
-
-/**
- * Leak greater-than-or-equal-to comparison.
- * One Leak struct is greater than a second if the first of its fields with a
- * different value than the corresponding field in the second has a greater
- * value than said corresponding field.
- * @param ac_roLeftLeak
- * @param ac_roRightLeak
- * @return true if the left Leak is greater than or equal to the right Leak.
- */
-bool LeakDebug::operator>=( const Leak& ac_roLeftLeak,
-                            const Leak& ac_roRightLeak )
-{
-    // Check address first
-    if( ac_roLeftLeak.pointer > ac_roRightLeak.pointer )
-        return true;
-    if( ac_roLeftLeak.pointer < ac_roRightLeak.pointer )
-        return false;
-
-    // Check size next
-    if( ac_roLeftLeak.size > ac_roRightLeak.size )
-        return true;
-    if( ac_roLeftLeak.size < ac_roRightLeak.size )
-        return false;
-
-    // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
-    if( iCmp > 0 )
-        return true;
-    if( iCmp < 0 )
-        return false;
-
-    // If all of the above were equal, compare line number
-    return ac_roLeftLeak.line >= ac_roRightLeak.line;
-}
-
-/**
- * Leak less-than comparison.
- * One Leak struct is less than a second if the first of its fields with a
- * different value than the corresponding field in the second has a lesser value
- * than said corresponding field.
- * @param ac_roLeftLeak
- * @param ac_roRightLeak
- * @return true if the left Leak is less than the right Leak.
- */
-bool LeakDebug::operator<( const Leak& ac_roLeftLeak,
-                           const Leak& ac_roRightLeak )
-{
-    // Check address first
-    if( ac_roLeftLeak.pointer < ac_roRightLeak.pointer )
-        return true;
-    if( ac_roLeftLeak.pointer > ac_roRightLeak.pointer )
-        return false;
-
-    // Check size next
-    if( ac_roLeftLeak.size < ac_roRightLeak.size )
-        return true;
-    if( ac_roLeftLeak.size > ac_roRightLeak.size )
-        return false;
-
-    // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
-    if( iCmp < 0 )
-        return true;
-    if( iCmp > 0 )
-        return false;
-
-    // If all of the above were equal, compare line number
-    return ac_roLeftLeak.line < ac_roRightLeak.line;
-}
-
-/**
- * Leak greater-than comparison.
- * One Leak struct is greater than a second if the first of its fields with a
- * different value than the corresponding field in the second has a greater
- * value than said corresponding field.
- * @param ac_roLeftLeak
- * @param ac_roRightLeak
- * @return true if the left Leak is greater than the right Leak.
- */
-bool LeakDebug::operator>( const Leak& ac_roLeftLeak,
-                           const Leak& ac_roRightLeak )
-{
-    // Check address first
-    if( ac_roLeftLeak.pointer > ac_roRightLeak.pointer )
-        return true;
-    if( ac_roLeftLeak.pointer < ac_roRightLeak.pointer )
-        return false;
-
-    // Check size next
-    if( ac_roLeftLeak.size > ac_roRightLeak.size )
-        return true;
-    if( ac_roLeftLeak.size < ac_roRightLeak.size )
-        return false;
-
-    // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
-    if( iCmp > 0 )
-        return true;
-    if( iCmp < 0 )
-        return false;
-
-    // If all of the above were equal, compare line number
-    return ac_roLeftLeak.line > ac_roRightLeak.line;
+    // free memory used for file name string
+    delete[] oLeak.file;
 }
 
 /**
@@ -623,4 +406,30 @@ template< typename T >
 static void LeakDebug::OutputMessage( std::ostream& a_roOut, T& a_rArg )
 {
     a_roOut << a_rArg;
+}
+
+/**
+ * Stores a file name and line number for use by a subsequent _New or _Delete.
+ * This way, _New() and _Delete() can be called from the code without having to
+ * pass in parameters for file and line, which makes it easier to set up macros
+ * calling redefined new and delete operators.
+ * @see LeakDebug.h for macros that use this.
+ * @param a_pccFile File from which a following _New or _Delete will originate.
+ * @param a_iLine   Line from which a following _New or _Delete will originate.
+ */
+void LeakDebug::StoreFileLine( char* const a_pccFile,
+                                    unsigned int a_iLine )
+    throw()
+{
+    sg_oStoredFile = a_pccFile;
+    sg_uiStoredLine = a_iLine;
+}
+
+/**
+ * Clear the file name and line number stored by _StoreFileLine().
+ */
+void LeakDebug::UnstoreFileLine() throw()
+{
+    sg_oStoredFile = "";
+    sg_uiStoredLine = 0;
 }
