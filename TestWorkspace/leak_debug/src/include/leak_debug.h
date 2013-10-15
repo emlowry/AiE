@@ -5,14 +5,16 @@
  * @brief     Memory leak logging.
  * @details   The header file to include in order to use the memory leak logging
  *              static library.
- * @pre       Make sure your project links to libLeakDebug.a before including
- *              this, and make sure your preprocessor directives can correctly
- *              determine whether or not to use this logging (modify lines 22-24
- *              if necessary).
+ * @pre       Make sure your project links to leak_debug.a or leak_debug_d.a
+ *              before including this, and make sure your preprocessor
+ *              directives can correctly determine whether or not to use this
+ *              logging (modify lines 22-24 if necessary).
  * @par       Last Modification:
  *              Added some comments and default parameter values.
  **************************************************************************** */
 
+// If you're including this external-use header, then you shouldn't include the
+// library's internal-use header LeakDebug.h
 #ifndef _LEAK_DEBUG_H_
 #define _LEAK_DEBUG_H_
 
@@ -65,6 +67,15 @@ struct Leak
     unsigned int line;  //!< Line of code on which the memory was allocated.
 };
 
+// operators for the Leak struct
+extern std::ostream& operator<<( std::ostream& a_roOut, const Leak& ac_roLeak );
+extern bool operator==( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator!=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator<=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator>=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator<( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+extern bool operator>( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+
 /**
  * A map of Leak structs describing allocated dynamic memory, keyed by address.
  */
@@ -74,16 +85,17 @@ typedef std::map< void*, Leak > LeakMap;
 
 // The logging implementations are only imported from libLeakDebug.a when in
 // debug mode.
-extern void _DumpLeaks( std::ostream& a_roOut );
-extern LeakMap _GetLeaks();
-extern void* _New( std::size_t a_iSize,
-                   OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                   OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
-                   bool a_bNoThrow = false ) throw( std::bad_alloc );
-extern void _Delete( void* a_pMemory,
-                     OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                     OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
-extern void _StoreFileLine( char* const a_pccFile, unsigned int a_iLine );
+extern void DebugDumpLeaks( std::ostream& a_roOut );
+extern LeakMap DebugGetLeaks();
+extern void* DebugNew( std::size_t a_iSize,
+                       OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+                       OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+                       bool a_bNoThrow = false ) throw( std::bad_alloc );
+extern void DebugDelete( void* a_pMemory,
+                         OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+                         OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
+    throw();
+extern void DebugStoreFileLine( char* const a_pccFile, unsigned int a_iLine );
 
 #endif  // LEAK_DEBUG_LOGGING
 
@@ -97,7 +109,7 @@ extern void _StoreFileLine( char* const a_pccFile, unsigned int a_iLine );
 void DumpLeaks()
 {
 #ifdef LEAK_DEBUG_LOGGING
-    _DumpLeaks( std::cout );
+    DebugDumpLeaks( std::cout );
 #endif  // LEAK_DEBUG_LOGGING
 }
 
@@ -108,7 +120,7 @@ void DumpLeaks()
 void DumpLeaks( std::ostream& a_roOut )
 {
 #ifdef LEAK_DEBUG_LOGGING
-    _DumpLeaks( a_roOut );
+    DebugDumpLeaks( a_roOut );
 #endif  // LEAK_DEBUG_LOGGING
 }
 
@@ -119,7 +131,7 @@ void DumpLeaks( std::ostream& a_roOut )
 LeakMap GetLeaks()
 {
 #ifdef LEAK_DEBUG_LOGGING
-    return _GetLeaks();
+    return DebugGetLeaks();
 #else
     return LeakMap();
 #endif  // LEAK_DEBUG_LOGGING
@@ -143,60 +155,60 @@ LeakMap GetLeaks()
 // the logging implementations from the library.
 void* operator new( std::size_t a_iSize ) throw(std::bad_alloc)
 {
-    return LeakDebug::_New( a_iSize,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    return LeakDebug::DebugNew( a_iSize,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
 }
 void* operator new[]( std::size_t a_iSize ) throw(std::bad_alloc)
 {
-    return LeakDebug::_New( a_iSize,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    return LeakDebug::DebugNew( a_iSize,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
 }
 void* operator new( std::size_t a_iSize, const std::nothrow_t& )
 {
-    return LeakDebug::_New( a_iSize,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS,
-                            true );
+    return LeakDebug::DebugNew( a_iSize,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS,
+                                true );
 }
 void* operator new[]( std::size_t a_iSize, const std::nothrow_t& )
 {
-    return LeakDebug::_New( a_iSize,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS,
-                            true );
+    return LeakDebug::DebugNew( a_iSize,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS,
+                                true );
 }
 void operator delete( void* a_pMemory ) throw()
 {
-    LeakDebug::_Delete( a_pMemory,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
 }
 void operator delete[]( void* a_pMemory ) throw()
 {
-    LeakDebug::_Delete( a_pMemory,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
 }
 void operator delete( void* a_pMemory, const std::nothrow_t& ) throw()
 {
-    LeakDebug::_Delete( a_pMemory,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
 }
 void operator delete[]( void* a_pMemory, const std::nothrow_t& ) throw()
 {
-    LeakDebug::_Delete( a_pMemory,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                        (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
+                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
 }
 
 // Macros replace simple new and delete calls so that the file and line of the
 // invocation are stored for the use of the logging implementation.
-#define new ( LeakDebug::_StoreFileLine( __FILE__, __LINE__ ), false ) \
+#define new ( LeakDebug::DebugStoreFileLine( __FILE__, __LINE__ ), false ) \
             ? nullptr : new
-#define delete LeakDebug::_StoreFileLine( __FILE__, __LINE__ ), delete
+#define delete LeakDebug::DebugStoreFileLine( __FILE__, __LINE__ ), delete
 
 #endif  // LEAK_DEBUG_LOGGING
 

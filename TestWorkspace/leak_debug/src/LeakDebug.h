@@ -8,8 +8,10 @@
  *              Adding some comments, default parameter values, and overloads.
  **************************************************************************** */
 
-#ifndef _LEAK_DEBUG_LIB_H_
-#define _LEAK_DEBUG_LIB_H_
+// If you're including this internal-use header, then you shouldn't include the
+// external-use header leak_debug.h
+#ifndef _LEAK_DEBUG_H_
+#define _LEAK_DEBUG_H_
 
 #include <iostream>
 #include <map>
@@ -56,30 +58,36 @@ struct Leak
 typedef std::map< void*, Leak > LeakMap;
 
 // These are the functions exposed to library users.
-void _Delete( void* a_pMemory,
-              OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-              OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
-void _Delete( void* a_pMemory,
-              char* const a_pccFile,
-              unsigned int a_uiLine,
-              OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-              OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
-void _DumpLeaks( std::ostream& a_roOut );
-LeakMap _GetLeaks();
-void* _New( std::size_t a_iSize,
-            OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-            OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
-            bool a_bNoThrow = false ) throw( std::bad_alloc );
-void* _New( std::size_t a_iSize,
-            char* const a_pccFile,
-            unsigned int a_uiLine,
-            OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-            OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
-            bool a_bNoThrow = false ) throw( std::bad_alloc );
+void DebugDelete( void* a_pMemory,
+                  OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+                  OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
+void DebugDelete( void* a_pMemory,
+                  char* const a_pccFile,
+                  unsigned int a_uiLine,
+                  OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+                  OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
+void DebugDumpLeaks( std::ostream& a_roOut );
+LeakMap DebugGetLeaks();
+void* DebugNew( std::size_t a_iSize,
+                OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+                OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+                bool a_bNoThrow = false ) throw( std::bad_alloc );
+void* DebugNew( std::size_t a_iSize,
+                char* const a_pccFile,
+                unsigned int a_uiLine,
+                OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
+                OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+                bool a_bNoThrow = false ) throw( std::bad_alloc );
+void DebugStoreFileLine( char* const a_pccFile, unsigned int a_iLine ) throw();
+void DebugUnstoreFileLine() throw();
 std::ostream& operator<<( std::ostream& a_roOut, const Leak& ac_roLeak );
-void _StoreFileLine( char* const a_pccFile, unsigned int a_iLine ) throw();
-void _UnstoreFileLine() throw();
+bool operator==( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+bool operator!=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+bool operator<=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+bool operator>=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+bool operator<( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
+bool operator>( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
 
 }   // namespace LeakDebug
 
-#endif // _LEAK_DEBUG_LIB_H_
+#endif // _LEAK_DEBUG_H_
