@@ -1,11 +1,11 @@
 /** ***************************************************************************
  * @file      LeakDebug.h
  * @author    Elizabeth Lowry
- * @date      October 15, 2013 - October 15, 2013
+ * @date      October 15, 2013 - October 16, 2013
  * @brief     LeakDebug library functions.
  * @details   Imports leak_debug library functions for testing.
  * @par       Last Modification:
- *              Creation.
+ *              Refactoring.
  **************************************************************************** */
 
 #ifndef _LEAK_DEBUG_H_
@@ -38,30 +38,21 @@ enum OutputFlags
 };
 
 // library functions
-extern void DebugDelete( void* a_pMemory,
-                         OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                         OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
-    throw();
-extern void DebugDelete( void* a_pMemory,
-                         char* const a_pccFile,
-                         unsigned int a_uiLine,
-                         OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                         OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
-    throw();
+extern void DebugDelete( void* a_pMemory ) throw();
+extern void* DebugNew( std::size_t a_iSize, bool a_bNoThrow = false )
+    throw( std::bad_alloc );
 extern void* DebugNew( std::size_t a_iSize,
-                       OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                       OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
-                       bool a_bNoThrow = false ) throw( std::bad_alloc );
-extern void* DebugNew( std::size_t a_iSize,
-                       char* const a_pccFile,
+                       const char* const a_pccFile,
                        unsigned int a_uiLine,
-                       OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                       OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
                        bool a_bNoThrow = false ) throw( std::bad_alloc );
 extern void DumpLeaks( std::ostream& a_roOut );
 extern LeakMap GetLeaks();
-extern void StoreFileLine( char* const a_pccFile,
-                                unsigned int a_iLine ) throw();
+extern void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
+                            OutputFlags a_eDefaultCerrFlags );
+extern void Start();
+extern void Stop();
+extern void StoreFileLine( const char* const a_pccFile,
+                           unsigned int a_iLine ) throw();
 extern void UnstoreFileLine() throw();
 
 }   // namespace LeakDebug

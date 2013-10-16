@@ -1,11 +1,11 @@
 /** ***************************************************************************
  * @file      LeakDebug.h
  * @author    Elizabeth Lowry
- * @date      October 7, 2013 - October 15, 2013
+ * @date      October 7, 2013 - October 16, 2013
  * @brief     Memory leak logging.
  * @details   The header file that defines the functions in the static library.
  * @par       Last Modification:
- *              Moving Leak struct and associated operators to separate file.
+ *              Refactoring.
  **************************************************************************** */
 
 // If you're including this internal-use header, then you shouldn't include the
@@ -42,27 +42,43 @@ enum OutputFlags
 };
 
 // These are the functions exposed to library users.
+void DebugDelete( void* a_pMemory ) throw();
 void DebugDelete( void* a_pMemory,
-                  OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                  OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
+                  OutputFlags a_eClogFlags,
+                  OutputFlags a_eCerrFlags ) throw();
 void DebugDelete( void* a_pMemory,
-                  char* const a_pccFile,
+                  const char* const a_pccFile,
+                  unsigned int a_uiLine ) throw();
+void DebugDelete( void* a_pMemory,
+                  const char* const a_pccFile,
                   unsigned int a_uiLine,
-                  OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                  OutputFlags a_eCerrFlags = OutputFlags::FAILURES ) throw();
+                  OutputFlags a_eClogFlags,
+                  OutputFlags a_eCerrFlags ) throw();
+void* DebugNew( std::size_t a_iSize, bool a_bNoThrow = false )
+    throw( std::bad_alloc );
 void* DebugNew( std::size_t a_iSize,
-                OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+                OutputFlags a_eClogFlags,
+                OutputFlags a_eCerrFlags,
                 bool a_bNoThrow = false ) throw( std::bad_alloc );
 void* DebugNew( std::size_t a_iSize,
-                char* const a_pccFile,
+                const char* const a_pccFile,
                 unsigned int a_uiLine,
-                OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
+                bool a_bNoThrow = false ) throw( std::bad_alloc );
+void* DebugNew( std::size_t a_iSize,
+                const char* const a_pccFile,
+                unsigned int a_uiLine,
+                OutputFlags a_eClogFlags,
+                OutputFlags a_eCerrFlags,
                 bool a_bNoThrow = false ) throw( std::bad_alloc );
 void DumpLeaks( std::ostream& a_roOut = std::cout );
 LeakMap GetLeaks();
-void StoreFileLine( char* const a_pccFile, unsigned int a_iLine ) throw();
+bool IsOn();
+void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
+                     OutputFlags a_eDefaultCerrFlags );
+void Start();
+void Start( OutputFlags a_eDefaultClogFlags, OutputFlags a_eDefaultCerrFlags );
+void Stop();
+void StoreFileLine( const char* const a_pccFile, unsigned int a_iLine ) throw();
 void UnstoreFileLine() throw();
 
 }   // namespace LeakDebug

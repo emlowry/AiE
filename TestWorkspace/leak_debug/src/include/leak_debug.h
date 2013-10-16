@@ -1,16 +1,16 @@
 /** ***************************************************************************
  * @file      leak_debug.h
  * @author    Elizabeth Lowry
- * @date      October 7, 2013 - October 8, 2013
+ * @date      October 7, 2013 - October 16, 2013
  * @brief     Memory leak logging.
  * @details   The header file to include in order to use the memory leak logging
  *              static library.
  * @pre       Make sure your project links to leak_debug.a or leak_debug_d.a
  *              before including this, and make sure your preprocessor
  *              directives can correctly determine whether or not to use this
- *              logging (modify lines 22-24 if necessary).
+ *              logging (modify lines 24-26 if necessary).
  * @par       Last Modification:
- *              Added some comments and default parameter values.
+ *              Refactoring.
  **************************************************************************** */
 
 // If you're including this external-use header, then you shouldn't include the
@@ -85,22 +85,38 @@ typedef std::map< void*, Leak > LeakMap;
 
 // The logging implementations are only imported from libLeakDebug.a when in
 // debug mode.
+extern void DebugDelete( void* a_pMemory ) throw();
+extern void DebugDelete( void* a_pMemory,
+                         OutputFlags a_eClogFlags,
+                         OutputFlags a_eCerrFlags ) throw();
+extern void* DebugNew( std::size_t a_iSize, bool a_bNoThrow = false )
+    throw( std::bad_alloc );
+extern void* DebugNew( std::size_t a_iSize,
+                       OutputFlags a_eClogFlags,
+                       OutputFlags a_eCerrFlags,
+                       bool a_bNoThrow = false ) throw( std::bad_alloc );
 extern void DumpLeaks( std::ostream& a_roOut = std::cout );
 extern LeakMap GetLeaks();
-extern void* DebugNew( std::size_t a_iSize,
-                       OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                       OutputFlags a_eCerrFlags = OutputFlags::FAILURES,
-                       bool a_bNoThrow = false ) throw( std::bad_alloc );
-extern void DebugDelete( void* a_pMemory,
-                         OutputFlags a_eClogFlags = OutputFlags::SUCCESSES,
-                         OutputFlags a_eCerrFlags = OutputFlags::FAILURES )
-    throw();
+extern bool IsOn();
+extern void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
+                            OutputFlags a_eDefaultCerrFlags );
+extern void Start();
+extern void Start( OutputFlags a_eDefaultClogFlags,
+                   OutputFlags a_eDefaultCerrFlags );
+extern void Stop();
 extern void StoreFileLine( char* const a_pccFile, unsigned int a_iLine );
 
 #else
 
 inline void DumpLeaks( std::ostream& a_roOut = std::cout ) {}
-#define GetLeaks LeakMap
+inline LeakMap GetLeaks() { return LeakMap(); }
+inline bool IsOn() { return false; }
+inline void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
+                            OutputFlags a_eDefaultCerrFlags ) {}
+inline void Start() {}
+inline void Start( OutputFlags a_eDefaultClogFlags,
+                   OutputFlags a_eDefaultCerrFlags ) {}
+inline void Stop() {}
 
 #endif  // LEAK_DEBUG_LOGGING
 
@@ -176,6 +192,19 @@ void operator delete[]( void* a_pMemory, const std::nothrow_t& ) throw()
 #define new ( LeakDebug::StoreFileLine( __FILE__, __LINE__ ), false ) \
             ? nullptr : new
 #define delete LeakDebug::StoreFileLine( __FILE__, __LINE__ ), delete
+
+// Macros provide easy calls to start and stop logging and to dump the leaks,
+// macros that expand to nothing when logging is disabled.
+#define LEAK_DEBUG_START LeakDebug::Start( LEAK_DEBUG_CLOG_FLAGS, \
+                                           LEAK_DEBUG_CERR_FLAGS );
+#define LEAK_DEBUG_DUMP LeakDebug::DumpLeaks();
+#define LEAK_DEBUG_STOP LeakDebug::Stop();
+
+#else
+
+#define LEAK_DEBUG_START
+#define LEAK_DEBUG_DUMP
+#define LEAK_DEBUG_STOP
 
 #endif  // LEAK_DEBUG_LOGGING
 

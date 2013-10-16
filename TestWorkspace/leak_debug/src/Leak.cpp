@@ -1,11 +1,11 @@
 /** ***************************************************************************
  * @file      Leak.cpp
  * @author    Elizabeth Lowry
- * @date      October 15, 2013 - October 15, 2013
+ * @date      October 15, 2013 - October 16, 2013
  * @brief     Memory leak logging.
  * @details   Implementations for the Leak struct operators.
  * @par       Last Modification:
- *              Splitting off from LeakDebug.cpp
+ *              Debugging.
  **************************************************************************** */
 
 #include "Leak.h"
@@ -25,7 +25,7 @@ std::ostream& LeakDebug::operator<<( std::ostream& a_roOut,
 {
     a_roOut << ac_roLeak.size << " bytes at "
             << ac_roLeak.pointer << " allocated by ";
-    if( strlen(ac_roLeak.file) > 0 )
+    if( strlen( ac_roLeak.file ) > 0 )
     {
         a_roOut << ac_roLeak.file << "(" << ac_roLeak.line << ")";
     }
