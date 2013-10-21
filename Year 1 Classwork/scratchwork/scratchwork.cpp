@@ -2,7 +2,9 @@
 //
 
 #include "stdafx.h"
+#include "tinyxml2.h"
 #include <iostream>
+#include <list>
 #include <string>
 #include <sstream>
 #include <conio.h>
@@ -104,10 +106,21 @@ struct ArmedPlayer
 	float smartBombChargePeriod;
 	unsigned int smartBombs;
 };
-/**/
 
 void expand( int*& a_raiArray, unsigned int& a_ruiCapacity );
 void sort( int* const ac_aiArray, const unsigned int ac_uiSize );
+/**/
+
+
+struct Score
+{
+    string name;
+    unsigned long points;
+};
+
+bool DescendingOrder( const Score& a_roFirstScore, const Score& a_roSecondScore );
+void PrintScores( const list<Score>& a_roScores );
+bool ReadScores( list<Score>& a_roScores, const string& a_roFileName );
 
 int main(int argc, char* argv[])
 {
@@ -227,7 +240,6 @@ int main(int argc, char* argv[])
 	for (unsigned int ui = 0; ui < 64; ui++)
 		aiGrid[ui/8][ui%8] = ui + 1;
 	DisplayTile(aiGrid);
-/**/
 
 	unsigned int uiSize = 0;
 	unsigned int uiCapacity = 16;
@@ -257,6 +269,23 @@ int main(int argc, char* argv[])
 		cout << (pi == aiValues ? "" : " ") << *pi;
 	}
 	delete[] aiValues;
+/**/
+
+    // get file name
+    string oFileName = "";
+    do
+    {
+        cout << "Please enter a score file name (name must not include whitespace): ";
+        cin >> oFileName;
+    } while( oFileName.empty() );
+
+    // read and print scores
+    list<Score> oScores;
+    if( ReadScores( oScores, oFileName ) )
+    {
+        oScores.sort( DescendingOrder );
+        PrintScores( oScores );
+    }
 
 	cout << endl << endl << "Press any key to exit...";
 	getch();
@@ -264,6 +293,74 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+inline bool DescendingOrder( const Score& a_roFirstScore, const Score& a_roSecondScore )
+{
+    return ( a_roFirstScore.points > a_roSecondScore.points );
+}
+
+void PrintScores( const list<Score>& a_roScores )
+{
+    cout << endl << "HIGH SCORES\n===========";
+    unsigned int uiPlace = 1;
+    for( list<Score>::const_iterator oIter = a_roScores.begin();
+         a_roScores.end() != oIter;
+         ++oIter, ++uiPlace )
+    {
+        cout << endl << "#" << uiPlace << ":\t" << (*oIter).points << "\t" << (*oIter).name;
+    }
+}
+
+bool ReadScores( list<Score>& a_roScores, const string& a_roFileName )
+{
+    // try to open the XML file
+    tinyxml2::XMLDocument oXML;
+    tinyxml2::XMLError oError = oXML.LoadFile( a_roFileName.c_str() );
+    if( tinyxml2::XML_SUCCESS != oError )
+    {
+        cout << "Unable to parse XML file.";
+        return false;
+    }
+
+    // structure of XML file:
+    // - scores         root element, FirstChildElement of the document
+    // - - score        a single player score
+    // - - - name       name of the player that made the score
+    // - - - points     point value of the score
+    tinyxml2::XMLElement* poRoot = oXML.FirstChildElement( "scores" );
+    if( NULL == poRoot )
+    {
+        cout << "No score list in XML file.";
+        return false;
+    }
+    if( poRoot->NoChildren() || NULL == poRoot->FirstChildElement( "score" ) )
+    {
+        cout << "No scores in list.";
+        return false;
+    }
+
+    // loop through the score elements
+    for( tinyxml2::XMLElement* poScore = poRoot->FirstChildElement( "score" );
+         poScore != NULL;
+         poScore = poScore->NextSiblingElement( "score" ) )
+    {
+        Score oValue;
+        oValue.name = poScore->FirstChildElement( "name" )->GetText();
+        string oPoints = poScore->FirstChildElement( "points" )->GetText();
+        try
+        {
+            oValue.points = stoul( oPoints );
+        }
+        catch( exception oException )
+        {
+            continue;
+        }
+        a_roScores.push_back(oValue);
+    }
+
+    return true;
+}
+
+/*
 void expand( int*& a_raiArray, unsigned int& a_ruiCapacity )
 {
 	int* aiNewArray = new int[a_ruiCapacity * 2];
@@ -305,7 +402,6 @@ void sort( int* const ac_aiArray, const unsigned int ac_uiSize )
 	}
 }
 
-/*
 void ExcerciseTwoFunction(char* a_pcString)
 {
 	for (unsigned int ui = 0; ui < strlen(a_pcString); ui++)

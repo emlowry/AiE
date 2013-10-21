@@ -1,0 +1,14 @@
+<scores>
+  <score>
+    <name>foo</name>
+    <points>256</points>
+  </score>
+  <score>
+    <name>baz</name>
+    <points>64</points>
+  </score>
+  <score>
+    <name>bar</name>
+    <points>128</points>
+  </score>
+</scores>
