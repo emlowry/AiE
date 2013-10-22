@@ -22,25 +22,25 @@ using LeakDebug::OutputFlags;
 // These functions are only used inside this cpp.  There's no need to expose
 // them to library users.
 template< typename... Args >
-static void ClogAndCerrMessages( OutputFlags a_eClogFlags,
-                                 OutputFlags a_eCerrFlags,
-                                 OutputFlags a_eRequiredFlags,
+static void ClogAndCerrMessages( const OutputFlags ac_eClogFlags,
+                                 const OutputFlags ac_eCerrFlags,
+                                 const OutputFlags ac_eRequiredFlags,
                                  Args&... a_rArgs ) throw();
 static void LogAllocation( void* a_pPointer,
                            std::size_t a_iSize,
-                           const char* const a_pccFile,
-                           unsigned int a_uiLine,
-                           OutputFlags a_eClogFlags,
-                           OutputFlags a_eCerrFlags ) throw();
+                           const std::string& ac_roFile,
+                           const unsigned int ac_uiLine,
+                           const OutputFlags ac_eClogFlags,
+                           const OutputFlags ac_eCerrFlags ) throw();
 static void LogDeallocation( void* a_pMemory,
-                             const char* const a_pccFile,
-                             unsigned int a_uiLine,
-                             OutputFlags a_eClogFlags,
-                             OutputFlags a_eCerrFlags ) throw();
+                             const std::string& ac_roFile,
+                             const unsigned int ac_uiLine,
+                             const OutputFlags ac_eClogFlags,
+                             const OutputFlags ac_eCerrFlags ) throw();
 template< typename... Args >
 static void OutputMessage( std::ostream& a_roOut,
-                           OutputFlags a_eFlags,
-                           OutputFlags a_eRequiredFlags,
+                           const OutputFlags ac_eFlags,
+                           const OutputFlags ac_eRequiredFlags,
                            Args&... a_rArgs ) throw();
 template< typename T, typename... Args >
 static void OutputMessage( std::ostream& a_roOut, T& a_rArg, Args&... a_rArgs );
@@ -50,12 +50,12 @@ static void OutputMessage( std::ostream& a_roOut, T& a_rArg );
 /**
  * If the things to print to std::clog aren't specified, what should they be?
  */
-static OutputFlags sg_eDefaultClogFlags = OutputFlags::SUCCESSES;
+static LeakDebug::OutputFlags sg_eDefaultClogFlags = LeakDebug::OutputFlags::SUCCESSES;
 
 /**
  * If the things to print to std::cerr aren't specified, what should they be?
  */
-static OutputFlags sg_eDefaultCerrFlags = OutputFlags::FAILURES;
+static LeakDebug::OutputFlags sg_eDefaultCerrFlags = LeakDebug::OutputFlags::FAILURES;
 
 /**
  * Map of allocated memory
@@ -89,13 +89,13 @@ static unsigned int sg_uiStoredLine = 0;
  * @param a_rArgs           The list of objects that the message is composed of.
  */
 template< typename... Args >
-static void ClogAndCerrMessages( OutputFlags a_eClogFlags,
-                                 OutputFlags a_eCerrFlags,
-                                 OutputFlags a_eRequiredFlags,
+static void ClogAndCerrMessages( const OutputFlags ac_eClogFlags,
+                                 const OutputFlags ac_eCerrFlags,
+                                 const OutputFlags ac_eRequiredFlags,
                                  Args&... a_rArgs ) throw()
 {
-    OutputMessage( std::clog, a_eClogFlags, a_eRequiredFlags, a_rArgs... );
-    OutputMessage( std::cerr, a_eCerrFlags, a_eRequiredFlags, a_rArgs... );
+    OutputMessage( std::clog, ac_eClogFlags, ac_eRequiredFlags, a_rArgs... );
+    OutputMessage( std::cerr, ac_eCerrFlags, ac_eRequiredFlags, a_rArgs... );
 }
 
 /**
@@ -114,13 +114,11 @@ void LeakDebug::DebugDelete( void* a_pMemory ) throw()
  * @param[in] a_eCerrFlags  What should be noted in the standard error stream?
  */
 void LeakDebug::DebugDelete( void* a_pMemory,
-                             OutputFlags a_eClogFlags,
-                             OutputFlags a_eCerrFlags ) throw()
+                             const OutputFlags ac_eClogFlags,
+                             const OutputFlags ac_eCerrFlags ) throw()
 {
-    char acEmpty[] = "";
-    DebugDelete( a_pMemory,
-                 sg_oStoredFile.empty() ? acEmpty : &sg_oStoredFile[0],
-                 sg_uiStoredLine, a_eClogFlags, a_eCerrFlags );
+    DebugDelete( a_pMemory, sg_oStoredFile.c_str(), sg_uiStoredLine,
+                 ac_eClogFlags, ac_eCerrFlags );
     UnstoreFileLine();
 }
 
@@ -131,10 +129,10 @@ void LeakDebug::DebugDelete( void* a_pMemory,
  * @param[in] a_uiLine      Line from which the deallocation call originated.
  */
 void LeakDebug::DebugDelete( void* a_pMemory,
-                             const char* const a_pccFile,
-                             unsigned int ac_uiLine ) throw()
+                             const char* const ac_pccFile,
+                             const unsigned int ac_uiLine ) throw()
 {
-    DebugDelete( a_pMemory, a_pccFile, ac_uiLine,
+    DebugDelete( a_pMemory, ac_pccFile, ac_uiLine,
                  sg_eDefaultClogFlags, sg_eDefaultCerrFlags );
 }
 
@@ -147,10 +145,10 @@ void LeakDebug::DebugDelete( void* a_pMemory,
  * @param[in] a_eCerrFlags  What should be noted in the standard error stream?
  */
 void LeakDebug::DebugDelete( void* a_pMemory,
-                             const char* const a_pccFile,
-                             unsigned int ac_uiLine,
-                             OutputFlags ac_eClogFlags,
-                             OutputFlags ac_eCerrFlags ) throw()
+                             const char* const ac_pccFile,
+                             const unsigned int ac_uiLine,
+                             const OutputFlags ac_eClogFlags,
+                             const OutputFlags ac_eCerrFlags ) throw()
 {
     // increase recursion level so recursive new/delete calls won't be logged
     ++sg_uiRecursionLevel;
@@ -164,7 +162,8 @@ void LeakDebug::DebugDelete( void* a_pMemory,
     // As long as this isn't a recursion from an earlier deallocation, log it.
     if( sg_uiRecursionLevel <= 1 )
     {
-        LogDeallocation( a_pMemory, a_pccFile, ac_uiLine,
+        std::string oFile = ac_pccFile;
+        LogDeallocation( a_pMemory, oFile, ac_uiLine,
                          ac_eClogFlags, ac_eCerrFlags );
     }
 
@@ -178,11 +177,11 @@ void LeakDebug::DebugDelete( void* a_pMemory,
  * @param a_bNoThrow    On failure, return a nullptr, don't throw a bad_alloc.
  * @return  A pointer to the allocated dynamic memory.
  */
-void* LeakDebug::DebugNew( std::size_t a_iSize, bool a_bNoThrow )
+void* LeakDebug::DebugNew( std::size_t a_iSize, const bool ac_bNoThrow )
     throw( std::bad_alloc )
 {
     return DebugNew( a_iSize, sg_eDefaultClogFlags,
-                     sg_eDefaultCerrFlags, a_bNoThrow );
+                     sg_eDefaultCerrFlags, ac_bNoThrow );
 }
 
 /**
@@ -194,19 +193,16 @@ void* LeakDebug::DebugNew( std::size_t a_iSize, bool a_bNoThrow )
  * @return  A pointer to the allocated dynamic memory.
  */
 void* LeakDebug::DebugNew( std::size_t a_iSize,
-                           OutputFlags a_eClogFlags,
-                           OutputFlags a_eCerrFlags,
-                           bool a_bNoThrow ) throw( std::bad_alloc )
+                           const OutputFlags ac_eClogFlags,
+                           const OutputFlags ac_eCerrFlags,
+                           const bool ac_bNoThrow ) throw( std::bad_alloc )
 {
     try
     {
         // Try to allocate memory, using the stored filename and line.
-        char acEmpty[] = "";
-        void* toReturn =
-            DebugNew( a_iSize,
-                      sg_oStoredFile.empty() ? acEmpty : &sg_oStoredFile[0],
-                      sg_uiStoredLine, a_eClogFlags, a_eCerrFlags,
-                      a_bNoThrow );
+        void* toReturn = DebugNew( a_iSize, sg_oStoredFile.c_str(),
+                                   sg_uiStoredLine, ac_eClogFlags,
+                                   ac_eCerrFlags, ac_bNoThrow );
 
         // If allocation succeeded, clear stored filename and line, then return.
         UnstoreFileLine();
@@ -229,12 +225,12 @@ void* LeakDebug::DebugNew( std::size_t a_iSize,
  * @return  A pointer to the allocated dynamic memory.
  */
 void* LeakDebug::DebugNew( std::size_t a_iSize,
-                           const char* const a_pccFile,
-                           unsigned int a_uiLine,
-                           bool a_bNoThrow ) throw( std::bad_alloc )
+                           const char* const ac_pccFile,
+                           const unsigned int ac_uiLine,
+                           const bool ac_bNoThrow ) throw( std::bad_alloc )
 {
-    return DebugNew( a_iSize, a_pccFile, a_uiLine,
-                     sg_eDefaultClogFlags, sg_eDefaultCerrFlags, a_bNoThrow );
+    return DebugNew( a_iSize, ac_pccFile, ac_uiLine,
+                     sg_eDefaultClogFlags, sg_eDefaultCerrFlags, ac_bNoThrow );
 }
 
 /**
@@ -248,11 +244,11 @@ void* LeakDebug::DebugNew( std::size_t a_iSize,
  * @return  A pointer to the allocated dynamic memory.
  */
 void* LeakDebug::DebugNew( std::size_t a_iSize,
-                           const char* const a_pccFile,
-                           unsigned int a_uiLine,
-                           OutputFlags a_eClogFlags,
-                           OutputFlags a_eCerrFlags,
-                           bool a_bNoThrow ) throw( std::bad_alloc )
+                           const char* const ac_pccFile,
+                           const unsigned int ac_uiLine,
+                           const OutputFlags ac_eClogFlags,
+                           const OutputFlags ac_eCerrFlags,
+                           const bool ac_bNoThrow ) throw( std::bad_alloc )
 {
     // increase recursion level so recursive new/delete calls won't be logged
     ++sg_uiRecursionLevel;
@@ -279,15 +275,16 @@ void* LeakDebug::DebugNew( std::size_t a_iSize,
     // As long as this isn't a recursion from an earlier allocation, log it.
     if( sg_uiRecursionLevel <= 1 )
     {
-        LogAllocation( pResult, a_iSize, a_pccFile, a_uiLine,
-                       a_eClogFlags, a_eCerrFlags );
+        std::string oFile = ac_pccFile;
+        LogAllocation( pResult, a_iSize, oFile, ac_uiLine,
+                       ac_eClogFlags, ac_eCerrFlags );
     }
 
     // decrease recursion level so subsequent new/delete calls will be logged.
     --sg_uiRecursionLevel;
 
     // If allocation failed even after trying to call the new_handler, throw up.
-    if( !a_bNoThrow && pResult == nullptr )
+    if( !ac_bNoThrow && pResult == nullptr )
     {
         throw std::bad_alloc();
     }
@@ -358,25 +355,25 @@ bool LeakDebug::IsOn()
  */
 static void LogAllocation( void* a_pPointer,
                            std::size_t a_iSize,
-                           const char* const a_pccFile,
-                           unsigned int a_uiLine,
-                           OutputFlags a_eClogFlags,
-                           OutputFlags a_eCerrFlags ) throw()
+                           const std::string& ac_roFile,
+                           const unsigned int ac_uiLine,
+                           const OutputFlags ac_eClogFlags,
+                           const OutputFlags ac_eCerrFlags ) throw()
 {
     // If allocation failed, just output an error message to the appropriate
     // stream(s) and return.
     if( a_pPointer == nullptr )
     {
-        if( strlen( a_pccFile ) > 0 )
+        if( !ac_roFile.empty() )
         {
-            ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+            ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                                  OutputFlags::FAILED_ALLOCATIONS,
                                  "FAILED ALLOCATION of ", a_iSize, " bytes by ",
-                                 a_pccFile, "(", a_uiLine, ")" );
+                                 ac_roFile, "(", ac_uiLine, ")" );
         }
         else
         {
-            ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+            ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                                  OutputFlags::FAILED_ALLOCATIONS,
                                  "FAILED ALLOCATION of ", a_iSize, " bytes by ",
                                  "unknown" );
@@ -385,15 +382,13 @@ static void LogAllocation( void* a_pPointer,
     }
 
     // Create a Leak struct.
-    char* pcName = new char[ strlen( a_pccFile ) + 1 ];
-    strcpy( pcName, a_pccFile );
-    LeakDebug::Leak oLeak = { a_pPointer, a_iSize, pcName, a_uiLine };
+    LeakDebug::Leak oLeak = { a_pPointer, a_iSize, ac_roFile, ac_uiLine };
 
     // Store a copy of the struct.
     sg_oLeaks[ a_pPointer ] = oLeak;
 
     // Output a success message to the appropriate streams.
-    ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+    ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                          OutputFlags::SUCCESSFUL_ALLOCATIONS, oLeak );
 }
 
@@ -406,24 +401,24 @@ static void LogAllocation( void* a_pPointer,
  * @param a_eCerrFlags  What should be noted in the standard error stream?
  */
 static void LogDeallocation( void* a_pMemory,
-                             const char* const a_pccFile,
-                             unsigned int a_uiLine,
-                             OutputFlags a_eClogFlags,
-                             OutputFlags a_eCerrFlags ) throw()
+                             const std::string& ac_roFile,
+                             const unsigned int ac_uiLine,
+                             const OutputFlags ac_eClogFlags,
+                             const OutputFlags ac_eCerrFlags ) throw()
 {
     // If trying to deallocate the null pointer, just print a message.
     if( a_pMemory == nullptr )
     {
-        if( strlen( a_pccFile ) > 0 )
+        if( !ac_roFile.empty() )
         {
-            ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+            ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                                  OutputFlags::DEALLOCATIONS,
                                  "Null pointer deallocated by ",
-                                 a_pccFile, "(", a_uiLine, ")" );
+                                 ac_roFile, "(", ac_uiLine, ")" );
         }
         else
         {
-            ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+            ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                                  OutputFlags::DEALLOCATIONS,
                                  "Null pointer deallocated by unknown" );
         }
@@ -433,17 +428,17 @@ static void LogDeallocation( void* a_pMemory,
     // Do the same for pointers to memory that wasn't allocated before anyway.
     if( sg_oLeaks.count( a_pMemory ) < 1 )
     {
-        if( strlen( a_pccFile ) > 0 )
+        if( !ac_roFile.empty() )
         {
-            ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+            ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                                  OutputFlags::DEALLOCATIONS,
                                  "Pointer to unallocated memory at ",
                                  a_pMemory, " deallocated by ",
-                                 a_pccFile, "(", a_uiLine, ")" );
+                                 ac_roFile, "(", ac_uiLine, ")" );
         }
         else
         {
-            ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+            ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                                  OutputFlags::DEALLOCATIONS,
                                  "Pointer to unallocated memory at ",
                                  a_pMemory, " deallocated by unknown" );
@@ -456,22 +451,19 @@ static void LogDeallocation( void* a_pMemory,
     sg_oLeaks.erase( a_pMemory );
 
     // Print message to appropriate output streams
-    if( strlen( a_pccFile ) > 0 )
+    if( !ac_roFile.empty() )
     {
-        ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+        ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                              OutputFlags::DEALLOCATIONS,
                              oLeak, " deallocated by ",
-                             a_pccFile, "(", a_uiLine, ")" );
+                             ac_roFile, "(", ac_uiLine, ")" );
     }
     else
     {
-        ClogAndCerrMessages( a_eClogFlags, a_eCerrFlags,
+        ClogAndCerrMessages( ac_eClogFlags, ac_eCerrFlags,
                              OutputFlags::DEALLOCATIONS,
                              oLeak, " deallocated by unknown" );
     }
-
-    // free memory used for file name string
-    delete[] oLeak.file;
 }
 
 /**
@@ -483,12 +475,12 @@ static void LogDeallocation( void* a_pMemory,
  */
 template< typename... Args >
 static void OutputMessage( std::ostream& a_roOut,
-                           OutputFlags a_eFlags,
-                           OutputFlags a_eRequiredFlags,
+                           const OutputFlags ac_eFlags,
+                           const OutputFlags ac_eRequiredFlags,
                            Args&... a_rArgs ) throw()
 {
     // If the required flags aren't in the given flags, don't do anything.
-    if( !( a_eFlags & a_eRequiredFlags ) )
+    if( !( ac_eFlags & ac_eRequiredFlags ) )
     {
         return;
     }
@@ -584,16 +576,16 @@ void LeakDebug::Stop()
  * @param a_pccFile File from which a following DebugNew/Delete will originate.
  * @param a_iLine   Line from which a following DebugNew/Delete will originate.
  */
-void LeakDebug::StoreFileLine( const char* const a_pccFile,
-                               unsigned int a_iLine )
+void LeakDebug::StoreFileLine( const char* const ac_pccFile,
+                               const unsigned int ac_uiLine )
     throw()
 {
     // increase recursion level so recursive new/delete calls won't be logged
     ++sg_uiRecursionLevel;
 
     // store file name and line
-    sg_oStoredFile = a_pccFile;
-    sg_uiStoredLine = a_iLine;
+    sg_oStoredFile = ac_pccFile;
+    sg_uiStoredLine = ac_uiLine;
 
     // decrease recursion level so subsequent new/delete calls will be logged.
     --sg_uiRecursionLevel;

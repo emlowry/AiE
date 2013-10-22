@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 
 #ifdef LEAK_DEBUG_LOGGING
 #include <new>
@@ -63,7 +64,7 @@ struct Leak
 {
     void* pointer;      //!< Address of the allocated memory.
     std::size_t size;   //!< Size in bytes of the block of allocated memory.
-    const char* file;   //!< Name of the code file that allocated the memory.
+    std::string file;   //!< Name of the code file that allocated the memory.
     unsigned int line;  //!< Line of code on which the memory was allocated.
 };
 
@@ -87,14 +88,14 @@ typedef std::map< void*, Leak > LeakMap;
 // debug mode.
 extern void DebugDelete( void* a_pMemory ) throw();
 extern void DebugDelete( void* a_pMemory,
-                         OutputFlags a_eClogFlags,
-                         OutputFlags a_eCerrFlags ) throw();
-extern void* DebugNew( std::size_t a_iSize, bool a_bNoThrow = false )
+                         const OutputFlags ac_eClogFlags,
+                         const OutputFlags ac_eCerrFlags ) throw();
+extern void* DebugNew( std::size_t a_iSize, const bool ac_bNoThrow = false )
     throw( std::bad_alloc );
 extern void* DebugNew( std::size_t a_iSize,
-                       OutputFlags a_eClogFlags,
-                       OutputFlags a_eCerrFlags,
-                       bool a_bNoThrow = false ) throw( std::bad_alloc );
+                       const OutputFlags ac_eClogFlags,
+                       const OutputFlags ac_eCerrFlags,
+                       const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 extern void DumpLeaks( std::ostream& a_roOut = std::cout );
 extern LeakMap GetLeaks();
 extern bool IsOn();
@@ -104,7 +105,8 @@ extern void Start();
 extern void Start( OutputFlags a_eDefaultClogFlags,
                    OutputFlags a_eDefaultCerrFlags );
 extern void Stop();
-extern void StoreFileLine( char* const a_pccFile, unsigned int a_iLine );
+extern void StoreFileLine( const char* const ac_pccFile,
+                           const unsigned int ac_uiLine );
 
 #else
 
@@ -138,53 +140,35 @@ inline void Stop() {}
 // the logging implementations from the library.
 void* operator new( std::size_t a_iSize ) throw(std::bad_alloc)
 {
-    return LeakDebug::DebugNew( a_iSize,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    return LeakDebug::DebugNew( a_iSize );
 }
 void* operator new[]( std::size_t a_iSize ) throw(std::bad_alloc)
 {
-    return LeakDebug::DebugNew( a_iSize,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    return LeakDebug::DebugNew( a_iSize );
 }
 void* operator new( std::size_t a_iSize, const std::nothrow_t& )
 {
-    return LeakDebug::DebugNew( a_iSize,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS,
-                                true );
+    return LeakDebug::DebugNew( a_iSize, true );
 }
 void* operator new[]( std::size_t a_iSize, const std::nothrow_t& )
 {
-    return LeakDebug::DebugNew( a_iSize,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                                (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS,
-                                true );
+    return LeakDebug::DebugNew( a_iSize, true );
 }
 void operator delete( void* a_pMemory ) throw()
 {
-    LeakDebug::DebugDelete( a_pMemory,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory );
 }
 void operator delete[]( void* a_pMemory ) throw()
 {
-    LeakDebug::DebugDelete( a_pMemory,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory );
 }
 void operator delete( void* a_pMemory, const std::nothrow_t& ) throw()
 {
-    LeakDebug::DebugDelete( a_pMemory,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory );
 }
 void operator delete[]( void* a_pMemory, const std::nothrow_t& ) throw()
 {
-    LeakDebug::DebugDelete( a_pMemory,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CLOG_FLAGS,
-                            (LeakDebug::OutputFlags)LEAK_DEBUG_CERR_FLAGS );
+    LeakDebug::DebugDelete( a_pMemory );
 }
 
 // Macros replace simple new and delete calls so that the file and line of the

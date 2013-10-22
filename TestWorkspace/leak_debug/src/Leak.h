@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <map>
+#include <string>
 
 namespace LeakDebug
 {
@@ -24,7 +25,7 @@ struct Leak
 {
     void* pointer;      //!< Address of the allocated memory.
     std::size_t size;   //!< Size in bytes of the block of allocated memory.
-    const char* file;   //!< Name of the code file that allocated the memory.
+    std::string file;   //!< Name of the code file that allocated the memory.
     unsigned int line;  //!< Line of code on which the memory was allocated.
 };
 

@@ -25,7 +25,7 @@ std::ostream& LeakDebug::operator<<( std::ostream& a_roOut,
 {
     a_roOut << ac_roLeak.size << " bytes at "
             << ac_roLeak.pointer << " allocated by ";
-    if( strlen( ac_roLeak.file ) > 0 )
+    if( !ac_roLeak.file.empty() )
     {
         a_roOut << ac_roLeak.file << "(" << ac_roLeak.line << ")";
     }
@@ -48,7 +48,7 @@ bool LeakDebug::operator==( const Leak& ac_roLeftLeak,
 {
     return ( ac_roLeftLeak.pointer == ac_roRightLeak.pointer &&
              ac_roLeftLeak.size == ac_roRightLeak.size &&
-             strcmp(ac_roLeftLeak.file, ac_roRightLeak.file) == 0 &&
+             ac_roLeftLeak.file.compare( ac_roRightLeak.file ) == 0 &&
              ac_roLeftLeak.line == ac_roRightLeak.line );
 }
 
@@ -64,7 +64,7 @@ bool LeakDebug::operator!=( const Leak& ac_roLeftLeak,
 {
     return ( ac_roLeftLeak.pointer != ac_roRightLeak.pointer ||
              ac_roLeftLeak.size != ac_roRightLeak.size ||
-             strcmp(ac_roLeftLeak.file, ac_roRightLeak.file) != 0 ||
+             ac_roLeftLeak.file.compare( ac_roRightLeak.file ) != 0 ||
              ac_roLeftLeak.line != ac_roRightLeak.line );
 }
 
@@ -93,7 +93,7 @@ bool LeakDebug::operator>( const Leak& ac_roLeftLeak,
         return false;
 
     // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
+    int iCmp = ac_roLeftLeak.file.compare( ac_roRightLeak.file );
     if( iCmp > 0 )
         return true;
     if( iCmp < 0 )
@@ -128,7 +128,7 @@ bool LeakDebug::operator>=( const Leak& ac_roLeftLeak,
         return false;
 
     // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
+    int iCmp = ac_roLeftLeak.file.compare( ac_roRightLeak.file );
     if( iCmp > 0 )
         return true;
     if( iCmp < 0 )
@@ -163,7 +163,7 @@ bool LeakDebug::operator<( const Leak& ac_roLeftLeak,
         return false;
 
     // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
+    int iCmp = ac_roLeftLeak.file.compare( ac_roRightLeak.file );
     if( iCmp < 0 )
         return true;
     if( iCmp > 0 )
@@ -198,7 +198,7 @@ bool LeakDebug::operator<=( const Leak& ac_roLeftLeak,
         return false;
 
     // Check file next
-    int iCmp = strcmp(ac_roLeftLeak.file, ac_roRightLeak.file);
+    int iCmp = ac_roLeftLeak.file.compare( ac_roRightLeak.file );
     if( iCmp < 0 )
         return true;
     if( iCmp > 0 )

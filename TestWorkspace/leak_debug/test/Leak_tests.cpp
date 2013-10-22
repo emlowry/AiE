@@ -52,7 +52,7 @@ TEST_F( LeakTest, EqualityOperator )
     m_oLeakTwo.size = m_oLeakOne.size;
 
     // Equality operator returns false if file names differ.
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_FALSE( m_oLeakOne == m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo == m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -86,7 +86,7 @@ TEST_F( LeakTest, InequalityOperator )
     m_oLeakTwo.size = m_oLeakOne.size;
 
     // Inequality operator returns true if file names differ.
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_TRUE( m_oLeakOne != m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo != m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -129,11 +129,11 @@ TEST_F( LeakTest, GreaterThanOperatorAddress )
     m_oLeakTwo.size = m_oLeakOne.size;
 
     // ... or if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_FALSE( m_oLeakOne > m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo > m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_FALSE( m_oLeakOne > m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo > m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -159,11 +159,11 @@ TEST_F( LeakTest, GreaterThanOperatorSize )
     EXPECT_TRUE( m_oLeakTwo > m_oLeakOne );
 
     // ... with no change in result if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_FALSE( m_oLeakOne > m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo > m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_FALSE( m_oLeakOne > m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo > m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -182,7 +182,7 @@ TEST_F( LeakTest, GreaterThanOperatorFile )
 {
     // Greater-than operator returns false if first file name is less than
     // second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_FALSE( m_oLeakOne > m_oLeakTwo );
 
     // ... true if vice-versa...
@@ -240,11 +240,11 @@ TEST_F( LeakTest, GreaterThanOrEqualToOperatorAddress )
     m_oLeakTwo.size = m_oLeakOne.size;
 
     // ... or if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_FALSE( m_oLeakOne >= m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo >= m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_FALSE( m_oLeakOne >= m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo >= m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -270,11 +270,11 @@ TEST_F( LeakTest, GreaterThanOrEqualToOperatorSize )
     EXPECT_TRUE( m_oLeakTwo >= m_oLeakOne );
 
     // ... with no change in result if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_FALSE( m_oLeakOne >= m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo >= m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_FALSE( m_oLeakOne >= m_oLeakTwo );
     EXPECT_TRUE( m_oLeakTwo >= m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -293,7 +293,7 @@ TEST_F( LeakTest, GreaterThanOrEqualToOperatorFile )
 {
     // Greater-than-or-equal-to operator returns false if first file name is
     // less than second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_FALSE( m_oLeakOne >= m_oLeakTwo );
 
     // ... true if vice-versa...
@@ -350,11 +350,11 @@ TEST_F( LeakTest, LessThanOperatorAddress )
     m_oLeakTwo.size = m_oLeakOne.size;
 
     // ... or if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_TRUE( m_oLeakOne < m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo < m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_TRUE( m_oLeakOne < m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo < m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -379,11 +379,11 @@ TEST_F( LeakTest, LessThanOperatorSize )
     EXPECT_FALSE( m_oLeakTwo < m_oLeakOne );
 
     // ... with no change in result if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_TRUE( m_oLeakOne < m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo < m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_TRUE( m_oLeakOne < m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo < m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -401,7 +401,7 @@ TEST_F( LeakTest, LessThanOperatorSize )
 TEST_F( LeakTest, LessThanOperatorFile )
 {
     // Less-than operator returns true if first file name is less than second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_TRUE( m_oLeakOne < m_oLeakTwo );
 
     // ... false if vice-versa...
@@ -459,11 +459,11 @@ TEST_F( LeakTest, LessThanOrEqualToOperatorAddress )
     m_oLeakTwo.size = m_oLeakOne.size;
 
     // ... or if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_TRUE( m_oLeakOne <= m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo <= m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_TRUE( m_oLeakOne <= m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo <= m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -489,11 +489,11 @@ TEST_F( LeakTest, LessThanOrEqualToOperatorSize )
     EXPECT_FALSE( m_oLeakTwo <= m_oLeakOne );
 
     // ... with no change in result if first file name differs from second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_TRUE( m_oLeakOne <= m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo <= m_oLeakOne );
     m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = &m_oLeakTwo.file[ strlen( m_oLeakTwo.file ) ]; // "\0"
+    m_oLeakTwo.file = "";
     EXPECT_TRUE( m_oLeakOne <= m_oLeakTwo );
     EXPECT_FALSE( m_oLeakTwo <= m_oLeakOne );
     m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
@@ -512,7 +512,7 @@ TEST_F( LeakTest, LessThanOrEqualToOperatorFile )
 {
     // Less-than-or-equal-to operator returns true if first file name is less
     // than second...
-    m_oLeakOne.file = &m_oLeakOne.file[ strlen( m_oLeakOne.file ) ]; // "\0"
+    m_oLeakOne.file = "";
     EXPECT_TRUE( m_oLeakOne <= m_oLeakTwo );
 
     // ... false if vice-versa...

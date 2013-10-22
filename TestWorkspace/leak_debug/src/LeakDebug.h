@@ -44,32 +44,32 @@ enum OutputFlags
 // These are the functions exposed to library users.
 void DebugDelete( void* a_pMemory ) throw();
 void DebugDelete( void* a_pMemory,
-                  OutputFlags a_eClogFlags,
-                  OutputFlags a_eCerrFlags ) throw();
+                  const OutputFlags ac_eClogFlags,
+                  const OutputFlags ac_eCerrFlags ) throw();
 void DebugDelete( void* a_pMemory,
-                  const char* const a_pccFile,
-                  unsigned int a_uiLine ) throw();
+                  const char* const ac_pccFile,
+                  const unsigned int ac_uiLine ) throw();
 void DebugDelete( void* a_pMemory,
-                  const char* const a_pccFile,
-                  unsigned int a_uiLine,
-                  OutputFlags a_eClogFlags,
-                  OutputFlags a_eCerrFlags ) throw();
-void* DebugNew( std::size_t a_iSize, bool a_bNoThrow = false )
+                  const char* const ac_pccFile,
+                  const unsigned int ac_uiLine,
+                  const OutputFlags ac_eClogFlags,
+                  const OutputFlags ac_eCerrFlags ) throw();
+void* DebugNew( std::size_t a_iSize, const bool ac_bNoThrow = false )
     throw( std::bad_alloc );
 void* DebugNew( std::size_t a_iSize,
-                OutputFlags a_eClogFlags,
-                OutputFlags a_eCerrFlags,
-                bool a_bNoThrow = false ) throw( std::bad_alloc );
+                const OutputFlags ac_eClogFlags,
+                const OutputFlags ac_eCerrFlags,
+                const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 void* DebugNew( std::size_t a_iSize,
-                const char* const a_pccFile,
-                unsigned int a_uiLine,
-                bool a_bNoThrow = false ) throw( std::bad_alloc );
+                const char* const ac_pccFile,
+                const unsigned int ac_uiLine,
+                const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 void* DebugNew( std::size_t a_iSize,
-                const char* const a_pccFile,
-                unsigned int a_uiLine,
-                OutputFlags a_eClogFlags,
-                OutputFlags a_eCerrFlags,
-                bool a_bNoThrow = false ) throw( std::bad_alloc );
+                const char* const ac_pccFile,
+                const unsigned int ac_uiLine,
+                const OutputFlags ac_eClogFlags,
+                const OutputFlags ac_eCerrFlags,
+                const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 void DumpLeaks( std::ostream& a_roOut = std::cout );
 LeakMap GetLeaks();
 bool IsOn();
@@ -78,7 +78,8 @@ void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
 void Start();
 void Start( OutputFlags a_eDefaultClogFlags, OutputFlags a_eDefaultCerrFlags );
 void Stop();
-void StoreFileLine( const char* const a_pccFile, unsigned int a_iLine ) throw();
+void StoreFileLine( const char* const ac_pccFile,
+                    const unsigned int ac_uiLine ) throw();
 void UnstoreFileLine() throw();
 
 }   // namespace LeakDebug

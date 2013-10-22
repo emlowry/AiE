@@ -39,20 +39,41 @@ enum OutputFlags
 
 // library functions
 extern void DebugDelete( void* a_pMemory ) throw();
-extern void* DebugNew( std::size_t a_iSize, bool a_bNoThrow = false )
+extern void DebugDelete( void* a_pMemory,
+                         const OutputFlags ac_eClogFlags,
+                         const OutputFlags ac_eCerrFlags ) throw();
+extern void DebugDelete( void* a_pMemory,
+                         const char* const ac_pccFile,
+                         const unsigned int ac_uiLine ) throw();
+extern void DebugDelete( void* a_pMemory,
+                         const char* const ac_pccFile,
+                         const unsigned int ac_uiLine,
+                         const OutputFlags ac_eClogFlags,
+                         const OutputFlags ac_eCerrFlags ) throw();
+extern void* DebugNew( std::size_t a_iSize, const bool ac_bNoThrow = false )
     throw( std::bad_alloc );
 extern void* DebugNew( std::size_t a_iSize,
-                       const char* const a_pccFile,
-                       unsigned int a_uiLine,
-                       bool a_bNoThrow = false ) throw( std::bad_alloc );
+                       const OutputFlags ac_eClogFlags,
+                       const OutputFlags ac_eCerrFlags,
+                       const bool ac_bNoThrow = false ) throw( std::bad_alloc );
+extern void* DebugNew( std::size_t a_iSize,
+                       const char* const ac_pccFile,
+                       const unsigned int ac_uiLine,
+                       const bool ac_bNoThrow = false ) throw( std::bad_alloc );
+extern void* DebugNew( std::size_t a_iSize,
+                       const char* const ac_pccFile,
+                       const unsigned int ac_uiLine,
+                       const OutputFlags ac_eClogFlags,
+                       const OutputFlags ac_eCerrFlags,
+                       const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 extern void DumpLeaks( std::ostream& a_roOut );
 extern LeakMap GetLeaks();
 extern void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
                             OutputFlags a_eDefaultCerrFlags );
 extern void Start();
 extern void Stop();
-extern void StoreFileLine( const char* const a_pccFile,
-                           unsigned int a_iLine ) throw();
+extern void StoreFileLine( const char* const ac_pccFile,
+                           const unsigned int ac_uiLine ) throw();
 extern void UnstoreFileLine() throw();
 
 }   // namespace LeakDebug
