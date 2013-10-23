@@ -26,10 +26,6 @@ public:
 
 protected:
 
-    // Strings with identical contents but at different addresses.
-    static const char* const sm_cpcFileNameCopyOne;
-    static const char* const sm_cpcFileNameCopyTwo;
-
     // These two structs will be equivalent at the start of each test.
     LeakDebug::Leak m_oLeakOne;
     LeakDebug::Leak m_oLeakTwo;

@@ -14,16 +14,25 @@
 
 using LeakDebug::OutputFlags;
 
+const char* const LeakDebugTest::smc_cpcDataOne = "Memory leak One";
+const char* const LeakDebugTest::smc_cpcDataTwo = "Memory leak Two";
+const unsigned int LeakDebugTest::smc_uiDataSize =
+    strlen( LeakDebugTest::smc_cpcDataOne ) + 1;
+
 /**
  * Frees all tracked allocated memory at the end of each test.
  */
 void LeakDebugTest::Clear()
 {
-    // make sure there are no pre-existing leaks
+    // check for remaining leaks
     LeakDebug::LeakMap oLeaks = LeakDebug::GetLeaks();
     for( LeakDebug::LeakMap::value_type oEntry : oLeaks )
     {
-        LeakDebug::DebugDelete( oEntry.second.pointer );
+        // If the leak is still here at this point, then the pointer that
+        // originally pointed to it must be out of scope, making this a true
+        // leak and safe to deallocate.
+        void* pLeak = const_cast< void* >( oEntry.second.GetAddress() );
+        LeakDebug::DebugDelete( pLeak );
     }
 
     // make sure there is no stored line locations

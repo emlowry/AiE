@@ -12,18 +12,9 @@
 #include "externs/Leak.h"
 #include "LeakTest.h"
 
-const char* const LeakTest::sm_cpcFileNameCopyOne = __FILE__;
-const char* const LeakTest::sm_cpcFileNameCopyTwo = __FILE__;
-
 /**
  * Constructor sets up the two member Leak structs with equivalent field values.
  */
 LeakTest::LeakTest()
-{
-    unsigned int uiLine = __LINE__;
-    m_oLeakOne.pointer = m_oLeakTwo.pointer = &m_oLeakOne;
-    m_oLeakOne.size = m_oLeakTwo.size = sizeof(LeakDebug::Leak);
-    m_oLeakOne.file = sm_cpcFileNameCopyOne;
-    m_oLeakTwo.file = sm_cpcFileNameCopyTwo;
-    m_oLeakOne.line = m_oLeakTwo.line = uiLine;
-}
+    : m_oLeakOne( &m_oLeakOne, sizeof( LeakDebug::Leak ), __FILE__, __LINE__),
+      m_oLeakTwo( m_oLeakOne ) {}

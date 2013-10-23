@@ -59,13 +59,42 @@ enum OutputFlags
 
 /**
  * Describes a block of allocated dynamic memory and what line allocated it.
+ * The address stored here is stored as a pointer to const data to discourage
+ * users from using it for deallocation - deallocate from the code that
+ * originally allocated the leak instead!  Besides, the memory might have been
+ * deallocated after tracking was paused or after this object was retrieved, so
+ * trying to do anything to it could cause a segmentation fault.
  */
-struct Leak
+class Leak
 {
-    void* pointer;      //!< Address of the allocated memory.
-    std::size_t size;   //!< Size in bytes of the block of allocated memory.
-    std::string file;   //!< Name of the code file that allocated the memory.
-    unsigned int line;  //!< Line of code on which the memory was allocated.
+public:
+
+    Leak();
+    Leak( const void* const ac_cpAddress,
+          const std::size_t ac_uiSize,
+          const char* const ac_cpcFile,
+          const unsigned int ac_uiLine );
+    Leak( const Leak& ac_roLeak );
+    ~Leak();
+    Leak& operator=( const Leak& ac_roLeak );
+
+    const void* GetAddress() const;
+    const char* GetFile() const;
+    unsigned int GetLine() const;
+    std::size_t GetSize() const;
+
+    void SetAddress( const void* const ac_cpAddress );
+    void SetFile( const char* const ac_cpcFile );
+    void SetLine( const unsigned int ac_uiLine );
+    void SetSize( const std::size_t ac_uiSize );
+
+private:
+
+    const void* m_pAddress; //!< Address of the allocated memory.
+    std::size_t m_uiSize;   //!< Size in bytes of the block of allocated memory.
+    char* m_pcFile;         //!< Name of the code file that allocated the memory.
+    unsigned int m_uiLine;  //!< Line of code on which the memory was allocated.
+
 };
 
 // operators for the Leak struct
@@ -80,32 +109,33 @@ extern bool operator<=( const Leak& ac_roLeftLeak, const Leak& ac_roRightLeak );
 /**
  * A map of Leak structs describing allocated dynamic memory, keyed by address.
  */
-typedef std::map< void*, Leak > LeakMap;
+typedef std::map< const void*, Leak > LeakMap;
 
 #ifdef LEAK_DEBUG_LOGGING
 
 // The logging implementations are only imported from libLeakDebug.a when in
 // debug mode.
-extern void DebugDelete( void* a_pMemory ) throw();
-extern void DebugDelete( void* a_pMemory,
+extern void DebugDelete( void* const a_cpMemory ) throw();
+extern void DebugDelete( void* const a_cpMemory,
                          const OutputFlags ac_eClogFlags,
                          const OutputFlags ac_eCerrFlags ) throw();
-extern void* DebugNew( std::size_t a_iSize, const bool ac_bNoThrow = false )
+extern void* DebugNew( const std::size_t ac_uiSize,
+                       const bool ac_bNoThrow = false )
     throw( std::bad_alloc );
-extern void* DebugNew( std::size_t a_iSize,
+extern void* DebugNew( const std::size_t ac_uiSize,
                        const OutputFlags ac_eClogFlags,
                        const OutputFlags ac_eCerrFlags,
                        const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 extern void DumpLeaks( std::ostream& a_roOut = std::cout );
 extern LeakMap GetLeaks();
 extern bool IsOn();
-extern void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
-                            OutputFlags a_eDefaultCerrFlags );
+extern void SetOutputFlags( const OutputFlags ac_eDefaultClogFlags,
+                            const OutputFlags ac_eDefaultCerrFlags );
 extern void Start();
-extern void Start( OutputFlags a_eDefaultClogFlags,
-                   OutputFlags a_eDefaultCerrFlags );
+extern void Start( const OutputFlags ac_eDefaultClogFlags,
+                   const OutputFlags ac_eDefaultCerrFlags );
 extern void Stop();
-extern void StoreFileLine( const char* const ac_pccFile,
+extern void StoreFileLine( const char* const ac_cpcFile,
                            const unsigned int ac_uiLine );
 
 #else

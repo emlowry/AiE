@@ -17,30 +17,37 @@ using LeakDebug::OutputFlags;
 using LeakDebug::Leak;
 using LeakDebug::LeakMap;
 
-TEST_F( LeakDebugTest, TrackOneNoLine )
+TEST_F( LeakDebugTest, StartStopAndIsOn )
 {
-    // data to put in allocated memory
-    char acData[] = "Memory leak";
-    unsigned int acDataSize = strlen( acData ) + 1;
+    // tracking hasn't started yet
+    EXPECT_FALSE( LeakDebug::IsOn() );
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
 
+    // Allocate without tracking
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+}
+
+TEST_F( LeakDebugTest, TrackOneWithNoLine )
+{
     // start tracking memory leaks
     LeakDebug::Start();
 
     // allocate some memory
-    char* pcDataCopy = (char*)LeakDebug::DebugNew( acDataSize );
-    strcpy( pcDataCopy, acData );
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+    strcpy( pcDataCopy, smc_cpcDataOne );
 
     // make sure the leak is being tracked
     LeakMap oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_NE( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // make sure the tracked leak has the expected attributes
-    Leak oLeak = oLeaks[pcDataCopy];
-    EXPECT_EQ( oLeak.pointer, pcDataCopy );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, "" );
-    EXPECT_EQ( oLeak.line, 0 );
+    Leak oLeak = oLeaks[ pcDataCopy ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopy );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
 
     // deallocate the leak
     LeakDebug::DebugDelete( pcDataCopy );
@@ -48,65 +55,60 @@ TEST_F( LeakDebugTest, TrackOneNoLine )
     // make sure the leak is no longer being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // make sure nothing happens if you try to deallocate the link again
     LeakDebug::DebugDelete( pcDataCopy );
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // stop tracking memory leaks
     LeakDebug::Stop();
 }
 
-TEST_F( LeakDebugTest, TrackTwoNoLine )
+TEST_F( LeakDebugTest, TrackTwoWithNoLine )
 {
-    // data to put in allocated memory
-    char acDataOne[] = "Memory leak one";
-    char acDataTwo[] = "Memory leak two";
-    unsigned int acDataSize = strlen( acDataOne ) + 1;
-
     // start tracking memory leaks
     LeakDebug::Start();
 
     // allocate some memory
-    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( acDataSize );
-    strcpy( pcDataCopyOne, acDataOne );
+    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+    strcpy( pcDataCopyOne, smc_cpcDataOne );
 
     // make sure the leak is being tracked
     LeakMap oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_NE( oLeaks.find(pcDataCopyOne), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
 
     // make sure the tracked leak has the expected attributes
-    Leak oLeak = oLeaks[pcDataCopyOne];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyOne );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, "" );
-    EXPECT_EQ( oLeak.line, 0 );
+    Leak oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
 
     // allocate some more memory
-    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( acDataSize );
-    strcpy( pcDataCopyTwo, acDataTwo );
+    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+    strcpy( pcDataCopyTwo, smc_cpcDataTwo );
 
     // make sure both leaks are being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 2 );
-    EXPECT_NE( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_NE( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // make sure the tracked leaks have the expected attributes
-    oLeak = oLeaks[pcDataCopyOne];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyOne );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, "" );
-    EXPECT_EQ( oLeak.line, 0 );
-    oLeak = oLeaks[pcDataCopyTwo];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyTwo );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, "" );
-    EXPECT_EQ( oLeak.line, 0 );
+    oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
 
     // deallocate the first leak
     LeakDebug::DebugDelete( pcDataCopyOne );
@@ -115,15 +117,15 @@ TEST_F( LeakDebugTest, TrackTwoNoLine )
     // still is
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_EQ( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_NE( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // Make sure the leak still being tracked has the expected attributes
-    oLeak = oLeaks[pcDataCopyTwo];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyTwo );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, "" );
-    EXPECT_EQ( oLeak.line, 0 );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
 
     // deallocate the second leak
     LeakDebug::DebugDelete( pcDataCopyTwo );
@@ -131,38 +133,35 @@ TEST_F( LeakDebugTest, TrackTwoNoLine )
     // make sure neither leak is still being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_EQ( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // stop tracking memory leaks
     LeakDebug::Stop();
 }
 
-TEST_F( LeakDebugTest, TrackOneLine )
+TEST_F( LeakDebugTest, TrackOneWithLine )
 {
-    // data to put in allocated memory
-    char acData[] = "Memory leak";
-    unsigned int acDataSize = strlen( acData ) + 1;
-
     // start tracking memory leaks
     LeakDebug::Start();
 
     // allocate some memory
-    unsigned int uiLine = __LINE__ + 1;
-    char* pcDataCopy = (char*)LeakDebug::DebugNew( acDataSize, __FILE__, __LINE__ );
-    strcpy( pcDataCopy, acData );
+    unsigned int uiLine = __LINE__ + 2;
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                   __FILE__, __LINE__ );
+    strcpy( pcDataCopy, smc_cpcDataOne );
 
     // make sure the leak is being tracked
     LeakMap oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_NE( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // make sure the tracked leak has the expected attributes
-    Leak oLeak = oLeaks[pcDataCopy];
-    EXPECT_EQ( oLeak.pointer, pcDataCopy );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLine );
+    Leak oLeak = oLeaks[ pcDataCopy ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopy );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLine );
 
     // deallocate the leak
     LeakDebug::DebugDelete( pcDataCopy, __FILE__, __LINE__ );
@@ -170,67 +169,64 @@ TEST_F( LeakDebugTest, TrackOneLine )
     // make sure the leak is no longer being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // make sure nothing happens if you try to deallocate the link again
     LeakDebug::DebugDelete( pcDataCopy, __FILE__, __LINE__ );
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // stop tracking memory leaks
     LeakDebug::Stop();
 }
 
-TEST_F( LeakDebugTest, TrackTwoLine )
+TEST_F( LeakDebugTest, TrackTwoWithLine )
 {
-    // data to put in allocated memory
-    char acDataOne[] = "Memory leak one";
-    char acDataTwo[] = "Memory leak two";
-    unsigned int acDataSize = strlen( acDataOne ) + 1;
-
     // start tracking memory leaks
     LeakDebug::Start();
 
     // allocate some memory
-    unsigned int uiLineOne = __LINE__ + 1;
-    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( acDataSize, __FILE__, __LINE__ );
-    strcpy( pcDataCopyOne, acDataOne );
+    unsigned int uiLineOne = __LINE__ + 2;
+    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      __FILE__, __LINE__ );
+    strcpy( pcDataCopyOne, smc_cpcDataOne );
 
     // make sure the leak is being tracked
     LeakMap oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_NE( oLeaks.find(pcDataCopyOne), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
 
     // make sure the tracked leak has the expected attributes
-    Leak oLeak = oLeaks[pcDataCopyOne];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyOne );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineOne );
+    Leak oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
 
     // allocate some more memory
-    unsigned int uiLineTwo = __LINE__ + 1;
-    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( acDataSize, __FILE__, __LINE__ );
-    strcpy( pcDataCopyTwo, acDataTwo );
+    unsigned int uiLineTwo = __LINE__ + 2;
+    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      __FILE__, __LINE__ );
+    strcpy( pcDataCopyTwo, smc_cpcDataTwo );
 
     // make sure both leaks are being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 2 );
-    EXPECT_NE( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_NE( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // make sure the tracked leaks have the expected attributes
-    oLeak = oLeaks[pcDataCopyOne];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyOne );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineOne );
-    oLeak = oLeaks[pcDataCopyTwo];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyTwo );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineTwo );
+    oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
 
     // deallocate the first leak
     LeakDebug::DebugDelete( pcDataCopyOne, __FILE__, __LINE__ );
@@ -239,15 +235,15 @@ TEST_F( LeakDebugTest, TrackTwoLine )
     // still is
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_EQ( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_NE( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // Make sure the leak still being tracked has the expected attributes
-    oLeak = oLeaks[pcDataCopyTwo];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyTwo );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineTwo );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
 
     // deallocate the second leak
     LeakDebug::DebugDelete( pcDataCopyTwo, __FILE__, __LINE__ );
@@ -255,39 +251,35 @@ TEST_F( LeakDebugTest, TrackTwoLine )
     // make sure neither leak is still being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_EQ( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // stop tracking memory leaks
     LeakDebug::Stop();
 }
 
-TEST_F( LeakDebugTest, TrackOneStoreLine )
+TEST_F( LeakDebugTest, TrackOneWithStoredLine )
 {
-    // data to put in allocated memory
-    char acData[] = "Memory leak";
-    unsigned int acDataSize = strlen( acData ) + 1;
-
     // start tracking memory leaks
     LeakDebug::Start();
 
     // allocate some memory
     unsigned int uiLine = __LINE__ + 2;
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
-    char* pcDataCopy = (char*)LeakDebug::DebugNew( acDataSize );
-    strcpy( pcDataCopy, acData );
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+    strcpy( pcDataCopy, smc_cpcDataOne );
 
     // make sure the leak is being tracked
     LeakMap oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_NE( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // make sure the tracked leak has the expected attributes
-    Leak oLeak = oLeaks[pcDataCopy];
-    EXPECT_EQ( oLeak.pointer, pcDataCopy );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLine );
+    Leak oLeak = oLeaks[ pcDataCopy ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopy );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLine );
 
     // deallocate the leak
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
@@ -296,70 +288,65 @@ TEST_F( LeakDebugTest, TrackOneStoreLine )
     // make sure the leak is no longer being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // make sure nothing happens if you try to deallocate the link again
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
     LeakDebug::DebugDelete( pcDataCopy );
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopy), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
 
     // stop tracking memory leaks
     LeakDebug::Stop();
 }
 
-TEST_F( LeakDebugTest, TrackTwoStoreLine )
+TEST_F( LeakDebugTest, TrackTwoWithStoredLine )
 {
-    // data to put in allocated memory
-    char acDataOne[] = "Memory leak one";
-    char acDataTwo[] = "Memory leak two";
-    unsigned int acDataSize = strlen( acDataOne ) + 1;
-
     // start tracking memory leaks
     LeakDebug::Start();
 
     // allocate some memory
     unsigned int uiLineOne = __LINE__ + 2;
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
-    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( acDataSize );
-    strcpy( pcDataCopyOne, acDataOne );
+    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+    strcpy( pcDataCopyOne, smc_cpcDataOne );
 
     // make sure the leak is being tracked
     LeakMap oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_NE( oLeaks.find((void*)pcDataCopyOne), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
 
     // make sure the tracked leak has the expected attributes
-    Leak oLeak = oLeaks[pcDataCopyOne];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyOne );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineOne );
+    Leak oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
 
     // allocate some more memory
     unsigned int uiLineTwo = __LINE__ + 2;
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
-    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( acDataSize );
-    strcpy( pcDataCopyTwo, acDataTwo );
+    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( smc_uiDataSize );
+    strcpy( pcDataCopyTwo, smc_cpcDataTwo );
 
     // make sure both leaks are being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 2 );
-    EXPECT_NE( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_NE( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // make sure the tracked leaks have the expected attributes
-    oLeak = oLeaks[pcDataCopyOne];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyOne );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineOne );
-    oLeak = oLeaks[pcDataCopyTwo];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyTwo );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineTwo );
+    oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
 
     // deallocate the first leak
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
@@ -369,15 +356,15 @@ TEST_F( LeakDebugTest, TrackTwoStoreLine )
     // still is
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 1 );
-    EXPECT_EQ( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_NE( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // Make sure the leak still being tracked has the expected attributes
-    oLeak = oLeaks[pcDataCopyTwo];
-    EXPECT_EQ( oLeak.pointer, pcDataCopyTwo );
-    EXPECT_EQ( oLeak.size, acDataSize );
-    EXPECT_EQ( oLeak.file, __FILE__ );
-    EXPECT_EQ( oLeak.line, uiLineTwo );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
 
     // deallocate the second leak
     LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
@@ -386,8 +373,386 @@ TEST_F( LeakDebugTest, TrackTwoStoreLine )
     // make sure neither leak is still being tracked
     oLeaks = LeakDebug::GetLeaks();
     EXPECT_EQ( oLeaks.size(), 0 );
-    EXPECT_EQ( oLeaks.find(pcDataCopyOne), oLeaks.end() );
-    EXPECT_EQ( oLeaks.find(pcDataCopyTwo), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // stop tracking memory leaks
+    LeakDebug::Stop();
+}
+
+TEST_F( LeakDebugTest, TrackOneWithFlagsAndNoLine )
+{
+    // start tracking memory leaks
+    LeakDebug::Start();
+
+    // allocate some memory
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                   OutputFlags::NONE,
+                                                   OutputFlags::NONE );
+    strcpy( pcDataCopy, smc_cpcDataOne );
+
+    // make sure the leak is being tracked
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_NE( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // make sure the tracked leak has the expected attributes
+    Leak oLeak = oLeaks[ pcDataCopy ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopy );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
+
+    // deallocate the leak
+    LeakDebug::DebugDelete( pcDataCopy, OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure the leak is no longer being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // make sure nothing happens if you try to deallocate the link again
+    LeakDebug::DebugDelete( pcDataCopy, OutputFlags::NONE, OutputFlags::NONE );
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // stop tracking memory leaks
+    LeakDebug::Stop();
+}
+
+TEST_F( LeakDebugTest, TrackTwoWithFlagsAndNoLine )
+{
+    // start tracking memory leaks
+    LeakDebug::Start();
+
+    // allocate some memory
+    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      OutputFlags::NONE,
+                                                      OutputFlags::NONE );
+    strcpy( pcDataCopyOne, smc_cpcDataOne );
+
+    // make sure the leak is being tracked
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+
+    // make sure the tracked leak has the expected attributes
+    Leak oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
+
+    // allocate some more memory
+    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      OutputFlags::NONE,
+                                                      OutputFlags::NONE );
+    strcpy( pcDataCopyTwo, smc_cpcDataTwo );
+
+    // make sure both leaks are being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 2 );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // make sure the tracked leaks have the expected attributes
+    oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
+
+    // deallocate the first leak
+    LeakDebug::DebugDelete( pcDataCopyOne,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure the first leak is no longer being tracked but the second leak
+    // still is
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // Make sure the leak still being tracked has the expected attributes
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), nullptr );
+    EXPECT_EQ( oLeak.GetLine(), 0 );
+
+    // deallocate the second leak
+    LeakDebug::DebugDelete( pcDataCopyTwo,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure neither leak is still being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // stop tracking memory leaks
+    LeakDebug::Stop();
+}
+
+TEST_F( LeakDebugTest, TrackOneWithFlagsAndLine )
+{
+    // start tracking memory leaks
+    LeakDebug::Start();
+
+    // allocate some memory
+    unsigned int uiLine = __LINE__ + 2;
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                   __FILE__, __LINE__,
+                                                   OutputFlags::NONE,
+                                                   OutputFlags::NONE );
+    strcpy( pcDataCopy, smc_cpcDataOne );
+
+    // make sure the leak is being tracked
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_NE( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // make sure the tracked leak has the expected attributes
+    Leak oLeak = oLeaks[ pcDataCopy ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopy );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLine );
+
+    // deallocate the leak
+    LeakDebug::DebugDelete( pcDataCopy, __FILE__, __LINE__,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure the leak is no longer being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // make sure nothing happens if you try to deallocate the link again
+    LeakDebug::DebugDelete( pcDataCopy, __FILE__, __LINE__,
+                            OutputFlags::NONE, OutputFlags::NONE );
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // stop tracking memory leaks
+    LeakDebug::Stop();
+}
+
+TEST_F( LeakDebugTest, TrackTwoWithFlagsAndLine )
+{
+    // start tracking memory leaks
+    LeakDebug::Start();
+
+    // allocate some memory
+    unsigned int uiLineOne = __LINE__ + 2;
+    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      __FILE__, __LINE__,
+                                                      OutputFlags::NONE,
+                                                      OutputFlags::NONE );
+    strcpy( pcDataCopyOne, smc_cpcDataOne );
+
+    // make sure the leak is being tracked
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+
+    // make sure the tracked leak has the expected attributes
+    Leak oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
+
+    // allocate some more memory
+    unsigned int uiLineTwo = __LINE__ + 2;
+    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      __FILE__, __LINE__,
+                                                      OutputFlags::NONE,
+                                                      OutputFlags::NONE );
+    strcpy( pcDataCopyTwo, smc_cpcDataTwo );
+
+    // make sure both leaks are being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 2 );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // make sure the tracked leaks have the expected attributes
+    oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
+
+    // deallocate the first leak
+    LeakDebug::DebugDelete( pcDataCopyOne, __FILE__, __LINE__,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure the first leak is no longer being tracked but the second leak
+    // still is
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // Make sure the leak still being tracked has the expected attributes
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
+
+    // deallocate the second leak
+    LeakDebug::DebugDelete( pcDataCopyTwo, __FILE__, __LINE__,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure neither leak is still being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // stop tracking memory leaks
+    LeakDebug::Stop();
+}
+
+TEST_F( LeakDebugTest, TrackOneWithFlagsAndStoredLine )
+{
+    // start tracking memory leaks
+    LeakDebug::Start();
+
+    // allocate some memory
+    unsigned int uiLine = __LINE__ + 2;
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    char* pcDataCopy = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                   OutputFlags::NONE,
+                                                   OutputFlags::NONE );
+    strcpy( pcDataCopy, smc_cpcDataOne );
+
+    // make sure the leak is being tracked
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_NE( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // make sure the tracked leak has the expected attributes
+    Leak oLeak = oLeaks[ pcDataCopy ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopy );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLine );
+
+    // deallocate the leak
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    LeakDebug::DebugDelete( pcDataCopy, OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure the leak is no longer being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // make sure nothing happens if you try to deallocate the link again
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    LeakDebug::DebugDelete( pcDataCopy, OutputFlags::NONE, OutputFlags::NONE );
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopy ), oLeaks.end() );
+
+    // stop tracking memory leaks
+    LeakDebug::Stop();
+}
+
+TEST_F( LeakDebugTest, TrackTwoWithFlagsAndStoredLine )
+{
+    // start tracking memory leaks
+    LeakDebug::Start();
+
+    // allocate some memory
+    unsigned int uiLineOne = __LINE__ + 2;
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    char* pcDataCopyOne = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      OutputFlags::NONE,
+                                                      OutputFlags::NONE );
+    strcpy( pcDataCopyOne, smc_cpcDataOne );
+
+    // make sure the leak is being tracked
+    LeakMap oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_NE( oLeaks.find( (void*)pcDataCopyOne ), oLeaks.end() );
+
+    // make sure the tracked leak has the expected attributes
+    Leak oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
+
+    // allocate some more memory
+    unsigned int uiLineTwo = __LINE__ + 2;
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    char* pcDataCopyTwo = (char*)LeakDebug::DebugNew( smc_uiDataSize,
+                                                      OutputFlags::NONE,
+                                                      OutputFlags::NONE );
+    strcpy( pcDataCopyTwo, smc_cpcDataTwo );
+
+    // make sure both leaks are being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 2 );
+    EXPECT_NE( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // make sure the tracked leaks have the expected attributes
+    oLeak = oLeaks[ pcDataCopyOne ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyOne );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineOne );
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
+
+    // deallocate the first leak
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    LeakDebug::DebugDelete( pcDataCopyOne,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure the first leak is no longer being tracked but the second leak
+    // still is
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 1 );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_NE( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
+
+    // Make sure the leak still being tracked has the expected attributes
+    oLeak = oLeaks[ pcDataCopyTwo ];
+    EXPECT_EQ( oLeak.GetAddress(), pcDataCopyTwo );
+    EXPECT_EQ( oLeak.GetSize(), smc_uiDataSize );
+    EXPECT_STREQ( oLeak.GetFile(), __FILE__ );
+    EXPECT_EQ( oLeak.GetLine(), uiLineTwo );
+
+    // deallocate the second leak
+    LeakDebug::StoreFileLine( __FILE__, __LINE__ + 1 );
+    LeakDebug::DebugDelete( pcDataCopyTwo,
+                            OutputFlags::NONE, OutputFlags::NONE );
+
+    // make sure neither leak is still being tracked
+    oLeaks = LeakDebug::GetLeaks();
+    EXPECT_EQ( oLeaks.size(), 0 );
+    EXPECT_EQ( oLeaks.find( pcDataCopyOne ), oLeaks.end() );
+    EXPECT_EQ( oLeaks.find( pcDataCopyTwo ), oLeaks.end() );
 
     // stop tracking memory leaks
     LeakDebug::Stop();

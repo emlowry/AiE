@@ -24,9 +24,13 @@ protected:
     virtual void SetUp();
     virtual void TearDown();
 
-private:
+protected:
 
     void Clear();
+
+    static const char* const smc_cpcDataOne;
+    static const char* const smc_cpcDataTwo;
+    static const unsigned int smc_uiDataSize;
 
 };
 

@@ -38,41 +38,43 @@ enum OutputFlags
 };
 
 // library functions
-extern void DebugDelete( void* a_pMemory ) throw();
-extern void DebugDelete( void* a_pMemory,
+extern void DebugDelete( void* const a_cpMemory ) throw();
+extern void DebugDelete( void* const a_cpMemory,
                          const OutputFlags ac_eClogFlags,
                          const OutputFlags ac_eCerrFlags ) throw();
-extern void DebugDelete( void* a_pMemory,
-                         const char* const ac_pccFile,
+extern void DebugDelete( void* const a_cpMemory,
+                         const char* const ac_cpcFile,
                          const unsigned int ac_uiLine ) throw();
-extern void DebugDelete( void* a_pMemory,
-                         const char* const ac_pccFile,
+extern void DebugDelete( void* const a_cpMemory,
+                         const char* const ac_cpcFile,
                          const unsigned int ac_uiLine,
                          const OutputFlags ac_eClogFlags,
                          const OutputFlags ac_eCerrFlags ) throw();
-extern void* DebugNew( std::size_t a_iSize, const bool ac_bNoThrow = false )
+extern void* DebugNew( const std::size_t ac_uiSize,
+                       const bool ac_bNoThrow = false )
     throw( std::bad_alloc );
-extern void* DebugNew( std::size_t a_iSize,
+extern void* DebugNew( const std::size_t ac_uiSize,
                        const OutputFlags ac_eClogFlags,
                        const OutputFlags ac_eCerrFlags,
                        const bool ac_bNoThrow = false ) throw( std::bad_alloc );
-extern void* DebugNew( std::size_t a_iSize,
-                       const char* const ac_pccFile,
+extern void* DebugNew( const std::size_t ac_uiSize,
+                       const char* const ac_cpcFile,
                        const unsigned int ac_uiLine,
                        const bool ac_bNoThrow = false ) throw( std::bad_alloc );
-extern void* DebugNew( std::size_t a_iSize,
-                       const char* const ac_pccFile,
+extern void* DebugNew( const std::size_t ac_uiSize,
+                       const char* const ac_cpcFile,
                        const unsigned int ac_uiLine,
                        const OutputFlags ac_eClogFlags,
                        const OutputFlags ac_eCerrFlags,
                        const bool ac_bNoThrow = false ) throw( std::bad_alloc );
 extern void DumpLeaks( std::ostream& a_roOut );
 extern LeakMap GetLeaks();
-extern void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
-                            OutputFlags a_eDefaultCerrFlags );
+extern bool IsOn();
+extern void SetOutputFlags( const OutputFlags ac_eDefaultClogFlags,
+                            const OutputFlags ac_eDefaultCerrFlags );
 extern void Start();
 extern void Stop();
-extern void StoreFileLine( const char* const ac_pccFile,
+extern void StoreFileLine( const char* const ac_cpcFile,
                            const unsigned int ac_uiLine ) throw();
 extern void UnstoreFileLine() throw();
 

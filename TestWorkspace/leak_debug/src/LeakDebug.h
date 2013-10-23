@@ -42,30 +42,30 @@ enum OutputFlags
 };
 
 // These are the functions exposed to library users.
-void DebugDelete( void* a_pMemory ) throw();
-void DebugDelete( void* a_pMemory,
+void DebugDelete( void* const a_cpMemory ) throw();
+void DebugDelete( void* const a_cpMemory,
                   const OutputFlags ac_eClogFlags,
                   const OutputFlags ac_eCerrFlags ) throw();
-void DebugDelete( void* a_pMemory,
-                  const char* const ac_pccFile,
+void DebugDelete( void* const a_cpMemory,
+                  const char* const ac_cpcFile,
                   const unsigned int ac_uiLine ) throw();
-void DebugDelete( void* a_pMemory,
-                  const char* const ac_pccFile,
+void DebugDelete( void* const a_cpMemory,
+                  const char* const ac_cpcFile,
                   const unsigned int ac_uiLine,
                   const OutputFlags ac_eClogFlags,
                   const OutputFlags ac_eCerrFlags ) throw();
-void* DebugNew( std::size_t a_iSize, const bool ac_bNoThrow = false )
+void* DebugNew( const std::size_t ac_uiSize, const bool ac_bNoThrow = false )
     throw( std::bad_alloc );
-void* DebugNew( std::size_t a_iSize,
+void* DebugNew( const std::size_t ac_uiSize,
                 const OutputFlags ac_eClogFlags,
                 const OutputFlags ac_eCerrFlags,
                 const bool ac_bNoThrow = false ) throw( std::bad_alloc );
-void* DebugNew( std::size_t a_iSize,
-                const char* const ac_pccFile,
+void* DebugNew( const std::size_t ac_uiSize,
+                const char* const ac_cpcFile,
                 const unsigned int ac_uiLine,
                 const bool ac_bNoThrow = false ) throw( std::bad_alloc );
-void* DebugNew( std::size_t a_iSize,
-                const char* const ac_pccFile,
+void* DebugNew( const std::size_t ac_uiSize,
+                const char* const ac_cpcFile,
                 const unsigned int ac_uiLine,
                 const OutputFlags ac_eClogFlags,
                 const OutputFlags ac_eCerrFlags,
@@ -73,12 +73,13 @@ void* DebugNew( std::size_t a_iSize,
 void DumpLeaks( std::ostream& a_roOut = std::cout );
 LeakMap GetLeaks();
 bool IsOn();
-void SetOutputFlags( OutputFlags a_eDefaultClogFlags,
-                     OutputFlags a_eDefaultCerrFlags );
+void SetOutputFlags( const OutputFlags ac_eDefaultClogFlags,
+                     const OutputFlags ac_eDefaultCerrFlags );
 void Start();
-void Start( OutputFlags a_eDefaultClogFlags, OutputFlags a_eDefaultCerrFlags );
+void Start( const OutputFlags ac_eDefaultClogFlags,
+            const OutputFlags ac_eDefaultCerrFlags );
 void Stop();
-void StoreFileLine( const char* const ac_pccFile,
+void StoreFileLine( const char* const ac_cpcFile,
                     const unsigned int ac_uiLine ) throw();
 void UnstoreFileLine() throw();
 
