@@ -12,6 +12,7 @@
 
 #include "Globals.h"
 
+// Handles a single drawable object.
 class Sprite
 {
 public:
