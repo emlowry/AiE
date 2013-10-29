@@ -13,9 +13,9 @@
 // Constructor does all its work in initializer list
 Sprite::Sprite( const char* const ac_cpcTextureName,
                 const IntXY& ac_roSize,
-                const FloatXY& ac_roPosition = XY_ZERO,
-                const float ac_fRotation = 0,
-                const FloatXY& ac_roScale = XY_ONE )
+                const FloatXY& ac_roPosition,
+                const float ac_fRotation,
+                const FloatXY& ac_roScale )
   : m_cuiSpriteID( CreateSprite( ac_cpcTextureName, ac_roSize.x, ac_roSize.y ) ),
     m_oPosition( ac_roPosition ),
     m_fRotation( ac_fRotation ),

@@ -102,6 +102,7 @@
     <None Include="resources\shaders\StaticFW_Vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\EventHandler.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\StopWatch.cpp" />
@@ -109,9 +110,11 @@
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
     <ClInclude Include="include\EventHandler.h" />
+    <ClInclude Include="include\Events.h" />
     <ClInclude Include="include\Globals.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\StopWatch.h" />
+    <ClInclude Include="source\Events.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
