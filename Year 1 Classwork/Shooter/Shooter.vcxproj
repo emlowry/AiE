@@ -110,6 +110,7 @@
   <ItemGroup>
     <ClCompile Include="source\EventHandler.cpp" />
     <ClCompile Include="source\GameEngine.cpp" />
+    <ClCompile Include="source\LoadScreen.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\StopWatch.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="include\Events.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\GameState.h" />
+    <ClInclude Include="include\LoadScreen.h" />
     <ClInclude Include="include\XY.h" />
     <ClInclude Include="include\Hashable.h" />
     <ClInclude Include="include\Sprite.h" />

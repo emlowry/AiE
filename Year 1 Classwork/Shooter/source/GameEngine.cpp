@@ -10,7 +10,8 @@
 #include "GameEngine.h"
 
 // Set up window, load things, etc.
-void GameEngine::Initialize()
+void GameEngine::Initialize( const char* ac_pcWindowTitle,
+                             const IntXY& ac_roScreenSize, bool a_bFullscreen )
 {
     // TODO
 }

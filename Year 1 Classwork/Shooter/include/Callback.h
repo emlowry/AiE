@@ -19,6 +19,8 @@ class Callback : public Hashable
 public:
     virtual Callback< T >* Clone() const = 0;
     virtual T operator()() = 0;
+    template< typename Callable >
+    static Callback< T >* MakeCallBack( Callable& a_roCall );
 };
 
 // Wrapper class for turning anything that implements operator() with no
@@ -29,21 +31,24 @@ class CallbackWrapper : public Callback< T >
 public:
 
     CallbackWrapper( Callable& a_roCall );
-    CallbackWrapper( const CallbackWrapper< T, Callable >& ac_roWrapper );
+    virtual ~CallbackWrapper();
 
     // Dynamically allocate another wrapper that refers to the same callable
     // object as this one.
-    virtual CallbackWrapper< T, Callable >* Clone() override;
+    virtual CallbackWrapper< T, Callable >* Clone() const override;
     virtual std::size_t Hash() const override;  // Hash by target address
     virtual T operator()() override;            // Pass to wrapped object
 
 protected:
 
-    Callable a_roCall;  // Must implement T operator()()
+    Callable* a_poCall;  // Must implement T operator()()
 
 private:
 
-    // Assignment operator wouldn't work due to reference member.
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    CallbackWrapper( const CallbackWrapper< T, Callable >& ac_roWrapper );
     CallbackWrapper& operator=(
         const CallbackWrapper< T, Callable >& ac_roWrapper );
 

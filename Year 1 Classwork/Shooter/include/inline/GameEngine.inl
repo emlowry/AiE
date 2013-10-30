@@ -7,10 +7,13 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#include "AIE.h"
+#include "GameState.h"
+
 // Get the current state
 inline GameState* GameEngine::GetState()
 {
-    return sm_oStates.empty() ? nullptr : sm_oStates.top();
+    return sm_oStates.empty() ? GameState::END : sm_oStates.top();
 }
 
 // Remove the topmost state from the stack
@@ -28,7 +31,7 @@ inline void GameEngine::PushState( GameState* a_poState )
 // Run the game
 inline void GameEngine::Run()
 {
-    while( !sm_oStates.empty() )
+    while( FrameworkUpdate() && GetState() != GameState::END )
     {
         sm_oStates.top()->Run();
     }
@@ -41,8 +44,5 @@ inline void GameEngine::SetState( GameState* a_poState )
     {
         sm_oStates.pop();
     }
-    if( nullptr != a_poState )
-    {
-        sm_oStates.push( a_poState );
-    }
+    sm_oStates.push( a_poState );
 }

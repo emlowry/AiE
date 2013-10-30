@@ -7,8 +7,15 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#include "GameEngine.h"
+// #include "LoadScreen.h"
+
 int main( int argc, char* argv[] )
 {	
+    GameEngine::Initialize( "Shooter" );
+    // GameEngine::SetState( LoadScreen::State );
+    GameEngine::Run();
+    GameEngine::Shutdown();
     return 0;
 }
 

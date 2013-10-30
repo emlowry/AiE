@@ -11,6 +11,7 @@
 #define _GAME_STATE_H_
 
 #include "EventHandler.h"
+#include "Callback.h"
 
 #define SINGLETON_STATE_CLASS( CLASS_NAME ) class CLASS_NAME \
     : public GameState::Singleton< CLASS_NAME >
@@ -23,7 +24,7 @@
 
 // Abstract class representing a game state.  Derived classes must implement the
 // Update and Draw functions.
-class GameState
+class GameState : public Callback< void >
 {
 public:
 
@@ -63,17 +64,25 @@ public:
     class Singleton : public GameState
     {
     public:
-        static inline GameState* State() { return &sm_oInstance; }
+        inline Singleton< Derived >* Clone() const override { return this; }
+        static const Callback< void >& State = sm_oWrapper;
     protected:
         Singleton();
     private:
         Singleton( const Singleton& a_roOriginal );
         Singleton& operator=( const Singleton& a_roOriginal );
         static Derived sm_oInstance;
+        static CallbackWrapper< void, Derived > sm_oWrapper( sm_oInstance );
     };
 
+    // Hash by instance address
+    inline std::size_t Hash() const override { return (std::size_t)this; }
+
     // Do everything you need to in a given frame.
-    inline void Run() { EventHandler::Run(); Update(); Draw(); }
+    inline void operator()() override { EventHandler::Run(); Update(); Draw(); }
+
+    // State that shuts down the game
+    static GameState* const END;
 
 private:
 
@@ -85,5 +94,8 @@ private:
     virtual void Draw() const = 0;
 
 };
+
+// State that shuts down the game
+GameState* const GameState::END = nullptr;
 
 #endif  // _GAME_STATE_H_

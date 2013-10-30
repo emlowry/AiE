@@ -28,13 +28,26 @@ bool MouseButtonDownEvent();
 template< typename ReturnsBool >
 class NotEvent : public CallbackWrapper< bool, ReturnsBool >
 {
+private:
+
+    typedef CallbackWrapper< bool > BaseClass;
+    typedef NotEvent< ReturnsBool > ThisClass;
+
 public:
 
     NotEvent( ReturnsBool a_roCall );
-    NotEvent( const NotEvent< ReturnsBool >& ac_roEvent );
+    virtual ~NotEvent();
 
-    NotEvent< ReturnsBool >* Clone() const override;
+    ThisClass* Clone() const override;
     bool operator()() override;
+
+private:
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    NotEvent( const ThisClass& ac_roEvent );
+    ThisClass& operator=( const ThisClass& ac_roEvent );
 
 };
 
@@ -46,17 +59,22 @@ public:
 
     EventCombination( ReturnsBoolOne& a_roCallOne,
                       ReturnsBoolTwo& a_roCallTwo );
+    virtual ~EventCombination();
     std::size_t Hash() const override;
 
 protected:
 
-    ReturnsBoolOne& m_roCallOne;
-    ReturnsBoolTwo& m_roCallTwo;
+    ReturnsBoolOne* m_poCallOne;
+    ReturnsBoolTwo* m_poCallTwo;
 
 private:
-
-    // Assignment wouldn't work due to reference members
-    EventCombination& operator=( const EventCombination& ac_roEvent );
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.
+    EventCombination(
+        const EventCombination< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
+    EventCombination< ReturnsBoolOne, ReturnsBoolTwo >& operator=(
+        const EventCombination< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
 
 };
 
@@ -64,13 +82,25 @@ private:
 template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
 class XOrEvent : public EventCombination< ReturnsBoolOne, ReturnsBoolTwo >
 {
+private:
+
+    typedef EventCombination< ReturnsBoolOne, ReturnsBoolTwo > BaseClass;
+    typedef XOrEvent< ReturnsBoolOne, ReturnsBoolTwo > ThisClass;
+
 public:
 
     XOrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
-    XOrEvent( const XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
 
-    XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >* Clone() const override;
+    ThisClass* Clone() const override;
     bool operator()() override;
+
+private:
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    XOrEvent( const ThisClass& ac_roEvent );
+    ThisClass& operator=( const ThisClass& ac_roEvent );
 
 };
 
@@ -135,7 +165,7 @@ public:
 private:
 
     NotEvent<ReturnsBool> m_oNotEvent;
-    ReturnsBool& m_roEvent;
+    ReturnsBool* m_poEvent;
 
 };
 

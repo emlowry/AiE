@@ -11,6 +11,7 @@
 #define _GAME_ENGINE_H_
 
 #include "GameState.h"
+#include "XY.h"
 #include <stack>
 
 // manages game states
@@ -22,7 +23,9 @@ public:
     static GameState* GetState();
 
     // Create window, set initial state, etc.
-    static void Initialize();
+    static void Initialize( const char* ac_pcWindowTitle = nullptr,
+                            const IntXY& ac_roScreenSize = IntXY( 1280, 720 ),
+                            bool a_bFullscreen = false );
 
     // Remove the topmost state from the stack
     static void PopState();

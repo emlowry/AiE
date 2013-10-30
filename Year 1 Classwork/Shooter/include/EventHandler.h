@@ -22,34 +22,29 @@ class EventHandler
 public:
 
     // Check for all events and react to those that occur
-    static inline void Run() { m_oInstance.ReactToEvents(); }
+    static void Run();
 
     // Start listening for an event
     template< typename ReturnsBool >
-    static inline void StartListening( ReturnsBool& a_roEvent )
-    { m_oInstance.Listen( a_roEvent ); }
+    static void StartListening( ReturnsBool& a_roEvent );
 
     // Stop listening for an event
     template< typename ReturnsBool >
-    static inline void StopListening( ReturnsBool& a_roEvent )
-    { m_oInstance.Unlisten( a_roEvent ); }
+    static void StopListening( ReturnsBool& a_roEvent );
 
     // When the given event occurs, execute the given reaction
     template< typename ReturnsBool, typename ReturnsVoid >
-    static inline void AddReaction( ReturnsBool& a_roEvent,
-                                    ReturnsVoid& a_roReaction )
-    { m_oInstance.Add( a_roEvent, a_roReaction ); }
+    static void AddReaction( ReturnsBool& a_roEvent,
+                             ReturnsVoid& a_roReaction );
     
     // When the given event occurs, don't execute the given reaction
     template< typename ReturnsBool, typename ReturnsVoid >
-    static inline void RemoveReaction( ReturnsBool& a_roEvent,
-                                       ReturnsVoid& a_roReaction )
-    { m_oInstance.Remove( a_roEvent, a_roReaction ); }
+    static void RemoveReaction( ReturnsBool& a_roEvent,
+                                ReturnsVoid& a_roReaction );
     
     // Don't execute the given reaction, no matter what event occurs
     template< typename ReturnsVoid >
-    static inline void RemoveReaction( ReturnsVoid& a_roReaction )
-    { m_oInstance.Remove( a_roReaction ); }
+    static inline void RemoveReaction( ReturnsVoid& a_roReaction );
 
 private:
 

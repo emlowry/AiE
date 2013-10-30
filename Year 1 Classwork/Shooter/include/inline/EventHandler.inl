@@ -7,6 +7,57 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+//
+// Public, static functions used to interact with the singleton instance
+//
+
+// Check for all events and react to those that occur
+inline void EventHandler::Run()
+{
+    m_oInstance.ReactToEvents();
+}
+
+// Start listening for an event
+template< typename ReturnsBool >
+inline void EventHandler::StartListening( ReturnsBool& a_roEvent )
+{
+    m_oInstance.Listen( a_roEvent );
+}
+
+// Stop listening for an event
+template< typename ReturnsBool >
+inline void EventHandler::StopListening( ReturnsBool& a_roEvent )
+{
+    m_oInstance.Unlisten( a_roEvent );
+}
+
+// When the given event occurs, execute the given reaction
+template< typename ReturnsBool, typename ReturnsVoid >
+inline void EventHandler::AddReaction( ReturnsBool& a_roEvent,
+                                       ReturnsVoid& a_roReaction )
+{
+    m_oInstance.Add( a_roEvent, a_roReaction );
+}
+    
+// When the given event occurs, don't execute the given reaction
+template< typename ReturnsBool, typename ReturnsVoid >
+inline void EventHandler::RemoveReaction( ReturnsBool& a_roEvent,
+                                          ReturnsVoid& a_roReaction )
+{
+    m_oInstance.Remove( a_roEvent, a_roReaction );
+}
+    
+// Don't execute the given reaction, no matter what event occurs
+template< typename ReturnsVoid >
+inline void EventHandler::RemoveReaction( ReturnsVoid& a_roReaction )
+{
+    m_oInstance.Remove( a_roReaction );
+}
+
+//
+// Private implementations used by the singleton instance
+//
+
 // Start listening for an event
 template< typename ReturnsBool >
 inline void EventHandler::Listen( ReturnsBool& a_roCall )

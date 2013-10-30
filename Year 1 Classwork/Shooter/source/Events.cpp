@@ -14,7 +14,7 @@
 template< typename ReturnsBool >
 bool Events::EventStart< ReturnsBool >::operator()()
 {
-    if( m_roCall() )
+    if( (*m_poCall)() )
     {
         if( m_bStarted)
         {
