@@ -15,6 +15,12 @@
     <None Include="resources\fonts\arial.fnt" />
     <None Include="resources\shaders\StaticFW_Pixel.glsl" />
     <None Include="resources\shaders\StaticFW_Vertex.glsl" />
+    <None Include="include\inline\Callback.inl" />
+    <None Include="include\inline\Events.inl" />
+    <None Include="include\inline\Hashable.inl" />
+    <None Include="include\inline\XY.inl" />
+    <None Include="include\inline\EventHandler.inl" />
+    <None Include="include\inline\GameEngine.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -29,15 +35,18 @@
     <ClCompile Include="source\EventHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\Events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AIE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\StopWatch.h">
@@ -49,7 +58,19 @@
     <ClInclude Include="include\Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\Events.h">
+    <ClInclude Include="include\GameState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Hashable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\XY.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

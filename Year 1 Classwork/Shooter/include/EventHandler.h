@@ -3,14 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       October 24, 2013
  * Description:        Class for reacting to events.
- * Last Modified:      October 24, 2013
- * Last Modification:  Creation.
+ * Last Modified:      October 29, 2013
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef _EVENT_HANDLER_H_
 #define _EVENT_HANDLER_H_
 
-#include "Globals.h"
+#include "Callback.h"
 #include <set>
 #include <unordered_map>
 
@@ -56,42 +56,14 @@ private:
     // Holds a functor, function object, or other object implementing operator()
     // with no parameters to return a bool.  This represents an event - if
     // myEvent() returns true, then the event is occurring.
-    class Event : public Hashable { public: virtual bool operator()() = 0; };
-    template< typename ReturnsBool >
-    class EventWrapper : public Event
-    {
-    public:
-        inline EventWrapper( ReturnsBool& a_roReturnsBool )
-            : m_roReturnsBool( a_roReturnsBool ) {}
-        inline EventWrapper( const EventWrapper& a_roEvent )
-            : m_roReturnsBool( a_roEvent.m_roReturnsBool ) {}
-        inline size_t Hash() const { return &m_roReturnsBool; }
-        inline virtual bool operator()() { return m_roReturnsBool(); }
-    private:
-        EventWrapper& operator=( const EventWrapper& a_roEvent );
-        ReturnsBool& m_roReturnsBool;
-    };
+    typedef Callback< bool > Event;
 
     // Holds a functor, function object, or other object implementing operator()
     // with no parameters.  Any return type is possible, but returned values are
     // ignored, so it might as well return null.  This represents a reaction to
     // an event - if an event occurs, the associated reactions will all be
     // executed.
-    class Reaction : public Hashable { public: virtual void operator()() = 0; };
-    template< typename ReturnsVoid >
-    class ReactionWrapper : public Reaction
-    {
-    public:
-        inline ReactionWrapper( ReturnsVoid& a_roReturnsVoid )
-            : m_roReturnsVoid( a_roReturnsVoid ) {}
-        inline ReactionWrapper( const ReactionWrapper& a_roReaction )
-            : m_roReturnsVoid( a_roReaction.m_roReturnsVoid ) {}
-        inline size_t Hash() const { return &m_roReturnsVoid; }
-        inline virtual void operator()() { m_roReturnsVoid(); }
-    private:
-        ReactionWrapper& operator=( const ReactionWrapper& a_roReaction );
-        ReturnsVoid& m_roReturnsVoid;
-    };
+    typedef Callback< void > Reaction;
 
     // typedef these to save space
     typedef std::set< Event*, HashablePointerLess > EventSet;
@@ -110,23 +82,36 @@ private:
 
     // Start listening for an event
     template< typename ReturnsBool >
-    inline void Listen( ReturnsBool& a_roEvent );
+    void Listen( ReturnsBool& a_roCall );
+    void Listen( Event& a_roEvent );
 
     // Stop listening for an event
     template< typename ReturnsBool >
-    void Unlisten( const ReturnsBool& a_roEvent );
+    void Unlisten( ReturnsBool& a_roCall );
+    void Unlisten( Event& ac_roEvent );
 
     // If the given event occurs, execute the given reaction
     template< typename ReturnsBool, typename ReturnsVoid >
-    void Add( ReturnsBool& a_roEvent, ReturnsVoid& a_roReaction );
+    void Add( ReturnsBool& a_roBoolCall, ReturnsVoid& a_roVoidCall );
+    template< typename ReturnsBool >
+    void Add( ReturnsBool& a_roBoolCall, Reaction& a_roReaction );
+    template< typename ReturnsVoid >
+    void Add( Event& a_roEvent, ReturnsVoid& a_roVoidCall );
+    void Add( Event& a_roEvent, Reaction& a_roReaction );
     
     // If the given event occurs, don't execute the given reaction
     template< typename ReturnsBool, typename ReturnsVoid >
-    void Remove( const ReturnsBool& a_roEvent, const ReturnsVoid& a_roReaction );
+    void Remove( ReturnsBool& a_roBoolCall, ReturnsVoid& a_roVoidCall );
+    template< typename ReturnsBool >
+    void Remove( ReturnsBool& a_roBoolCall, Reaction& a_roReaction );
+    template< typename ReturnsVoid >
+    void Remove( Event& a_roEvent, ReturnsVoid& a_roVoidCall );
+    void Remove( Event& a_roEvent, Reaction& a_roReaction );
     
     // Don't execute the given reaction, no matter what event occurs
     template< typename ReturnsVoid >
-    void Remove( const ReturnsVoid& a_roReaction );
+    void Remove( ReturnsVoid& a_roCall );
+    void Remove( Reaction& a_roReaction );
 
     EventSet m_oEvents;         // Events we're listening for
     ReactionMap m_oReactions;   // Reactions to events
@@ -135,5 +120,7 @@ private:
     static EventHandler m_oInstance;    // Singleton
 
 };
+
+#include "inline/EventHandler.inl"
 
 #endif  // _EVENT_HANDLER_H_

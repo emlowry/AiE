@@ -3,12 +3,12 @@
  * Author:             Elizabeth Lowry
  * Date Created:       October 28, 2013
  * Description:        Class for reacting to events.
- * Last Modified:      October 28, 2013
- * Last Modification:  Creation.
+ * Last Modified:      October 29, 2013
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "EventHandler.h"
-#include "Globals.h"
+#include "Callback.h"
 #include <set>
 #include <unordered_map>
 
@@ -27,20 +27,11 @@ void EventHandler::ReactToEvents()
     }
 }
 
-// Start listening for an event
-template< typename ReturnsBool >
-inline void Listen( ReturnsBool& a_roEvent )
-{
-    m_oEvents.insert( new EventWrapper( a_roEvent ) );
-}
-
 // Stop listening for an event
-template< typename ReturnsBool >
-void EventHandler::Unlisten( const ReturnsBool& a_roEvent )
+void EventHandler::Unlisten( Event& a_roEvent )
 {
     // check to see if the event is being listened for
-    Event oEvent = EventWrapper( a_roEvent );
-    EventList::iterator oIterator = m_oEvents.find( &oEvent );
+    EventSet::iterator oIterator = m_oEvents.find( &a_roEvent );
     if( m_oEvents.end() == oIterator )
     {
         return;
@@ -67,16 +58,14 @@ void EventHandler::Unlisten( const ReturnsBool& a_roEvent )
 }
 
 // If the given event occurs, execute the given reaction
-template< typename ReturnsBool, typename ReturnsVoid >
-void EventHandler::Add( ReturnsBool& a_roEvent, ReturnsVoid& a_roReaction )
+void EventHandler::Add( Event& a_roEvent, Reaction& a_roReaction )
 {
     // make sure the event wrapper is allocated and listed
-    Event oEvent = EventWrapper( a_roEvent );
-    EventList::iterator oEventIterator = m_oEvents.find( &oEvent );
+    EventSet::iterator oEventIterator = m_oEvents.find( &a_roEvent );
     Event* poEvent;
     if( m_oEvents.end() == oEventIterator )
     {
-        poEvent = new EventWrapper( a_roEvent );
+        poEvent = a_roEvent.Clone();
         m_oEvents.insert( poEvent );
     }
     else
@@ -85,13 +74,9 @@ void EventHandler::Add( ReturnsBool& a_roEvent, ReturnsVoid& a_roReaction )
     }
 
     // make sure the reaction wrapper is allocated
-    Reaction oReaction = ReactionWrapper( a_roReaction );
-    TriggerMap::iterator oReactionIterator = m_oTriggers.find( &oReaction );
-    Reaction* poReaction;
-    if( m_oTriggers.end() == oReactionIterator )
-    {
-        poReaction = new ReactionWrapper( a_roReaction );
-    }
+    TriggerMap::iterator oReactionIterator = m_oTriggers.find( &a_roReaction );
+    Reaction* poReaction = ( m_oTriggers.end() == oReactionIterator )
+                           ? a_roReaction.Clone() : (*oReactionIterator).first;
     
     // associate the event and reaction
     m_oReactions[ poEvent ].insert( poReaction );
@@ -99,12 +84,10 @@ void EventHandler::Add( ReturnsBool& a_roEvent, ReturnsVoid& a_roReaction )
 }
     
 // If the given event occurs, don't execute the given reaction
-template< typename ReturnsBool, typename ReturnsVoid >
-void EventHandler::Remove( const ReturnsBool& a_roEvent, const ReturnsVoid& a_roReaction )
+void EventHandler::Remove( Event& a_roEvent, Reaction& a_roReaction )
 {
     // check to see if the event is being listened for
-    Event oEvent = EventWrapper( a_roEvent );
-    EventList::iterator oEventIterator = m_oEvents.find( &oEvent );
+    EventSet::iterator oEventIterator = m_oEvents.find( &a_roEvent );
     if( m_oEvents.end() == oEventIterator )
     {
         return;
@@ -112,10 +95,9 @@ void EventHandler::Remove( const ReturnsBool& a_roEvent, const ReturnsVoid& a_ro
     Event* poEvent = *oEventIterator;
 
     // check to see if the reaction wrapper is associated with the event
-    Reaction oReaction = ReactionWrapper( a_roReaction );
-    ReactionList::iterator oReactionIterator =
-        m_oReactions[ poEvent ].find( &oReaction );
-    if( m_oTriggers.end() == oReactionIterator )
+    ReactionSet::iterator oReactionIterator =
+        m_oReactions[ poEvent ].find( &a_roReaction );
+    if( m_oReactions[ poEvent ].end() == oReactionIterator )
     {
         return;
     }
@@ -134,12 +116,10 @@ void EventHandler::Remove( const ReturnsBool& a_roEvent, const ReturnsVoid& a_ro
 }
     
 // Don't execute the given reaction, no matter what event occurs
-template< typename ReturnsVoid >
-void EventHandler::Remove( const ReturnsVoid& a_roReaction )
+void EventHandler::Remove( Reaction& a_roReaction )
 {
     // check to see if the reaction wrapper is associated with any events
-    Reaction oReaction = ReactionWrapper( a_roReaction );
-    TriggerMap::iterator oTriggerIterator = m_oTriggers.find( &oReaction );
+    TriggerMap::iterator oTriggerIterator = m_oTriggers.find( &a_roReaction );
     if( m_oTriggers.end() == oTriggerIterator )
     {
         return;

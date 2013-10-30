@@ -10,7 +10,7 @@
 #ifndef _SPRITE_H_
 #define _SPRITE_H_
 
-#include "Globals.h"
+#include "XY.h"
 
 // Handles a single drawable object.
 class Sprite

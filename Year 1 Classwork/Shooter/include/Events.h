@@ -11,121 +11,114 @@
 #define _EVENTS_H_
 
 #include "AIE.h"
+#include "Callback.h"
 
 namespace Events
 {
 
 // Event triggered by a key on the keyboard being down
 template< int t_iKey >
-bool KeyDownEvent()
-{
-    return IsKeyDown( t_iKey );
-}
+bool KeyDownEvent();
 
 // Event triggered by a mouse button being down
 template< int t_iButton >
-bool MouseButtonDownEvent()
-{
-    return GetMouseButtonDown( t_iButton );
-}
+bool MouseButtonDownEvent();
 
 // Event triggered by another event not occurring
 template< typename ReturnsBool >
-class NotEvent
+class NotEvent : public CallbackWrapper< bool, ReturnsBool >
 {
 public:
-    inline NotEvent( ReturnsBool a_roEvent ) : m_roEvent( a_roEvent ) {}
-    inline bool operator()() { return !m_roEvent(); }
-private:
-    ReturnsBool& m_roEvent;
+
+    NotEvent( ReturnsBool a_roCall );
+    NotEvent( const NotEvent< ReturnsBool >& ac_roEvent );
+
+    NotEvent< ReturnsBool >* Clone() const override;
+    bool operator()() override;
+
 };
 
-// Event triggered by some combination of multiple options
-template< typename... Events >
-class MultiEvent
+// Abstract event triggered by some combination of events occurring.
+template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
+class EventCombination : public Callback< bool >
 {
 public:
-    inline MultiEvent( Recursion& a_roRecursion, Events&... a_roEvents )
-        : m_roRecursion( a_roRecursion ), m_roEvents( a_roEvents ) {}
-    inline bool operator()() { return Recurse( m_roEvents ); }
+
+    EventCombination( ReturnsBoolOne& a_roCallOne,
+                      ReturnsBoolTwo& a_roCallTwo );
+    std::size_t Hash() const override;
+
+protected:
+
+    ReturnsBoolOne& m_roCallOne;
+    ReturnsBoolTwo& m_roCallTwo;
+
 private:
-    Events&... m_roEvents;
-    template< typename ReturnsBool >
-    virtual bool Recurse( ReturnsBool& a_roEvent, Events&... a_roEvents ) = 0;
+
+    // Assignment wouldn't work due to reference members
+    EventCombination& operator=( const EventCombination& ac_roEvent );
+
 };
 
-// Event triggered by only one event occurring out of multiple options
-template< typename... Events >
-class XOrEvent : public MultiEvent< Events >
+// Event triggered by only one of two events occurring.
+template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
+class XOrEvent : public EventCombination< ReturnsBoolOne, ReturnsBoolTwo >
 {
 public:
 
-    inline XOrEvent( Events&... a_roEvents ) : MultiEvent( a_roEvents ) {}
+    XOrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
+    XOrEvent( const XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
 
-private:
+    XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >* Clone() const override;
+    bool operator()() override;
 
-    template< typename ReturnsBool >
-    inline bool Recurse( ReturnsBool a_roEvent, Events&... a_roEvents )
-    { return a_roEvent() ? RecurseNone( a_roEvents ) : Recurse( a_roEvents ); }
-
-    template< typename ReturnsBool >
-    inline bool RecurseNone( ReturnsBool a_roEvent, Events&... a_roEvents )
-    { return a_roEvent() ? false : RecurseNone( a_roEvents ); }
-
-    template< typename ReturnsBool >
-    inline bool Recurse( ReturnsBool a_roEvent ) { return a_roEvent(); }
-
-    template< typename ReturnsBool >
-    inline bool RecurseNone( ReturnsBool a_roEvent ) { return !a_roEvent(); }
 };
 
-// Event triggered by at least one event occurring out of multiple options
-template< typename... Events >
-class OrEvent : public MultiEvent< Events >
+// Event triggered by at least one of two events occurring.
+// Both events are checked, in case they require ongoing tracking.
+template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
+class OrEvent : public EventCombination< ReturnsBoolOne, ReturnsBoolTwo >
 {
 public:
 
-    inline OrEvent( Events&... a_roEvents ) : MultiEvent( a_roEvents ) {}
+    OrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
+    OrEvent( const OrEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
 
-private:
+    OrEvent< ReturnsBoolOne, ReturnsBoolTwo >* Clone() const override;
+    bool operator()() override;
 
-    template< typename ReturnsBool >
-    inline bool Recurse( ReturnsBool a_roEvent, Events&... a_roEvents )
-    { return a_roEvent() || Recurse( a_roEvents ); }
-
-    template< typename ReturnsBool >
-    inline bool Recurse( ReturnsBool a_roEvent ) { return a_roEvent(); }
 };
 
-// Event triggered by multiple events all occurring
-template< typename... Events >
-class AndEvent : public MultiEvent< Events >
+// Event triggered by two events both occurring
+template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
+class AndEvent
 {
 public:
 
-    inline AndEvent( Events&... a_roEvents ) : MultiEvent( a_roEvents ) {}
+    AndEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
+    AndEvent( const AndEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
 
-private:
+    AndEvent< ReturnsBoolOne, ReturnsBoolTwo >* Clone() const override;
+    bool operator()() override;
 
-    template< typename ReturnsBool >
-    inline bool Recurse( ReturnsBool a_roEvent, Events&... a_roEvents )
-    { return a_roEvent() && Recurse( a_roEvents ); }
-
-    template< typename ReturnsBool >
-    inline bool Recurse( ReturnsBool a_roEvent ) { return a_roEvent(); }
 };
 
 // Event triggered by another event starting, but not by said event continuing
 template< typename ReturnsBool >
-class EventStart
+class EventStart : public CallbackWrapper< bool, ReturnsBool >
 {
 public:
-    inline StartEvent( ReturnsBool& a_roEvent )
-        : m_bStarted( false ), m_roEvent( a_roEvent ) {}
-    bool operator()();
+
+    EventStart( ReturnsBool& a_roCall, bool a_bStarted = false );
+    EventStart( const EventStart< ReturnsBool >& a_roEvent );
+
+    EventStart< ReturnsBool >* Clone() const override;
+    bool operator()() override;
+
 private:
+
     bool m_bStarted;
-    ReturnsBool& m_roEvent;
+
 };
 
 // Event triggered by another event ending
@@ -133,12 +126,21 @@ template< typename ReturnsBool >
 class EventEnd : public EventStart< ReturnsBool >
 {
 public:
-    inline EndEvent( ReturnsBool& a_roEvent )
-        : m_roNotEvent( a_roEvent ), EventStart( m_roNotEvent ) {}
+
+    EventEnd( ReturnsBool& a_roEvent, bool a_bStarted = false );
+    EventEnd( const EventEnd< ReturnsBool >& a_roEvent );
+
+    EventEnd< ReturnsBool >* Clone() const override;
+
 private:
-    NotEvent<ReturnsBool> m_roNotEvent;
+
+    NotEvent<ReturnsBool> m_oNotEvent;
+    ReturnsBool& m_roEvent;
+
 };
 
 }   // namespace Events
+
+#include "inline/Events.inl"
 
 #endif  // _EVENTS_H_

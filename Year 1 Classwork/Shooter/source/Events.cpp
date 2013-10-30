@@ -7,15 +7,14 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#include "AIE.h"
 #include "Events.h"
 
-namespace Events
-{
-
 // Is the internally-watched event taking place when it was not previously?
-bool EventStart::operator()()
+template< typename ReturnsBool >
+bool Events::EventStart< ReturnsBool >::operator()()
 {
-    if( m_roEvent() )
+    if( m_roCall() )
     {
         if( m_bStarted)
         {
@@ -27,5 +26,3 @@ bool EventStart::operator()()
     m_bStarted = false;
     return false;
 }
-
-}   // namespace Events
