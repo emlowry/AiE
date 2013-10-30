@@ -17,10 +17,24 @@ template< typename T >
 class Callback : public Hashable
 {
 public:
+
     virtual Callback< T >* Clone() const = 0;
+    virtual std::size_t Hash() const override;
     virtual T operator()() = 0;
+
     template< typename Callable >
-    static Callback< T >* MakeCallBack( Callable& a_roCall );
+    static Callback< T >* Create( Callable& a_roCall );
+
+protected:
+    
+    // Returns components of this class's hash
+    virtual const char* ClassName() const;
+    virtual std::size_t TargetHash() const;
+
+private:
+
+    static const char* const CLASS_NAME;
+
 };
 
 // Wrapper class for turning anything that implements operator() with no
@@ -33,13 +47,13 @@ public:
     CallbackWrapper( Callable& a_roCall );
     virtual ~CallbackWrapper();
 
-    // Dynamically allocate another wrapper that refers to the same callable
-    // object as this one.
     virtual CallbackWrapper< T, Callable >* Clone() const override;
-    virtual std::size_t Hash() const override;  // Hash by target address
-    virtual T operator()() override;            // Pass to wrapped object
+    virtual T operator()() override;
 
 protected:
+
+    virtual const char* ClassName() const override;
+    virtual std::size_t TargetHash() const override;
 
     Callable* a_poCall;  // Must implement T operator()()
 
@@ -51,6 +65,9 @@ private:
     CallbackWrapper( const CallbackWrapper< T, Callable >& ac_roWrapper );
     CallbackWrapper& operator=(
         const CallbackWrapper< T, Callable >& ac_roWrapper );
+
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
 
 };
 

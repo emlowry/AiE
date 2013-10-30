@@ -39,8 +39,16 @@ inline std::size_t
 {
     return ac_roHashable.Hash();
 }
+inline bool
+    HashablePointerEqualTo::operator()( const Hashable* const ac_cpoFirst,
+                                        const Hashable* const ac_cpoSecond ) const
+{
+    return ( ac_cpoFirst == ac_cpoSecond ) ? true
+           : ( nullptr == ac_cpoFirst || nullptr == ac_cpoSecond ) ? false
+           : ac_cpoFirst->Hash() == ac_cpoSecond->Hash();
+}
 inline std::size_t
-    HashablePointerHash::operator()( const Hashable* const ac_cpoHashable) const
+    HashablePointerHash::operator()( const Hashable* const ac_cpoHashable ) const
 {
     return ( nullptr == ac_cpoHashable ) ? 0 : ac_cpoHashable->Hash();
 }
@@ -48,7 +56,8 @@ inline bool
     HashablePointerLess::operator()( const Hashable* const ac_cpoFirst,
                                      const Hashable* const ac_cpoSecond ) const
 {
-    return ( nullptr == ac_cpoFirst) ? ( nullptr == ac_cpoSecond )
-                                     : ( nullptr == ac_cpoSecond ) ? false
-                                     : ( ac_cpoFirst->Hash() < ac_cpoSecond->Hash() );
+    return ( ac_cpoFirst == ac_cpoSecond ) ? false
+           : ( nullptr == ac_cpoFirst ) ? true
+           : ( nullptr == ac_cpoSecond ) ? false
+           : ac_cpoFirst->Hash() < ac_cpoSecond->Hash();
 }

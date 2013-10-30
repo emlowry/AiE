@@ -7,6 +7,10 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#include <functional>
+#include <sstream>
+#include <string>
+
 namespace Events
 {
 
@@ -30,20 +34,29 @@ inline bool Events::MouseButtonDownEvent()
 
 // Constructor
 template< typename ReturnsBool >
-inline NotEvent< ReturnsBool >::NotEvent( ReturnsBool a_roCall )
-    : CallbackWrapper< bool, ReturnsBool >( a_roCall ) {}
+inline NotEvent< ReturnsBool >::NotEvent( ReturnsBool& a_roCall )
+    : BaseClass( a_roCall ) {}
 
 // Copy Constructor
 template< typename ReturnsBool >
 inline NotEvent< ReturnsBool >::
     NotEvent(const NotEvent< ReturnsBool >& ac_roEvent )
-    : CallbackWrapper< bool, ReturnsBool >( *(ac_roEvent.m_poCall) ) {}
+    : BaseClass( *(ac_roEvent.m_poCall) ) {}
 
 // Dynamically allocate a copy pointing to the same event
 template< typename ReturnsBool >
 inline NotEvent< ReturnsBool >* NotEvent< ReturnsBool >::Clone() const
 {
-    return new NotEvent< ReturnsBool >( *this );
+    return new ThisClass( *this );
+}
+
+// Class name
+template< typename ReturnsBool >
+inline const char* const NotEvent< ReturnsBool >::CLASS_NAME = "NotEvent";
+template< typename ReturnsBool >
+inline const char* NotEvent< ReturnsBool >::ClassName() const
+{
+    return CLASS_NAME;
 }
 
 // Negation of the wrapped call result
@@ -58,19 +71,44 @@ inline bool NotEvent< ReturnsBool >::operator()()
 //
 
 // Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline EventCombination< ReturnsBoolOne, ReturnsBoolTwo >::
-    EventCombination( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo )
-        : m_poCallOne( &a_roCallOne ), m_poCallTwo( &a_roCallTwo ) {}
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline EventCombination< ReturnsBool, OtherReturnsBool >::
+    EventCombination( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall )
+        : BaseClass( &a_roCall ), m_poOtherCall( &a_roOtherCall ) {}
 
 // Hash based on concatenation of the target addresses
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
+template< typename ReturnsBool, typename OtherReturnsBool >
 inline std::size_t
-    EventCombination< ReturnsBoolOne, ReturnsBoolTwo >::Hash() const
+    EventCombination< ReturnsBool, OtherReturnsBool >::Hash() const
 {
-    std::size_t uiPartOne = (std::size_t)m_poCallOne;
-    uiPartOne << ( 8 * sizeof( m_poCallOne ) );
-    return uiPartOne + (std::size_t)m_poCallTwo;
+    stringstream oStream;
+    oStream << ClassName() << "(" << TargetHash() << "," << OtherTargetHash() << ")";
+    std::hash<string> hasher;
+    return hasher( oStream.str() );
+}
+
+// EventCombination class name
+template< typename ReturnsBool, typename OtherReturnsBool >
+const char* const EventCombination< ReturnsBool, OtherReturnsBool >::
+    CLASS_NAME = "EventCombination";
+template< typename ReturnsBool, typename OtherReturnsBool >
+const char* EventCombination< ReturnsBool, OtherReturnsBool >::ClassName() const
+{
+    return CLASS_NAME;
+}
+
+// EventCombination default other target hash is the hash of the other target,
+// if the other target is hashable, or the other target's address.
+template< typename ReturnsBool, typename OtherReturnsBool >
+std::size_t EventCombination< ReturnsBool, OtherReturnsBool >::OtherTargetHash() const
+{
+    std::hash< OtherReturnsBool* > hasher();
+    return hasher( m_poOtherCall );
+}
+template< typename ReturnsBool >
+std::size_t EventCombination< ReturnsBool, Hashable >::OtherTargetHash() const
+{
+    return m_poOtherCall->Hash();
 }
 
 //
@@ -78,30 +116,30 @@ inline std::size_t
 //
 
 // Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >::
-    XOrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo )
-    : BaseClass( a_roCallOne, a_roCallTwo ) {}
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline XOrEvent< ReturnsBool, OtherReturnsBool >::
+    XOrEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall )
+    : BaseClass( a_roCall, a_roOtherCall ) {}
 
 // Copy Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >::
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline XOrEvent< ReturnsBool, OtherReturnsBool >::
     XOrEvent( const ThisClass& ac_roEvent )
-    : BaseClass( *(ac_roEvent.m_poCallOne), *(ac_roEvent.m_poCallTwo) ) {}
+    : BaseClass( *(ac_roEvent.m_poCall), *(ac_roEvent.m_poOtherCall) ) {}
 
 // Dynamically allocate a copy pointing to the same events
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >*
-    XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >::Clone() const
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline XOrEvent< ReturnsBool, OtherReturnsBool >*
+    XOrEvent< ReturnsBool, OtherReturnsBool >::Clone() const
 {
-    return new XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >( *this );
+    return new ThisClass( *this );
 };
 
 // Exclusive-or of the call results
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline bool XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >::operator()()
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline bool XOrEvent< ReturnsBool, OtherReturnsBool >::operator()()
 {
-    return (*m_poCallOne)() ? !(*m_poCallTwo)() : (*m_poCallTwo)();
+    return (*m_poCall)() ? !(*m_poOtherCall)() : (*m_poOtherCall)();
 }
 
 //
@@ -109,35 +147,32 @@ inline bool XOrEvent< ReturnsBoolOne, ReturnsBoolTwo >::operator()()
 //
 
 // Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline OrEvent< ReturnsBoolOne, ReturnsBoolTwo >::
-    OrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo )
-    : EventCombination< ReturnsBoolOne, ReturnsBoolTwo >( a_roCallOne,
-                                                          a_roCallTwo ) {}
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline OrEvent< ReturnsBool, OtherReturnsBool >::
+    OrEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall )
+    : BaseClass( a_roCall, a_roOtherCall ) {}
 
 // Copy Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline OrEvent< ReturnsBoolOne, ReturnsBoolTwo >::
-    OrEvent(const OrEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent )
-    : EventCombination< ReturnsBoolOne, ReturnsBoolTwo >(
-                                                  *(ac_roEvent.m_poCallOne),
-                                                  *(ac_roEvent.m_poCallTwo) ) {}
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline OrEvent< ReturnsBool, OtherReturnsBool >::
+    OrEvent(const ThisClass& ac_roEvent )
+    : BaseClass( *(ac_roEvent.m_poCall), *(ac_roEvent.m_poOtherCall) ) {}
 
 // Dynamically allocate a copy pointing to the same events
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline OrEvent< ReturnsBoolOne, ReturnsBoolTwo >*
-    OrEvent< ReturnsBoolOne, ReturnsBoolTwo >::Clone() const
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline OrEvent< ReturnsBool, OtherReturnsBool >*
+    OrEvent< ReturnsBool, OtherReturnsBool >::Clone() const
 {
-    return new OrEvent< ReturnsBoolOne, ReturnsBoolTwo >( *this );
+    return new ThisClass( *this );
 }
 
 // Exclusive-or of the call results.  Make sure both are checked, in case they
 // track their own results.
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline bool OrEvent< ReturnsBoolOne, ReturnsBoolTwo >::operator()()
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline bool OrEvent< ReturnsBool, OtherReturnsBool >::operator()()
 {
-    bool bOne = (*m_poCallOne)();
-    return (*m_poCallTwo)() || bOne;
+    bool bOne = (*m_poCall)();
+    return (*m_poOtherCall)() || bOne;
 }
 
 //
@@ -145,33 +180,30 @@ inline bool OrEvent< ReturnsBoolOne, ReturnsBoolTwo >::operator()()
 //
 
 // Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline AndEvent< ReturnsBoolOne, ReturnsBoolTwo >::
-    AndEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo )
-    : EventCombination< ReturnsBoolOne, ReturnsBoolTwo >( a_roCallOne,
-                                                          a_roCallTwo ) {}
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline AndEvent< ReturnsBool, OtherReturnsBool >::
+    AndEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall )
+    : BaseClass( a_roCall, a_roOtherCall ) {}
 
 // Copy Constructor
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline AndEvent< ReturnsBoolOne, ReturnsBoolTwo >::
-    AndEvent( const AndEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent )
-    : EventCombination< ReturnsBoolOne, ReturnsBoolTwo >(
-                                                  *(ac_roEvent.m_poCallOne),
-                                                  *(ac_roEvent.m_poCallTwo) ) {}
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline AndEvent< ReturnsBool, OtherReturnsBool >::
+    AndEvent( const ThisClass& ac_roEvent )
+    : BaseClass( *(ac_roEvent.m_poCall), *(ac_roEvent.m_poOtherCall) ) {}
 
 // Dynamically allocate a copy pointing to the same events
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline AndEvent< ReturnsBoolOne, ReturnsBoolTwo >*
-    AndEvent< ReturnsBoolOne, ReturnsBoolTwo >::Clone() const
+template< typename ReturnsBool, typename OtherReturnsBool >
+inline AndEvent< ReturnsBool, OtherReturnsBool >*
+    AndEvent< ReturnsBool, OtherReturnsBool >::Clone() const
 {
-    return new AndEvent< ReturnsBoolOne, ReturnsBoolTwo >( *this );
+    return new ThisClass( *this );
 }
 
 // And of the call results.
 template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-inline bool AndEvent< ReturnsBoolOne, ReturnsBoolTwo >::operator()()
+inline bool AndEvent< ReturnsBool, OtherReturnsBool >::operator()()
 {
-    return (*a_roCallOne)() && (*a_roCallTwo)();
+    return (*a_roCall)() && (*a_roOtherCall)();
 }
 
 //
@@ -182,21 +214,18 @@ inline bool AndEvent< ReturnsBoolOne, ReturnsBoolTwo >::operator()()
 template< typename ReturnsBool >
 inline EventStart< ReturnsBool >::EventStart( ReturnsBool& a_roCall,
                                               bool a_bStarted )
-    : CallbackWrapper< bool, ReturnsBool >( a_roCall ),
-      m_bStarted( a_bStarted ) {}
+    : BaseClass( a_roCall ), m_bStarted( a_bStarted ) {}
 
 // Copy Constructor
 template< typename ReturnsBool >
-inline EventStart< ReturnsBool >::EventStart(
-                                   const EventStart< ReturnsBool >& ac_roEvent )
-    : CallbackWrapper< bool, ReturnsBool >( *(ac_roEvent.m_poCall) ),
-      m_bStarted( ac_roEvent.m_bStarted ) {}
+inline EventStart< ReturnsBool >::EventStart( const ThisClass& ac_roEvent )
+    : BaseClass( *(ac_roEvent.m_poCall) ), m_bStarted( ac_roEvent.m_bStarted ) {}
 
 // Dynamically allocate a copy pointing to the same event
 template< typename ReturnsBool >
 inline EventStart< ReturnsBool >* EventStart< ReturnsBool >::Clone() const
 {
-    return new EventStart( *m_poCall, m_bStarted );
+    return new ThisClass( *m_poCall, m_bStarted );
 }
 
 //
@@ -208,20 +237,19 @@ template< typename ReturnsBool >
 inline EventEnd< ReturnsBool >::EventEnd( ReturnsBool& a_roEvent,
                                           bool a_bStarted = false )
     : m_poEvent( &a_roEvent ), m_oNotEvent( a_roEvent ),
-      EventStart< ReturnsBool >( m_oNotEvent, !a_bStarted ) {}
+      m_poCall( m_oNotEvent ), m_bStarted( !a_bStarted ) {}
 
 // Copy Constructor
 template< typename ReturnsBool >
-inline EventEnd< ReturnsBool >::EventEnd(
-                                      const EventEnd< ReturnsBool >& a_roEvent )
+inline EventEnd< ReturnsBool >::EventEnd( const ThisClass& a_roEvent )
     : m_poEvent( a_roEvent.m_poEvent ), m_oNotEvent( *(a_roEvent.m_poEvent) ),
-      EventStart< ReturnsBool >( m_oNotEvent, m_bStarted ) {}
+      m_poCall( m_oNotEvent), m_bStarted( a_roEvent.m_bStarted ) {}
 
 // Dynamically allocate a copy pointing to the same event
 template< typename ReturnsBool >
 inline EventEnd< ReturnsBool >* EventEnd< ReturnsBool >::Clone() const
 {
-    return new EventEnd( *m_poEvent, !m_bStarted );
+    return new ThisClass( *m_poEvent, !m_bStarted );
 }
 
 }   // namespace Events

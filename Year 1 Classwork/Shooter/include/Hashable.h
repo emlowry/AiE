@@ -32,15 +32,25 @@ struct std::hash< Hashable >
     std::size_t operator()( const Hashable& ac_roHashable ) const;
 };
 
-// Provide a hasher functor for cases where we want to hash pointers by their
-// targets instead of using the standard implementation.
+// Provide an equal_to comparison functor for cases when we want to hash
+// pointers to hashable objects by their targets instead of using the standard
+// equal_to<T*> implementation.
+struct HashablePointerEqualTo : public std::equal_to< Hashable* >
+{
+    bool operator()( const Hashable* const ac_cpoFirst,
+                     const Hashable* const ac_cpoSecond ) const;
+}
+
+// Provide a hash functor for cases where we want to hash pointers to hashable
+// objects by their targets instead of using the standard hash<T*>
+// implementation.
 struct HashablePointerHash : public std::hash< Hashable* >
 {
     std::size_t operator()( const Hashable* const ac_cpoHashable) const;
 };
 
 // Provide a less comparison functor for cases where we want to sort pointers
-// to hashable objects by their targets instead of using the standard
+// to hashable objects by their targets instead of using the standard less<T*>
 // implementation.
 struct HashablePointerLess : public std::less< Hashable* >
 {

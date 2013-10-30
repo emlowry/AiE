@@ -63,10 +63,10 @@ private:
     // typedef these to save space
     typedef std::set< Event*, HashablePointerLess > EventSet;
     typedef std::set< Reaction*, HashablePointerLess > ReactionSet;
-    typedef std::unordered_map< Event*, ReactionSet, HashablePointerHash >
-            ReactionMap;
-    typedef std::unordered_map< Reaction*, EventSet, HashablePointerHash >
-            TriggerMap;
+    typedef std::unordered_map< Event*, ReactionSet, HashablePointerHash,
+                                HashablePointerEqualTo > ReactionMap;
+    typedef std::unordered_map< Reaction*, EventSet, HashablePointerHash,
+                                HashablePointerEqualTo > TriggerMap;
 
     // Constructor is private - this class is a singleton that users interact
     // with via static functions.

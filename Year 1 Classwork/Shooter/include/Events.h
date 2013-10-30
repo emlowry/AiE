@@ -30,7 +30,7 @@ class NotEvent : public CallbackWrapper< bool, ReturnsBool >
 {
 private:
 
-    typedef CallbackWrapper< bool > BaseClass;
+    typedef CallbackWrapper< bool, ReturnsBool > BaseClass;
     typedef NotEvent< ReturnsBool > ThisClass;
 
 public:
@@ -41,6 +41,10 @@ public:
     ThisClass* Clone() const override;
     bool operator()() override;
 
+protected:
+    
+    virtual const char* ClassName() const override;
+
 private:
     
     // Keep copy constructor and assignment operator private to prevent
@@ -49,50 +53,60 @@ private:
     NotEvent( const ThisClass& ac_roEvent );
     ThisClass& operator=( const ThisClass& ac_roEvent );
 
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
+
 };
 
 // Abstract event triggered by some combination of events occurring.
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-class EventCombination : public Callback< bool >
+template< typename ReturnsBool, typename OtherReturnsBool >
+class EventCombination : public CallbackWrapper< bool, ReturnsBool >
 {
+private:
+    
+    typedef CallbackWrapper< bool, ReturnsBool > BaseClass;
+    typedef EventCombination< ReturnsBool, OtherReturnsBool > ThisClass;
+
 public:
 
-    EventCombination( ReturnsBoolOne& a_roCallOne,
-                      ReturnsBoolTwo& a_roCallTwo );
+    EventCombination( ReturnsBool& a_roCall,
+                      OtherReturnsBool& a_roOtherCall );
     virtual ~EventCombination();
     std::size_t Hash() const override;
 
 protected:
+    
+    virtual const char* ClassName() const override;
+    virtual std::size_t OtherTargetHash() const;
 
-    ReturnsBoolOne* m_poCallOne;
-    ReturnsBoolTwo* m_poCallTwo;
+    OtherReturnsBool* m_poOtherCall;
 
 private:
-    
-    // Keep copy constructor and assignment operator private to prevent
-    // object slicing.
-    EventCombination(
-        const EventCombination< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
-    EventCombination< ReturnsBoolOne, ReturnsBoolTwo >& operator=(
-        const EventCombination< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
+
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
 
 };
 
 // Event triggered by only one of two events occurring.
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-class XOrEvent : public EventCombination< ReturnsBoolOne, ReturnsBoolTwo >
+template< typename ReturnsBool, typename OtherReturnsBool >
+class XOrEvent : public EventCombination< ReturnsBool, OtherReturnsBool >
 {
 private:
 
-    typedef EventCombination< ReturnsBoolOne, ReturnsBoolTwo > BaseClass;
-    typedef XOrEvent< ReturnsBoolOne, ReturnsBoolTwo > ThisClass;
+    typedef EventCombination< ReturnsBool, OtherReturnsBool > BaseClass;
+    typedef XOrEvent< ReturnsBool, OtherReturnsBool > ThisClass;
 
 public:
 
-    XOrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
+    XOrEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall );
 
     ThisClass* Clone() const override;
     bool operator()() override;
+
+protected:
+    
+    virtual const char* ClassName() const override;
 
 private:
     
@@ -102,34 +116,77 @@ private:
     XOrEvent( const ThisClass& ac_roEvent );
     ThisClass& operator=( const ThisClass& ac_roEvent );
 
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
+
 };
 
 // Event triggered by at least one of two events occurring.
 // Both events are checked, in case they require ongoing tracking.
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
-class OrEvent : public EventCombination< ReturnsBoolOne, ReturnsBoolTwo >
+template< typename ReturnsBool, typename OtherReturnsBool >
+class OrEvent : public EventCombination< ReturnsBool, OtherReturnsBool >
 {
+private:
+
+    typedef EventCombination< ReturnsBool, OtherReturnsBool > BaseClass;
+    typedef OrEvent< ReturnsBool, OtherReturnsBool > ThisClass;
+
 public:
 
-    OrEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
-    OrEvent( const OrEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
+    OrEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall );
+    OrEvent( const ThisClass& ac_roEvent );
 
-    OrEvent< ReturnsBoolOne, ReturnsBoolTwo >* Clone() const override;
+    ThisClass* Clone() const override;
     bool operator()() override;
+
+protected:
+    
+    virtual const char* ClassName() const override;
+
+private:
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    OrEvent( const ThisClass& ac_roEvent );
+    ThisClass& operator=( const ThisClass& ac_roEvent );
+
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
 
 };
 
 // Event triggered by two events both occurring
-template< typename ReturnsBoolOne, typename ReturnsBoolTwo >
+template< typename ReturnsBool, typename OtherReturnsBool >
 class AndEvent
 {
+private:
+
+    typedef EventCombination< ReturnsBool, OtherReturnsBool > BaseClass;
+    typedef AndEvent< ReturnsBool, OtherReturnsBool > ThisClass;
+
 public:
 
-    AndEvent( ReturnsBoolOne& a_roCallOne, ReturnsBoolTwo& a_roCallTwo );
-    AndEvent( const AndEvent< ReturnsBoolOne, ReturnsBoolTwo >& ac_roEvent );
+    AndEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall );
+    AndEvent( const ThisClass& ac_roEvent );
 
-    AndEvent< ReturnsBoolOne, ReturnsBoolTwo >* Clone() const override;
+    ThisClass* Clone() const override;
     bool operator()() override;
+
+protected:
+    
+    virtual const char* ClassName() const override;
+
+private:
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    AndEvent( const ThisClass& ac_roEvent );
+    ThisClass& operator=( const ThisClass& ac_roEvent );
+
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
 
 };
 
@@ -137,15 +194,33 @@ public:
 template< typename ReturnsBool >
 class EventStart : public CallbackWrapper< bool, ReturnsBool >
 {
+private:
+
+    typedef CallbackWrapper< bool, ReturnsBool > BaseClass;
+    typedef EventStart< ReturnsBool > ThisClass;
+
 public:
 
     EventStart( ReturnsBool& a_roCall, bool a_bStarted = false );
-    EventStart( const EventStart< ReturnsBool >& a_roEvent );
+    EventStart( const ThisClass& a_roEvent );
 
-    EventStart< ReturnsBool >* Clone() const override;
+    ThisClass* Clone() const override;
     bool operator()() override;
 
+protected:
+    
+    virtual const char* ClassName() const override;
+
 private:
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    EventStart( const ThisClass& ac_roEvent );
+    ThisClass& operator=( const ThisClass& ac_roEvent );
+
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
 
     bool m_bStarted;
 
@@ -155,14 +230,33 @@ private:
 template< typename ReturnsBool >
 class EventEnd : public EventStart< ReturnsBool >
 {
+private:
+
+    typedef EventStart< ReturnsBool > BaseClass;
+    typedef EventEnd< ReturnsBool > ThisClass;
+
 public:
 
     EventEnd( ReturnsBool& a_roEvent, bool a_bStarted = false );
-    EventEnd( const EventEnd< ReturnsBool >& a_roEvent );
+    EventEnd( const ThisClass& a_roEvent );
 
-    EventEnd< ReturnsBool >* Clone() const override;
+    ThisClass* Clone() const override;
+
+protected:
+    
+    virtual const char* ClassName() const override;
+    virtual std::size_t TargetHash() const override;
 
 private:
+    
+    // Keep copy constructor and assignment operator private to prevent
+    // object slicing.  Copy constructor is used by Clone() and should be
+    // implemented.  Assignment operator should not be used.
+    EventEnd( const ThisClass& ac_roEvent );
+    ThisClass& operator=( const ThisClass& ac_roEvent );
+
+    // class name for the hash function to use
+    static const char* const CLASS_NAME;
 
     NotEvent<ReturnsBool> m_oNotEvent;
     ReturnsBool* m_poEvent;
