@@ -21,6 +21,8 @@
     <None Include="include\inline\XY.inl" />
     <None Include="include\inline\EventHandler.inl" />
     <None Include="include\inline\GameEngine.inl" />
+    <None Include="include\inline\CallbackWrapper.inl" />
+    <None Include="include\inline\DoubleCallback.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -77,6 +79,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\LoadScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CallbackWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DoubleCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

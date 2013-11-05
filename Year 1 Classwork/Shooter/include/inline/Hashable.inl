@@ -8,36 +8,36 @@
  ******************************************************************************/
 
 // Comparison operators
-inline std::size_t Hashable::operator<( const Hashable& ac_roHashable ) const
+inline std::size_t Hashable::operator<( const Hashable&& ac_rroHashable ) const
 {
-    return Hash() < ac_roHashable.Hash();
+    return Hash() < ac_rroHashable.Hash();
 }
-inline std::size_t Hashable::operator>( const Hashable& ac_roHashable ) const
+inline std::size_t Hashable::operator>( const Hashable&& ac_rroHashable ) const
 {
-    return Hash() > ac_roHashable.Hash();
+    return Hash() > ac_rroHashable.Hash();
 }
-inline std::size_t Hashable::operator<=( const Hashable& ac_roHashable ) const
+inline std::size_t Hashable::operator<=( const Hashable&& ac_rroHashable ) const
 {
-    return Hash() <= ac_roHashable.Hash();
+    return Hash() <= ac_rroHashable.Hash();
 }
-inline std::size_t Hashable::operator>=( const Hashable& ac_roHashable ) const
+inline std::size_t Hashable::operator>=( const Hashable&& ac_rroHashable ) const
 {
-    return Hash() >= ac_roHashable.Hash();
+    return Hash() >= ac_rroHashable.Hash();
 }
-inline std::size_t Hashable::operator==( const Hashable& ac_roHashable ) const
+inline std::size_t Hashable::operator==( const Hashable&& ac_rroHashable ) const
 {
-    return Hash() == ac_roHashable.Hash();
+    return Hash() == ac_rroHashable.Hash();
 }
-inline std::size_t Hashable::operator!=( const Hashable& ac_roHashable ) const
+inline std::size_t Hashable::operator!=( const Hashable&& ac_rroHashable ) const
 {
-    return Hash() != ac_roHashable.Hash();
+    return Hash() != ac_rroHashable.Hash();
 }
 
 // Functor implementations
 inline std::size_t
-    std::hash< Hashable >::operator()( const Hashable& ac_roHashable ) const
+    std::hash< Hashable >::operator()( const Hashable&& ac_rroHashable ) const
 {
-    return ac_roHashable.Hash();
+    return ac_rroHashable.Hash();
 }
 inline bool
     HashablePointerEqualTo::operator()( const Hashable* const ac_cpoFirst,

@@ -17,19 +17,19 @@
 struct Hashable
 {
     virtual std::size_t Hash() const = 0;
-    std::size_t operator<( const Hashable& ac_roHashable ) const;
-    std::size_t operator>( const Hashable& ac_roHashable ) const;
-    std::size_t operator<=( const Hashable& ac_roHashable ) const;
-    std::size_t operator>=( const Hashable& ac_roHashable ) const;
-    std::size_t operator==( const Hashable& ac_roHashable ) const;
-    std::size_t operator!=( const Hashable& ac_roHashable ) const;
+    std::size_t operator<( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator>( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator<=( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator>=( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator==( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator!=( const Hashable&& ac_rroHashable ) const;
 };
 
 // Redefine std::hash functor for hashable objects
 template<>
 struct std::hash< Hashable >
 {
-    std::size_t operator()( const Hashable& ac_roHashable ) const;
+    std::size_t operator()( const Hashable&& ac_rroHashable ) const;
 };
 
 // Provide an equal_to comparison functor for cases when we want to hash
@@ -39,7 +39,7 @@ struct HashablePointerEqualTo : public std::equal_to< Hashable* >
 {
     bool operator()( const Hashable* const ac_cpoFirst,
                      const Hashable* const ac_cpoSecond ) const;
-}
+};
 
 // Provide a hash functor for cases where we want to hash pointers to hashable
 // objects by their targets instead of using the standard hash<T*>

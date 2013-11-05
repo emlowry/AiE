@@ -18,9 +18,7 @@
 
 #define SINGLETON_STATE_PRIVATE( CLASS_NAME ) private: \
     friend GameState::Singleton< CLASS_NAME >; \
-    CLASS_NAME(); \
-    CLASS_NAME( const CLASS_NAME &a_roOriginal ); \
-    CLASS_NAME & operator=( const CLASS_NAME &a_roOriginal );
+    CLASS_NAME();
 
 // Abstract class representing a game state.  Derived classes must implement the
 // Update and Draw functions.
@@ -41,8 +39,6 @@ public:
     // private:
     //     friend GameState::Singleton< DerivedState >;
     //     DerivedState();
-    //     DerivedState( const DerivedState& a_roOriginal );
-    //     DerivedState& operator=( const DerivedState& a_roOriginal );
     //
     //     // ... the rest of the class private declarations...
     //
@@ -69,10 +65,18 @@ public:
     protected:
         Singleton();
     private:
-        Singleton( const Singleton& a_roOriginal );
-        Singleton& operator=( const Singleton& a_roOriginal );
+        class Wrapper : public Callback< void >
+        {
+        public:
+            Wrapper( Derived& a_roSingleton ) : m_roCall( a_roSingleton ) {}
+            ~Wrapper();
+            Wrapper* Clone() const override { return new Wrapper( m_roSingleton ); }
+            void operator()() override { m_roSingleton(); }
+        private:
+            Derived& m_roSingleton;
+        };
         static Derived sm_oInstance;
-        static CallbackWrapper< void, Derived > sm_oWrapper( sm_oInstance );
+        static Wrapper sm_oWrapper( sm_oInstance );
     };
 
     // Hash by instance address
