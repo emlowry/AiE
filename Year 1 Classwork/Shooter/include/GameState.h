@@ -87,15 +87,19 @@ private:
 template< typename Derived >
 class GameState::Singleton : public GameState
 {
+private:
+
+    class Caller;
+
 public:
 
     // You should never be able to call a singleton's Clone() function because
     // you should never have access to the singleton instance - only the
-    // singleton's private wrapper class can access that instance, and you can
+    // singleton's private caller class can access that instance, and you can
     // only call on the instance by calling on an instance of that private
-    // wrapper class
+    // caller class
     Singleton< Derived >* Clone() const override;
-    static const Wrapper State;
+    static const Caller State;
 
 protected:
 
@@ -103,12 +107,12 @@ protected:
 
 private:
 
-    class Wrapper : public GameState
+    class Caller : public GameState
     {
     public:
-        Wrapper();
-        virtual ~Wrapper();
-        Wrapper* Clone() const override;
+        Caller();
+        virtual ~Caller();
+        Caller* Clone() const override;
     private:
         void Update() override;
         void Draw() const override;

@@ -3,23 +3,58 @@
  * Author:             Elizabeth Lowry
  * Date Created:       October 29, 2013
  * Description:        Inline function implementations for Callback.h.
- * Last Modified:      October 29, 2013
- * Last Modification:  Moved code out of Globals.inl.
+ * Last Modified:      November 6, 2013
+ * Last Modification:  Simplified templating.
  ******************************************************************************/
 
-#include "CallbackWrapper.h"
-#include "DoubleCallback.h"
-#include <functional>
-#include <sstream>
-#include <string>
+#ifndef _CALLBACK_INL_
+#define _CALLBACK_INL_
+
+#include <functional>   // for std::hash
+#include <sstream>      // for std::stringstream
+#include <string>       // for std::string
+
+// Public constructors
+template< typename T >
+inline Callback< T >::Callback( const Callback&& ac_rroCall )
+    : m_poCall( ac_rroCall.Clone() ) {}
+template< typename T >
+template< typename Callable >
+inline Callback< T >::Callback( Callable& a_roTarget )
+    : m_poCall( new Wrapper< Callable >( a_roTarget ) ) {}
+
+// Protected constructors
+template< typename T >
+inline Callback< T >::Callback() : m_poCall( nullptr ) {}
+template< typename T >
+inline Callback< T >::Callback( Callback* a_poCall ) : m_poCall( a_poCall ) {}
+
+// Destructor
+template< typename T >
+inline Callback< T >::~Callback()
+{
+    // Derived classes might set the pointer to something undeletable, so check
+    if( nullptr != m_poCall && this != m_poCall )
+    {
+        delete m_poCall;
+        m_poCall = nullptr;
+    }
+}
 
 // Callback class name
 template< typename T >
 const char* const Callback< T >::CLASS_NAME = "Callback";
 template< typename T >
-const char* Callback< T >::ClassName() const
+inline const char* Callback< T >::ClassName() const
 {
     return CLASS_NAME;
+}
+
+// Clone the callback
+template< typename T >
+inline Callback< T >* Callback< T >::Clone() const
+{
+    return new Callback( *m_poCall );
 }
 
 // Hash callbacks by callback class name and target hash
@@ -32,57 +67,83 @@ inline std::size_t Callback< T >::Hash() const
     return std::hash< std::string >()( oStream.str() );
 }
 
-// Create a callback from any callable object without worrying about the
-// template parameter for the callable object's type - in a non-constructor
-// function, the template parameters can be inferred from the function params.
-// If the object is iteself a Callback, clone it - otherwise, wrap it.
-template< typename T, typename Callable >
-inline Callback< T >* NewCallback( Callable& a_roCall )
-{
-    return new CallbackWrapper< T, Callable >( a_roCall );
-}
+// Static functions for creating a new callback out of anything implementing
+// operator() with no parameters and the correct return type, without
+// unneccessary wrapping if the parameter is already a callback
 template< typename T >
-inline Callback< T >* NewCallback( const Callback< T >&& ac_rroCall )
+inline Callback< T >* Callback< T >::New( const Callback&& ac_rroCall )
 {
     return ac_rroCall.Clone();
 }
-
-// Create a callback from any pair of callable objects without worrying about
-// the template parameters for the callable objects' types.
-template< typename T, typename Callable, typename OtherCallable >
-inline Callback< T >* NewCallback( Callable& a_roCall,
-                                   OtherCallable& a_roOtherCall )
-{
-    typedef DoubleCallback< T, Callable, OtherCallable > DC;
-    return new DC( a_roCall,  a_roOtherCall );
-}
-template< typename T, typename Callable >
-inline Callback< T >* NewCallback( Callable& a_roCall,
-                                   const Callback< T >&& ac_rroOtherCall )
-{
-    typedef DoubleCallback< T, Callable, Callback< T > > DC;
-    return new DC( a_roCall, std::forward< Callback< T > >( ac_rroOtherCall ) );
-}
-template< typename T, typename OtherCallable >
-inline Callback< T >* NewCallback( const Callback< T >&& ac_rroCall,
-                                   OtherCallable& a_roOtherCall )
-{
-    typedef DoubleCallback< T, Callback< T >, OtherCallable > DC;
-    return new DC( std::forward< Callback< T > >( ac_rroCall ), a_roOtherCall );
-}
 template< typename T >
-inline Callback< T >* NewCallback( const Callback< T >&& ac_rroCall,
-                                   const Callback< T >&& ac_rroOtherCall )
+template< typename Callable >
+inline Callback< T >* Callback< T >::New( Callable& a_roTarget )
 {
-    typedef DoubleCallback< T, Callback< T >, Callback< T > > DC;
-    return new DC( std::forward< Callback< T > >( ac_rroCall ),
-                   std::forward< Callback< T > >( ac_rroOtherCall ) );
+    return new Wrapper< Callable >( a_roTarget );
 }
 
-// Callback default target hash is the hash of its address
+// Call the target of the internal pointer.  Since this assumes the target is
+// valid, this operator must be redefined in any child class that sets the
+// internal pointer to null (or this, though why anyone would do that...)
+template< typename T >
+inline T Callback< T >::operator()()
+{
+    return (*m_poCall)();
+}
+
+// Callback default target hash is pointer target's hash, if target is another
+// callback, or the hash of the pointer itself if target is null or this.
 template< typename T >
 inline std::size_t Callback< T >::TargetHash() const
 {
-    //std::hash< RootClass* > hasher();
-    return std::hash< const RootClass* >()( this );
+    return ( nullptr != m_poCall && this != m_poCall )
+            ? m_poCall->Hash()
+            : std::hash< const Callback< T >* >()( m_poCall );
 }
+
+// Wrapper constructor invokes protected default callback constructor to set
+// internal callback pointer to null, since this class points to a non-callback
+// object instead.
+template< typename T >
+template< typename Callable >
+inline Callback< T >::Wrapper< Callable >::Wrapper( Callable& a_roTarget )
+    : m_poTarget( &a_roTarget ) {}
+
+// Wrapper classname
+template< typename T >
+template< typename Callable >
+const char* const Callback< T >::Wrapper< Callable >::CLASS_NAME = "Wrapper";
+template< typename T >
+template< typename Callable >
+inline const char* Callback< T >::Wrapper< Callable >::ClassName() const
+{
+    return CLASS_NAME;
+}
+
+// Clone a wrapper callback
+template< typename T >
+template< typename Callable >
+inline typename Callback< T >::Wrapper< Callable >*
+    Callback< T >::Wrapper< Callable >::Clone() const
+{
+    return new Wrapper( *m_poTarget );
+}
+
+// Wrapper calls its target.  The target has better implement operator() with no
+// parameters and the given return type!
+template< typename T >
+template< typename Callable >
+inline T Callback< T >::Wrapper< Callable >::operator()()
+{
+    return (*m_poTarget)();
+}
+
+// Wrapper target hash is hash of the target pointer
+template< typename T >
+template< typename Callable >
+inline std::size_t Callback< T >::Wrapper< Callable >::TargetHash() const
+{
+    return std::hash< const Callable* >()( m_poTarget );
+}
+
+#endif  // _CALLBACK_INL_

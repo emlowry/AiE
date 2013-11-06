@@ -7,157 +7,77 @@
  *                      TODO: after this gets ported to Eclipse, use variadic
  *                      template parameters to implement a MultiCallback class -
  *                      like this one, but combining any number of callables.
- * Last Modified:      November 4, 2013
- * Last Modification:  Moved code out of Callback.h.
+ * Last Modified:      November 6, 2013
+ * Last Modification:  Simplified templating.
  ******************************************************************************/
 
-#ifndef _DOUBLE_CALLBACK_WRAPPER_H_
-#define _DOUBLE_CALLBACK_WRAPPER_H_
+#ifndef _DOUBLE_CALLBACK_H_
+#define _DOUBLE_CALLBACK_H_
 
 #include "Callback.h"
-#include "CallbackWrapper.h"
 
-// Abstract base class for generic and specialized wrapper classes - this way,
-// implementation details don't have to be repeated in both.
-template< typename T, typename Callable = Callback< T >,
-          typename OtherCallable = Callback< T > >
-class DoubleCallbackBase : public CallbackWrapperBase< T, Callable >
+// Base class that wraps to Callbacks or other callable objects into one.
+template< typename T = void >
+class DoubleCallback : public Callback< T >
 {
-private:
-    
-    // Simplify typing and reduce parameter template typos
-    typedef CallbackWrapperBase< T, Callable > BaseClass;
-    typedef DoubleCallbackBase< T, Callable, OtherCallable > ThisClass;
-
 public:
 
-    // Redefine Hash to produce a code based on class name and *both* targets.
+    // Sets pointers to clones of parameters
+    DoubleCallback( const Callback< T >&& ac_rroCall,
+                    const Callback< T >&& ac_rroOtherCall );
+
+    // Sets first pointer to clone of first parameter, sets second pointer to a
+    // wrapper pointing to the second parameter
+    template< typename OtherCallable >
+    DoubleCallback( const Callback< T >&& ac_rroCall,
+                    OtherCallable& a_roOtherTarget );
+
+    // Sets first pointer to a wrapper pointing to the first parameter, sets the
+    // second pointer to a clone of the second parameter
+    template< typename Callable >
+    DoubleCallback( Callable& a_roTarget,
+                    const Callback< T >&& ac_rroOtherCall );
+
+    // Sets pointers to wrappers pointing to parameters
+    template< typename Callable, typename OtherCallable >
+    DoubleCallback( Callable& a_roTarget, OtherCallable& a_roOtherTarget );
+
+    // Deallocate the second pointer.  Base Callback destructor will take care
+    // of the first.
+    virtual ~DoubleCallback();
+
+    // Allocate a double callback that points to clones of the callbacks this
+    // one points to
+    virtual DoubleCallback* Clone() const override;
+
+    // Hash by class name and both targets' hashes
     virtual std::size_t Hash() const override;
 
-    // Default implementation returns (m_poCall(), m_poOtherCall), so be careful
-    // when T is a pointer type to dynamically allocated data.
+    // Call both targets, but only return the result of the second - in other
+    // words, call ( FirstCall(), SecondCall() ).  Be careful if the return type
+    // is dynamically allocated data - only make a double callback returning
+    // that type if it's a derived class that can dispose of extra objects.
     virtual T operator()() override;
 
 protected:
 
-    // Constructor should only be called by derived classes
-    DoubleCallbackBase( Callable* a_poCall, OtherCallable* a_poOtherCall );
-    virtual ~DoubleCallbackBase();
-    
-    // Default other target hash is hash of other target's address
+    // Default constructor sets both pointers to null, for derived classes that
+    // point to a pair of things other than other callbacks.
+    DoubleCallback();
+
+    // Set the pointers directly.  Assumes the calling derived class constructor
+    // has done any neccessary cloning.
+    DoubleCallback( Callback< T >* a_poCall, Callback< T >* a_poOtherCall );
+
+    // used by the hash function
     virtual std::size_t OtherTargetHash() const;
 
-    OtherCallable* m_poOtherCall;
-
-};
-
-// General implementation for a pair of callable objects joined together into
-// one callback
-template< typename T, typename Callable = Callback< T >,
-          typename OtherCallable = Callback< T > >
-class DoubleCallback : public DoubleCallbackBase< T, Callable, OtherCallable >
-{
-private:
-    
-    // Simplify typing and reduce parameter template typos
-    typedef DoubleCallbackBase< T, Callable, OtherCallable > BaseClass;
-    typedef DoubleCallback< T, Callable, OtherCallable > ThisClass;
-
-public:
-
-    // Reference parameters ensure that targets exist.  If either target is
-    // local, make sure this wrapper stays local too!
-    DoubleCallback( Callable& a_roCall, OtherCallable& a_roOtherCall );
-    virtual ~DoubleCallback();
-
-    virtual ThisClass* Clone() const override;
-
-};
-
-// Partially specialized implementations for any callable and a callback
-template< typename T, typename Callable >
-class DoubleCallback< T, Callable >
-    : public DoubleCallbackBase< T, Callable >
-{
-private:
-    
-    // Simplify typing and reduce parameter template typos
-    typedef DoubleCallbackBase< T, Callable > BaseClass;
-    typedef DoubleCallback< T, Callable > ThisClass;
-
-public:
-    
-    // Reference parameters ensure that targets exist.  If the non-callback
-    // parameter or the final target of the callback parameter are local, make
-    // sure this wrapper stays local too.
-    DoubleCallback( Callable& a_roCall, const RootClass&& ac_rroOtherCall );
-    virtual ~DoubleCallback();
-
-    virtual ThisClass* Clone() const override;
-
-protected:
-    
-    // Other target hash is other target's hash
-    virtual std::size_t OtherTargetHash() const;
-
-};
-template< typename T, typename OtherCallable >
-class DoubleCallback< T, Callback< T >, OtherCallable >
-    : public DoubleCallbackBase< T, Callback< T >, OtherCallable >
-{
-private:
-    
-    // Simplify typing and reduce parameter template typos
-    typedef DoubleCallbackBase< T, RootClass, OtherCallable > BaseClass;
-    typedef DoubleCallback< T, RootClass, OtherCallable > ThisClass;
-
-public:
-    
-    // Reference parameters ensure that targets exist.  If the non-callback
-    // parameter or the final target of the callback parameter are local, make
-    // sure this wrapper stays local too!
-    DoubleCallback( const RootClass&& ac_rroCall,
-                    OtherCallable& a_roOtherCall );
-    virtual ~DoubleCallback();
-
-    virtual ThisClass* Clone() const override;
-
-protected:
-    
-    // Target hash is target's hash
-    virtual std::size_t TargetHash() const;
-
-};
-
-// Fully specialized implementation for a pair of Callbacks
-template< typename T >
-class DoubleCallback< T >
-    : public DoubleCallbackBase< T >
-{
-private:
-    
-    // Simplify typing and reduce parameter template typos
-    typedef DoubleCallbackBase< T > BaseClass;
-    typedef DoubleCallback< T > ThisClass;
-
-public:
-
-    // Reference parameters ensure that targets exist.  If the final target of
-    // either parameter are local, make sure this wrapper stays local too!
-    DoubleCallback( const RootClass&& ac_rroCall,
-                    const RootClass&& ac_rroOtherCall );
-    virtual ~DoubleCallback();
-
-    virtual ThisClass* Clone() const override;
-
-protected:
-    
-    // Target hashes are other targets' hashes
-    virtual std::size_t TargetHash() const;
-    virtual std::size_t OtherTargetHash() const;
+    // Other target to call.  This object owns the target and is responsible for
+    // deallocating it.
+    Callback< T >* m_poOtherCall;
 
 };
 
 #include "inline/DoubleCallback.inl"
 
-#endif  // _DOUBLE_CALLBACK_WRAPPER_H_
+#endif  // _DOUBLE_CALLBACK_H_

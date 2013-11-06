@@ -7,6 +7,9 @@
  * Last Modification:  Moved code out of Globals.inl.
  ******************************************************************************/
 
+#ifndef _HASHABLE_INL_
+#define _HASHABLE_INL_
+
 // Comparison operators
 inline std::size_t Hashable::operator<( const Hashable&& ac_rroHashable ) const
 {
@@ -61,3 +64,5 @@ inline bool
            : ( nullptr == ac_cpoSecond ) ? false
            : ac_cpoFirst->Hash() < ac_cpoSecond->Hash();
 }
+
+#endif  // _HASHABLE_INL_

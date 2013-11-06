@@ -97,12 +97,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="include\inline\Callback.inl" />
-    <None Include="include\inline\CallbackWrapper.inl" />
     <None Include="include\inline\DoubleCallback.inl" />
     <None Include="include\inline\EventHandler.inl" />
-    <None Include="include\inline\Events.inl" />
+    <None Include="include\inline\events\And.inl" />
     <None Include="include\inline\events\KeyDown.inl" />
     <None Include="include\inline\events\MouseButtonDown.inl" />
+    <None Include="include\inline\events\Not.inl" />
+    <None Include="include\inline\events\Or.inl" />
+    <None Include="include\inline\events\Start.inl" />
+    <None Include="include\inline\events\XOr.inl" />
     <None Include="include\inline\GameEngine.inl" />
     <None Include="include\inline\GameState.inl" />
     <None Include="include\inline\XY.inl" />
@@ -123,7 +126,6 @@
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
     <ClInclude Include="include\Callback.h" />
-    <ClInclude Include="include\CallbackWrapper.h" />
     <ClInclude Include="include\DoubleCallback.h" />
     <ClInclude Include="include\EventHandler.h" />
     <ClInclude Include="include\Events.h" />
@@ -142,9 +144,6 @@
     <ClInclude Include="include\Hashable.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\StopWatch.h" />
-    <ClCompile Include="source\Events.cpp">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

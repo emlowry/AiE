@@ -7,6 +7,9 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#ifndef _EVENT_HANDLER_INL_
+#define _EVENT_HANDLER_INL_
+
 //
 // Public, static functions used to interact with the singleton instance
 //
@@ -127,3 +130,5 @@ inline void EventHandler::Remove( ReturnsVoid& a_roReaction )
     Reaction oReaction = CallbackWrapper< void, ReturnsVoid >( a_roReaction );
     Remove( oReaction );
 }
+
+#endif  // _EVENT_HANDLER_INL_

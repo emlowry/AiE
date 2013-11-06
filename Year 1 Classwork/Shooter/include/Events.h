@@ -11,25 +11,19 @@
 #define _EVENTS_H_
 
 #include "Callback.h"
+#include "DoubleCallback.h"
 
 // Simplify typing and reduce template parameter typos
 typedef Callback< bool > Event;
-
-// Create an event from anything that implements operator() with no parameters to
-// return a bool.
-template< typename Callable >
-Event* NewEvent( Callable& a_roEvent );
-Event* NewEvent( const Event&& ac_rroEvent );
+typedef DoubleCallback< bool > DoubleEvent;
 
 #include "events/And.h"
-#include "events/End.h"
 #include "events/KeyDown.h"
 #include "events/MouseButtonDown.h"
-#include "events/Not.h"
 #include "events/Or.h"
-#include "events/Start.h"
 #include "events/XOr.h"
-
-#include "inline/Events.inl"
+#include "events/End.h"
+#include "events/Not.h"
+#include "events/Start.h"
 
 #endif  // _EVENTS_H_

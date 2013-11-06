@@ -7,6 +7,9 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#ifndef _GAME_ENGINE_INL_
+#define _GAME_ENGINE_INL_
+
 #include "AIE.h"
 #include "GameState.h"
 
@@ -58,3 +61,5 @@ inline void GameEngine::SetState( const GameState* const ac_cpoState )
     }
     sm_oStates.push( ac_cpoState->Clone() );
 }
+
+#endif  // _GAME_ENGINE_INL_

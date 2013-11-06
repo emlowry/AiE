@@ -7,8 +7,8 @@
  * Last Modification:  Moving code from Events.h.
  ******************************************************************************/
 
-#ifndef _EVENTS_AND_H_
-#define _EVENTS_AND_H_
+#ifndef _EVENTS__AND_H_
+#define _EVENTS__AND_H_
 
 #include "Events.h"
 
@@ -16,39 +16,40 @@ namespace Events
 {
     
 // Event triggered by two events both occurring
-template< typename ReturnsBool, typename OtherReturnsBool >
-class AndEvent : public DoubleCallback< bool, ReturnsBool, OtherReturnsBool >
+class And: public DoubleEvent
 {
-private:
-
-    typedef DoubleCallback< bool, ReturnsBool, OtherReturnsBool > BaseClass;
-    typedef AndEvent< ReturnsBool, OtherReturnsBool > ThisClass;
-
 public:
 
-    AndEvent( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall );
-    AndEvent( const ThisClass& ac_roEvent );
+    // constructors that just call base class constructors
+    And( const Event&& ac_rroCall, const Event&& ac_rroOtherCall );
+    template< typename OtherReturnsBool >
+    And( const Event&& ac_rroCall, OtherReturnsBool& a_roOtherTarget );
+    template< typename ReturnsBool >
+    And( ReturnsBool& a_roTarget, const Event&& a_roOtherCall );
+    template< typename ReturnsBool, typename OtherReturnsBool >
+    And( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherTarget );
+    
+    // Destructor doesn't need to be implemented - default is fine.
+    virtual ~And();
 
-    ThisClass* Clone() const override;
+    // Implement Clone() so it returns And pointers instead of base class
+    And* Clone() const override;
+
+    // return true if only one of m_poCall() or m_poOtherCall() return true
     bool operator()() override;
 
-protected:
-    
-    virtual const char* ClassName() const override;
-
 private:
-    
-    // Keep copy constructor and assignment operator private to prevent
-    // object slicing.  Copy constructor is used by Clone() and should be
-    // implemented.  Assignment operator should not be used.
-    AndEvent( const ThisClass& ac_roEvent );
-    ThisClass& operator=( const ThisClass& ac_roEvent );
 
     // class name for the hash function to use
+    const char* ClassName() const override;
     static const char* const CLASS_NAME;
 
 };
 
 }   // namespace Events
 
-#endif  // _EVENTS_AND_H_
+typedef Events::And AndEvent;
+
+#include "inline/events/And.inl"
+
+#endif  // _EVENTS__AND_H_

@@ -21,13 +21,8 @@ struct XY
     XY( const T& a_roT );
     XY( const T& a_roTx, const T& a_roTy );
 
-    // This conversion operator fails to compile as inline outside the struct
-    // definition, apparently due to a Visual Studio 2010 bug.
     template < typename U >
-    inline operator XY< U >() const
-    {
-        return { (U)x, (U)y };
-    }
+    operator XY< U >() const;
 };
 
 // Return the distance betweed two coordinate pairs

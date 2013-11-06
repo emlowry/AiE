@@ -7,6 +7,9 @@
  * Last Modification:  Moved code out of Globals.inl.
  ******************************************************************************/
 
+#ifndef _XY_INL_
+#define _XY_INL_
+
 #include <cmath>
 
 // Constructors
@@ -16,6 +19,14 @@ template < typename T >
 inline XY< T >::XY( const T& a_roTx, const T& a_roTy )
     : x( a_roTx ), y( a_roTy ) {}
 
+// Conversion operator
+template< typename T >
+template < typename U >
+inline XY< T >::operator XY< U >() const
+{
+    return { (U)x, (U)y };
+}
+
 // Distance between two points
 template < typename T, typename U >
 inline float Hypotenuse( const XY< T >& a_roPointA, const XY< U >& a_roPointB )
@@ -23,3 +34,5 @@ inline float Hypotenuse( const XY< T >& a_roPointA, const XY< U >& a_roPointB )
     return hypot( fdim( a_roPointA.x, a_roPointB.x ),
                   fdim( a_roPointA.y, a_roPointB.y ) );
 }
+
+#endif  // _XY_INL_

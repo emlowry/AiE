@@ -7,6 +7,9 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#ifndef _GAME_STATE_INL_
+#define _GAME_STATE_INL_
+
 #include "EventHandler.h"
 
 // State that shuts down the game
@@ -22,7 +25,8 @@ inline void GameState::operator()()
 
 // Attempting to clone a singleton only returns a pointer to the singleton.
 // That said, you should never ever have a pointer to the singleton itself, only
-// to a wrapper - otherwise, some idiot might try to deallocate the singleton.
+// to a disposable caller object - otherwise, some idiot might try to deallocate
+// the singleton instance.
 template< typename Derived >
 inline GameState::Singleton< Derived >*
     GameState::Singleton< Derived >::Clone() const
@@ -30,28 +34,24 @@ inline GameState::Singleton< Derived >*
     return const_cast< GameState::Singleton< Derived >* >( this );
 }
 
-// To use a singleton gamestate, clone this publically-available wrapper
-template< typename Derived >
-const GameState& GameState::Singleton< Derived >::State =
-    GameState::Singleton< Derived >::sm_oWrapper;
-
 // The singleton wrapper can be cloned normally
 template< typename Derived >
-inline typename GameState::Singleton< Derived >::Wrapper*
-    GameState::Singleton< Derived >::Wrapper::Clone() const
+inline typename GameState::Singleton< Derived >::Caller*
+    GameState::Singleton< Derived >::Caller::Clone() const
 {
-    return new Wrapper();
+    return new Caller();
 }
 
 // Singleton wrapper calls on wrapped singleton
 template< typename Derived >
-void GameState::Singleton< Derived >::Wrapper::Update()
+void GameState::Singleton< Derived >::Caller::Update()
 {
     sm_oInstance.Update();
 }
 template< typename Derived >
-void GameState::Singleton< Derived >::Wrapper::Draw() const
+void GameState::Singleton< Derived >::Caller::Draw() const
 {
     sm_oInstance.Draw();
 }
 
+#endif  // _GAME_STATE_INL_

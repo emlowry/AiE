@@ -16,16 +16,19 @@
     <None Include="resources\shaders\StaticFW_Pixel.glsl" />
     <None Include="resources\shaders\StaticFW_Vertex.glsl" />
     <None Include="include\inline\Callback.inl" />
-    <None Include="include\inline\Events.inl" />
     <None Include="include\inline\Hashable.inl" />
     <None Include="include\inline\XY.inl" />
     <None Include="include\inline\EventHandler.inl" />
     <None Include="include\inline\GameEngine.inl" />
-    <None Include="include\inline\CallbackWrapper.inl" />
     <None Include="include\inline\DoubleCallback.inl" />
     <None Include="include\inline\GameState.inl" />
     <None Include="include\inline\events\KeyDown.inl" />
     <None Include="include\inline\events\MouseButtonDown.inl" />
+    <None Include="include\inline\events\XOr.inl" />
+    <None Include="include\inline\events\Or.inl" />
+    <None Include="include\inline\events\And.inl" />
+    <None Include="include\inline\events\Not.inl" />
+    <None Include="include\inline\events\Start.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -38,9 +41,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\EventHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\GameEngine.cpp">
@@ -82,9 +82,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\LoadScreen.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\CallbackWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DoubleCallback.h">

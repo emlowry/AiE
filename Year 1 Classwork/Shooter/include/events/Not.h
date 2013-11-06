@@ -7,8 +7,8 @@
  * Last Modification:  Moving code from Events.h.
  ******************************************************************************/
 
-#ifndef _EVENTS_NOT_H_
-#define _EVENTS_NOT_H_
+#ifndef _EVENTS__NOT_H_
+#define _EVENTS__NOT_H_
 
 #include "Events.h"
 
@@ -16,39 +16,35 @@ namespace Events
 {
     
 // Event triggered by another event not occurring
-template< typename ReturnsBool >
-class NotEvent : public CallbackWrapper< bool, ReturnsBool >
+class Not : public Event
 {
-private:
-
-    typedef CallbackWrapper< bool, ReturnsBool > BaseClass;
-    typedef NotEvent< ReturnsBool > ThisClass;
-
 public:
 
-    NotEvent( ReturnsBool a_roCall );
-    virtual ~NotEvent();
+    // Constructors just call base class constructors
+    Not( const Event&& ac_rroCall );
+    template< typename ReturnsBool >
+    Not( ReturnsBool& a_roTarget );
 
-    ThisClass* Clone() const override;
+    // No need to implement - default destructor is fine
+    virtual ~Not();
+
+    // Implement Clone() so it'll return a Not pointer instead of an Event
+    Not* Clone() const override;
+
+    // Returns true if calling the internal pointer returns false
     bool operator()() override;
 
 protected:
     
-    virtual const char* ClassName() const override;
+    // used by the hash function
+    const char* ClassName() const override;
 
-private:
-    
-    // Keep copy constructor and assignment operator private to prevent
-    // object slicing.  Copy constructor is used by Clone() and should be
-    // implemented.  Assignment operator should not be used.
-    NotEvent( const ThisClass& ac_roEvent );
-    ThisClass& operator=( const ThisClass& ac_roEvent );
-
-    // class name for the hash function to use
     static const char* const CLASS_NAME;
 
 };
 
 }   // namespace Events
 
-#endif  // _EVENTS_NOT_H_
+typedef Events::Not NotEvent;
+
+#endif  // _EVENTS__NOT_H_

@@ -7,6 +7,9 @@
  * Last Modification:  Moving code from Events.inl.
  ******************************************************************************/
 
+#ifndef _EVENTS__MOUSE_BUTTON_DOWN_INL_
+#define _EVENTS__MOUSE_BUTTON_DOWN_INL_
+
 #include "AIE.h"
 
 namespace Events
@@ -44,3 +47,5 @@ inline std::size_t MouseButtonDown< t_iButton >::TargetHash() const
 }
 
 }   // namespace Events
+
+#endif  // _EVENTS__MOUSE_BUTTON_DOWN_INL_
