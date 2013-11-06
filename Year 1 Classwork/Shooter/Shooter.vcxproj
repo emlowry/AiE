@@ -101,7 +101,10 @@
     <None Include="include\inline\DoubleCallback.inl" />
     <None Include="include\inline\EventHandler.inl" />
     <None Include="include\inline\Events.inl" />
+    <None Include="include\inline\events\KeyDown.inl" />
+    <None Include="include\inline\events\MouseButtonDown.inl" />
     <None Include="include\inline\GameEngine.inl" />
+    <None Include="include\inline\GameState.inl" />
     <None Include="include\inline\XY.inl" />
     <None Include="include\inline\Hashable.inl" />
     <None Include="ReadMe.txt" />
@@ -124,6 +127,14 @@
     <ClInclude Include="include\DoubleCallback.h" />
     <ClInclude Include="include\EventHandler.h" />
     <ClInclude Include="include\Events.h" />
+    <ClInclude Include="include\events\And.h" />
+    <ClInclude Include="include\events\End.h" />
+    <ClInclude Include="include\events\KeyDown.h" />
+    <ClInclude Include="include\events\MouseButtonDown.h" />
+    <ClInclude Include="include\events\Not.h" />
+    <ClInclude Include="include\events\Or.h" />
+    <ClInclude Include="include\events\Start.h" />
+    <ClInclude Include="include\events\XOr.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\GameState.h" />
     <ClInclude Include="include\LoadScreen.h" />

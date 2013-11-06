@@ -31,13 +31,15 @@ public:
     static void PopState();
 
     // Add the given state to the top of the stack
-    static void PushState( GameState* a_poState );
+    static void PushState( const GameState&& ac_rroState );
+    static void PushState( const GameState* const ac_cpoState );
 
     // Run the game
     static void Run();
 
     // Set the given state as the only state
-    static void SetState( GameState* a_poState );
+    static void SetState( const GameState&& ac_rroState );
+    static void SetState( const GameState* const ac_cpoState );
 
     // Shut down the game and perform cleanup tasks
     static void Shutdown();
@@ -47,7 +49,7 @@ private:
     GameEngine();   // static methods only
 
     // Current game state is at the top of the stack
-    static stack< GameState* > sm_oStates;
+    static std::stack< GameState* > sm_oStates;
 
 };
 

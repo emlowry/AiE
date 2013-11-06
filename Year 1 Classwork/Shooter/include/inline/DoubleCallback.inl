@@ -7,6 +7,10 @@
  * Last Modification:  Moved code out of Callback.inl.
  ******************************************************************************/
 
+#include <functional>
+#include <sstream>
+#include <string>
+
 // Base class constructor
 template< typename T, typename Callable, typename OtherCallable >
 inline DoubleCallbackBase< T, Callable, OtherCallable >::
@@ -21,7 +25,7 @@ inline DoubleCallback< T, Callable, OtherCallable >::
 
 // Partially-specialized class constructors
 template< typename T, typename Callable >
-inline DoubleCallback< T, Callable, Callback< T > >::
+inline DoubleCallback< T, Callable >::
     DoubleCallback( Callable& a_roCall, const RootClass&& ac_rroOtherCall )
     : BaseClass( &a_roCall, ac_rroOtherCall.Clone() ) {}
 template< typename T, typename OtherCallable >
@@ -31,14 +35,13 @@ inline DoubleCallback< T, Callback< T >, OtherCallable >::
 
 // Fully-specialized class constructor
 template< typename T >
-inline DoubleCallback< T, Callback< T >, Callback< T > >::
-    DoubleCallback( const RootClass&& ac_rroCall,
-                    const RootClass&& ac_rroOtherCall )
+inline DoubleCallback< T >::DoubleCallback( const RootClass&& ac_rroCall,
+                                            const RootClass&& ac_rroOtherCall )
     : BaseClass( ac_rroCall.Clone(), ac_rroOtherCall.Clone() ) {}
 
 // Partially and fully specialized class destructors
 template< typename T, typename Callable >
-inline DoubleCallback< T, Callable, Callback< T > >::~DoubleCallback()
+inline DoubleCallback< T, Callable >::~DoubleCallback()
 {
     delete m_poOtherCall;
 }
@@ -48,7 +51,7 @@ inline DoubleCallback< T, Callback< T >, OtherCallable >::~DoubleCallback()
     delete m_poCall;
 }
 template< typename T >
-inline DoubleCallback< T, Callback< T >, Callback< T > >::~DoubleCallback()
+inline DoubleCallback< T >::~DoubleCallback()
 {
     delete m_poCall;
     delete m_poOtherCall;
@@ -63,8 +66,8 @@ inline DoubleCallback< T, Callable, OtherCallable >*
     return new ThisClass( *m_poCall, *m_poOtherCall );
 }
 template< typename T, typename Callable >
-inline DoubleCallback< T, Callable, Callback< T > >*
-    DoubleCallback< T, Callable, Callback< T > >::Clone() const
+inline DoubleCallback< T, Callable >*
+    DoubleCallback< T, Callable >::Clone() const
 {
     return new ThisClass( *m_poCall, *m_poOtherCall );
 }
@@ -75,8 +78,7 @@ inline DoubleCallback< T, Callback< T >, OtherCallable >*
     return new ThisClass( *m_poCall, *m_poOtherCall );
 }
 template< typename T >
-inline DoubleCallback< T, Callback< T >, Callback< T > >*
-    DoubleCallback< T, Callback< T >, Callback< T > >::Clone() const
+inline DoubleCallback< T >* DoubleCallback< T >::Clone() const
 {
     return new ThisClass( *m_poCall, *m_poOtherCall );
 }
@@ -86,10 +88,10 @@ template< typename T, typename Callable, typename OtherCallable >
 inline std::size_t DoubleCallbackBase< T, Callable, OtherCallable >::
     Hash() const
 {
-    stringstream oStream;
+    std::stringstream oStream;
     oStream << ClassName() << "(" << TargetHash()
             << "," << OtherTargetHash() << ")";
-    std::hash<string> hasher;
+    std::hash< std::string > hasher;
     return hasher( oStream.str() );
 }
 
@@ -111,14 +113,12 @@ inline std::size_t DoubleCallbackBase< T, Callable, OtherCallable >::
     return hasher( m_poOtherCall );
 }
 template< typename T, typename Callable >
-inline std::size_t DoubleCallback< T, Callable, Callback< T > >::
-    OtherTargetHash() const
+inline std::size_t DoubleCallback< T, Callable >::OtherTargetHash() const
 {
     return m_poOtherCall->Hash();
 }
 template< typename T >
-inline std::size_t DoubleCallback< T, Callback< T >, Callback< T > >::
-    OtherTargetHash() const
+inline std::size_t DoubleCallback< T >::OtherTargetHash() const
 {
     return m_poOtherCall->Hash();
 }
@@ -131,8 +131,7 @@ inline std::size_t DoubleCallback< T, Callback< T >, OtherCallable >::
     return m_poCall->Hash();
 }
 template< typename T >
-inline std::size_t DoubleCallback< T, Callback< T >, Callback< T > >::
-    TargetHash() const
+inline std::size_t DoubleCallback< T >::TargetHash() const
 {
     return m_poCall->Hash();
 }

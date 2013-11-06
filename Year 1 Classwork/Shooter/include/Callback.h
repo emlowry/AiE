@@ -31,23 +31,6 @@ public:
     virtual std::size_t Hash() const override;
     virtual T operator()() = 0;
 
-    // Turn anything that implements operator() with no parameters into a
-    // callable without worrying about the type of said object.
-    template< typename Callable >
-    static RootClass* Create( Callable& a_roCall );
-    static RootClass* Create( const RootClass&& ac_rroCall );
-    template< typename Callable, typename OtherCallable >
-    static RootClass* Create( Callable& a_roCall,
-                              OtherCallable& a_roOtherCall );
-    template< typename Callable >
-    static RootClass* Create( Callable& a_roCall,
-                              const RootClass&& ac_rroOtherCall );
-    template< typename OtherCallable >
-    static RootClass* Create( const RootClass&& ac_rroCall,
-                              OtherCallable& a_roOtherCall );
-    static RootClass* Create( const RootClass&& ac_rroCall,
-                              const RootClass&& ac_rroOtherCall );
-
 protected:
 
     // Returns components of this class's hash

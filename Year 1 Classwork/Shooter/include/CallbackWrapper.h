@@ -15,7 +15,7 @@
 
 // Abstract base class for generic and specialized wrapper classes - this way,
 // implementation details don't have to be repeated in both.
-template< typename T, typename Callable >
+template< typename T, typename Callable = Callback< T > >
 class CallbackWrapperBase : public Callback< T >
 {
 private:
@@ -53,7 +53,7 @@ private:
 
 // Generic callback wrapper for turning anything that implements operator() with
 // no parameters into a callback
-template< typename T, typename Callable >
+template< typename T, typename Callable = Callback< T > >
 class CallbackWrapper : public CallbackWrapperBase< T, Callable >
 {
 private:
@@ -77,14 +77,14 @@ public:
 // instead of just pointing to it, which allows said parameter to be constant
 // and requires that the destructor deallocate the clone.
 template< typename T >
-class CallbackWrapper< T, Callback< T > >
-    : public CallbackWrapperBase< T, Callback< T > >
+class CallbackWrapper< T >
+    : public CallbackWrapperBase< T >
 {
 private:
     
     // Simplify typing and reduce template parameter typos
-    typedef CallbackWrapperBase< T, RootClass > BaseClass;
-    typedef CallbackWrapper< T, RootClass > ThisClass;
+    typedef CallbackWrapperBase< T > BaseClass;
+    typedef CallbackWrapper< T > ThisClass;
 
 public:
     

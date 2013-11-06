@@ -23,9 +23,13 @@ inline void GameEngine::PopState()
 }
 
 // Add the given state to the top of the stack
-inline void GameEngine::PushState( GameState* a_poState )
+inline void GameEngine::PushState( const GameState&& ac_rroState )
 {
-    sm_oStates.push( a_poState );
+    sm_oStates.push( ac_rroState.Clone() );
+}
+inline void GameEngine::PushState( const GameState* const ac_cpoState )
+{
+    sm_oStates.push( ac_cpoState->Clone() );
 }
 
 // Run the game
@@ -33,16 +37,24 @@ inline void GameEngine::Run()
 {
     while( FrameworkUpdate() && GetState() != GameState::END )
     {
-        sm_oStates.top()->Run();
+        (*GetState())();
     }
 }
 
 // Set the given state as the only state
-inline void GameEngine::SetState( GameState* a_poState )
+inline void GameEngine::SetState( const GameState&& ac_rroState )
 {
     while( !sm_oStates.empty() )
     {
         sm_oStates.pop();
     }
-    sm_oStates.push( a_poState );
+    sm_oStates.push( ac_rroState.Clone() );
+}
+inline void GameEngine::SetState( const GameState* const ac_cpoState )
+{
+    while( !sm_oStates.empty() )
+    {
+        sm_oStates.pop();
+    }
+    sm_oStates.push( ac_cpoState->Clone() );
 }

@@ -7,6 +7,7 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
+#include "AIE.h"
 #include <functional>
 #include <sstream>
 #include <string>
@@ -14,18 +15,16 @@
 namespace Events
 {
 
-// Is the given key down?
-template< int t_iKey >
-inline bool Events::KeyDownEvent()
+// Create an event from anything that implements operator() with no parameters to
+// return a bool.
+template< typename Callable >
+Event* NewEvent( Callable& a_roEvent )
 {
-    return IsKeyDown( t_iKey );
+    return NewCallback< bool >( a_roEvent );
 }
-
-// Is the given mouse button down?
-template< int t_iButton >
-inline bool Events::MouseButtonDownEvent()
+Event* NewEvent( const Event&& ac_rroEvent )
 {
-    return GetMouseButtonDown( t_iButton );
+    return NewCallback< bool >( std::forward< const Event >( ac_rroEvent ) );
 }
 
 //
@@ -64,51 +63,6 @@ template< typename ReturnsBool >
 inline bool NotEvent< ReturnsBool >::operator()()
 {
     return !(*m_roCall)();
-}
-
-//
-// EventCombination
-//
-
-// Constructor
-template< typename ReturnsBool, typename OtherReturnsBool >
-inline EventCombination< ReturnsBool, OtherReturnsBool >::
-    EventCombination( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall )
-        : BaseClass( &a_roCall ), m_poOtherCall( &a_roOtherCall ) {}
-
-// Hash based on concatenation of the target addresses
-template< typename ReturnsBool, typename OtherReturnsBool >
-inline std::size_t
-    EventCombination< ReturnsBool, OtherReturnsBool >::Hash() const
-{
-    stringstream oStream;
-    oStream << ClassName() << "(" << TargetHash() << "," << OtherTargetHash() << ")";
-    std::hash<string> hasher;
-    return hasher( oStream.str() );
-}
-
-// EventCombination class name
-template< typename ReturnsBool, typename OtherReturnsBool >
-const char* const EventCombination< ReturnsBool, OtherReturnsBool >::
-    CLASS_NAME = "EventCombination";
-template< typename ReturnsBool, typename OtherReturnsBool >
-const char* EventCombination< ReturnsBool, OtherReturnsBool >::ClassName() const
-{
-    return CLASS_NAME;
-}
-
-// EventCombination default other target hash is the hash of the other target,
-// if the other target is hashable, or the other target's address.
-template< typename ReturnsBool, typename OtherReturnsBool >
-std::size_t EventCombination< ReturnsBool, OtherReturnsBool >::OtherTargetHash() const
-{
-    std::hash< OtherReturnsBool* > hasher();
-    return hasher( m_poOtherCall );
-}
-template< typename ReturnsBool >
-std::size_t EventCombination< ReturnsBool, Hashable >::OtherTargetHash() const
-{
-    return m_poOtherCall->Hash();
 }
 
 //

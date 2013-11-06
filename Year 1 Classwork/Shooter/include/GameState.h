@@ -10,9 +10,12 @@
 #ifndef _GAME_STATE_H_
 #define _GAME_STATE_H_
 
-#include "EventHandler.h"
 #include "Callback.h"
 
+// Use these macros to simplify declaration of GameState::Singleton classes.
+// Derived GameState classes, Singleton or otherwise, will need to implement the
+// Draw() and Update() functions.  Non-singleton game states will need to
+// implement Clone().
 #define SINGLETON_STATE_CLASS( CLASS_NAME ) class CLASS_NAME \
     : public GameState::Singleton< CLASS_NAME >
 
@@ -26,64 +29,16 @@ class GameState : public Callback< void >
 {
 public:
 
-    // Abstract class representing a singleton game state.  Uses the Curiously
-    // Recurring Template Pattern idiom so that the derived classes only have to
-    // implement Update() and Draw().  Derived classes are declared like so:
-    //
-    // class DerivedState // final // C++11
-    //     : public GameState::Singleton< DerivedState > //, other base classes
-    // {
-    // 
-    //     // ... class public and protected declarations...
-    //
-    // private:
-    //     friend GameState::Singleton< DerivedState >;
-    //     DerivedState();
-    //
-    //     // ... the rest of the class private declarations...
-    //
-    // };
-    //
-    // Or, to use the simplifying macros:
-    //
-    // SINGLETON_STATE_CLASS( DerivedState ) //, other base classes
-    // {
-    // 
-    //     // ... class public and protected declarations...
-    //
-    // SINGLETON_STATE_PRIVATE( DerivedState )
-    // 
-    //     // ... the rest of the class private declarations...
-    //
-    // };
     template< typename Derived >
-    class Singleton : public GameState
-    {
-    public:
-        inline Singleton< Derived >* Clone() const override { return this; }
-        static const Callback< void >& State = sm_oWrapper;
-    protected:
-        Singleton();
-    private:
-        class Wrapper : public Callback< void >
-        {
-        public:
-            Wrapper( Derived& a_roSingleton ) : m_roCall( a_roSingleton ) {}
-            ~Wrapper();
-            Wrapper* Clone() const override { return new Wrapper( m_roSingleton ); }
-            void operator()() override { m_roSingleton(); }
-        private:
-            Derived& m_roSingleton;
-        };
-        static Derived sm_oInstance;
-        static Wrapper sm_oWrapper( sm_oInstance );
-    };
+    class Singleton;
 
-    // Hash by instance address
-    inline std::size_t Hash() const override { return (std::size_t)this; }
+    // Declared here so calls will be expected to return GameState* and not just
+    // Callback<void>*, but made abstract so that derived classes must implement
+    // it to compile.
+    virtual GameState* Clone() const override = 0;
 
     // Do everything you need to in a given frame.
-    inline void operator()() override { EventHandler::Run(); Update(); Draw(); }
+    void operator()() override;
 
     // State that shuts down the game
     static GameState* const END;
@@ -99,7 +54,70 @@ private:
 
 };
 
-// State that shuts down the game
-GameState* const GameState::END = nullptr;
+// Abstract class representing a singleton game state.  Uses the Curiously
+// Recurring Template Pattern idiom so that the derived classes only have to
+// implement Update() and Draw().  Derived classes are declared like so:
+//
+// class DerivedState // final // C++11
+//     : public GameState::Singleton< DerivedState > //, other base classes
+// {
+// 
+//     // ... class public and protected declarations...
+//
+// private:
+//     friend GameState::Singleton< DerivedState >;
+//     DerivedState();
+//
+//     // ... the rest of the class private declarations...
+//
+// };
+//
+// Or, to use the simplifying macros:
+//
+// SINGLETON_STATE_CLASS( DerivedState ) //, other base classes
+// {
+// 
+//     // ... class public and protected declarations...
+//
+// SINGLETON_STATE_PRIVATE( DerivedState )
+// 
+//     // ... the rest of the class private declarations...
+//
+// };
+template< typename Derived >
+class GameState::Singleton : public GameState
+{
+public:
+
+    // You should never be able to call a singleton's Clone() function because
+    // you should never have access to the singleton instance - only the
+    // singleton's private wrapper class can access that instance, and you can
+    // only call on the instance by calling on an instance of that private
+    // wrapper class
+    Singleton< Derived >* Clone() const override;
+    static const Wrapper State;
+
+protected:
+
+    Singleton();
+
+private:
+
+    class Wrapper : public GameState
+    {
+    public:
+        Wrapper();
+        virtual ~Wrapper();
+        Wrapper* Clone() const override;
+    private:
+        void Update() override;
+        void Draw() const override;
+    };
+
+    static Derived sm_oInstance;
+
+};
+
+#include "inline/GameState.inl"
 
 #endif  // _GAME_STATE_H_

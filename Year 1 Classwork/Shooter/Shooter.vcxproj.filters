@@ -23,6 +23,9 @@
     <None Include="include\inline\GameEngine.inl" />
     <None Include="include\inline\CallbackWrapper.inl" />
     <None Include="include\inline\DoubleCallback.inl" />
+    <None Include="include\inline\GameState.inl" />
+    <None Include="include\inline\events\KeyDown.inl" />
+    <None Include="include\inline\events\MouseButtonDown.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -85,6 +88,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\DoubleCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\KeyDown.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\MouseButtonDown.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\Not.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\XOr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\Or.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\And.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\Start.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\events\End.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,7 +19,8 @@
 
 // Abstract base class for generic and specialized wrapper classes - this way,
 // implementation details don't have to be repeated in both.
-template< typename T, typename Callable, typename OtherCallable >
+template< typename T, typename Callable = Callback< T >,
+          typename OtherCallable = Callback< T > >
 class DoubleCallbackBase : public CallbackWrapperBase< T, Callable >
 {
 private:
@@ -52,7 +53,8 @@ protected:
 
 // General implementation for a pair of callable objects joined together into
 // one callback
-template< typename T, typename Callable, typename OtherCallable >
+template< typename T, typename Callable = Callback< T >,
+          typename OtherCallable = Callback< T > >
 class DoubleCallback : public DoubleCallbackBase< T, Callable, OtherCallable >
 {
 private:
@@ -74,14 +76,14 @@ public:
 
 // Partially specialized implementations for any callable and a callback
 template< typename T, typename Callable >
-class DoubleCallback< T, Callable, Callback< T > >
-    : public DoubleCallbackBase< T, Callable, Callback< T > >
+class DoubleCallback< T, Callable >
+    : public DoubleCallbackBase< T, Callable >
 {
 private:
     
     // Simplify typing and reduce parameter template typos
-    typedef DoubleCallbackBase< T, Callable, RootClass > BaseClass;
-    typedef DoubleCallback< T, Callable, RootClass > ThisClass;
+    typedef DoubleCallbackBase< T, Callable > BaseClass;
+    typedef DoubleCallback< T, Callable > ThisClass;
 
 public:
     
@@ -129,14 +131,14 @@ protected:
 
 // Fully specialized implementation for a pair of Callbacks
 template< typename T >
-class DoubleCallback< T, Callback< T >, Callback< T > >
-    : public DoubleCallbackBase< T, Callback< T >, Callback< T > >
+class DoubleCallback< T >
+    : public DoubleCallbackBase< T >
 {
 private:
     
     // Simplify typing and reduce parameter template typos
-    typedef DoubleCallbackBase< T, RootClass, RootClass > BaseClass;
-    typedef DoubleCallback< T, RootClass, RootClass > ThisClass;
+    typedef DoubleCallbackBase< T > BaseClass;
+    typedef DoubleCallback< T > ThisClass;
 
 public:
 

@@ -20,13 +20,13 @@ inline CallbackWrapper< T, Callable >::CallbackWrapper( Callable& a_roCall )
 
 // Specialized class constructor
 template< typename T >
-inline CallbackWrapper< T, Callback< T > >::
+inline CallbackWrapper< T >::
     CallbackWrapper( const RootClass&& ac_rroCall )
     : BaseClass( ac_roCall.Clone() ) {}
 
 // Specialized class destructor
 template< typename T >
-inline CallbackWrapper< T, Callback< T > >::~CallbackWrapper()
+inline CallbackWrapper< T >::~CallbackWrapper()
 {
     delete m_poCall;
 }
@@ -50,8 +50,8 @@ inline CallbackWrapper< T, Callable >*
     return new ThisClass( *m_poCall );
 }
 template< typename T >
-inline CallbackWrapper< T, Callback< T > >*
-    CallbackWrapper< T, Callback< T > >::Clone() const
+inline CallbackWrapper< T >*
+    CallbackWrapper< T >::Clone() const
 {
     return new ThisClass( *m_poCall );
 }
@@ -72,7 +72,7 @@ std::size_t CallbackWrapperBase< T, Callable >::TargetHash() const
     return hasher( m_poCall );
 }
 template< typename T >
-std::size_t CallbackWrapper< T, Callback< T > >::TargetHash() const
+std::size_t CallbackWrapper< T >::TargetHash() const
 {
     return m_poCall->Hash();
 }
