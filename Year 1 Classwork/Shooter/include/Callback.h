@@ -10,23 +10,28 @@
 #ifndef _CALLBACK_H_
 #define _CALLBACK_H_
 
+#include "Clone.h"
 #include "Hashable.h"
+#include <string>
 
 // Parent class for callbacks.  Child classes will offer different operator()
 // behavior and their own ClassName() values.
 template< typename T = void >
-class Callback : public Hashable
+class Callback : public virtual CloneableType< Callback< T > >,
+                 public virtual Hashable
 {
-protected:
-
 public:
 
     // Sets pointer to a clone of the parameter
-    Callback( const Callback&& ac_rroCall );
+    Callback( const Callback& ac_roCall );
 
     // Sets pointer to a wrapper pointing to the callable
+    // Cloneable targets aren't cloned - the contribution of a non-callback to
+    // the overall callback hash is its address, so two callbacks pointing to
+    // different clones of the same callable object would have different hashes
+    // despite doing the same thing
     template< typename Callable >
-    Callback( Callable& a_roCall );
+    Callback( Callable& a_roTarget );
 
     // Deletes the target of the pointer, if not null or self (in case a derived
     // class sets it to such values).
@@ -35,9 +40,9 @@ public:
     // Allocate a new Callback pointing to a clone of the callback this one
     // points to.  Redefine this in derived classes to return pointers to said
     // derived classes instead of just Callback pointers. 
-    virtual Callback* Clone() const;
+    virtual Callback* Clone() const override;
 
-    // Has based on class name and hash of target
+    // Hash based on class name and hash of target
     virtual std::size_t Hash() const override;
 
     // Returns a clone
@@ -55,7 +60,7 @@ public:
 
 protected:
 
-    // Used by constructor and make function when parameter isn't a Callback
+    // Used by constructor and New function when parameter isn't a Callback
     template< typename Callable >
     class Wrapper;
 
@@ -76,12 +81,6 @@ protected:
 
 private:
 
-    // Make copy and move constructors private to prevent slicing
-    Callback( const Callback& ac_roCall );
-    Callback( Callback&& a_rroCall );
-    Callback& operator=( const Callback& ac_roCall );
-    Callback& operator=( Callback&& ac_roCall );
-
     // Used by the ClassName function
     static const char* const CLASS_NAME;
 
@@ -100,13 +99,13 @@ public:
     Wrapper( Callable& a_roTarget );
     virtual ~Wrapper(); // default implementation - no deallocations needed here
 
-    virtual Wrapper* Clone() const override;
-    virtual T operator()() override;
+    Wrapper* Clone() const override;
+    T operator()() override;
 
 protected:
 
-    virtual const char* ClassName() const override;
-    virtual std::size_t TargetHash() const override;
+    const char* ClassName() const override;
+    std::size_t TargetHash() const override;
 
     Callable* m_poTarget;
 

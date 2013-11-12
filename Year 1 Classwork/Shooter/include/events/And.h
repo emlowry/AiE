@@ -21,13 +21,13 @@ class And: public DoubleEvent
 public:
 
     // constructors that just call base class constructors
-    And( const Event&& ac_rroCall, const Event&& ac_rroOtherCall );
+    And( const Cloneable& ac_roCall, const Cloneable& ac_roOtherCall );
     template< typename OtherReturnsBool >
-    And( const Event&& ac_rroCall, OtherReturnsBool& a_roOtherTarget );
+    And( const Cloneable& ac_roCall, OtherReturnsBool& a_roOtherCall );
     template< typename ReturnsBool >
-    And( ReturnsBool& a_roTarget, const Event&& a_roOtherCall );
+    And( ReturnsBool& a_roCall, const Cloneable& ac_roOtherCall );
     template< typename ReturnsBool, typename OtherReturnsBool >
-    And( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherTarget );
+    And( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall );
     
     // Destructor doesn't need to be implemented - default is fine.
     virtual ~And();

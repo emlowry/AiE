@@ -11,7 +11,7 @@
 #define _EVENTS__END_H_
 
 #include "Events.h"
-#include "events/Not.h"
+#include "events/Start.h"
 
 namespace Events
 {
@@ -44,6 +44,8 @@ protected:
 
 }   // namespace Events
 
-typedef Events::Start StartEvent;
+typedef Events::End EndEvent;
+
+#include "inline/events/End.inl"
 
 #endif  // _EVENTS__END_H_

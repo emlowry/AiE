@@ -17,6 +17,7 @@
 SINGLETON_STATE_CLASS( LoadScreen )
 {
 SINGLETON_STATE_PRIVATE( LoadScreen )
+
     void Draw() const override;
     bool IsFinished();
     void WhenFinished();

@@ -27,45 +27,58 @@ void EventHandler::ReactToEvents()
     }
 }
 
-// Stop listening for an event
-void EventHandler::Unlisten( Event& a_roEvent )
+// Stop listening for an event.
+void EventHandler::Unlisten( const Event&& ac_rroEvent )
 {
-    // check to see if the event is being listened for
-    EventSet::iterator oIterator = m_oEvents.find( &a_roEvent );
+    // Check to see if the event is being listened for.
+    EventSet::iterator oIterator =
+        m_oEvents.find( const_cast< Event* >( &ac_rroEvent ) );
+
+    // If the event isn't being listened for, nothing more needs to be done.
     if( m_oEvents.end() == oIterator )
     {
         return;
     }
+
+    // Otherwise, get a pointer to the stored event.
     Event* poEvent = *oIterator;
 
-    // loop through event reactions and remove them
+    // Loop through event reactions.
     for each( Reaction* poReaction in m_oReactions[ poEvent ] )
     {
+        // Erase the event from the reaction's list of triggers.
         m_oTriggers[ poReaction ].erase( poEvent );
 
-        // if no other events cause the reaction, deallocate its wrapper
+        // If no other events trigger the reaction, remove its list of triggers
+        // and deallocate the stored copy.
         if( m_oTriggers[ poReaction ].size() == 0 )
         {
             m_oTriggers.erase( poReaction );
             delete poReaction;
         }
     }
+
+    // Remove this event's list of reactions.
     m_oReactions.erase( poEvent );
 
-    // deallocate the event's wrapper
+    // Deallocate the stored copy of the event.
     m_oEvents.erase( poEvent );
     delete poEvent;
 }
 
 // If the given event occurs, execute the given reaction
-void EventHandler::Add( Event& a_roEvent, Reaction& a_roReaction )
+void EventHandler::Add( const Event&& ac_rroEvent,
+                        const Reaction&& ac_rroReaction )
 {
-    // make sure the event wrapper is allocated and listed
-    EventSet::iterator oEventIterator = m_oEvents.find( &a_roEvent );
+    // Check to see if the event is already being listened for
+    EventSet::iterator oEventIterator =
+        m_oEvents.find( const_cast< Event* >( &ac_rroEvent ) );
     Event* poEvent;
+
+    // If the 
     if( m_oEvents.end() == oEventIterator )
     {
-        poEvent = a_roEvent.Clone();
+        poEvent = ac_rroEvent.Clone();
         m_oEvents.insert( poEvent );
     }
     else

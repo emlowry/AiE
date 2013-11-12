@@ -21,13 +21,18 @@
 
 #define SINGLETON_STATE_PRIVATE( CLASS_NAME ) private: \
     friend GameState::Singleton< CLASS_NAME >; \
-    CLASS_NAME();
+    CLASS_NAME(); \
+    virtual ~CLASSNAME();
 
 // Abstract class representing a game state.  Derived classes must implement the
 // Update and Draw functions.
 class GameState : public Callback< void >
 {
 public:
+
+    // No need to define these - default implementations are fine
+    GameState();
+    virtual ~GameState();
 
     template< typename Derived >
     class Singleton;
@@ -37,20 +42,29 @@ public:
     // it to compile.
     virtual GameState* Clone() const override = 0;
 
+    // Override these in child classes if you want things to happen when this
+    // state is set as the current state, when another state is pushed onto the
+    // stack above this one, when the state above this one in the stack is
+    // popped off, or when this state is removed from the stack of states.
+    virtual void OnEnter() {}   // When set as current state...
+    virtual void OnExit() {}    // When removed from state stack...
+    virtual void OnResume() {}  // When above state is popped from stack...
+    virtual void OnSuspend() {} // When another state is pushed above this...
+
     // Do everything you need to in a given frame.
     void operator()() override;
 
     // State that shuts down the game
-    static GameState* const END;
+    static const GameState* const END;
 
 private:
+
+    // Draw the game to the screen.
+    virtual void Draw() const = 0;
 
     // Progress animations, move items with velocity, etc.
     // Collision detection could be handled here or via event handling.
     virtual void Update() = 0;
-
-    // Draw the game to the screen.
-    virtual void Draw() const = 0;
 
 };
 
@@ -104,18 +118,25 @@ public:
 protected:
 
     Singleton();
+    virtual ~Singleton();
 
 private:
 
+    // Full declaration of the Caller class, objects of which are the only
+    // things that call the singleton instance directly.
     class Caller : public GameState
     {
     public:
         Caller();
         virtual ~Caller();
         Caller* Clone() const override;
+        void OnEnter() override;
+        void OnExit() override;
+        void OnResume() override;
+        void OnSuspend() override;
     private:
-        void Update() override;
         void Draw() const override;
+        void Update() override;
     };
 
     static Derived sm_oInstance;

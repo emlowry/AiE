@@ -29,6 +29,7 @@
     <None Include="include\inline\events\And.inl" />
     <None Include="include\inline\events\Not.inl" />
     <None Include="include\inline\events\Start.inl" />
+    <None Include="include\inline\events\End.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -109,6 +110,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\events\End.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\clone\Cloneable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Clone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\clone\DeepOperators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -18,12 +18,12 @@ typedef Callback< bool > Event;
 typedef DoubleCallback< bool > DoubleEvent;
 
 #include "events/And.h"
+#include "events/End.h"
 #include "events/KeyDown.h"
 #include "events/MouseButtonDown.h"
+#include "events/Start.h"
+#include "events/Not.h"
 #include "events/Or.h"
 #include "events/XOr.h"
-#include "events/End.h"
-#include "events/Not.h"
-#include "events/Start.h"
 
 #endif  // _EVENTS_H_

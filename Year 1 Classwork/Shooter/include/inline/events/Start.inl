@@ -15,17 +15,13 @@
 namespace Events
 {
 
-// Public constructors
+// Constructors pass to base constructor and set started flag
 inline Start::Start( const Event&& ac_rroCall, bool a_bStarted )
     : Event( std::forward< const Event >( ac_rroCall ) ),
       m_bStarted( a_bStarted ) {}
 template< typename ReturnsBool >
 inline Start::Start( ReturnsBool& a_roCall, bool a_bStarted )
     : Event( a_roCall ), m_bStarted( a_bStarted ) {}
-
-// Protected constructor
-inline Start::Start( Event* a_poCall, bool a_bStarted )
-    : Event( a_poCall ), m_bStarted( a_bStarted ) {}
 
 // Class name
 const char* const Start::CLASS_NAME = "Start";

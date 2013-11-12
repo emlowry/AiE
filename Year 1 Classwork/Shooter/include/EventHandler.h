@@ -10,7 +10,7 @@
 #ifndef _EVENT_HANDLER_H_
 #define _EVENT_HANDLER_H_
 
-#include "Callback.h"
+#include "Events.h"
 #include <set>
 #include <unordered_map>
 
@@ -19,39 +19,7 @@ using std::size_t;
 // Handles reacting to an events, such as keypresses or mouse clicks
 class EventHandler
 {
-public:
-
-    // Check for all events and react to those that occur
-    static void Run();
-
-    // Start listening for an event
-    template< typename ReturnsBool >
-    static void StartListening( ReturnsBool& a_roEvent );
-
-    // Stop listening for an event
-    template< typename ReturnsBool >
-    static void StopListening( ReturnsBool& a_roEvent );
-
-    // When the given event occurs, execute the given reaction
-    template< typename ReturnsBool, typename ReturnsVoid >
-    static void AddReaction( ReturnsBool& a_roEvent,
-                             ReturnsVoid& a_roReaction );
-    
-    // When the given event occurs, don't execute the given reaction
-    template< typename ReturnsBool, typename ReturnsVoid >
-    static void RemoveReaction( ReturnsBool& a_roEvent,
-                                ReturnsVoid& a_roReaction );
-    
-    // Don't execute the given reaction, no matter what event occurs
-    template< typename ReturnsVoid >
-    static inline void RemoveReaction( ReturnsVoid& a_roReaction );
-
 private:
-
-    // Holds a functor, function object, or other object implementing operator()
-    // with no parameters to return a bool.  This represents an event - if
-    // myEvent() returns true, then the event is occurring.
-    typedef Callback< bool > Event;
 
     // Holds a functor, function object, or other object implementing operator()
     // with no parameters.  Any return type is possible, but returned values are
@@ -59,6 +27,54 @@ private:
     // an event - if an event occurs, the associated reactions will all be
     // executed.
     typedef Callback< void > Reaction;
+
+public:
+
+    // Check for all events and react to those that occur
+    static void Run();
+
+    // Start listening for an event
+    static void StartListening( const Event&& ac_rroEvent );
+    template< typename ReturnsBool >
+    static void StartListening( ReturnsBool& a_roTarget );
+
+    // Stop listening for an event
+    static void StopListening( const Event&& ac_rroEvent );
+    template< typename ReturnsBool >
+    static void StopListening( ReturnsBool& a_roTarget );
+
+    // When the given event occurs, execute the given reaction
+    static void AddReaction( const Event&& ac_rroEvent,
+                             const Reaction&& ac_rroReaction );
+    template< typename ReturnsVoid >
+    static void AddReaction( const Event&& ac_rroEvent,
+                             ReturnsVoid& a_roReactionTarget );
+    template< typename ReturnsBool >
+    static void AddReaction( ReturnsBool& a_roEventTarget,
+                             const Reaction&& ac_rroReactionTarget );
+    template< typename ReturnsBool, typename ReturnsVoid >
+    static void AddReaction( ReturnsBool& a_roEventTarget,
+                             ReturnsVoid& a_roReactionTarget );
+    
+    // When the given event occurs, don't execute the given reaction
+    static void RemoveReaction( const Event&& ac_rroEvent,
+                                const Reaction&& ac_rroReaction );
+    template< typename ReturnsVoid >
+    static void RemoveReaction( const Event&& ac_rroEvent,
+                                ReturnsVoid& a_roReactionTarget );
+    template< typename ReturnsBool >
+    static void RemoveReaction( ReturnsBool& a_roEventTarget,
+                                const Reaction& ac_rroReaction );
+    template< typename ReturnsBool, typename ReturnsVoid >
+    static void RemoveReaction( ReturnsBool& a_roEventTarget,
+                                ReturnsVoid& a_roReactionTarget );
+    
+    // Don't execute the given reaction, no matter what event occurs
+    static inline void RemoveReaction( const Reaction&& ac_rroReaction );
+    template< typename ReturnsVoid >
+    static inline void RemoveReaction( ReturnsVoid& a_roTarget );
+
+private:
 
     // typedef these to save space
     typedef std::set< Event*, HashablePointerLess > EventSet;
@@ -76,37 +92,19 @@ private:
     void ReactToEvents();
 
     // Start listening for an event
-    template< typename ReturnsBool >
-    void Listen( ReturnsBool& a_roCall );
-    void Listen( Event& a_roEvent );
+    void Listen( const Event&& ac_rroEvent );
 
     // Stop listening for an event
-    template< typename ReturnsBool >
-    void Unlisten( ReturnsBool& a_roCall );
-    void Unlisten( Event& ac_roEvent );
+    void Unlisten( const Event&& ac_rroEvent );
 
     // If the given event occurs, execute the given reaction
-    template< typename ReturnsBool, typename ReturnsVoid >
-    void Add( ReturnsBool& a_roBoolCall, ReturnsVoid& a_roVoidCall );
-    template< typename ReturnsBool >
-    void Add( ReturnsBool& a_roBoolCall, Reaction& a_roReaction );
-    template< typename ReturnsVoid >
-    void Add( Event& a_roEvent, ReturnsVoid& a_roVoidCall );
-    void Add( Event& a_roEvent, Reaction& a_roReaction );
+    void Add( const Event&& ac_rroEvent, const Reaction&& ac_rroReaction );
     
     // If the given event occurs, don't execute the given reaction
-    template< typename ReturnsBool, typename ReturnsVoid >
-    void Remove( ReturnsBool& a_roBoolCall, ReturnsVoid& a_roVoidCall );
-    template< typename ReturnsBool >
-    void Remove( ReturnsBool& a_roBoolCall, Reaction& a_roReaction );
-    template< typename ReturnsVoid >
-    void Remove( Event& a_roEvent, ReturnsVoid& a_roVoidCall );
-    void Remove( Event& a_roEvent, Reaction& a_roReaction );
+    void Remove( const Event&& ac_rroEvent, const Reaction&& ac_rroReaction );
     
     // Don't execute the given reaction, no matter what event occurs
-    template< typename ReturnsVoid >
-    void Remove( ReturnsVoid& a_roCall );
-    void Remove( Reaction& a_roReaction );
+    void Remove( const Reaction&& ac_rroReaction );
 
     EventSet m_oEvents;         // Events we're listening for
     ReactionMap m_oReactions;   // Reactions to events

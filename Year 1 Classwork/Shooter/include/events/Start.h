@@ -29,7 +29,7 @@ public:
     virtual ~Start();
 
     // Implement Clone() so it'll return a Start pointer instead of an Event
-    Start* Clone() const override;
+    virtual Start* Clone() const override;
 
     // Returns true if internal call returns true when it wasn't before
     bool operator()() override;

@@ -22,6 +22,10 @@ public:
     // Get the current state
     static GameState* GetState();
 
+    // Remove all states from the stack.  The same effect can be accomplished by
+    // setting or pushing GameState::END.
+    static void ClearStates();
+
     // Create window, set initial state, etc.
     static void Initialize( const char* ac_pcWindowTitle = nullptr,
                             const IntXY& ac_roScreenSize = IntXY( 1280, 720 ),
@@ -47,6 +51,12 @@ public:
 private:
 
     GameEngine();   // static methods only
+
+    // Call corresponding functions in current state, if there is a current state.
+    static void OnEnter();
+    static void OnExit();
+    static void OnResume();
+    static void OnSuspend();
 
     // Current game state is at the top of the stack
     static std::stack< GameState* > sm_oStates;

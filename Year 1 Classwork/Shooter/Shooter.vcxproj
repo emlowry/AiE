@@ -100,6 +100,7 @@
     <None Include="include\inline\DoubleCallback.inl" />
     <None Include="include\inline\EventHandler.inl" />
     <None Include="include\inline\events\And.inl" />
+    <None Include="include\inline\events\End.inl" />
     <None Include="include\inline\events\KeyDown.inl" />
     <None Include="include\inline\events\MouseButtonDown.inl" />
     <None Include="include\inline\events\Not.inl" />
@@ -126,6 +127,9 @@
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
     <ClInclude Include="include\Callback.h" />
+    <ClInclude Include="include\Clone.h" />
+    <ClInclude Include="include\clone\Cloneable.h" />
+    <ClInclude Include="include\clone\DeepOperators.h" />
     <ClInclude Include="include\DoubleCallback.h" />
     <ClInclude Include="include\EventHandler.h" />
     <ClInclude Include="include\Events.h" />

@@ -17,19 +17,24 @@
 struct Hashable
 {
     virtual std::size_t Hash() const = 0;
-    std::size_t operator<( const Hashable&& ac_rroHashable ) const;
-    std::size_t operator>( const Hashable&& ac_rroHashable ) const;
-    std::size_t operator<=( const Hashable&& ac_rroHashable ) const;
-    std::size_t operator>=( const Hashable&& ac_rroHashable ) const;
-    std::size_t operator==( const Hashable&& ac_rroHashable ) const;
-    std::size_t operator!=( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator<( const Hashable& ac_roHashable ) const;
+    std::size_t operator>( const Hashable& ac_roHashable ) const;
+    std::size_t operator<=( const Hashable& ac_roHashable ) const;
+    std::size_t operator>=( const Hashable& ac_roHashable ) const;
+    std::size_t operator==( const Hashable& ac_roHashable ) const;
+    std::size_t operator!=( const Hashable& ac_roHashable ) const;
 };
 
 // Redefine std::hash functor for hashable objects
 template<>
 struct std::hash< Hashable >
 {
-    std::size_t operator()( const Hashable&& ac_rroHashable ) const;
+    std::size_t operator()( const Hashable& ac_roHashable ) const;
+};
+template<>
+struct std::hash< const Hashable >
+{
+    std::size_t operator()( const Hashable& ac_roHashable ) const;
 };
 
 // Provide an equal_to comparison functor for cases when we want to hash

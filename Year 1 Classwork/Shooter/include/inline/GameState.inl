@@ -34,7 +34,7 @@ inline GameState::Singleton< Derived >*
     return const_cast< GameState::Singleton< Derived >* >( this );
 }
 
-// The singleton wrapper can be cloned normally
+// The singleton caller can be cloned normally
 template< typename Derived >
 inline typename GameState::Singleton< Derived >::Caller*
     GameState::Singleton< Derived >::Caller::Clone() const
@@ -42,16 +42,36 @@ inline typename GameState::Singleton< Derived >::Caller*
     return new Caller();
 }
 
-// Singleton wrapper calls on wrapped singleton
+// Singleton caller calls on singleton
 template< typename Derived >
-void GameState::Singleton< Derived >::Caller::Update()
-{
-    sm_oInstance.Update();
-}
-template< typename Derived >
-void GameState::Singleton< Derived >::Caller::Draw() const
+inline void GameState::Singleton< Derived >::Caller::Draw() const
 {
     sm_oInstance.Draw();
+}
+template< typename Derived >
+inline void GameState::Singleton< Derived >::Caller::OnEnter()
+{
+    sm_oInstance.OnEnter();
+}
+template< typename Derived >
+inline void GameState::Singleton< Derived >::Caller::OnExit()
+{
+    sm_oInstance.OnExit();
+}
+template< typename Derived >
+inline void GameState::Singleton< Derived >::Caller::OnResume()
+{
+    sm_oInstance.OnResume();
+}
+template< typename Derived >
+inline void GameState::Singleton< Derived >::Caller::OnSuspend()
+{
+    sm_oInstance.OnSuspend();
+}
+template< typename Derived >
+inline void GameState::Singleton< Derived >::Caller::Update()
+{
+    sm_oInstance.Update();
 }
 
 #endif  // _GAME_STATE_INL_

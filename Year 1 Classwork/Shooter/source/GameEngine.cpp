@@ -19,5 +19,8 @@ void GameEngine::Initialize( const char* ac_pcWindowTitle,
 // Cleanup tasks
 void GameEngine::Shutdown()
 {
+    // Exit any remaining states, in case there are any left.
+    ClearStates();
+
     // TODO
 }
