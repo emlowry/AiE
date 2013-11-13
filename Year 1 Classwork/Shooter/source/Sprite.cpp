@@ -10,26 +10,33 @@
 #include "AIE.h"
 #include "Sprite.h"
 
+std::set< Sprite* > Sprite::sm_oAllSprites = std::set< Sprite* >();
+
 // Constructor does all its work in initializer list
 Sprite::Sprite( const char* const ac_cpcTextureName,
                 const IntXY& ac_roSize,
-                const FloatXY& ac_roPosition,
-                const float ac_fRotation,
-                const FloatXY& ac_roScale )
+                const FloatXY& ac_roPosition )
   : m_cuiSpriteID( CreateSprite( ac_cpcTextureName, ac_roSize.x, ac_roSize.y ) ),
     m_oPosition( ac_roPosition ),
-    m_fRotation( ac_fRotation ),
-    m_oScale( ac_roScale ),
     m_bDestroyed( false ),
-    m_bUpToDate( false ),
-    m_bVisible( true )
+    m_bVisible( true ),
+    m_uiRadius( ( ac_roSize.x + ac_roSize.y ) / 4 )
 {
+    sm_oAllSprites.insert( this );
 }
 
 // Destructor
 Sprite::~Sprite()
 {
     Destroy();
+    sm_oAllSprites.erase( this );
+}
+
+// Is this sprite colliding with the given sprite?
+bool Sprite::CollidingWith( const Sprite& ac_roSprite )
+{
+    return Hypotenuse( m_oPosition, ac_roSprite.m_oPosition )
+            < ( m_uiRadius + ac_roSprite.m_uiRadius );
 }
 
 // Destroy the OpenGL sprite
@@ -39,6 +46,14 @@ void Sprite::Destroy()
     {
         m_bDestroyed = true;
         DestroySprite( m_cuiSpriteID );
+    }
+}
+
+void Sprite::DestroyAll()
+{
+    for each( Sprite* poSprite in sm_oAllSprites )
+    {
+        poSprite->Destroy();
     }
 }
 
@@ -54,13 +69,7 @@ void Sprite::Draw() const
 // Do the work of drawing the sprite
 void Sprite::DrawThis() const
 {
-    if( !m_bUpToDate )
-    {
-        MoveSprite( m_cuiSpriteID, m_oPosition.x, m_oPosition.y );
-        RotateSprite( m_cuiSpriteID, m_fRotation );
-        FloatXY oScaleCopy = m_oScale;  // to prevent compiler error
-        SetSpriteScale( m_cuiSpriteID, oScaleCopy.x, oScaleCopy.y );
-    }
+    MoveSprite( m_cuiSpriteID, m_oPosition.x, m_oPosition.y );
     DrawSprite( m_cuiSpriteID );
 }
 

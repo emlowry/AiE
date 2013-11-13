@@ -15,7 +15,7 @@
 #include <stack>
 
 template< typename T >
-class CloneStack : protected std::stack< T* >
+class CloneStack : private std::stack< T* >
 {
 public:
 

@@ -26,7 +26,7 @@
 
 // Abstract class representing a game state.  Derived classes must implement the
 // Update and Draw functions.
-class GameState : public Callback< void >
+class GameState// : public Callback< void >
 {
 public:
 
@@ -40,7 +40,7 @@ public:
     // Declared here so calls will be expected to return GameState* and not just
     // Callback<void>*, but made abstract so that derived classes must implement
     // it to compile.
-    virtual GameState* Clone() const override = 0;
+    virtual GameState* Clone() const /*override*/ = 0;
 
     // Override these in child classes if you want things to happen when this
     // state is set as the current state, when another state is pushed onto the
@@ -52,7 +52,7 @@ public:
     virtual void OnSuspend() {} // When another state is pushed above this...
 
     // Do everything you need to in a given frame.
-    void operator()() override;
+    void operator()() /*override*/;
 
     // State that shuts down the game
     static GameState* const END;
@@ -61,6 +61,9 @@ private:
 
     // Draw the game to the screen.
     virtual void Draw() const = 0;
+
+    // Update based on used input
+    virtual void HandleInput() = 0;
 
     // Progress animations, move items with velocity, etc.
     // Collision detection could be handled here or via event handling.
@@ -107,6 +110,9 @@ private:
 
 public:
 
+    // No need to implement - default implementation is fine
+    virtual ~Singleton() {}
+
     // You should never be able to call a singleton's Clone() function because
     // you should never have access to the singleton instance - only the
     // singleton's private caller class can access that instance, and you can
@@ -117,9 +123,10 @@ public:
 
 protected:
 
-    // No need to implement - default implementations are fine
+    // No need to implement - default implementation is fine
     Singleton() {}
-    virtual ~Singleton() {}
+
+    static Derived sm_oInstance;
 
 private:
 
@@ -128,8 +135,8 @@ private:
     class Caller : public GameState
     {
     public:
-        Caller();
-        virtual ~Caller();
+        Caller() {}
+        virtual ~Caller() {}
         Caller* Clone() const override;
         void OnEnter() override;
         void OnExit() override;
@@ -137,10 +144,9 @@ private:
         void OnSuspend() override;
     private:
         void Draw() const override;
+        void HandleInput() override;
         void Update() override;
     };
-
-    static Derived sm_oInstance;
 
 };
 

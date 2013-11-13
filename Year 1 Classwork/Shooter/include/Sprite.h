@@ -11,6 +11,7 @@
 #define _SPRITE_H_
 
 #include "XY.h"
+#include <set>
 
 // Handles a single drawable object.
 class Sprite
@@ -19,14 +20,15 @@ public:
 
     Sprite( const char* const ac_cpcTextureName,
             const IntXY& ac_roSize,
-            const FloatXY& ac_roPosition = XY_ZERO,
-            const float ac_fRotation = 0,
-            const FloatXY& ac_roScale = XY_ONE );
+            const FloatXY& ac_roPosition = XY_ZERO );
     virtual ~Sprite();
 
     void Destroy();
-    void Draw() const;  // if visible and not destroyed, call DrawThis
+    virtual void Draw() const;  // if visible and not destroyed, call DrawThis
     virtual void Update( const float ac_fDeltaT );  // implement in child class
+    bool CollidingWith( const Sprite& ac_roSprite );
+
+    static void DestroyAll();
 
 protected:
 
@@ -34,10 +36,8 @@ protected:
 
     bool m_bDestroyed;
     FloatXY m_oPosition;
-    float m_fRotation;
-    FloatXY m_oScale;
+    unsigned int m_uiRadius;
     const unsigned int m_cuiSpriteID;
-    bool m_bUpToDate;
     bool m_bVisible;
 
 private:
@@ -45,6 +45,9 @@ private:
     // leave copy/assignment constructors uncallable and unimplemented
     Sprite( const Sprite& a_roSprite );
     Sprite operator=( const Sprite& a_roSprite );
+
+    // keep track of all sprites.  this set does not own the sprite objects.
+    static std::set< Sprite* > sm_oAllSprites;
 
 };
 

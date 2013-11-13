@@ -12,17 +12,20 @@
 #include <set>
 #include <unordered_map>
 
+// instantiate singleton
+EventHandler EventHandler::sm_oInstance = EventHandler();
+
 // Check for all events and react to those that occur
 void EventHandler::ReactToEvents()
 {
-    for each( Event* poEvent in m_oEvents )
+    for( EventIndex oEventIndex = m_oEvents.Begin();
+         oEventIndex != m_oEvents.End(); ++oEventIndex )
     {
-        if( (*poEvent)() )
+        Lookup::ForwardSet& roReactions = m_oLookup[ m_oEvents[ oEventIndex ] ];
+        for( Lookup::ForwardIndex oReactionIndex = roReactions.Begin();
+             oReactionIndex != roReactions.End(); ++oReactionIndex )
         {
-            for each( Reaction* poReaction in m_oReactions[ poEvent ] )
-            {
-                (*poReaction)();
-            }
+            roReactions[ oReactionIndex ]();
         }
     }
 }
@@ -30,125 +33,103 @@ void EventHandler::ReactToEvents()
 // Stop listening for an event.
 void EventHandler::Unlisten( const Event& ac_roEvent )
 {
-    // Check to see if the event is being listened for.
-    EventSet::iterator oIterator =
-        m_oEvents.find( const_cast< Event* >( &ac_roEvent ) );
-
     // If the event isn't being listened for, nothing more needs to be done.
-    if( m_oEvents.end() == oIterator )
+    if( !m_oEvents.Contains( ac_roEvent ) )
     {
         return;
     }
 
-    // Otherwise, get a pointer to the stored event.
-    Event* poEvent = *oIterator;
+    // Otherwise, get a reference to the stored event.
+    Event& roEvent = m_oEvents[ ac_roEvent ];
+
+    // If the event has no reactions, just remove it from the event list and
+    // return
+    if( m_oLookup.Count( roEvent ) == 0 )
+    {
+        m_oEvents.Erase( roEvent );
+        return;
+    }
+
+    // Otherwise, get a copy of the list of the event reactions before removing
+    // all associations
+    Lookup::ForwardSet oReactions = m_oLookup[ roEvent ];
+    m_oLookup.Erase( roEvent );
 
     // Loop through event reactions.
-    for each( Reaction* poReaction in m_oReactions[ poEvent ] )
+    for( Lookup::ForwardIndex oReactionIndex = oReactions.Begin();
+         oReactionIndex != oReactions.End(); ++oReactionIndex )
     {
-        // Erase the event from the reaction's list of triggers.
-        m_oTriggers[ poReaction ].erase( poEvent );
-
-        // If no other events trigger the reaction, remove its list of triggers
-        // and deallocate the stored copy.
-        if( m_oTriggers[ poReaction ].size() == 0 )
+        // If no events trigger the reaction anymore, remove it from the set of
+        // reactions
+        Reaction& roReaction = oReactions[ oReactionIndex ];
+        if( m_oLookup.Count( roReaction ) == 0 )
         {
-            m_oTriggers.erase( poReaction );
-            delete poReaction;
+            m_oReactions.Erase( roReaction );
         }
     }
 
-    // Remove this event's list of reactions.
-    m_oReactions.erase( poEvent );
-
-    // Deallocate the stored copy of the event.
-    m_oEvents.erase( poEvent );
-    delete poEvent;
+    // Remove the event from the list of events
+    m_oEvents.Erase( roEvent );
 }
 
 // If the given event occurs, execute the given reaction
 void EventHandler::Add( const Event& ac_roEvent,
                         const Reaction& ac_roReaction )
 {
-    // Check to see if the event is already being listened for
-    EventSet::iterator oEventIterator =
-        m_oEvents.find( const_cast< Event* >( &ac_roEvent ) );
-    Event* poEvent;
+    // make sure the event and reaction are present in the event and reaction
+    // sets.
+    Event& roEvent = m_oEvents[ ac_roEvent ];
+    Reaction& roReaction = m_oReactions[ ac_roReaction ];
 
-    // If the 
-    if( m_oEvents.end() == oEventIterator )
-    {
-        poEvent = ac_roEvent.Clone();
-        m_oEvents.insert( poEvent );
-    }
-    else
-    {
-        poEvent = *oEventIterator;
-    }
-
-    // make sure the reaction wrapper is allocated
-    TriggerMap::iterator oReactionIterator =
-        m_oTriggers.find( const_cast< Reaction* >( &ac_roReaction ) );
-    Reaction* poReaction = ( m_oTriggers.end() == oReactionIterator )
-                           ? ac_roReaction.Clone() : (*oReactionIterator).first;
-    
-    // associate the event and reaction
-    m_oReactions[ poEvent ].insert( poReaction );
-    m_oTriggers[ poReaction ].insert( poEvent );
+    // make sure the event and reaction are associated.
+    m_oLookup.Insert( roEvent, roReaction );
 }
     
 // If the given event occurs, don't execute the given reaction
-void EventHandler::Remove( const Event& ac_roEvent, const Reaction& ac_roReaction )
+void EventHandler::Remove( const Event& ac_roEvent,
+                           const Reaction& ac_roReaction )
 {
-    // check to see if the event is being listened for
-    EventSet::iterator oEventIterator =
-        m_oEvents.find( const_cast< Event* >( &ac_roEvent ) );
-    if( m_oEvents.end() == oEventIterator )
+    // If the event or reaction aren't even present, nothing needs to be done.
+    if( !m_oEvents.Contains( ac_roEvent ) ||
+        !m_oReactions.Contains( ac_roReaction ) )
     {
         return;
     }
-    Event* poEvent = *oEventIterator;
 
-    // check to see if the reaction wrapper is associated with the event
-    ReactionSet::iterator oReactionIterator =
-        m_oReactions[ poEvent ].find( const_cast< Reaction* >( &ac_roReaction ) );
-    if( m_oReactions[ poEvent ].end() == oReactionIterator )
+    // get references to the stored event and reaction
+    Event& roEvent = m_oEvents[ ac_roEvent ];
+    Reaction& roReaction = m_oReactions[ ac_roReaction ];
+
+    // if the two aren't associated, then nothing more needs to be done
+    if( !m_oLookup.AreLinked( roEvent, roReaction ) )
     {
         return;
     }
-    Reaction* poReaction = *oReactionIterator;
 
-    // disassociate the event and reaction
-    m_oReactions[ poEvent ].erase( poReaction );
-    m_oTriggers[ poReaction ].erase( poEvent );
+    // Otherwise, remove their association
+    m_oLookup.Erase( roEvent, roReaction );
 
-    // if nothing else triggers the reaction, deallocate its wrapper
-    if( m_oTriggers[ poReaction ].size() == 0 )
+    // If nothing else triggers the reaction anymore, remove it from the list of
+    // reactions
+    if( m_oLookup.Count( roReaction ) == 0 )
     {
-        m_oTriggers.erase( poReaction );
-        delete poReaction;
+        m_oReactions.Erase( roReaction );
     }
 }
     
 // Don't execute the given reaction, no matter what event occurs
 void EventHandler::Remove( const Reaction& ac_roReaction )
 {
-    // check to see if the reaction wrapper is associated with any events
-    TriggerMap::iterator oTriggerIterator =
-        m_oTriggers.find( const_cast< Reaction* >( &ac_roReaction ) );
-    if( m_oTriggers.end() == oTriggerIterator )
+    // If the reaction isn't even present, then nothing needs to be done
+    if( !m_oReactions.Contains( ac_roReaction ) )
     {
         return;
     }
-    Reaction* poReaction = (*oTriggerIterator).first;
 
-    // disassociate the reaction with any events that trigger it
-    for each( Event* poEvent in m_oTriggers[ poReaction ] )
-    {
-        m_oReactions[ poEvent ].erase( poReaction );
-    }
+    // otherwise, get a reference to the stored reaction
+    Reaction& roReaction = m_oReactions[ ac_roReaction ];
 
-    // deallocate the reaction's wrapper
-    m_oTriggers.erase( poReaction );
-    delete poReaction;
+    // remove all associations between the reaction and events
+    m_oLookup.Erase( roReaction );
+    m_oReactions.Erase( roReaction );
 }

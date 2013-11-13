@@ -24,15 +24,28 @@ template< typename T >
 template < typename U >
 inline XY< T >::operator XY< U >() const
 {
-    return { (U)x, (U)y };
+    return XY< U >( (U)x, (U)y );
+}
+
+// Assignment operator
+template< typename T >
+template< typename U >
+XY< T >& XY< T >::operator=( const XY< U >& ac_roNew )
+{
+    if( (const void*)(&ac_roNew) != (const void*)(this) )
+    {
+        x = (T)(ac_roNew.x);
+        y = (T)(ac_roNew.y);
+    }
+    return *this;
 }
 
 // Distance between two points
 template < typename T, typename U >
-inline float Hypotenuse( const XY< T >& a_roPointA, const XY< U >& a_roPointB )
+inline double Hypotenuse( const XY< T >& a_roPointA, const XY< U >& a_roPointB )
 {
-    return hypot( fdim( a_roPointA.x, a_roPointB.x ),
-                  fdim( a_roPointA.y, a_roPointB.y ) );
+    return hypot( abs( (double)(a_roPointA.x) - (double)(a_roPointB.x) ),
+                  abs( (double)(a_roPointA.y) - (double)(a_roPointB.y) ) );
 }
 
 #endif  // _XY_INL_

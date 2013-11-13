@@ -12,15 +12,16 @@
 
 // Equality
 template< typename T >
-inline bool DeepEqualTo< T >::operator( const T* const ac_cpoLeft,
-                                        const T* const ac_cpoRight ) const
+inline bool DeepEqualTo< T >::operator()( const T* const ac_cpoLeft,
+                                          const T* const ac_cpoRight ) const
 {
     return ( ac_cpoLeft != nullptr && ac_cpoRight != nullptr )
             ? base( ac_cpoLeft, ac_cpoRight ) : ac_cpoLeft == ac_cpoRight;
 }
 template< typename T >
-inline bool DeepEqualTo< const T >::operator( const T* const ac_cpoLeft,
-                                              const T* const ac_cpoRight ) const
+inline bool 
+    DeepEqualTo< const T >::operator()( const T* const ac_cpoLeft,
+                                        const T* const ac_cpoRight ) const
 {
     return ( ac_cpoLeft != nullptr && ac_cpoRight != nullptr )
             ? base( ac_cpoLeft, ac_cpoRight ) : ac_cpoLeft == ac_cpoRight;
@@ -28,13 +29,14 @@ inline bool DeepEqualTo< const T >::operator( const T* const ac_cpoLeft,
 
 // Hash
 template< typename T >
-inline std::size_t DeepHash< T >::operator( const T* const ac_cpoT )
+inline std::size_t DeepHash< T >::operator()( const T* const ac_cpoT ) const
 {
     return ( ac_cpoT != nullptr ) ? base( ac_cpoT )
                                   : std::hash< T* >::( nullptr );
 }
 template< typename T >
-inline std::size_t DeepHash< T >::operator( const T* const ac_cpoT )
+inline std::size_t
+    DeepHash< const T >::operator()( const T* const ac_cpoT ) const
 {
     return ( ac_cpoT != nullptr ) ? base( ac_cpoT )
                                   : std::hash< T* >::( nullptr );
@@ -42,16 +44,16 @@ inline std::size_t DeepHash< T >::operator( const T* const ac_cpoT )
 
 // Less Than
 template< typename T >
-inline bool DeepLess< T >::operator( const T* const ac_cpoLeft,
-                                     const T* const ac_cpoRight ) const
+inline bool DeepLess< T >::operator()( const T* const ac_cpoLeft,
+                                       const T* const ac_cpoRight ) const
 {
     return ( ac_cpoLeft != nullptr && ac_cpoRight != nullptr )
             ? base( ac_cpoLeft, ac_cpoRight )
             : ( nullptr == ac_cpoLeft ) ? ( nullptr != ac_cpoRight ) : false;
 }
 template< typename T >
-inline bool DeepLess< const T >::operator( const T* const ac_cpoLeft,
-                                           const T* const ac_cpoRight ) const
+inline bool DeepLess< const T >::operator()( const T* const ac_cpoLeft,
+                                             const T* const ac_cpoRight ) const
 {
     return ( ac_cpoLeft != nullptr && ac_cpoRight != nullptr )
             ? base( ac_cpoLeft, ac_cpoRight )

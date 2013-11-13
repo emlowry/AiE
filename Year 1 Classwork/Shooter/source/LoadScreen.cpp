@@ -10,32 +10,70 @@
 #include "GameEngine.h"
 #include "GameState.h"
 #include "LoadScreen.h"
+#include "Play.h"
+#include "Sprite.h"
+
+LoadScreen::LoadScreen()
+    : m_bLoadingComplete( false ), m_bSplashDrawn( false ), m_poSplashScreen( nullptr ) {}
+
+LoadScreen::~LoadScreen()
+{
+    if( nullptr != m_poSplashScreen )
+    {
+        delete m_poSplashScreen;
+        m_poSplashScreen = nullptr;
+    }
+}
+
+void LoadScreen::Draw() const
+{
+    if( m_poSplashScreen != nullptr )
+    {
+        m_poSplashScreen->Draw();
+    }
+}
+
+bool LoadScreen::IsFinished()
+{
+    return ( m_bSplashDrawn && m_bLoadingComplete &&
+             (unsigned int)m_oLoadTime.GetSeconds() < MIN_LOAD_SECONDS );
+}
+
+void LoadScreen::Load()
+{
+    Play::LoadState();
+    // TODO Load art for other game states
+
+    m_bLoadingComplete = true;
+}
 
 // Start timer
-LoadScreen::LoadScreen()
+void LoadScreen::OnEnter()
 {
     m_oLoadTime.Start();
 }
 
-// destructor doesn't need to do anything
-LoadScreen::~LoadScreen() {}
-
-void LoadScreen::Draw() const
-{
-    // TODO
-}
-
-inline bool LoadScreen::IsFinished()
-{
-    return ( (unsigned int)m_oLoadTime.GetSeconds() < MIN_LOAD_SECONDS );
-}
-
 void LoadScreen::WhenFinished()
 {
-    GameEngine::SetState(GameState::END);//MainMenu::State
+    GameEngine::SetState(Play::State);//MainMenu::State
 }
 
 void LoadScreen::Update()
 {
-    // TODO
+    if( !m_bSplashDrawn )
+    {
+        m_poSplashScreen = new Sprite( "images/splash.png", IntXY( 1280, 720 ), IntXY( 640, 360 ) );
+        m_bSplashDrawn = true;
+        return;
+    }
+
+    if( !m_bLoadingComplete )
+    {
+        Load();
+    }
+
+    if( IsFinished() )
+    {
+        WhenFinished();
+    }
 }

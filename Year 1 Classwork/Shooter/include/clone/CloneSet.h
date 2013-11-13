@@ -16,7 +16,7 @@
 #include <set>
 
 template< typename T >
-class CloneSet : protected std::set< T*, DeepLess< T > >
+class CloneSet : private std::set< T*, DeepLess< T > >
 {
 protected:
 
@@ -26,7 +26,7 @@ protected:
 public:
 
     // make available to users so they can iterate
-    typedef set_type::const_iterator Index;
+    typedef typename set_type::const_iterator Index;
 
     // deallocate contents
     ~CloneSet();
@@ -40,18 +40,27 @@ public:
     //
     // methods with actual implementation
     //
+    
+    // return a reference to the element pointed to by the iterator.
+    // Behavior is undefined for an invalid position - it'll probably throw up.
+    T& At( Index a_oIndex );
+    const T& At( Index a_oIndex ) const;
 
     // remove and deallocate all elements.
     void Clear();
-
-    // return an iterator pointing to the stored pointer to the cloned object
-    // equivalent to the parameter.
-    Index Find( const T& ac_roValue ) const;
 
     // find the object at the given position or equivalent to the given object,
     // remove it from the set, and deallocate it.
     void Erase( Index a_oIndex );
     void Erase( const T& ac_roValue );
+
+    // returns true if the set contains a pointer to an object equivalent to the
+    // given one
+    bool Contains( const T& ac_roValue ) const;
+
+    // return an iterator pointing to the stored pointer to the cloned object
+    // equivalent to the parameter.
+    Index Find( const T& ac_roValue ) const;
 
     // find the object at the given position or equivalent to the given object,
     // remove it from the set, and return a pointer to it.
@@ -66,8 +75,7 @@ public:
     // same behavior as Insert
     T& operator[]( const T& ac_roValue );
 
-    // return a reference to the element pointed to by the iterator.
-    // Behavior is undefined for an invalid position - it'll probably throw up.
+    // same behavior as At
     T& operator[]( Index a_oIndex );
     const T& operator[]( Index a_oIndex ) const;
 };

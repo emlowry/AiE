@@ -10,15 +10,23 @@
 #ifndef _GAME_STATE_INL_
 #define _GAME_STATE_INL_
 
-#include "EventHandler.h"
+//#include "EventHandler.h"
 
 // Base class defines the call - handle events, then update components and draw.
 inline void GameState::operator()()
 {
-    EventHandler::Run();
+    //EventHandler::Run();
     Update();
     Draw();
 }
+
+// Instantiate singleton and singleton caller instances
+template< typename Derived >
+Derived GameState::Singleton< Derived >::sm_oInstance = Derived();
+template< typename Derived >
+const typename GameState::Singleton< Derived >::Caller
+    GameState::Singleton< Derived >::State =
+        GameState::Singleton< Derived >::Caller();
 
 // Attempting to clone a singleton only returns a pointer to the singleton.
 // That said, you should never ever have a pointer to the singleton itself, only
@@ -44,6 +52,11 @@ template< typename Derived >
 inline void GameState::Singleton< Derived >::Caller::Draw() const
 {
     sm_oInstance.Draw();
+}
+template< typename Derived >
+inline void GameState::Singleton< Derived >::Caller::HandleInput()
+{
+    sm_oInstance.HandleInput();
 }
 template< typename Derived >
 inline void GameState::Singleton< Derived >::Caller::OnEnter()

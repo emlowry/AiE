@@ -23,11 +23,14 @@ struct XY
 
     template < typename U >
     operator XY< U >() const;
+
+    template< typename U >
+    XY& operator=( const XY< U >& ac_roNew );
 };
 
 // Return the distance betweed two coordinate pairs
 template < typename T, typename U >
-float Hypotenuse( const XY< T >& a_roPointA, const XY< U >& a_roPointB );
+double Hypotenuse( const XY< T >& a_roPointA, const XY< U >& a_roPointB );
 
 // typedef the most-used versions of the template
 typedef XY<int> IntXY;

@@ -11,6 +11,8 @@
 #define _EVENT_HANDLER_H_
 
 #include "Events.h"
+#include "Clone.h"
+#include "DoubleLookup.h"
 #include <set>
 #include <unordered_map>
 
@@ -29,6 +31,9 @@ private:
     typedef Callback< void > Reaction;
 
 public:
+
+    // Destructor clears internal lists to deallocate memory
+    ~EventHandler();
 
     // Check for all events and react to those that occur
     static void Run();
@@ -77,16 +82,15 @@ public:
 private:
 
     // typedef these to save space
-    typedef std::set< Event*, HashablePointerLess > EventSet;
-    typedef std::set< Reaction*, HashablePointerLess > ReactionSet;
-    typedef std::unordered_map< Event*, ReactionSet, HashablePointerHash,
-                                HashablePointerEqualTo > ReactionMap;
-    typedef std::unordered_map< Reaction*, EventSet, HashablePointerHash,
-                                HashablePointerEqualTo > TriggerMap;
+    typedef CloneSet< Event > EventSet;
+    typedef EventSet::Index EventIndex;
+    typedef CloneSet< Reaction > ReactionSet;
+    typedef ReactionSet::Index ReactionIndex;
+    typedef DoubleLookup< Event, Reaction > Lookup;
 
     // Constructor is private - this class is a singleton that users interact
     // with via static functions.
-    EventHandler();
+    EventHandler() {}
     
     // Check for all events and react to those that occur
     void ReactToEvents();
@@ -106,11 +110,16 @@ private:
     // Don't execute the given reaction, no matter what event occurs
     void Remove( const Reaction& ac_roReaction );
 
+    // Store and own clones, do deep checks for equality to prevent duplicates
     EventSet m_oEvents;         // Events we're listening for
-    ReactionMap m_oReactions;   // Reactions to events
-    TriggerMap m_oTriggers;     // Reverse lookup of above
+    ReactionSet m_oReactions;   // Reactions to events
 
-    static EventHandler m_oInstance;    // Singleton
+    // Stores and does not own references to the contents of m_oEvents and
+    // m_oReactions, checks for address equality (so make sure to look up using
+    // references from m_oEvents and m_oReactions, not from function arguments).
+    Lookup m_oLookup;
+
+    static EventHandler sm_oInstance;    // Singleton
 
 };
 

@@ -15,12 +15,8 @@
     <None Include="resources\fonts\arial.fnt" />
     <None Include="resources\shaders\StaticFW_Pixel.glsl" />
     <None Include="resources\shaders\StaticFW_Vertex.glsl" />
-    <None Include="include\inline\Callback.inl" />
-    <None Include="include\inline\Hashable.inl" />
     <None Include="include\inline\XY.inl" />
-    <None Include="include\inline\EventHandler.inl" />
     <None Include="include\inline\GameEngine.inl" />
-    <None Include="include\inline\DoubleCallback.inl" />
     <None Include="include\inline\GameState.inl" />
     <None Include="include\inline\events\KeyDown.inl" />
     <None Include="include\inline\events\MouseButtonDown.inl" />
@@ -30,11 +26,6 @@
     <None Include="include\inline\events\Not.inl" />
     <None Include="include\inline\events\Start.inl" />
     <None Include="include\inline\events\End.inl" />
-    <None Include="include\inline\clone\CloneSet.inl" />
-    <None Include="include\inline\clone\CloneStack.inl" />
-    <None Include="include\inline\DeepOperators.inl" />
-    <None Include="include\inline\ReferenceSet.inl" />
-    <None Include="include\inline\DoubleLookup.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -46,34 +37,19 @@
     <ClCompile Include="source\Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\EventHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\GameEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\LoadScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\events\And.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\events\End.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\events\Not.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\events\Or.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\events\Start.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\events\XOr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\GameState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Play.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -87,22 +63,10 @@
     <ClInclude Include="include\StopWatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\EventHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Events.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GameEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Hashable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\XY.h">
@@ -111,55 +75,10 @@
     <ClInclude Include="include\LoadScreen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DoubleCallback.h">
+    <ClInclude Include="include\Play.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\events\KeyDown.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\MouseButtonDown.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\Not.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\XOr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\Or.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\And.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\Start.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\End.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\clone\Cloneable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Clone.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\events\Typedefs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\clone\CloneSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\clone\CloneStack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DeepOperators.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ReferenceSet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\DoubleLookup.h">
+    <ClInclude Include="include\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -35,13 +35,13 @@ template< typename T >
 struct DeepHash : public virtual std::hash< T* >
 {
     std::hash< T > base;
-    bool operator()( const T* const ac_cpoT ) const;
+    std::size_t operator()( const T* const ac_cpoT ) const;
 };
 template< typename T >
 struct DeepHash< const T > : public virtual std::hash< const T* >
 {
     std::hash< const T > base;
-    bool operator()( const T* const ac_cpoT ) const;
+    std::size_t operator()( const T* const ac_cpoT ) const;
 };
 
 // Less-than comparison
@@ -59,5 +59,7 @@ struct DeepLess< const T > : public virtual std::less< const T* >
     bool operator()( const T* const ac_cpoLeft,
                      const T* const ac_cpoRight ) const;
 };
+
+#include "inline/DeepOperators.inl"
 
 #endif  // _DEEP_OPERATORS_H_

@@ -41,6 +41,7 @@
     <LinkIncremental>true</LinkIncremental>
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>obj\</IntDir>
@@ -96,13 +97,6 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="include\inline\Callback.inl" />
-    <None Include="include\inline\clone\CloneSet.inl" />
-    <None Include="include\inline\clone\CloneStack.inl" />
-    <None Include="include\inline\DeepOperators.inl" />
-    <None Include="include\inline\DoubleCallback.inl" />
-    <None Include="include\inline\DoubleLookup.inl" />
-    <None Include="include\inline\EventHandler.inl" />
     <None Include="include\inline\events\And.inl" />
     <None Include="include\inline\events\End.inl" />
     <None Include="include\inline\events\KeyDown.inl" />
@@ -113,56 +107,30 @@
     <None Include="include\inline\events\XOr.inl" />
     <None Include="include\inline\GameEngine.inl" />
     <None Include="include\inline\GameState.inl" />
-    <None Include="include\inline\ReferenceSet.inl" />
     <None Include="include\inline\XY.inl" />
-    <None Include="include\inline\Hashable.inl" />
     <None Include="ReadMe.txt" />
     <None Include="resources\fonts\arial.fnt" />
     <None Include="resources\shaders\StaticFW_Pixel.glsl" />
     <None Include="resources\shaders\StaticFW_Vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\EventHandler.cpp" />
-    <ClCompile Include="source\events\And.cpp" />
-    <ClCompile Include="source\events\End.cpp" />
-    <ClCompile Include="source\events\Not.cpp" />
-    <ClCompile Include="source\events\Or.cpp" />
-    <ClCompile Include="source\events\Start.cpp" />
-    <ClCompile Include="source\events\XOr.cpp" />
     <ClCompile Include="source\GameEngine.cpp" />
     <ClCompile Include="source\GameState.cpp" />
     <ClCompile Include="source\LoadScreen.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Play.cpp" />
+    <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\Sprite.cpp" />
     <ClCompile Include="source\StopWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
-    <ClInclude Include="include\Callback.h" />
-    <ClInclude Include="include\Clone.h" />
-    <ClInclude Include="include\clone\Cloneable.h" />
-    <ClInclude Include="include\clone\CloneSet.h" />
-    <ClInclude Include="include\clone\CloneStack.h" />
-    <ClInclude Include="include\DeepOperators.h" />
-    <ClInclude Include="include\DoubleLookup.h" />
-    <ClInclude Include="include\DoubleCallback.h" />
-    <ClInclude Include="include\EventHandler.h" />
-    <ClInclude Include="include\Events.h" />
-    <ClInclude Include="include\events\And.h" />
-    <ClInclude Include="include\events\End.h" />
-    <ClInclude Include="include\events\KeyDown.h" />
-    <ClInclude Include="include\events\MouseButtonDown.h" />
-    <ClInclude Include="include\events\Not.h" />
-    <ClInclude Include="include\events\Or.h" />
-    <ClInclude Include="include\events\Start.h" />
-    <ClInclude Include="include\events\Typedefs.h" />
-    <ClInclude Include="include\events\XOr.h" />
     <ClInclude Include="include\GameEngine.h" />
     <ClInclude Include="include\GameState.h" />
     <ClInclude Include="include\LoadScreen.h" />
-    <ClInclude Include="include\ReferenceSet.h" />
+    <ClInclude Include="include\Play.h" />
+    <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\XY.h" />
-    <ClInclude Include="include\Hashable.h" />
     <ClInclude Include="include\Sprite.h" />
     <ClInclude Include="include\StopWatch.h" />
   </ItemGroup>
