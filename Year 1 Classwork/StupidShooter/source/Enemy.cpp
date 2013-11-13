@@ -64,7 +64,8 @@ std::set< Enemy* > Enemy::GetLive()
 }
 void Enemy::UpdateAll( const float ac_fDeltaT )
 {
-    for each( Enemy* poEnemy in sm_oLive )
+    std::set<Enemy*> oEnemies = sm_oLive;
+    for each( Enemy* poEnemy in oEnemies )
     {
         poEnemy->Update( ac_fDeltaT );
     }

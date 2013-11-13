@@ -63,7 +63,8 @@ std::set< Bullet* > Bullet::GetLive()
 }
 void Bullet::UpdateAll( const float ac_fDeltaT )
 {
-    for each( Bullet* poBullet in sm_oLive )
+    std::set<Bullet*> oBullets = sm_oLive;
+    for each( Bullet* poBullet in oBullets )
     {
         poBullet->Update( ac_fDeltaT );
     }
