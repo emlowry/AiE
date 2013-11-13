@@ -22,7 +22,7 @@
 #define SINGLETON_STATE_PRIVATE( CLASS_NAME ) private: \
     friend GameState::Singleton< CLASS_NAME >; \
     CLASS_NAME(); \
-    virtual ~CLASSNAME();
+    virtual ~CLASS_NAME();
 
 // Abstract class representing a game state.  Derived classes must implement the
 // Update and Draw functions.
@@ -31,8 +31,8 @@ class GameState : public Callback< void >
 public:
 
     // No need to define these - default implementations are fine
-    GameState();
-    virtual ~GameState();
+    GameState() {}
+    virtual ~GameState() {}
 
     template< typename Derived >
     class Singleton;
@@ -55,7 +55,7 @@ public:
     void operator()() override;
 
     // State that shuts down the game
-    static const GameState* const END;
+    static GameState* const END;
 
 private:
 
@@ -117,8 +117,9 @@ public:
 
 protected:
 
-    Singleton();
-    virtual ~Singleton();
+    // No need to implement - default implementations are fine
+    Singleton() {}
+    virtual ~Singleton() {}
 
 private:
 

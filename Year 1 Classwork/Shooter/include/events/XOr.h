@@ -10,7 +10,7 @@
 #ifndef _EVENTS__XOR_H_
 #define _EVENTS__XOR_H_
 
-#include "Events.h"
+#include "events/Typedefs.h"
 
 namespace Events
 {
@@ -21,16 +21,16 @@ class XOr: public DoubleEvent
 public:
 
     // constructors that just call base class constructors
-    XOr( const Event&& ac_rroCall, const Event&& ac_rroOtherCall );
+    XOr( const Event& ac_roCall, const Event& ac_roOtherCall );
     template< typename OtherReturnsBool >
-    XOr( const Event&& ac_rroCall, OtherReturnsBool& a_roOtherTarget );
+    XOr( const Event& ac_roCall, OtherReturnsBool& a_roOtherTarget );
     template< typename ReturnsBool >
-    XOr( ReturnsBool& a_roTarget, const Event&& a_roOtherCall );
+    XOr( ReturnsBool& a_roTarget, const Event& ac_roOtherCall );
     template< typename ReturnsBool, typename OtherReturnsBool >
     XOr( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherTarget );
 
     // Destructor doesn't need to be implemented - default is fine.
-    virtual ~XOr();
+    virtual ~XOr() {}
 
     // Implement Clone() so it returns XOr pointers instead of base class
     XOr* Clone() const override;

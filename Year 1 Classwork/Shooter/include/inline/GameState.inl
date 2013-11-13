@@ -12,9 +12,6 @@
 
 #include "EventHandler.h"
 
-// State that shuts down the game
-GameState* const GameState::END = nullptr;
-
 // Base class defines the call - handle events, then update components and draw.
 inline void GameState::operator()()
 {

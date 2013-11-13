@@ -10,29 +10,23 @@
 #ifndef _EVENTS__OR_INL_
 #define _EVENTS__OR_INL_
 
-#include <utility>  // for std::forward
-
 namespace Events
 {
 
 // Constructors
-inline Or::Or( const Event&& ac_rroCall, const Event&& ac_rroOtherCall )
-    : DoubleEvent( std::forward< const Event >( ac_rroCall ),
-                   std::forward< const Event >( ac_rroOtherCall ) ) {}
+inline Or::Or( const Event& ac_roCall, const Event& ac_roOtherCall )
+    : DoubleEvent( ac_roCall, ac_roOtherCall ) {}
 template< typename OtherReturnsBool >
-inline Or::Or( const Event&& ac_rroCall, OtherReturnsBool& a_roOtherTarget )
-    : DoubleEvent( std::forward< const Event >( ac_rroCall ),
-                   a_roOtherTarget ) {}
+inline Or::Or( const Event& ac_roCall, OtherReturnsBool& a_roOtherTarget )
+    : DoubleEvent( ac_roCall, a_roOtherTarget ) {}
 template< typename ReturnsBool >
-inline Or::Or( ReturnsBool& a_roTarget, const Event&& ac_rroOtherCall )
-    : DoubleEvent( a_roTarget,
-                   std::forward< const Event >( ac_rroOtherCall ) ) {}
+inline Or::Or( ReturnsBool& a_roTarget, const Event& ac_roOtherCall )
+    : DoubleEvent( a_roTarget, ac_roOtherCall ) {}
 template< typename ReturnsBool, typename OtherReturnsBool >
-inline Or::Or( ReturnsBool& a_roTarget, OtherReturnsBool& ac_rroOtherTarget )
+inline Or::Or( ReturnsBool& a_roTarget, OtherReturnsBool& a_roOtherTarget )
     : DoubleEvent( a_roTarget, a_roOtherTarget ) {}
 
 // Class name
-const char* const Or::CLASS_NAME = "Or";
 inline const char* Or::ClassName() const
 {
     return CLASS_NAME;

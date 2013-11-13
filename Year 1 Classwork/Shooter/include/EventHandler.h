@@ -34,33 +34,33 @@ public:
     static void Run();
 
     // Start listening for an event
-    static void StartListening( const Event&& ac_rroEvent );
+    static void StartListening( const Event& ac_roEvent );
     template< typename ReturnsBool >
     static void StartListening( ReturnsBool& a_roTarget );
 
     // Stop listening for an event
-    static void StopListening( const Event&& ac_rroEvent );
+    static void StopListening( const Event& ac_roEvent );
     template< typename ReturnsBool >
     static void StopListening( ReturnsBool& a_roTarget );
 
     // When the given event occurs, execute the given reaction
-    static void AddReaction( const Event&& ac_rroEvent,
-                             const Reaction&& ac_rroReaction );
+    static void AddReaction( const Event& ac_roEvent,
+                             const Reaction& ac_roReaction );
     template< typename ReturnsVoid >
-    static void AddReaction( const Event&& ac_rroEvent,
+    static void AddReaction( const Event& ac_roEvent,
                              ReturnsVoid& a_roReactionTarget );
     template< typename ReturnsBool >
     static void AddReaction( ReturnsBool& a_roEventTarget,
-                             const Reaction&& ac_rroReactionTarget );
+                             const Reaction& ac_roReactionTarget );
     template< typename ReturnsBool, typename ReturnsVoid >
     static void AddReaction( ReturnsBool& a_roEventTarget,
                              ReturnsVoid& a_roReactionTarget );
     
     // When the given event occurs, don't execute the given reaction
-    static void RemoveReaction( const Event&& ac_rroEvent,
-                                const Reaction&& ac_rroReaction );
+    static void RemoveReaction( const Event& ac_roEvent,
+                                const Reaction& ac_roReaction );
     template< typename ReturnsVoid >
-    static void RemoveReaction( const Event&& ac_rroEvent,
+    static void RemoveReaction( const Event& ac_roEvent,
                                 ReturnsVoid& a_roReactionTarget );
     template< typename ReturnsBool >
     static void RemoveReaction( ReturnsBool& a_roEventTarget,
@@ -70,7 +70,7 @@ public:
                                 ReturnsVoid& a_roReactionTarget );
     
     // Don't execute the given reaction, no matter what event occurs
-    static inline void RemoveReaction( const Reaction&& ac_rroReaction );
+    static inline void RemoveReaction( const Reaction& ac_roReaction );
     template< typename ReturnsVoid >
     static inline void RemoveReaction( ReturnsVoid& a_roTarget );
 
@@ -92,19 +92,19 @@ private:
     void ReactToEvents();
 
     // Start listening for an event
-    void Listen( const Event&& ac_rroEvent );
+    void Listen( const Event& ac_roEvent );
 
     // Stop listening for an event
-    void Unlisten( const Event&& ac_rroEvent );
+    void Unlisten( const Event& ac_roEvent );
 
     // If the given event occurs, execute the given reaction
-    void Add( const Event&& ac_rroEvent, const Reaction&& ac_rroReaction );
+    void Add( const Event& ac_roEvent, const Reaction& ac_roReaction );
     
     // If the given event occurs, don't execute the given reaction
-    void Remove( const Event&& ac_rroEvent, const Reaction&& ac_rroReaction );
+    void Remove( const Event& ac_roEvent, const Reaction& ac_roReaction );
     
     // Don't execute the given reaction, no matter what event occurs
-    void Remove( const Reaction&& ac_rroReaction );
+    void Remove( const Reaction& ac_roReaction );
 
     EventSet m_oEvents;         // Events we're listening for
     ReactionMap m_oReactions;   // Reactions to events

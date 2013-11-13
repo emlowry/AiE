@@ -21,9 +21,9 @@ inline void EventHandler::Run()
 }
 
 // Start listening for an event
-inline void EventHandler::StartListening( const Event&& ac_rroEvent )
+inline void EventHandler::StartListening( const Event& ac_roEvent )
 {
-    m_oInstance.Listen( std::forward< const Event >( ac_rroEvent ) );
+    m_oInstance.Listen( ac_roEvent );
 }
 template< typename ReturnsBool >
 inline void EventHandler::StartListening( ReturnsBool& a_roTarget )
@@ -32,9 +32,9 @@ inline void EventHandler::StartListening( ReturnsBool& a_roTarget )
 }
 
 // Stop listening for an event
-inline void EventHandler::StopListening( const Event&& ac_rroEvent )
+inline void EventHandler::StopListening( const Event& ac_roEvent )
 {
-    m_oInstance.Unlisten( std::forward< const Event >( ac_rroEvent ) );
+    m_oInstance.Unlisten( ac_roEvent );
 }
 template< typename ReturnsBool >
 inline void EventHandler::StopListening( ReturnsBool& a_roTarget )
@@ -43,25 +43,22 @@ inline void EventHandler::StopListening( ReturnsBool& a_roTarget )
 }
 
 // When the given event occurs, execute the given reaction
-inline void EventHandler::AddReaction( const Event&& ac_rroEvent,
-                                       const Reaction&& ac_rroReaction )
+inline void EventHandler::AddReaction( const Event& ac_roEvent,
+                                       const Reaction& ac_roReaction )
 {
-    m_oInstance.Add( std::forward< const Event >( ac_rroEvent ),
-                     std::forward< const Reaction >( ac_rroReaction ) );
+    m_oInstance.Add( ac_roEvent, ac_roReaction );
 }
 template< typename ReturnsVoid >
-inline void EventHandler::AddReaction( const Event&& ac_rroEvent,
+inline void EventHandler::AddReaction( const Event& ac_roEvent,
                                        ReturnsVoid& a_roReactionTarget )
 {
-    m_oInstance.Add( std::forward< const Event >( ac_rroEvent ),
-                     Reaction( a_roReactionTarget ) );
+    m_oInstance.Add( ac_roEvent, Reaction( a_roReactionTarget ) );
 }
 template< typename ReturnsBool >
 inline void EventHandler::AddReaction( ReturnsBool& a_roEventTarget,
-                                       const Reaction&& ac_rroReaction )
+                                       const Reaction& ac_roReaction )
 {
-    m_oInstance.Add( Event( a_roEventTarget ),
-                     std::forward< const Reaction >( ac_rroReaction ) );
+    m_oInstance.Add( Event( a_roEventTarget ), ac_roReaction );
 }
 template< typename ReturnsBool, typename ReturnsVoid >
 inline void EventHandler::AddReaction( ReturnsBool& a_roEventTarget,
@@ -71,25 +68,22 @@ inline void EventHandler::AddReaction( ReturnsBool& a_roEventTarget,
 }
     
 // When the given event occurs, don't execute the given reaction
-inline void EventHandler::RemoveReaction( const Event&& ac_rroEvent,
-                                          const Reaction&& ac_rroReaction )
+inline void EventHandler::RemoveReaction( const Event& ac_roEvent,
+                                          const Reaction& ac_roReaction )
 {
-    m_oInstance.Remove( std::forward< const Event >( ac_rroEvent ),
-                        std::forward< const Reaction >( ac_rroReaction ) );
+    m_oInstance.Remove( ac_roEvent, ac_roReaction );
 }
 template< typename ReturnsVoid >
-inline void EventHandler::RemoveReaction( const Event&& ac_rroEvent,
+inline void EventHandler::RemoveReaction( const Event& ac_roEvent,
                                           ReturnsVoid& a_roReactionTarget )
 {
-    m_oInstance.Remove( std::forward< const Event >( ac_rroEvent ),
-                        Reaction( a_roReactionTarget ) );
+    m_oInstance.Remove( ac_roEvent, Reaction( a_roReactionTarget ) );
 }
 template< typename ReturnsBool >
 inline void EventHandler::RemoveReaction( ReturnsBool& a_roEventTarget,
-                                          const Reaction&& ac_rroReaction )
+                                          const Reaction& ac_roReaction )
 {
-    m_oInstance.Remove( Event( a_roEventTarget ),
-                        std::forward< const Reaction >( ac_rroReaction ) );
+    m_oInstance.Remove( Event( a_roEventTarget ), ac_roReaction );
 }
 template< typename ReturnsBool, typename ReturnsVoid >
 inline void EventHandler::RemoveReaction( ReturnsBool& a_roEventTarget,
@@ -100,9 +94,9 @@ inline void EventHandler::RemoveReaction( ReturnsBool& a_roEventTarget,
 }
     
 // Don't execute the given reaction, no matter what event occurs
-inline void EventHandler::RemoveReaction( const Reaction&& ac_rroReaction )
+inline void EventHandler::RemoveReaction( const Reaction& ac_roReaction )
 {
-    m_oInstance.Remove( std::forward< const Reaction >( ac_rroReaction ) );
+    m_oInstance.Remove( ac_roReaction );
 }
 template< typename ReturnsVoid >
 inline void EventHandler::RemoveReaction( ReturnsVoid& a_roTarget )
@@ -115,9 +109,9 @@ inline void EventHandler::RemoveReaction( ReturnsVoid& a_roTarget )
 //
 
 // Start listening for an event
-inline void EventHandler::Listen( const Event&& ac_rroEvent )
+inline void EventHandler::Listen( const Event& ac_roEvent )
 {
-    m_oEvents.insert( ac_rroEvent.Clone() );
+    m_oEvents.insert( ac_roEvent.Clone() );
 }
 
 #endif  // _EVENT_HANDLER_INL_

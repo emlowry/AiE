@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:               DeepOperations.h
+ * File:               DeepOperators.h
  * Author:             Elizabeth Lowry
  * Date Created:       November 7, 2013
  * Description:        Derived classes of various std structs for performing
@@ -9,8 +9,8 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
-#ifndef _DEEP_OPERATIONS_H_
-#define _DEEP_OPERATIONS_H_
+#ifndef _DEEP_OPERATORS_H_
+#define _DEEP_OPERATORS_H_
 
 #include <functional>
 
@@ -18,12 +18,14 @@
 template< typename T >
 struct DeepEqualTo : public virtual std::equal_to< T* >
 {
+    std::equal_to< T > base;
     bool operator()( const T* const ac_cpoLeft,
                      const T* const ac_cpoRight ) const;
 };
 template< typename T >
 struct DeepEqualTo< const T > : public virtual std::equal_to< const T* >
 {
+    std::equal_to< const T > base;
     bool operator()( const T* const ac_cpoLeft,
                      const T* const ac_cpoRight ) const;
 };
@@ -32,11 +34,13 @@ struct DeepEqualTo< const T > : public virtual std::equal_to< const T* >
 template< typename T >
 struct DeepHash : public virtual std::hash< T* >
 {
+    std::hash< T > base;
     bool operator()( const T* const ac_cpoT ) const;
 };
 template< typename T >
 struct DeepHash< const T > : public virtual std::hash< const T* >
 {
+    std::hash< const T > base;
     bool operator()( const T* const ac_cpoT ) const;
 };
 
@@ -44,14 +48,16 @@ struct DeepHash< const T > : public virtual std::hash< const T* >
 template< typename T >
 struct DeepLess : public virtual std::less< T* >
 {
+    std::less< T > base;
     bool operator()( const T* const ac_cpoLeft,
                      const T* const ac_cpoRight ) const;
 };
 template< typename T >
 struct DeepLess< const T > : public virtual std::less< const T* >
 {
+    std::less< const T > base;
     bool operator()( const T* const ac_cpoLeft,
                      const T* const ac_cpoRight ) const;
 };
 
-#endif  // _DEEP_OPERATIONS_H_
+#endif  // _DEEP_OPERATORS_H_

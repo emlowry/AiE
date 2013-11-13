@@ -10,7 +10,7 @@
 #ifndef _EVENTS__MOUSE_BUTTON_DOWN_H_
 #define _EVENTS__MOUSE_BUTTON_DOWN_H_
 
-#include "Events.h"
+#include "events/Typedefs.h"
 
 namespace Events
 {
@@ -22,8 +22,8 @@ class MouseButtonDown : public Event
 public:
     
     // No need to implement (con/de)structor - default implementations are fine
-    MouseButtonDown();
-    virtual ~MouseButtonDown();
+    MouseButtonDown() {}
+    virtual ~MouseButtonDown() {}
 
     // Implement Clone() to return MouseButtonDown pointer instead of base class
     MouseButtonDown* Clone() const override;

@@ -17,6 +17,9 @@ LoadScreen::LoadScreen()
     m_oLoadTime.Start();
 }
 
+// destructor doesn't need to do anything
+LoadScreen::~LoadScreen() {}
+
 void LoadScreen::Draw() const
 {
     // TODO

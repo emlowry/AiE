@@ -13,27 +13,25 @@
 #include <functional>   // for std::hash
 #include <sstream>      // for std::stringstream
 #include <string>       // for std::string
-#include <utility>      // for std::forward
 
 // Public constructors
 template< typename T >
 inline DoubleCallback< T >::
-    DoubleCallback( const Callback< T >&& ac_rroCall,
-                    const Callback< T >&& ac_rroOtherCall )
-    : Callback( std::forward< const Callback< T > >( ac_rroCall ) ),
-      m_poOtherCall( ac_rroOtherCall.Clone() ) {}
+    DoubleCallback( const Callback< T >& ac_roCall,
+                    const Callback< T >& ac_roOtherCall )
+    : Callback( ac_roCall ), m_poOtherCall( ac_roOtherCall.Clone() ) {}
 template< typename T >
 template< typename OtherCallable >
-inline DoubleCallback< T >::DoubleCallback( const Callback< T >&& ac_rroCall,
+inline DoubleCallback< T >::DoubleCallback( const Callback< T >& ac_roCall,
                                             OtherCallable& a_roOtherTarget )
-    : Callback( std::forward< const Callback< T > >( ac_rroCall ) ),
+    : Callback( ac_rroCall ),
       m_poOtherCall( new Wrapper< OtherCallable >( a_roOtherTarget ) ) {}
 template< typename T >
 template< typename Callable >
 inline DoubleCallback< T >::
     DoubleCallback( Callable& a_roTarget,
-                    const Callback< T >&& ac_rroOtherCall )
-    : Callback( a_roTarget ), m_poOtherCall( ac_rroOtherCall.Clone() ) {}
+                    const Callback< T >& ac_roOtherCall )
+    : Callback( a_roTarget ), m_poOtherCall( ac_roOtherCall.Clone() ) {}
 template< typename T >
 template< typename Callable, typename OtherCallable >
 inline DoubleCallback< T >::DoubleCallback( Callable& a_roTarget,

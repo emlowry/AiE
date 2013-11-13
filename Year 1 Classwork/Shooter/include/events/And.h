@@ -10,27 +10,27 @@
 #ifndef _EVENTS__AND_H_
 #define _EVENTS__AND_H_
 
-#include "Events.h"
+#include "events/Typedefs.h"
 
 namespace Events
 {
     
 // Event triggered by two events both occurring
-class And: public DoubleEvent
+class And : public DoubleEvent
 {
 public:
 
     // constructors that just call base class constructors
-    And( const Cloneable& ac_roCall, const Cloneable& ac_roOtherCall );
+    And( const Event& ac_roCall, const Event& ac_roOtherCall );
     template< typename OtherReturnsBool >
-    And( const Cloneable& ac_roCall, OtherReturnsBool& a_roOtherCall );
+    And( const Event& ac_roCall, OtherReturnsBool& a_roOtherCall );
     template< typename ReturnsBool >
-    And( ReturnsBool& a_roCall, const Cloneable& ac_roOtherCall );
+    And( ReturnsBool& a_roCall, const Event& ac_roOtherCall );
     template< typename ReturnsBool, typename OtherReturnsBool >
     And( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherCall );
     
     // Destructor doesn't need to be implemented - default is fine.
-    virtual ~And();
+    virtual ~And() {}
 
     // Implement Clone() so it returns And pointers instead of base class
     And* Clone() const override;

@@ -18,25 +18,25 @@
 
 // Base class that wraps to Callbacks or other callable objects into one.
 template< typename T = void >
-class DoubleCallback : public Callback< T >
+class DoubleCallback : public virtual Callback< T >
 {
 public:
 
     // Sets pointers to clones of parameters
-    DoubleCallback( const Callback< T >&& ac_rroCall,
-                    const Callback< T >&& ac_rroOtherCall );
+    DoubleCallback( const Callback< T >& ac_roCall,
+                    const Callback< T >& ac_roOtherCall );
 
     // Sets first pointer to clone of first parameter, sets second pointer to a
     // wrapper pointing to the second parameter
     template< typename OtherCallable >
-    DoubleCallback( const Callback< T >&& ac_rroCall,
+    DoubleCallback( const Callback< T >& ac_roCall,
                     OtherCallable& a_roOtherTarget );
 
     // Sets first pointer to a wrapper pointing to the first parameter, sets the
     // second pointer to a clone of the second parameter
     template< typename Callable >
     DoubleCallback( Callable& a_roTarget,
-                    const Callback< T >&& ac_rroOtherCall );
+                    const Callback< T >& ac_roOtherCall );
 
     // Sets pointers to wrappers pointing to parameters
     template< typename Callable, typename OtherCallable >

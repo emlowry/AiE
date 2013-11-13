@@ -28,11 +28,11 @@ void EventHandler::ReactToEvents()
 }
 
 // Stop listening for an event.
-void EventHandler::Unlisten( const Event&& ac_rroEvent )
+void EventHandler::Unlisten( const Event& ac_roEvent )
 {
     // Check to see if the event is being listened for.
     EventSet::iterator oIterator =
-        m_oEvents.find( const_cast< Event* >( &ac_rroEvent ) );
+        m_oEvents.find( const_cast< Event* >( &ac_roEvent ) );
 
     // If the event isn't being listened for, nothing more needs to be done.
     if( m_oEvents.end() == oIterator )
@@ -67,18 +67,18 @@ void EventHandler::Unlisten( const Event&& ac_rroEvent )
 }
 
 // If the given event occurs, execute the given reaction
-void EventHandler::Add( const Event&& ac_rroEvent,
-                        const Reaction&& ac_rroReaction )
+void EventHandler::Add( const Event& ac_roEvent,
+                        const Reaction& ac_roReaction )
 {
     // Check to see if the event is already being listened for
     EventSet::iterator oEventIterator =
-        m_oEvents.find( const_cast< Event* >( &ac_rroEvent ) );
+        m_oEvents.find( const_cast< Event* >( &ac_roEvent ) );
     Event* poEvent;
 
     // If the 
     if( m_oEvents.end() == oEventIterator )
     {
-        poEvent = ac_rroEvent.Clone();
+        poEvent = ac_roEvent.Clone();
         m_oEvents.insert( poEvent );
     }
     else
@@ -87,9 +87,10 @@ void EventHandler::Add( const Event&& ac_rroEvent,
     }
 
     // make sure the reaction wrapper is allocated
-    TriggerMap::iterator oReactionIterator = m_oTriggers.find( &a_roReaction );
+    TriggerMap::iterator oReactionIterator =
+        m_oTriggers.find( const_cast< Reaction* >( &ac_roReaction ) );
     Reaction* poReaction = ( m_oTriggers.end() == oReactionIterator )
-                           ? a_roReaction.Clone() : (*oReactionIterator).first;
+                           ? ac_roReaction.Clone() : (*oReactionIterator).first;
     
     // associate the event and reaction
     m_oReactions[ poEvent ].insert( poReaction );
@@ -97,10 +98,11 @@ void EventHandler::Add( const Event&& ac_rroEvent,
 }
     
 // If the given event occurs, don't execute the given reaction
-void EventHandler::Remove( Event& a_roEvent, Reaction& a_roReaction )
+void EventHandler::Remove( const Event& ac_roEvent, const Reaction& ac_roReaction )
 {
     // check to see if the event is being listened for
-    EventSet::iterator oEventIterator = m_oEvents.find( &a_roEvent );
+    EventSet::iterator oEventIterator =
+        m_oEvents.find( const_cast< Event* >( &ac_roEvent ) );
     if( m_oEvents.end() == oEventIterator )
     {
         return;
@@ -109,7 +111,7 @@ void EventHandler::Remove( Event& a_roEvent, Reaction& a_roReaction )
 
     // check to see if the reaction wrapper is associated with the event
     ReactionSet::iterator oReactionIterator =
-        m_oReactions[ poEvent ].find( &a_roReaction );
+        m_oReactions[ poEvent ].find( const_cast< Reaction* >( &ac_roReaction ) );
     if( m_oReactions[ poEvent ].end() == oReactionIterator )
     {
         return;
@@ -129,10 +131,11 @@ void EventHandler::Remove( Event& a_roEvent, Reaction& a_roReaction )
 }
     
 // Don't execute the given reaction, no matter what event occurs
-void EventHandler::Remove( Reaction& a_roReaction )
+void EventHandler::Remove( const Reaction& ac_roReaction )
 {
     // check to see if the reaction wrapper is associated with any events
-    TriggerMap::iterator oTriggerIterator = m_oTriggers.find( &a_roReaction );
+    TriggerMap::iterator oTriggerIterator =
+        m_oTriggers.find( const_cast< Reaction* >( &ac_roReaction ) );
     if( m_oTriggers.end() == oTriggerIterator )
     {
         return;

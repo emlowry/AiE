@@ -10,7 +10,7 @@
 #ifndef _EVENTS__KEY_DOWN_H_
 #define _EVENTS__KEY_DOWN_H_
 
-#include "Events.h"
+#include "events/Typedefs.h"
 
 namespace Events
 {
@@ -22,8 +22,8 @@ class KeyDown : public Event
 public:
 
     // No need to implement (con/de)structor - default implementations are fine
-    KeyDown();
-    virtual ~KeyDown();
+    KeyDown() {}
+    virtual ~KeyDown() {}
 
     // Implement Clone() so it'll return a KeyDown pointer instead of base class
     KeyDown* Clone() const override;

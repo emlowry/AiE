@@ -30,6 +30,11 @@
     <None Include="include\inline\events\Not.inl" />
     <None Include="include\inline\events\Start.inl" />
     <None Include="include\inline\events\End.inl" />
+    <None Include="include\inline\clone\CloneSet.inl" />
+    <None Include="include\inline\clone\CloneStack.inl" />
+    <None Include="include\inline\DeepOperators.inl" />
+    <None Include="include\inline\ReferenceSet.inl" />
+    <None Include="include\inline\DoubleLookup.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -48,6 +53,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\LoadScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\events\And.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\events\End.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\events\Not.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\events\Or.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\events\Start.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\events\XOr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -118,7 +144,22 @@
     <ClInclude Include="include\Clone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\clone\DeepOperators.h">
+    <ClInclude Include="include\events\Typedefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\clone\CloneSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\clone\CloneStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DeepOperators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ReferenceSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DoubleLookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

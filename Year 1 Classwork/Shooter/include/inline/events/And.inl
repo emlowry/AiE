@@ -10,29 +10,23 @@
 #ifndef _EVENTS__AND_INL_
 #define _EVENTS__AND_INL_
 
-#include <utility>  // for std::forward
-
 namespace Events
 {
 
 // Constructors
-inline And::And( const Event&& ac_rroCall, const Event&& ac_rroOtherCall )
-    : DoubleEvent( std::forward< const Event >( ac_rroCall ),
-                   std::forward< const Event >( ac_rroOtherCall ) ) {}
+inline And::And( const Event& ac_roCall, const Event& ac_roOtherCall )
+    : DoubleEvent( ac_roCall , ac_roOtherCall ) {}
 template< typename OtherReturnsBool >
-inline And::And( const Event&& ac_rroCall, OtherReturnsBool& a_roOtherTarget )
-    : DoubleEvent( std::forward< const Event >( ac_rroCall ),
-                   a_roOtherTarget ) {}
+inline And::And( const Event& ac_roCall, OtherReturnsBool& a_roOtherTarget )
+    : DoubleEvent( ac_roCall, a_roOtherTarget ) {}
 template< typename ReturnsBool >
-inline And::And( ReturnsBool& a_roTarget, const Event&& ac_rroOtherCall )
-    : DoubleEvent( a_roTarget,
-                   std::forward< const Event >( ac_rroOtherCall ) ) {}
+inline And::And( ReturnsBool& a_roTarget, const Event& ac_roOtherCall )
+    : DoubleEvent( a_roTarget, ac_roOtherCall ) {}
 template< typename ReturnsBool, typename OtherReturnsBool >
-inline And::And( ReturnsBool& a_roTarget, OtherReturnsBool& ac_rroOtherTarget )
+inline And::And( ReturnsBool& a_roTarget, OtherReturnsBool& a_roOtherTarget )
     : DoubleEvent( a_roTarget, a_roOtherTarget ) {}
 
 // Class name
-const char* const And::CLASS_NAME = "And";
 inline const char* And::ClassName() const
 {
     return CLASS_NAME;

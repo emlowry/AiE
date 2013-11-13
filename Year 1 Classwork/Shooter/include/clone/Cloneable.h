@@ -17,16 +17,10 @@ class Cloneable
 {
 public:
 
-    // If you want to make it easier to remember to make a derived class's
-    // Clone() return a pointer of the derived type instead of Cloneable, you
-    // can use this as the base class instead.
-    template< typename Derived >
-    class Type : public virtual Cloneable
-    {
-    public:
-        virtual Derived* Clone() const override = 0;
-    };
-
+    // Add empty default (con/de)structor so derived classes can compile.
+    Cloneable() {}
+    virtual ~Cloneable() {}
+    
     // Derived classes must implement this function to return a dynamically
     // allocated copy of the current object.  The override declaration should
     // probably return a pointer of the derived type instead of Cloneable.
@@ -42,7 +36,5 @@ private:
     Cloneable& operator=( Cloneable&& ac_rroToMove );
 
 };
-
-#define CloneableType Cloneable::Type
 
 #endif  // _CLONE__CLONEABLE_H_

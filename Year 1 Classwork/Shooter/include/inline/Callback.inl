@@ -16,8 +16,8 @@
 
 // Public constructors
 template< typename T >
-inline Callback< T >::Callback( const Callback&& ac_rroCall )
-    : m_poCall( ac_rroCall.Clone() ) {}
+inline Callback< T >::Callback( const Callback& ac_roCall )
+    : m_poCall( ac_roCall.Clone() ) {}
 template< typename T >
 template< typename Callable >
 inline Callback< T >::Callback( Callable& a_roTarget )
@@ -71,9 +71,9 @@ inline std::size_t Callback< T >::Hash() const
 // operator() with no parameters and the correct return type, without
 // unneccessary wrapping if the parameter is already a callback
 template< typename T >
-inline Callback< T >* Callback< T >::New( const Callback&& ac_rroCall )
+inline Callback< T >* Callback< T >::New( const Callback& ac_roCall )
 {
-    return ac_rroCall.Clone();
+    return ac_roCall.Clone();
 }
 template< typename T >
 template< typename Callable >

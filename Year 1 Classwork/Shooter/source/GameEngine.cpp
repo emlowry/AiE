@@ -8,6 +8,10 @@
  ******************************************************************************/
 
 #include "GameEngine.h"
+#include <stack>
+
+// instantiate static stack
+std::stack< GameState* > GameEngine::sm_oStates = std::stack< GameState* >();
 
 // Set up window, load things, etc.
 void GameEngine::Initialize( const char* ac_pcWindowTitle,

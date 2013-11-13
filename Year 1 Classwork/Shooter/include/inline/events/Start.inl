@@ -10,21 +10,19 @@
 #ifndef _EVENTS__START_INL_
 #define _EVENTS__START_INL_
 
-#include <utility>  // for std::forward
-
 namespace Events
 {
 
 // Constructors pass to base constructor and set started flag
-inline Start::Start( const Event&& ac_rroCall, bool a_bStarted )
-    : Event( std::forward< const Event >( ac_rroCall ) ),
-      m_bStarted( a_bStarted ) {}
+inline Start::Start( const Event& ac_roCall, bool a_bStarted )
+    : Event( ac_roCall ), m_bStarted( a_bStarted ) {}
 template< typename ReturnsBool >
 inline Start::Start( ReturnsBool& a_roCall, bool a_bStarted )
     : Event( a_roCall ), m_bStarted( a_bStarted ) {}
+inline Start::Start( Event* a_poCall, bool a_bStarted )
+    : Event( a_poCall ), m_bStarted( a_bStarted ) {}
 
 // Class name
-const char* const Start::CLASS_NAME = "Start";
 inline const char* Start::ClassName() const
 {
     return CLASS_NAME;

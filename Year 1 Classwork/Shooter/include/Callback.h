@@ -17,8 +17,7 @@
 // Parent class for callbacks.  Child classes will offer different operator()
 // behavior and their own ClassName() values.
 template< typename T = void >
-class Callback : public virtual CloneableType< Callback< T > >,
-                 public virtual Hashable
+class Callback : public virtual Cloneable, public virtual Hashable
 {
 public:
 
@@ -46,7 +45,7 @@ public:
     virtual std::size_t Hash() const override;
 
     // Returns a clone
-    static Callback* New( const Callback&& ac_rroCall );
+    static Callback* New( const Callback& ac_roCall );
 
     // Returns a wrapper pointing to the parameter - if the parameter is local,
     // make sure the resulting Callback is deallocated at the end of scope so
@@ -89,7 +88,7 @@ private:
 // Wraps a non-callback object for use by the main Callback class
 template< typename T >
 template< typename Callable >
-class Callback< T >::Wrapper : public Callback< T >
+class Callback< T >::Wrapper : public virtual Callback< T >
 {
 public:
 
@@ -97,7 +96,7 @@ public:
     // Unlike the parent class, the target isn't owned by this object, so it
     // won't be deallocated in the destructor.
     Wrapper( Callable& a_roTarget );
-    virtual ~Wrapper(); // default implementation - no deallocations needed here
+    virtual ~Wrapper() {} // default implementation - no deallocations needed here
 
     Wrapper* Clone() const override;
     T operator()() override;

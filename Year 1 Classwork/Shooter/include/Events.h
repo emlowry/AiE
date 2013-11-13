@@ -10,18 +10,12 @@
 #ifndef _EVENTS_H_
 #define _EVENTS_H_
 
-#include "Callback.h"
-#include "DoubleCallback.h"
-
-// Simplify typing and reduce template parameter typos
-typedef Callback< bool > Event;
-typedef DoubleCallback< bool > DoubleEvent;
-
+#include "events/Typedefs.h"
 #include "events/And.h"
-#include "events/End.h"
 #include "events/KeyDown.h"
 #include "events/MouseButtonDown.h"
 #include "events/Start.h"
+#include "events/End.h"
 #include "events/Not.h"
 #include "events/Or.h"
 #include "events/XOr.h"

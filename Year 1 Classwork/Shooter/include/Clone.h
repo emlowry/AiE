@@ -12,5 +12,7 @@
 #define _CLONE_H_
 
 #include "clone/Cloneable.h"
+#include "clone/CloneStack.h"
+#include "clone/CloneSet.h"
 
 #endif  // _CLONE_H_

@@ -10,19 +10,16 @@
 #ifndef _EVENTS__NOT_INL_
 #define _EVENTS__NOT_INL_
 
-#include <utility>  // for std::forward
-
 namespace Events
 {
 
 // Constructors
-inline Not::Not( const Event&& ac_rroCall )
-    : Event( std::forward< const Event >( ac_rroCall ) ) {}
+inline Not::Not( const Event& ac_roCall ) : Event( ac_roCall ) {}
 template< typename ReturnsBool >
 inline Not::Not( ReturnsBool& a_roCall ) : Event( a_roCall ) {}
+inline Not::Not( Event* a_poCall ) : Event( a_poCall ) {}
 
 // Class name
-const char* const Not::CLASS_NAME = "Not";
 inline const char* Not::ClassName() const
 {
     return CLASS_NAME;

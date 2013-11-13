@@ -10,7 +10,7 @@
 #ifndef _EVENTS__OR_H_
 #define _EVENTS__OR_H_
 
-#include "Events.h"
+#include "events/Typedefs.h"
 
 namespace Events
 {
@@ -22,16 +22,16 @@ class Or: public DoubleEvent
 public:
 
     // constructors that just call base class constructors
-    Or( const Event&& ac_rroCall, const Event&& ac_rroOtherCall );
+    Or( const Event& ac_roCall, const Event& ac_roOtherCall );
     template< typename OtherReturnsBool >
-    Or( const Event&& ac_rroCall, OtherReturnsBool& a_roOtherTarget );
+    Or( const Event& ac_roCall, OtherReturnsBool& a_roOtherTarget );
     template< typename ReturnsBool >
-    Or( ReturnsBool& a_roTarget, const Event&& a_roOtherCall );
+    Or( ReturnsBool& a_roTarget, const Event& a_roOtherCall );
     template< typename ReturnsBool, typename OtherReturnsBool >
     Or( ReturnsBool& a_roCall, OtherReturnsBool& a_roOtherTarget );
     
     // Destructor doesn't need to be implemented - default is fine.
-    virtual ~Or();
+    virtual ~Or() {}
 
     // Implement Clone() so it returns Or pointers instead of base class
     Or* Clone() const override;
