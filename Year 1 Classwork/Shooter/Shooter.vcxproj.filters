@@ -18,14 +18,6 @@
     <None Include="include\inline\XY.inl" />
     <None Include="include\inline\GameEngine.inl" />
     <None Include="include\inline\GameState.inl" />
-    <None Include="include\inline\events\KeyDown.inl" />
-    <None Include="include\inline\events\MouseButtonDown.inl" />
-    <None Include="include\inline\events\XOr.inl" />
-    <None Include="include\inline\events\Or.inl" />
-    <None Include="include\inline\events\And.inl" />
-    <None Include="include\inline\events\Not.inl" />
-    <None Include="include\inline\events\Start.inl" />
-    <None Include="include\inline\events\End.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
