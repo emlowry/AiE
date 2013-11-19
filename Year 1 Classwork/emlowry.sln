@@ -15,6 +15,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shooter", "Shooter\Shooter.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StupidShooter", "StupidShooter\StupidShooter.vcxproj", "{37CD679B-52B9-4279-8F0E-83890D68F546}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Math", "Math\Math.vcxproj", "{2ADF0B80-2156-4113-A0E1-BE96CCDE23FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -49,6 +51,10 @@ Global
 		{37CD679B-52B9-4279-8F0E-83890D68F546}.Debug|Win32.Build.0 = Debug|Win32
 		{37CD679B-52B9-4279-8F0E-83890D68F546}.Release|Win32.ActiveCfg = Release|Win32
 		{37CD679B-52B9-4279-8F0E-83890D68F546}.Release|Win32.Build.0 = Release|Win32
+		{2ADF0B80-2156-4113-A0E1-BE96CCDE23FC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2ADF0B80-2156-4113-A0E1-BE96CCDE23FC}.Debug|Win32.Build.0 = Debug|Win32
+		{2ADF0B80-2156-4113-A0E1-BE96CCDE23FC}.Release|Win32.ActiveCfg = Release|Win32
+		{2ADF0B80-2156-4113-A0E1-BE96CCDE23FC}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
