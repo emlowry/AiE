@@ -16,155 +16,20 @@
 namespace Math
 {
 
-// Copy constructor
+// Zero matrix
 template< typename T, unsigned int M, unsigned int N >
-Matrix< T, M, N >::Matrix( const Matrix& ac_roMatrix )
-{/*
-    if( !std::is_copy_constructable< T >::value )
-    {
-        throw exception("Non-copy-constructable type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            m_aaData[i][j]( ac_roMatrix[i][j] );
-        }
-    }
-}
+ZERO_MATRIX< T, M, N >( 0 );
+template< typename T, unsigned int M, unsigned int N >
+const Matrix< T, M, N >& Matrix< T, M, N >::ZERO = ZERO_MATRIX< T, M, N >;
 
-// Copy assignment
+// Identity matrix
+template< typename T, unsigned int N >
+IDENTITY_MATRIX< T, N >( 1, 0 );
 template< typename T, unsigned int M, unsigned int N >
-Matrix< T, M, N >& Matrix< T, M, N >::operator=( const Matrix& ac_roMatrix )
-{/*
-    if( !std::is_copy_assignable< T >::value )
-    {
-        throw exception("Non-copy-assignable type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            m_aaData[i][j] = ac_roMatrix[i][j];
-        }
-    }
-}
+const Matrix< T, ( M < N ? M : N ) >&
+    Matrix< T, M, N >::IDENTITY = IDENTITY_MATRIX< T, ( M < N ? M : N ) >;
 
-// Move constructor
-template< typename T, unsigned int M, unsigned int N >
-Matrix< T, M, N >::Matrix( Matrix&& a_rroMatrix )
-{/*
-    if( !std::is_move_constructable< T >::value )
-    {
-        throw exception("Non-move-constructable type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            m_aaData[i][j]( std::move( ac_roMatrix[i][j] ) );
-        }
-    }
-}
-
-// Move assignment
-template< typename T, unsigned int M, unsigned int N >
-Matrix< T, M, N >& Matrix< T, M, N >::operator=( Matrix&& a_rroMatrix )
-{/*
-    if( !std::is_move_assignable< T >::value )
-    {
-        throw exception("Non-move-assignable type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            m_aaData[i][j] = std::move( ac_roMatrix[i][j] );
-        }
-    }
-}
-
-// Copy construct from a different type of matrix
-template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
-Matrix< T, M, N >::Matrix( const Matrix< U, P, Q >& ac_roMatrix,
-                           const T& ac_roFill )
-{/*
-    if( !std::is_copy_constructable< T >::value )
-    {
-        throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            if( i < P && j < Q )
-            {
-                m_aaData[i][j]( (T)( ac_roMatrix[i][j] ) );
-            }
-            else
-            {
-                m_aaData[i][j]( ac_roFill );
-            }
-        }
-    }
-}
-
-// Copy assign from a different type of matrix
-template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
-Matrix< T, M, N >& Matrix< T, M, N >::
-    operator=( const Matrix< U, P, Q >& ac_roMatrix, const T& ac_roFill )
-{/*
-    if( !std::is_copy_assignable< T >::value )
-    {
-        throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            if( i < P && j < Q )
-            {
-                m_aaData[i][j] = (T)( ac_roMatrix[i][j] );
-            }
-            else
-            {
-                m_aaData[i][j] = ac_roFill;
-            }
-        }
-    }
-}
-
-// Construct with all elements set to the given value
-template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-Matrix< T, M, N >::Matrix( const U& ac_rFill )
-{/*
-    if( !std::is_copy_constructable< T >::value )
-    {
-        throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
-    {
-        for( unsigned int j = 0; j < N; ++j )
-        {
-            m_aaData[i][j]( (T)( ac_rFill ) );
-        }
-    }
-}
+// TODO - constructors that forward to base class
 
 // Construct with diagonal elements set to the second given value and all others
 // set to the first
@@ -199,6 +64,8 @@ Matrix< T, M, N >:Matrix( const U& ac_rFill, const V& ac_rIdentityFill )
         }
     }
 }
+
+// TODO
 
 }   // namespace Math
 

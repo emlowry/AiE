@@ -70,11 +70,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Matrix.inl" />
+    <None Include="MatrixBase.inl" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="MatrixBase.h" />
     <ClInclude Include="T_Matrix.h" />
+    <ClInclude Include="T_MatrixBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Matrix.cpp" />

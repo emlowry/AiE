@@ -12,6 +12,7 @@
 #ifndef _T_MATRIX_H_
 #define _T_MATRIX_H_
 
+#include "T_MatrixBase.h"   // include base class inline implementations
 #include "Matrix.h"
 #include "Matrix.inl"
 
