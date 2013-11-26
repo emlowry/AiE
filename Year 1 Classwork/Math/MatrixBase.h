@@ -8,8 +8,8 @@
  *                      and void* types.  If a user needs to instantiate a
  *                      MatrixBase class with type or dimensions beyond these,
  *                      then they need to include T_MatrixBase.h instead.
- * Last Modified:      November 20, 2013
- * Last Modification:  Moving code in from Matrix.h.
+ * Last Modified:      November 25, 2013
+ * Last Modification:  Adding the closely-entwined VectorBase class.
  ******************************************************************************/
 
 #ifndef _MATRIX_BASE_H_
@@ -17,6 +17,11 @@
 
 namespace Math
 {
+
+// Forward-declare VectorBase, include definition *after* MatrixBase definition,
+// since MatrixBase is the parent of VectorBase.
+template< typename T, unsigned int N, bool t_bIsRowVector = true >
+class VectorBase;
 
 // Base class for matrices.  For matrices with mathematical operations beyond
 // transposition, use the child Matrix class instead.
@@ -26,6 +31,8 @@ class MatrixBase
 public:
 
     // Simplify typing
+    typedef VectorBase< T, M, false > ColumnVectorType;
+    typedef VectorBase< T, N > RowVectorType;
     typedef MatrixBase< T, N, M > TransposeType;
     static const T& DEFAULT_FILL;   // referance to MatrixFill< T >::DEFAULT
 
@@ -39,62 +46,83 @@ public:
     
     // Copy/move constructor/operator
     MatrixBase( const MatrixBase& ac_roMatrix );
-    virtual MatrixBase& Assign( const MatrixBase& ac_roMatrix );
     MatrixBase& operator=( const MatrixBase& ac_roMatrix );
     MatrixBase( MatrixBase&& a_rroMatrix );
-    virtual MatrixBase& Assign( MatrixBase&& a_rroMatrix );
     MatrixBase& operator=( MatrixBase&& a_rroMatrix );
 
     // Construct/assign from a differently-sized matrix
     template< typename U, unsigned int P, unsigned int Q >
     MatrixBase( const MatrixBase< U, P, Q >& ac_roMatrix,
-                const T& ac_roFill = MatrixFill< T >::DEFAULT );
+                const T& ac_rFill = DEFAULT_FILL );
     template< typename U, unsigned int P, unsigned int Q >
-    virtual MatrixBase& Assign( const MatrixBase< U, P, Q >& ac_roMatrix );
     MatrixBase& operator=( const MatrixBase< U, P, Q >& ac_roMatrix );
 
-    // Construct with all values equal to parameter
+    // Construct/assign all values equal to parameter
     template< typename U >
     MatrixBase( const U& ac_rFill );
-    template< typename U, typename V >
-    MatrixBase( const U& ac_rFill, const V& ac_rIdentityFill );
-
-    // Construct with data filled in with parameter data one row at a time, one
-    // column at a time, until end of parameter data, then filled with either
-    // default/previous data
     template< typename U >
-    MatrixBase( const U (&ac_raData)[ M * N ] );
-    template< typename U, unsigned int t_uiDataSize >
-    MatrixBase( const U (&ac_raData)[ t_uiDataSize ],
-                const T& ac_roFill = MatrixFill< T >::DEFAULT );
+    MatrixBase& operator=( const U& ac_rFill );
+
+    // Construct/assign withparameter data one row at a time until end of
+    // parameter data, then filled with default/previous data
     template< typename U >
     MatrixBase( const U* const ac_cpData,
-                const unsigned int ac_uiSize = M * N,
-                const T& ac_roFill = MatrixFill< T >::DEFAULT );
+                const unsigned int ac_uiSize,
+                const T& ac_rFill = DEFAULT_FILL );
+    template< typename U, unsigned int t_uiSize >
+    MatrixBase( const U (&ac_raData)[ t_uiSize ],
+                const T& ac_rFill = DEFAULT_FILL );
+    template< typename U, unsigned int t_uiSize >
+    MatrixBase& operator=( const U (&ac_raData)[ t_uiSize ] );
 
-    // Construct with data filled in with parameter data where given and either
-    // default/previous data elsewhere
-    template< typename U >
-    MatrixBase( const U (&ac_raaData)[ M ][ N ] );
-    template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
-    MatrixBase( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ],
-                const T& ac_roFill = MatrixFill< T >::DEFAULT );
+    // Construct/assign with parameter data where given and default/previous
+    // data elsewhere
     template< typename U >
     MatrixBase( const U* const* const ac_cpcpData,
-                const unsigned int ac_uiRows = M,
-                const unsigned int ac_uiColumns = N,
-                const T& ac_roFill = MatrixFill< T >::DEFAULT );
+                const unsigned int ac_uiRows,
+                const unsigned int ac_uiColumns,
+                const T& ac_rFill = DEFAULT_FILL );
+    template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
+    MatrixBase( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ],
+                const T& ac_rFill = DEFAULT_FILL );
+    template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
+    MatrixBase& operator=( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ] );
+
+    // Equality and inequality checks
+    bool operator==( const Matrix& ac_roMatrix ) const;
+    bool operator!=( const Matrix& ac_roMatrix ) const;
     
     // Array access - *non-virtual* override in VectorBase child class
     T (&operator[])( unsigned int a_uiRow )[ N ];
-    const T (&operator[])( unsigned int a_uiRow )[ N ];
+    const T (&operator[])( unsigned int a_uiRow )[ N ] const;
     T& operator[]( unsigned int a_uiRow, unsigned int a_uiColumn );
     const T& operator[]( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
+
+    // Get row/column vectors - redefine in child classes to return correct type
+    virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    virtual RowVectorType Row( unsigned int ac_uiIndex ) const;
 
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const;
 
+    static const unsigned int ROWS = M;
+    static const unsigned int COLUMNS = N;
+
 protected:
+
+    // Used by assignment operators so that only child classes with genuinely
+    // different behavior need to override.
+    virtual MatrixBase& Assign( const MatrixBase& ac_roMatrix );
+    virtual MatrixBase& Assign( MatrixBase&& a_rroMatrix );
+    template< typename U, unsigned int P, unsigned int Q >
+    virtual MatrixBase& Assign( const MatrixBase< U, P, Q >& ac_roMatrix );
+    template< typename U >
+    virtual MatrixBase& Assign( const U& ac_rFill );
+    template< typename U, unsigned int t_uiSize >
+    virtual MatrixBase& Assign( const U (&ac_raData)[ t_uiSize ] );
+    template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
+    virtual MatrixBase&
+        Assign( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ] );
 
     // elements of the matrix
     T m_aaData[ M ][ N ];
@@ -116,7 +144,7 @@ struct MatrixFill< T* >
 };
 
 //
-// For non-numeric types, be sure to add the following:
+// For non-numeric types, be sure to define the following:
 //
 //  // YourType.h:
 //  template<>
@@ -130,5 +158,8 @@ struct MatrixFill< T* >
 //
 
 }   // namespace Math
+
+// MatrixBase *must* be defined before VectorBase.
+#include "VectorBase.h"
 
 #endif  // _MATRIX_BASE_H_

@@ -35,7 +35,7 @@ const Matrix< T, ( M < N ? M : N ) >&
 // set to the first
 template< typename T, unsigned int M, unsigned int N >
 template< typename U, typename V >
-Matrix< T, M, N >:Matrix( const U& ac_rFill, const V& ac_rIdentityFill )
+Matrix< T, M, N >::Matrix( const U& ac_rFill, const V& ac_rIdentityFill )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {

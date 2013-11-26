@@ -71,13 +71,25 @@
   <ItemGroup>
     <None Include="Matrix.inl" />
     <None Include="MatrixBase.inl" />
+    <None Include="MatrixBaseCopyConstructors.inl" />
+    <None Include="MatrixBaseFillConstructors.inl" />
+    <None Include="NumericVectorBase.inl" />
     <None Include="ReadMe.txt" />
+    <None Include="Vector.inl" />
+    <None Include="VectorBase.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixBase.h" />
+    <ClInclude Include="IntegerMatrixInverseTypes.h" />
+    <ClInclude Include="NumericVectorBase.h" />
     <ClInclude Include="T_Matrix.h" />
     <ClInclude Include="T_MatrixBase.h" />
+    <ClInclude Include="T_NumericVectorBase.h" />
+    <ClInclude Include="T_Vector.h" />
+    <ClInclude Include="T_VectorBase.h" />
+    <ClInclude Include="Vector.h" />
+    <ClInclude Include="VectorBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Matrix.cpp" />

@@ -11,6 +11,7 @@
  ******************************************************************************/
 
 #include "T_Matrix.h"
+#include "IntegerMatrixInverseTypes.h"
 
 namespace Math
 {

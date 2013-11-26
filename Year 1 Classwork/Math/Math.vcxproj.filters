@@ -22,6 +22,21 @@
     <None Include="MatrixBase.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="MatrixBaseCopyConstructors.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="MatrixBaseFillConstructors.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="VectorBase.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="NumericVectorBase.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Vector.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.h">
@@ -34,6 +49,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="T_MatrixBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T_VectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerMatrixInverseTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NumericVectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T_NumericVectorBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="T_Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

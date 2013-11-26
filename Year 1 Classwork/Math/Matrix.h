@@ -42,36 +42,11 @@ struct MatrixInverse
 {
     typedef T Type;
 };
-template<>
-struct MatrixInverse< bool >
-{
-    typedef float Type;
-};
-template<>
-struct MatrixInverse< char >
-{
-    typedef float Type;
-};
-template<>
-struct MatrixInverse< short >
-{
-    typedef double Type;
-};
-template<>
-struct MatrixInverse< int >
-{
-    typedef double Type;
-};
-template<>
-struct MatrixInverse< long >
-{
-    typedef long double Type;
-};
-template<>
-struct MatrixInverse< long long >
-{
-    typedef long double Type;
-};
+
+// Forward declare vector type, include vector definition *after* matrix
+// definition, since matrix is parent of vector
+template< typename T, unsigned int N, bool t_bIsRow = true >
+class Vector;
 
 // Represents a matrix of values of a set type with set dimensions.
 template< typename T, unsigned int M, unsigned int N = M >
@@ -80,8 +55,11 @@ class Matrix : public virtual MatrixBase< T, M, N >
 public:
 
     // simplify typing
+    typedef MatrixBase< T, M, N > BaseType;
+    typedef Vector< T, M, false > ColumnVectorType;
+    typedef Vector< T, N > RowVectorType;
     typedef Matrix< T, ( M < N ? M : N ) > IdentityType;
-    typedef Matrix< MatrixInverse< T >, N, M > InverseType;
+    typedef Matrix< MatrixInverse< T >::Type, N, M > InverseType;
     typedef Matrix< T, N, M > TransposeType;
 
     // virtual destructor needed due to virtual methods
@@ -95,28 +73,24 @@ public:
     Matrix( MatrixBase&& a_rroMatrix );
     template< typename U, unsigned int P, unsigned int Q >
     Matrix( const MatrixBase< U, P, Q >& ac_roMatrix,
-            const T& ac_roFill = MatrixFill< T >::DEFAULT );
+            const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
     Matrix( const U& ac_rFill );
-    template< typename U >
-    Matrix( const U (&ac_raData)[ M * N ] );
     template< typename U, unsigned int t_uiDataSize >
     Matrix( const U (&ac_raData)[ t_uiDataSize ],
-            const T& ac_roFill = MatrixFill< T >::DEFAULT );
+            const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
     Matrix( const U* const ac_cpData,
-            const unsigned int ac_uiSize = M * N,
-            const T& ac_roFill = MatrixFill< T >::DEFAULT );
-    template< typename U >
-    Matrix( const U (&ac_raaData)[ M ][ N ] );
+            const unsigned int ac_uiSize,
+            const T& ac_rFill = DEFAULT_FILL );
     template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
     Matrix( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ],
-            const T& ac_roFill = MatrixFill< T >::DEFAULT );
+            const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
     Matrix( const U* const* const ac_cpcpData,
-            const unsigned int ac_uiRows = M,
-            const unsigned int ac_uiColumns = N,
-            const T& ac_roFill = MatrixFill< T >::DEFAULT );
+            const unsigned int ac_uiRows,
+            const unsigned int ac_uiColumns,
+            const T& ac_rFill = DEFAULT_FILL );
 
     // Fill with one value along the identity diagonal and another elsewhere
     template< typename U, typename V >
@@ -126,29 +100,29 @@ public:
     template< typename U >
     Matrix& operator*=( const U& a_rScalar );
     template< typename U >
-    Matrix< MatrixOperationResult< T, U >::Type, M, N >
+    Matrix< CommonType< T, U >::Type, M, N >
         operator*( const U& a_rScalar ) const;
     template< typename U >
     Matrix& operator/=( const U& a_rScalar );
     template< typename U >
-    Matrix< MatrixOperationResult< T, U >::Type, M, N >
+    Matrix< CommonType< T, U >::Type, M, N >
         operator/( const U& a_rScalar ) const;
 
     // Matrix addition and subtraction
     template< typename U >
     Matrix& operator+=( const Matrix< U, M, N >& ac_roMatrix );
     template< typename U >
-    Matrix< MatrixOperationResult< T, U >::Type, M, N >
+    Matrix< CommonType< T, U >::Type, M, N >
         operator+( const Matrix< U, M, N >& ac_roMatrix ) const;
     template< typename U >
     Matrix& operator-=( const Matrix< U, M, N >& ac_roMatrix );
     template< typename U >
-    Matrix< MatrixOperationResult< T, U >::Type, M, N >
+    Matrix< CommonType< T, U >::Type, M, N >
         operator-( const Matrix< U, M, N >& ac_roMatrix ) const;
 
     // Matrix multiplication
     template< typename U, unsigned int P >
-    Matrix< MatrixOperationResult< T, U >::Type, M, N >
+    Matrix< CommonType< T, U >::Type, M, P >
         operator*( const Matrix< U, N, P >& ac_roMatrix ) const;
     // Matrix "division" = multiplication by inverse
     // Returns error if parameter is not invertable
@@ -157,8 +131,19 @@ public:
     //  ac_roMatrix.Inverse() * ac_roMatrix = IDENTITY but
     //  ac_roMatrix * ac_roMatrix.Inverse() != IDENTITY_MATRIX< T, P >
     template< typename U, unsigned int P >
-    Matrix< MatrixOperationResult< T, U >::Type, M, N >
+    Matrix< CommonType< T, MatrixInverse< U >::Type >::Type, M, P >
         operator/( const Matrix< U, P, N >& ac_roMatrix ) const;
+
+    // TODO bitwise operations
+
+    // multiplication by a column vector
+    template< typename U >
+    Vector< CommonType< T, U >, M, false >
+        operator*( const Vector< U, N, false >& ac_roVector ) const;
+    // "division" by a row vector = multiplication by its inverse, if it has one
+    template< typename U >
+    Vector< CommonType< T, MatrixInverse< U >::Type >, M, false >
+        operator/( const Vector< U, N >& ac_roVector ) const;
 
     // Determinant - return 0 if non-square matrix
     T Determinant();
@@ -168,6 +153,10 @@ public:
     bool Inverse( InverseType& a_roMatrix ) const;  // !invertable = !change
     InverseType Inverse() const;    // if not invertable, return zero matrix
     InverseType Inverse( bool& a_rbInvertable ) const;  // as above
+
+    // Get row/column vectors - redefine in child classes to return correct type
+    virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    virtual RowVectorType Row( unsigned int ac_uiIndex ) const;
     
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const;
@@ -195,5 +184,9 @@ template< typename T, unsigned int N >
 const Matrix< T, N > IDENTITY_MATRIX;
 
 }   // namespace Math
+
+// The Matrix class *must* be defined before the Vector class, since Vector is
+// a child class of Matrix.
+#include "Vector.h"
 
 #endif  // _MATRIX_H_
