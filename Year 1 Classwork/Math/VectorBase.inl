@@ -11,6 +11,7 @@
 #define _VECTOR_BASE_INL_
 
 // #include <type_traits>  // for std::is_whateverable checks
+#include <cassert>  // for assert
 #include <utility>  // for std::forward and std::move
 
 namespace Math
@@ -30,11 +31,23 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( const VectorBase& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
+inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
+    operator=( const VectorBase& ac_roVector )
+{
+    return Assign( ac_roVector );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( BaseType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( VectorBase&& a_rroVector )
     : BaseType( std::forward( a_rroVector ) ) {}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
+    operator=( VectorBase&& a_rroVector )
+{
+    return Assign( std::forward( a_rroVector ) );
+}
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U, unsigned int P, unsigned int Q >
 inline VectorBase< T, N, t_bIsRow >::
@@ -93,10 +106,28 @@ inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     {
         throw exception("Non-convertable input type");
     } /**/
-    for( unsigned int i = 0; i < N; ++i )
+    for( unsigned int i = 0; i < N && i < Q; ++i )
+    {
+        m_aaData[ t_bIsRow ? 1 : i][ t_bIsRow ? i : 1 ] = ac_roVector[i];
+    }
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U, unsigned int Q, bool t_bOtherIsRow >
+inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
+    Assign( VectorBase< U, Q, t_bOtherIsRow >&& a_rroVector )
+{/*
+    if( !std::is_move_assignable< T >::value )
+    {
+        throw exception("Non-move-assignable type");
+    }
+    if( !std::is_convertible< U, T >:: value )
+    {
+        throw exception("Non-convertable input type");
+    } /**/
+    for( unsigned int i = 0; i < N && i < Q; ++i )
     {
         m_aaData[ t_bIsRow ? 1 : i][ t_bIsRow ? i : 1 ] =
-            ( i < Q ) ? ac_roVector[i] : ac_rFill;
+            std::move( ac_roVector[i] );
     }
 }
 template< typename T, unsigned int N, bool t_bIsRow >
@@ -111,6 +142,7 @@ inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
 template< typename T, unsigned int N, bool t_bIsRow >
 inline T& VectorBase< T, N, t_bIsRow >::At( unsigned int a_uiIndex )
 {
+    assert( a_uiIndex < N );
     return ( t_bIsRow ? m_aaData[1][a_uiIndex] : m_aaData[a_uiIndex][1] );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
@@ -121,6 +153,7 @@ inline T& VectorBase< T, N, t_bIsRow >::operator[]( unsigned int a_uiIndex )
 template< typename T, unsigned int N, bool t_bIsRow >
 inline const T& VectorBase< T, N, t_bIsRow >::At( unsigned int a_uiIndex ) const
 {
+    assert( a_uiIndex < N );
     return ( t_bIsRow ? m_aaData[1][a_uiIndex] : m_aaData[a_uiIndex][1] );
 }
 template< typename T, unsigned int N, bool t_bIsRow >

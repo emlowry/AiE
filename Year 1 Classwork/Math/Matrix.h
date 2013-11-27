@@ -62,15 +62,20 @@ public:
     typedef Matrix< MatrixInverse< T >::Type, N, M > InverseType;
     typedef Matrix< T, N, M > TransposeType;
 
+    // inherit assignment operators
+    using BaseType::operator=;
+
     // virtual destructor needed due to virtual methods
     virtual ~Matrix();
     
     // Constructors that forward to base class constructors
     Matrix();
     Matrix( const Matrix& ac_roMatrix );
-    Matrix( const MatrixBase& ac_roMatrix );
+    Matrix& operator=( const Matrix& ac_roMatrix );
+    Matrix( const BaseType& ac_roMatrix );
     Matrix( Matrix&& a_rroMatrix );
-    Matrix( MatrixBase&& a_rroMatrix );
+    Matrix& operator=( Matrix&& a_rroMatrix );
+    Matrix( BaseType&& a_rroMatrix );
     template< typename U, unsigned int P, unsigned int Q >
     Matrix( const MatrixBase< U, P, Q >& ac_roMatrix,
             const T& ac_rFill = DEFAULT_FILL );
@@ -96,63 +101,16 @@ public:
     template< typename U, typename V >
     Matrix( const V& ac_rIdentityFill, const U& ac_rFill );
 
-    // Scalar multiplication and division
-    template< typename U >
-    Matrix& operator*=( const U& a_rScalar );
-    template< typename U >
-    Matrix< CommonType< T, U >::Type, M, N >
-        operator*( const U& a_rScalar ) const;
-    template< typename U >
-    Matrix& operator/=( const U& a_rScalar );
-    template< typename U >
-    Matrix< CommonType< T, U >::Type, M, N >
-        operator/( const U& a_rScalar ) const;
-
-    // Matrix addition and subtraction
-    template< typename U >
-    Matrix& operator+=( const Matrix< U, M, N >& ac_roMatrix );
-    template< typename U >
-    Matrix< CommonType< T, U >::Type, M, N >
-        operator+( const Matrix< U, M, N >& ac_roMatrix ) const;
-    template< typename U >
-    Matrix& operator-=( const Matrix< U, M, N >& ac_roMatrix );
-    template< typename U >
-    Matrix< CommonType< T, U >::Type, M, N >
-        operator-( const Matrix< U, M, N >& ac_roMatrix ) const;
-
-    // Matrix multiplication
-    template< typename U, unsigned int P >
-    Matrix< CommonType< T, U >::Type, M, P >
-        operator*( const Matrix< U, N, P >& ac_roMatrix ) const;
-    // Matrix "division" = multiplication by inverse
-    // Returns error if parameter is not invertable
-    // Order is (*this) * ( ac_roMatrix.Inverse() ) even if P > N
-    // (P > N means the matrix can only be left-invertable, where
-    //  ac_roMatrix.Inverse() * ac_roMatrix = IDENTITY but
-    //  ac_roMatrix * ac_roMatrix.Inverse() != IDENTITY_MATRIX< T, P >
-    template< typename U, unsigned int P >
-    Matrix< CommonType< T, MatrixInverse< U >::Type >::Type, M, P >
-        operator/( const Matrix< U, P, N >& ac_roMatrix ) const;
-
-    // TODO bitwise operations
-
-    // multiplication by a column vector
-    template< typename U >
-    Vector< CommonType< T, U >, M, false >
-        operator*( const Vector< U, N, false >& ac_roVector ) const;
-    // "division" by a row vector = multiplication by its inverse, if it has one
-    template< typename U >
-    Vector< CommonType< T, MatrixInverse< U >::Type >, M, false >
-        operator/( const Vector< U, N >& ac_roVector ) const;
-
     // Determinant - return 0 if non-square matrix
     T Determinant();
 
     // Inverse
+    // The second two functions are invertable so that derived classes can
+    // redefine them to return the correct type
     bool IsInvertable() const;
     bool Inverse( InverseType& a_roMatrix ) const;  // !invertable = !change
-    InverseType Inverse() const;    // if not invertable, return zero matrix
-    InverseType Inverse( bool& a_rbInvertable ) const;  // as above
+    virtual InverseType Inverse() const;    // if !invertable, return ZERO
+    virtual InverseType Inverse( bool& a_rbInvertable ) const;  // as above
 
     // Get row/column vectors - redefine in child classes to return correct type
     virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const;
@@ -160,6 +118,69 @@ public:
     
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const;
+
+    // Shift elements right/down the given number of spaces, wrapping around the
+    // ends of columns and rows
+    // Example:
+    // Matrix m = { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } };
+    // m.Scroll( 1, 1 );
+    // // m == { { 22, 20, 21 }, { 2, 0, 1 }, { 12, 10, 11 } }
+    // m.Scroll( -1, -1 );
+    // // m == { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } }
+    virtual Scroll( int a_iRight, int a_iDown = 0 );
+
+    //
+    // Scalar math
+    //
+    // Operations are only defined for the matrix data type.
+    // If you have a decimal parameter and you want a decimal result when your
+    // matrix is an integral type, you should explicitly convert.
+    //
+
+    // Scalar multiplication and division
+    Matrix& operator*=( const T& a_rScalar );
+    virtual Matrix operator*( const T& a_rScalar ) const;
+    Matrix& operator/=( const T& a_rScalar );
+    virtual Matrix operator/( const T& a_rScalar ) const;
+
+    // TODO bitwise operations
+
+    //
+    // Matrix math
+    //
+    // Operations are only defined for the matrix data type.
+    // If you have a decimal parameter and you want a decimal result when your
+    // matrix is an integral type, you should explicitly convert.
+    //
+
+    // Matrix multiplication
+    template< unsigned int P >
+    virtual Matrix< T, M, P >
+        operator*( const Matrix< T, N, P >& ac_roMatrix ) const;
+    // Matrix "division" = multiplication by inverse
+    // Returns error if parameter is not invertable
+    // Order is (*this) * ( ac_roMatrix.Inverse() ) even if P > N
+    // (P > N means the matrix can only be left-invertable, where
+    //  ac_roMatrix.Inverse() * ac_roMatrix = IDENTITY but
+    //  ac_roMatrix * ac_roMatrix.Inverse() != IDENTITY_MATRIX< T, P >
+    template< unsigned int P >
+    virtual Matrix< MatrixInverse< T >::Type, M, P >
+        operator/( const Matrix< T, P, N >& ac_roMatrix ) const;
+
+    // multiplication by a column vector produces another column vector
+    virtual Vector< T, M, false >
+        operator*( const Matrix< T, N, 1 >& ac_roVector ) const;
+    // "division" by a row vector = multiplication by its inverse, if it has one
+    virtual Vector< MatrixInverse< T >::Type, M, false >
+        operator/( const Matrix< T, 1, N >& ac_roVector ) const;
+
+    // Matrix addition and subtraction
+    Matrix& operator+=( const Matrix& ac_roMatrix );
+    Matrix operator+( const Matrix& ac_roMatrix ) const;
+    Matrix& operator-=( const Matrix& ac_roMatrix );
+    Matrix operator-( const Matrix& ac_roMatrix ) const;
+
+    // TODO bitwise operations
 
     static const Matrix& ZERO;  // reference to ZERO_MATRIX< T, M, N >
     static const IdentityType& IDENTITY;    // IDENTITY_MATRIX< T, min( M, N ) >

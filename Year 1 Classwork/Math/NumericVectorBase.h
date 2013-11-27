@@ -49,39 +49,68 @@ public:
     typedef Vector< T, N, !t_bIsRow > TransposeType;
     typedef Vector< T, N, t_bIsRow > ChildType;
 
+    // inherit assignment operators
+    using BaseType::operator=;
+
     // virtual destructor needed due to virtual methods
     virtual ~NumericVectorBase();
 
-    // Assign from a different type of vector
+    // Copy assign, move assign, and assign from a different type of vector
+    // These are specified to remove ambiguity between MatrixBase::operator= and
+    // VectorBase::operator=, since both could work - MatrixBase::operator= is
+    // available through inheritance from Matrix, VectorBase::operator= through
+    // inheritance from VectorBase.
+    NumericVectorBase& operator=( const NumericVectorBase& ac_roVector );
+    NumericVectorBase& operator=( NumericVectorBase& a_rroVector );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector& operator=( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
+    NumericVectorBase& operator=( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
 
     // Element access - hides matrix class row-returning implementation
     T& operator[]( unsigned int a_uiIndex );
     const T& operator[]( unsigned int a_uiIndex ) const;
 
-    // non-virtual override for addition and subtraction - vector implementation
-    // doesn't care whether the other vector is a row vector or a column vector,
-    // but matrix addition and subtraction does.
-    template< typename U, t_bOtherIsRow >
-    ChildType& operator+=( const Vector< U, N, t_bOtherIsRow >& ac_roVector );
-    template< typename U, t_bOtherIsRow >
-    Vector< CommonType< T, U >::Type, N, t_bIsRow >
-        operator+( const Vector< U, N, t_bOtherIsRow >& ac_roVector ) const;
-    template< typename U, t_bOtherIsRow >
-    ChildType& operator-=( const Vector< U, N, t_bOtherIsRow >& ac_roVector );
-    template< typename U, t_bOtherIsRow >
-    Vector< CommonType< T, U >::Type, N, t_bIsRow >
-        operator-( const Vector< U, N, t_bOtherIsRow >& ac_roVector ) const;
-
-    // TODO bitwise operators taking other vectors
-
     // Get this vector in row/column form
     virtual ColumnVectorType Column() const;
     virtual RowVectorType Row() const;
 
+    // Inverse - if not invertable, return zero vector
+    virtual InverseType Inverse() const override;
+    virtual InverseType Inverse( bool& a_rbInvertable ) const override;
+
     // Transpose
     virtual TransposeType Transpose() const override;
+
+    // Dot and cross products
+    T Dot( const Vector& ac_roVector ) const;
+    virtual Vector Cross( const Vector& ac_roVector ) const;
+
+    // Normalization
+    MatrixInverse< T >::Type Magnitude() const;
+    void Normalize();
+    virtual Vector< MatrixInverse< T >::Type, N, t_bIsRow > Normal() const;
+
+    //
+    // Vector math
+    //
+    // Non-virtual overrides for arithmatic with another vector - vector
+    // implementation doesn't care whether the other vector is a row vector or a
+    // column vector, as arithmatic with a matrix does.  If this object is being
+    // explicitly treated like a matrix, then a user should expect matrix-style
+    // arithmatic.  If this object is instead being explicitly treated as the
+    // vector it is, then a user should expect vector-style arithmatic.
+    //
+
+    // Addition and subtraction
+    ChildType& operator+=( const Vector& ac_roVector );
+    ChildType& operator+=( const TransposeType& ac_roVector );
+    Vector operator+( const Vector& ac_roVector ) const;
+    Vector operator+( const TransposeType& ac_roVector ) const;
+    ChildType& operator-=( const Vector& ac_roVector );
+    ChildType& operator-=( const TransposeType& ac_roVector );
+    Vector operator-( const Vector& ac_roVector ) const;
+    Vector operator-( const TransposeType& ac_roVector ) const;
+
+    // TODO bitwise operators taking other vectors
 
 private:
 
@@ -95,9 +124,11 @@ private:
     NumericVectorBase( BaseType&& a_rroVector );
     NumericVectorBase( MatrixType&& a_rroMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    NumericVectorBase( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
+    NumericVectorBase( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+                       const T& ac_rFill = DEFAULT_FILL );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    NumericVectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
+    NumericVectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+                       const T& ac_rFill = DEFAULT_FILL);
     template< typename U, unsigned int P, unsigned int Q >
     NumericVectorBase( const MatrixBase< U, P, Q >& ac_roMatrix,
                        const T& ac_rFill = DEFAULT_FILL );
@@ -127,10 +158,12 @@ private:
 
 };
 
+
+
 }   // namespace Math
 
-// The NumericVectorBase type *must* be defined before the Vector type, but
-// the Vector type definition must be defined before the NumericVectorBase
+// The NumericVectorBase type must be defined before the Vector type, but the
+// Vector type definition must be defined before the NumericVectorBase
 // implementations.
 #include "Vector.h"
 

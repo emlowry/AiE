@@ -111,7 +111,6 @@ void expand( int*& a_raiArray, unsigned int& a_ruiCapacity );
 void sort( int* const ac_aiArray, const unsigned int ac_uiSize );
 /**/
 
-
 struct Score
 {
     string name;

@@ -36,14 +36,19 @@ public:
     typedef VectorBase< T, N > RowVectorType;
     typedef VectorBase< T, N, !t_bIsRow > TransposeType;
 
+    // inherit assignment operators
+    using BaseType::operator=;
+
     // virtual destructor needed due to virtual methods
     virtual ~VectorBase();
     
     // Constructors that forward to base class constructors
     VectorBase();
     VectorBase( const VectorBase& ac_roVector );
+    VectorBase& operator=( const VectorBase& ac_roVector );
     VectorBase( const BaseType& ac_roMatrix );
     VectorBase( VectorBase&& a_rroVector );
+    VectorBase& operator=( VectorBase&& a_rroVector );
     VectorBase( BaseType&& a_rroMatrix );
     template< typename U, unsigned int P, unsigned int Q >
     VectorBase( const MatrixBase< U, P, Q >& ac_roMatrix,
@@ -60,7 +65,8 @@ public:
 
     // Construct from another type of vector
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    VectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
+    VectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+                const T& ac_rFill = DEFAULT_FILL );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     VectorBase& operator=( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
 
@@ -84,26 +90,12 @@ protected:
     // used by assignment operator
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     VectorBase& Assign( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    VectorBase& Assign( VectorBase< U, Q, t_bOtherIsRow >&& a_rroVector );
 
     // used by operator[] and other places that need to get an element
     T& At( const unsigned int ac_uiIndex );
     const T& At( const unsigned int ac_uiIndex ) const;
-
-private:
-    
-    // Hide parent class functions that you shouldn't be using unless you are
-    // explicitly treating this object as a matrix, either via casting or via
-    // a pointer or reference of the parent type
-    template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
-    VectorBase& operator=( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ] );
-    T& operator[]( unsigned int a_uiRow, unsigned int a_uiColumn );
-    const T& operator[]( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
-
-    // Non-virtual override - if explicitly treated as a matrix, then matrix
-    // implementation should be available, otherwise no implementation should be
-    // available
-    ColumnVectorType Column( unsigned int ac_uiIndex ) const;
-    RowVectorType Row( unsigned int ac_uiIndex ) const;
 
 };
 

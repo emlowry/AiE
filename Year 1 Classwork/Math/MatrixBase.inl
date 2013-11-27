@@ -13,6 +13,7 @@
 // Separated out to keep individual file size down
 #include "MatrixBaseCopyConstructors.inl"
 #include "MatrixBaseFillConstructors.inl"
+#include <cassert>  // for assert
 
 namespace Math
 {
@@ -59,12 +60,14 @@ inline bool MatrixBase< T, M, N >::
 template< typename T, unsigned int M, unsigned int N >
 inline T (&MatrixBase< T, M, N >::operator[])( unsigned int a_uiRow )[ N ]
 {
+    assert( a_uiRow < M );
     return m_aaData[a_uiRow];
 }
 template< typename T, unsigned int M, unsigned int N >
 inline const
     T (&MatrixBase< T, M, N >::operator[])( unsigned int a_uiRow )[ N ] const
 {
+    assert( a_uiRow < M )
     return m_aaData[a_uiRow];
 }
 
@@ -73,12 +76,14 @@ template< typename T, unsigned int M, unsigned int N >
 inline T& MatrixBase< T, M, N >::
     operator[]( unsigned int a_uiRow, unsigned int a_uiColumn )
 {
+    assert( a_uiRow < M && a_uiColumn < N );
     return m_aaData[a_uiRow][a_uiColumn];
 }
 template< typename T, unsigned int M, unsigned int N >
 inline const T& MatrixBase< T, M, N >::
     operator[]( unsigned int a_uiRow, unsigned int a_uiColumn ) const
 {
+    assert( a_uiRow < M && a_uiColumn < N );
     return m_aaData[a_uiRow][a_uiColumn];
 }
 

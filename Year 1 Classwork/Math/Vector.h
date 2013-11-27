@@ -24,42 +24,7 @@ namespace Math
 
 // Forward declare the actual Vector class
 template< typename T, unsigned int N, bool t_bIsRow = true >
-class Vector : public virtual NumericVectorBase< T, N, t_bIsRow >
-{
-public:
-
-    // simplify typing
-    typedef NumericVectorBase< T, N, t_bIsRow > BaseType;
-    typedef typename BaseType::BaseType VectorBaseType;
-
-    // virtual destructor needed due to virtual methods
-    virtual ~Vector();
-
-    // Constructors that forward to base class constructors
-    Vector();
-    Vector( const Vector& ac_roVector );
-    Vector( const VectorBaseType& ac_roVector );
-    Vector( const MatrixType& ac_roMatrix );
-    Vector( Vector&& a_rroVector );
-    Vector( VectorBaseType&& a_rroVector );
-    Vector( MatrixType&& a_rroMatrix );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
-    template< typename U, unsigned int P, unsigned int Q >
-    Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    Vector( const U& ac_rFill );
-    template< typename U, unsigned int t_uiSize >
-    Vector( const U (&ac_raData)[ t_uiSize ],
-            const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    Vector( const U* const ac_cpData,
-            const unsigned int ac_uiSize,
-            const T& ac_rFill = DEFAULT_FILL );
-};
+class Vector;
 
 // Row vector implementation has specialized multiplication/division operators
 // that return vectors, specifically, when multiplied by a matrix instead of
@@ -73,21 +38,30 @@ public:
     typedef NumericVectorBase< T, N, true > BaseType;
     typedef typename BaseType::BaseType VectorBaseType;
 
+    // inherit assignment operators
+    using BaseType::operator=;
+
     // virtual destructor needed due to virtual methods
     virtual ~Vector();
 
     // Constructors that forward to base class constructors
     Vector();
     Vector( const Vector& ac_roVector );
+    Vector& operator=( const Vector& ac_roVector );
+    Vector( const BaseType& ac_roVector );
     Vector( const VectorBaseType& ac_roVector );
     Vector( const MatrixType& ac_roMatrix );
     Vector( Vector&& a_rroVector );
+    Vector& operator=( Vector&& a_rroVector );
+    Vector( BaseType&& a_rroVector );
     Vector( VectorBaseType&& a_rroVector );
     Vector( MatrixType&& a_rroMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
+    Vector( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DEFAULT_FILL );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
+    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DEFAULT_FILL );
     template< typename U, unsigned int P, unsigned int Q >
     Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
             const T& ac_rFill = DEFAULT_FILL );
@@ -101,14 +75,67 @@ public:
             const unsigned int ac_uiSize,
             const T& ac_rFill = DEFAULT_FILL );
 
-    // Matrix multiplication
-    template< typename U, unsigned int P >
-    Vector< CommonType< T, U >::Type, P, true >
-        operator*( const Matrix< U, N, P >& ac_roMatrix ) const;
+    // Matrix multiplication produces another row vector
+    template< unsigned int P >
+    virtual Vector< T, P >
+        operator*( const Matrix< T, N, P >& ac_roMatrix ) const override;
     // Matrix "division" = multiplication by inverse, if one exists
-    template< typename U, unsigned int P >
-    Vector< CommonType< T, MatrixInverse< U >::Type >::Type, P, true >
-        operator/( const Matrix< U, N, P >& ac_roMatrix ) const;
+    template< unsigned int P >
+    virtual Vector< MatrixInverse< T >::Type, P >
+        operator/( const Matrix< T, P, N >& ac_roMatrix ) const override;
+};
+
+// Column vector
+template< typename T, unsigned int N >
+class Vector< T, N, false > : public virtual NumericVectorBase< T, N, false >
+{
+public:
+
+    // simplify typing
+    typedef NumericVectorBase< T, N, false > BaseType;
+    typedef typename BaseType::BaseType VectorBaseType;
+
+    // Inherit matrix implementation for multiplication by 1xN (N>1) matrices
+    using MatrixType::operator*;
+    using MatrixType::operator/;
+
+    // virtual destructor needed due to virtual methods
+    virtual ~Vector();
+
+    // Constructors that forward to base class constructors
+    Vector();
+    Vector( const Vector& ac_roVector );
+    Vector( const VectorBaseType& ac_roVector );
+    Vector( const MatrixType& ac_roMatrix );
+    Vector( Vector&& a_rroVector );
+    Vector( VectorBaseType&& a_rroVector );
+    Vector( MatrixType&& a_rroMatrix );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    Vector( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DEFAULT_FILL );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DEFAULT_FILL );
+    template< typename U, unsigned int P, unsigned int Q >
+    Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
+            const T& ac_rFill = DEFAULT_FILL );
+    template< typename U >
+    Vector( const U& ac_rFill );
+    template< typename U, unsigned int t_uiSize >
+    Vector( const U (&ac_raData)[ t_uiSize ],
+            const T& ac_rFill = DEFAULT_FILL );
+    template< typename U >
+    Vector( const U* const ac_cpData,
+            const unsigned int ac_uiSize,
+            const T& ac_rFill = DEFAULT_FILL );
+
+    // Matrix multiplication uses matrix implementation unless the multiplier is
+    // a 1x1 matrix, in which case another column matrix is produced.
+    virtual Vector< T, N, false >
+        operator*( const Matrix< T, 1 >& ac_roMatrix ) const override;
+    // Matrix "division" = multiplication by inverse, if one exists
+    virtual Vector< MatrixInverse< T >::Type, N, false >
+        operator/( const Matrix< T, 1 >& ac_roMatrix ) const override;
 };
 
 }   // namespace Math

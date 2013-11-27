@@ -63,7 +63,7 @@ public:
     template< typename U >
     MatrixBase& operator=( const U& ac_rFill );
 
-    // Construct/assign withparameter data one row at a time until end of
+    // Construct/assign with parameter data one row at a time until end of
     // parameter data, then filled with default/previous data
     template< typename U >
     MatrixBase( const U* const ac_cpData,
