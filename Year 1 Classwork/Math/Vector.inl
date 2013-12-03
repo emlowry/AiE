@@ -60,33 +60,34 @@ template< typename T, unsigned int N >
 inline Vector< T, N >::Vector( MatrixType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline Vector< T, N >::
-    Vector( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill )
     : BaseType( ac_roVector, ac_rFill ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline Vector< T, N >::
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill )
     : BaseType( ac_roVector, ac_rFill ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
-inline Vector< T, N >::Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
+template< typename U >
+inline Vector< T, N >::
+    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix )
+    : BaseType( ac_roMatrix ) {}
+template< typename T, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline Vector< T, N >::Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
                                const T& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int N >
-template< typename U >
-inline Vector< T, N >::Vector( const U& ac_rFill ) : BaseType( ac_rFill ) {}
+inline Vector< T, N >::Vector( const T& ac_rFill ) : BaseType( ac_rFill ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int t_uiSize >
-inline Vector< T, N >::Vector( const U (&ac_raData)[ t_uiSize ],
-                               const T& ac_rFill )
-    : BaseType( ac_raData, ac_rFill ) {}
+inline Vector< T, N >::Vector( const T (&ac_raData)[ N ] )
+    : BaseType( ac_raData ) {}
 template< typename T, unsigned int N >
-template< typename U >
-inline Vector< T, N >::Vector( const U* const ac_cpData,
+inline Vector< T, N >::Vector( const T* const ac_cpData,
                                const unsigned int ac_uiSize,
                                const T& ac_rFill )
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}
@@ -98,6 +99,12 @@ template< typename T, unsigned int N >
 inline Vector< T, N, false >::Vector( const Vector& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N >
+inline Vector< T, N, false >& Vector< T, N, false >::
+    operator=( const Vector& ac_roVector )
+{
+    return BaseType::operator=( ac_roVector );
+}
+template< typename T, unsigned int N >
 inline Vector< T, N, false >::Vector( const VectorBaseType& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N >
@@ -107,38 +114,45 @@ template< typename T, unsigned int N >
 inline Vector< T, N, false >::Vector( Vector&& a_rroVector )
     : BaseType( std::forward( a_rroVector ) ) {}
 template< typename T, unsigned int N >
+inline Vector< T, N, false >& Vector< T, N, false >::
+    operator=( Vector&& a_rroVector )
+{
+    return BaseType::operator=( std::forward( a_rroVector ) );
+}
+template< typename T, unsigned int N >
 inline Vector< T, N, false >::Vector( VectorBaseType&& a_rroVector )
     : BaseType( std::forward( a_rroVector ) ) {}
 template< typename T, unsigned int N >
 inline Vector< T, N, false >::Vector( MatrixType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline Vector< T, N, false >::
-    Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector )
+    Vector( const Vector< T, Q, t_bOtherIsRow >& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline Vector< T, N, false >::
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector )
+    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
-inline Vector< T, N, false >::Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
+template< typename U >
+inline Vector< T, N, false >::
+    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix )
+    : BaseType( ac_roMatrix ) {}
+template< typename T, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline Vector< T, N, false >::Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
                                       const T& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int N >
-template< typename U >
-inline Vector< T, N, false >::Vector( const U& ac_rFill )
+inline Vector< T, N, false >::Vector( const T& ac_rFill )
     : BaseType( ac_rFill ) {}
 template< typename T, unsigned int N >
-template< typename U, unsigned int t_uiSize >
-inline Vector< T, N, false >::Vector( const U (&ac_raData)[ t_uiSize ],
-                                      const T& ac_rFill )
-    : BaseType( ac_raData, ac_rFill ) {}
+inline Vector< T, N, false >::Vector( const T (&ac_raData)[ N ] )
+    : BaseType( ac_raData ) {}
 template< typename T, unsigned int N >
-template< typename U >
-inline Vector< T, N, false >::Vector( const U* const ac_cpData,
+inline Vector< T, N, false >::Vector( const T* const ac_cpData,
                                       const unsigned int ac_uiSize,
                                       const T& ac_rFill )
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}

@@ -61,6 +61,8 @@ public:
     typedef Matrix< T, ( M < N ? M : N ) > IdentityType;
     typedef Matrix< MatrixInverse< T >::Type, N, M > InverseType;
     typedef Matrix< T, N, M > TransposeType;
+    typedef MatrixScalarOperation< T > ScalarOperation;
+    typedef MatrixElementOperation< T > ElementOperation;
 
     // inherit assignment operators
     using BaseType::operator=;
@@ -76,30 +78,24 @@ public:
     Matrix( Matrix&& a_rroMatrix );
     Matrix& operator=( Matrix&& a_rroMatrix );
     Matrix( BaseType&& a_rroMatrix );
-    template< typename U, unsigned int P, unsigned int Q >
-    Matrix( const MatrixBase< U, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
-    Matrix( const U& ac_rFill );
-    template< typename U, unsigned int t_uiDataSize >
-    Matrix( const U (&ac_raData)[ t_uiDataSize ],
+    Matrix( const MatrixBase< U, M, N >& ac_roMatrix )
+    template< unsigned int P, unsigned int Q >
+    Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
             const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    Matrix( const U* const ac_cpData,
+    Matrix( const T& ac_rFill );
+    Matrix( const T (&ac_raData)[ M*N ] );
+    Matrix( const T* const ac_cpData,
             const unsigned int ac_uiSize,
             const T& ac_rFill = DEFAULT_FILL );
-    template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
-    Matrix( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ],
-            const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    Matrix( const U* const* const ac_cpcpData,
+    Matrix( const T (&ac_raaData)[ M ][ N ] );
+    Matrix( const T* const* const ac_cpcpData,
             const unsigned int ac_uiRows,
             const unsigned int ac_uiColumns,
             const T& ac_rFill = DEFAULT_FILL );
 
     // Fill with one value along the identity diagonal and another elsewhere
-    template< typename U, typename V >
-    Matrix( const V& ac_rIdentityFill, const U& ac_rFill );
+    Matrix( const T& ac_rIdentityFill, const T& ac_rFill );
 
     // Determinant - return 0 if non-square matrix
     T Determinant();
@@ -119,31 +115,19 @@ public:
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const;
 
-    // Shift elements right/down the given number of spaces, wrapping around the
-    // ends of columns and rows
-    // Example:
-    // Matrix m = { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } };
-    // m.Scroll( 1, 1 );
-    // // m == { { 22, 20, 21 }, { 2, 0, 1 }, { 12, 10, 11 } }
-    // m.Scroll( -1, -1 );
-    // // m == { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } }
-    virtual Scroll( int a_iRight, int a_iDown = 0 );
-
     //
-    // Scalar math
+    // Scalar math - multiplication, division, and modulo
     //
     // Operations are only defined for the matrix data type.
     // If you have a decimal parameter and you want a decimal result when your
     // matrix is an integral type, you should explicitly convert.
     //
-
-    // Scalar multiplication and division
     Matrix& operator*=( const T& a_rScalar );
     virtual Matrix operator*( const T& a_rScalar ) const;
     Matrix& operator/=( const T& a_rScalar );
     virtual Matrix operator/( const T& a_rScalar ) const;
-
-    // TODO bitwise operations
+    Matrix& operator%=( const T& a_rScalar );
+    virtual Matrix operator%( const T& a_rScalar ) const;
 
     //
     // Matrix math
@@ -179,8 +163,6 @@ public:
     Matrix operator+( const Matrix& ac_roMatrix ) const;
     Matrix& operator-=( const Matrix& ac_roMatrix );
     Matrix operator-( const Matrix& ac_roMatrix ) const;
-
-    // TODO bitwise operations
 
     static const Matrix& ZERO;  // reference to ZERO_MATRIX< T, M, N >
     static const IdentityType& IDENTITY;    // IDENTITY_MATRIX< T, min( M, N ) >

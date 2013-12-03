@@ -56,22 +56,20 @@ public:
     Vector( BaseType&& a_rroVector );
     Vector( VectorBaseType&& a_rroVector );
     Vector( MatrixType&& a_rroMatrix );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    template< unsigned int Q, bool t_bOtherIsRow >
+    Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill = DEFAULT_FILL );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL );
-    template< typename U, unsigned int P, unsigned int Q >
-    Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
+    template< unsigned int Q, bool t_bOtherIsRow >
+    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
-    Vector( const U& ac_rFill );
-    template< typename U, unsigned int t_uiSize >
-    Vector( const U (&ac_raData)[ t_uiSize ],
+    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
+    template< unsigned int P, unsigned int Q >
+    Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
             const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    Vector( const U* const ac_cpData,
+    Vector( const T& ac_rFill );
+    Vector( const T (&ac_raData)[ N ] );
+    Vector( const T* const ac_cpData,
             const unsigned int ac_uiSize,
             const T& ac_rFill = DEFAULT_FILL );
 
@@ -105,27 +103,29 @@ public:
     // Constructors that forward to base class constructors
     Vector();
     Vector( const Vector& ac_roVector );
+    Vector& operator=( const Vector& ac_roVector );
+    Vector( const BaseType& ac_roVector );
     Vector( const VectorBaseType& ac_roVector );
     Vector( const MatrixType& ac_roMatrix );
     Vector( Vector&& a_rroVector );
+    Vector& operator=( Vector&& a_rroVector );
+    Vector( BaseType&& a_rroVector );
     Vector( VectorBaseType&& a_rroVector );
     Vector( MatrixType&& a_rroMatrix );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    template< unsigned int Q, bool t_bOtherIsRow >
+    Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill = DEFAULT_FILL );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL );
-    template< typename U, unsigned int P, unsigned int Q >
-    Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
+    template< unsigned int Q, bool t_bOtherIsRow >
+    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
-    Vector( const U& ac_rFill );
-    template< typename U, unsigned int t_uiSize >
-    Vector( const U (&ac_raData)[ t_uiSize ],
+    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
+    template< unsigned int P, unsigned int Q >
+    Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
             const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    Vector( const U* const ac_cpData,
+    Vector( const T& ac_rFill );
+    Vector( const T (&ac_raData)[ N ] );
+    Vector( const T* const ac_cpData,
             const unsigned int ac_uiSize,
             const T& ac_rFill = DEFAULT_FILL );
 

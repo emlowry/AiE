@@ -19,45 +19,34 @@ namespace Math
 
 // Construct with all elements set to the given value
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline MatrixBase< T, M, N >::MatrixBase( const U& ac_rFill )
+inline MatrixBase< T, M, N >::MatrixBase( const T& ac_rFill )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < M*N; ++i )
     {
-        m_aaData[i/N][i%N]( (T)( ac_rFill ) );
+        m_aaData[i/N][i%N]( ac_rFill );
     }
 }
 
 // Assign all elements to the given value
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::Assign( const U& ac_rFill )
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::Assign( const T& ac_rFill )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < M*N; ++i )
     {
-        m_aaData[i/N][i%N] = (T)( ac_rFill );
+        m_aaData[i/N][i%N] = ac_rFill;
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const U& ac_rFill )
+    operator=( const T& ac_rFill )
 {
     Assign( ac_rFill );
 }
@@ -65,43 +54,31 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
 // Construct with parameter data one row at a time until end of parameter data,
 // then filled with given fill value
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline MatrixBase< T, M, N >::MatrixBase( const U* const ac_cpData,
+inline MatrixBase< T, M, N >::MatrixBase( const T* const ac_cpData,
                                           const unsigned int ac_uiSize,
                                           const T& ac_rFill )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < M*N; ++i )
     {
-        m_aaData[i/N][i%N]( ( i < ac_uiSize ) ? (T)(ac_cpData[i]) : ac_rFill );
+        m_aaData[i/N][i%N]( ( i < ac_uiSize ) ? ac_cpData[i] : ac_rFill );
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiSize >
-inline MatrixBase< T, M, N >::MatrixBase( const U (&ac_raData)[ t_uiSize ],
-                                          const T& ac_rFill)
-    : MatrixBase( ac_roData, t_uiSize, ac_rFill ) {}
+inline MatrixBase< T, M, N >::MatrixBase( const T (&ac_raData)[ M*N ] )
+    : MatrixBase( ac_roData, M*N, DEFAULT_FILL ) {}
 
 // Assign parameter data one row at a time until end of parameter data
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiSize >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const U (&ac_raData)[ t_uiSize ] )
+    Assign( const T (&ac_raData)[ M*N ] )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < M*N && i < t_uiSize; ++i )
     {
@@ -109,73 +86,139 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiSize >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const U (&ac_raData)[ t_uiSize ] )
+    operator=( const T (&ac_raData)[ M*N ] )
 {
     Assign( ac_raData );
 }
 
 // Construct with parameter data where given and fill data elsewhere
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline MatrixBase< T, M, N >::MatrixBase( const U* const* const ac_cpcpData,
-                                          const unsigned int ac_uiRows = M,
-                                          const unsigned int ac_uiColumns = N,
+inline MatrixBase< T, M, N >::MatrixBase( const T* const* const ac_cpcpData,
+                                          const unsigned int ac_uiRows,
+                                          const unsigned int ac_uiColumns,
                                           const T& ac_rFill )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < M; ++i )
     {
         for( unsigned int j = 0; j < N; ++j )
         {
             m_aaData[i][j]( ( i < ac_uiRows && j < ac_uiColumns )
-                            ? (T)(ac_cpcpData[i][j]) : ac_rFill );
+                            ? ac_cpcpData[i][j] : ac_rFill );
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
 inline MatrixBase< T, M, N >::
-    MatrixBase( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ],
-                const T& ac_rFill )
-    : MatrixBase( ac_raaData, t_uiRows, t_uiColumns, ac_rFill ) {}
+    MatrixBase( const T (&ac_raaData)[ M ][ N ] )
+    : MatrixBase( ac_raaData, M, N, DEFAULT_FILL ) {}
 
 // Assign parameter data where given
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ] )
+    Assign( const T (&ac_raaData)[ M ][ N ] )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
+    } /**/
+    for( unsigned int i = 0; i < M; ++i )
     {
-        throw exception("Non-convertable input type");
+        for( unsigned int j = 0; j < N; ++j )
+        {
+            m_aaData[i][j] = ac_raaData[i][j];
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    operator=( const T (&ac_raaData)[ M ][ N ] )
+{
+    Assign( ac_raaData );
+}
+
+// Construct/assign from a set of columns
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >::
+    MatrixBase( const ColumnVectorType (&ac_raColumns)[ N ] )
+{/*
+    if( !std::is_copy_constructable< T >::value )
+    {
+        throw exception("Non-copy-constructable type");
     } /**/
     for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
     {
         for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
         {
-            m_aaData[i][j] = (T)(ac_raaData[i][j]);
+            m_aaData[i][j]( ac_raColumns[j][i] );
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ] )
+    Assign( const ColumnVectorType (&ac_raColumns)[ N ] )
+{/*
+    if( !std::is_copy_assignable< T >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    } /**/
+    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    {
+        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        {
+            m_aaData[i][j] = ac_raColumns[j][i];
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    operator=( const ColumnVectorType (&ac_raColumns)[ N ] )
 {
-    Assign( ac_raaData );
+    return Assign( ac_raRows );
+}
+
+// Construct/assign from a set of rows
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >::
+    MatrixBase( const RowVectorType (&ac_raRows)[ M ] )
+{/*
+    if( !std::is_copy_constructable< T >::value )
+    {
+        throw exception("Non-copy-constructable type");
+    } /**/
+    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    {
+        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        {
+            m_aaData[i][j]( ac_raRows[i][j] );
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    Assign( const RowVectorType (&ac_raRows)[ M ] )
+{/*
+    if( !std::is_copy_assignable< T >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    } /**/
+    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    {
+        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        {
+            m_aaData[i][j] = ac_raRows[i][j];
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    operator=( const RowVectorType (&ac_raRows)[ M ] )
+{
+    return Assign( ac_raRows );
 }
 
 }   // namespace Math

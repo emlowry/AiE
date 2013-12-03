@@ -11,6 +11,7 @@
 #ifndef _NUMERIC_VECTOR_BASE_INL_
 #define _NUMERIC_VECTOR_BASE_INL_
 
+#include <cmath>    // for std::sqrt
 // #include <type_traits>  // for std::is_whateverable checks
 #include <utility>  // for std::forward and std::move
 
@@ -50,37 +51,38 @@ inline NumericVectorBase< T, N, t_bIsRow >::
     NumericVectorBase( MatrixType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline NumericVectorBase< T, N, t_bIsRow >::
-    NumericVectorBase( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    NumericVectorBase( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
                        const T& ac_rFill )
     : BaseType( ac_roVector, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline NumericVectorBase< T, N, t_bIsRow >::
-    NumericVectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    NumericVectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
                        const T& ac_rFill )
     : BaseType( ac_roVector, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int P, unsigned int Q >
+template< typename U >
 inline NumericVectorBase< T, N, t_bIsRow >::
-    NumericVectorBase( const MatrixBase< U, P, Q >& ac_roMatrix,
+    NumericVectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix )
+    : BaseType( ac_roMatrix );
+template< typename T, unsigned int N, bool t_bIsRow >
+template< unsigned int P, unsigned int Q >
+inline NumericVectorBase< T, N, t_bIsRow >::
+    NumericVectorBase( const MatrixBase< T, P, Q >& ac_roMatrix,
                        const T& ac_rFill = DEFAULT_FILL )
     : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U >
 inline NumericVectorBase< T, N, t_bIsRow >::
-    NumericVectorBase( const U& ac_rFill ) : BaseType( ac_rFill ) {}
+    NumericVectorBase( const T& ac_rFill ) : BaseType( ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int t_uiSize >
 inline NumericVectorBase< T, N, t_bIsRow >::
-    NumericVectorBase( const U (&ac_raData)[ t_uiSize ],
-                       const T& ac_rFill = DEFAULT_FILL )
-    : BaseType( ac_raData, ac_rFill ) {}
+    NumericVectorBase( const T (&ac_raData)[ N ] )
+    : BaseType( ac_raData ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U >
 inline NumericVectorBase< T, N, t_bIsRow >::
-    NumericVectorBase( const U* const ac_cpData,
+    NumericVectorBase( const T* const ac_cpData,
                        const unsigned int ac_uiSize,
                        const T& ac_rFill = DEFAULT_FILL )
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}
@@ -100,15 +102,15 @@ inline NumericVectorBase< T, N, t_bIsRow >&
 template< typename T, unsigned int N, bool t_bIsRow >
 inline NumericVectorBase< T, N, t_bIsRow >&
     NumericVectorBase< T, N, t_bIsRow >::
-    operator=( NumericVectorBase& a_rroVector )
+    operator=( NumericVectorBase&& a_rroVector )
 {
     return BaseType::operator=( ac_roVector );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline NumericVectorBase< T, N, t_bIsRow >&
     NumericVectorBase< T, N, t_bIsRow >::
-    operator=( const NumericVectorBase< U, Q, t_bOtherIsRow >& ac_roVector )
+    operator=( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
 {
     return BaseType::operator=( ac_roVector );
 }
@@ -176,6 +178,13 @@ inline NumericVectorBase< T, N, t_bIsRow >::TransposeType
 
 // Dot and cross products
 template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+    NumericVectorBase< T, N, t_bIsRow >::
+    Cross( const Vector& ac_roVector ) const
+{
+    // TODO
+}
+template< typename T, unsigned int N, bool t_bIsRow >
 inline T NumericVectorBase< T, N, t_bIsRow >::
     Dot( const Vector& ac_roVector ) const
 {
@@ -186,29 +195,117 @@ inline T NumericVectorBase< T, N, t_bIsRow >::
     }
     return T;
 }
-template< typename T, unsigned int N, bool t_bIsRow >
-inline Vector NumericVectorBase< T, N, t_bIsRow >::
-    Cross( const Vector& ac_roVector ) const
-{
-}
 
 // Normalization
 template< typename T, unsigned int N, bool t_bIsRow >
 inline MatrixInverse< T >::Type
     NumericVectorBase< T, N, t_bIsRow >::Magnitude() const
 {
+    return std::sqrt( MagnitudeSquared() );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline T
+    NumericVectorBase< T, N, t_bIsRow >::MagnitudeSquared() const
+{
+    T result = 0;
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        result += At(i) * At(i);
+    }
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline void NumericVectorBase< T, N, t_bIsRow >::Normalize()
 {
+    MatrixInverse< T >::Type magnitude = Magnitude();
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At(i) /= magnitude;
+    }
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-inline Vector< MatrixInverse< T >::Type, N, t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::NormalType
     NumericVectorBase< T, N, t_bIsRow >::Normal() const
 {
+    NormalType oNormal(*this);
+    oNormal.Normalize();
+    return oNormal;
 }
 
-// TODO
+// Addition
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType&
+    NumericVectorBase< T, N, t_bIsRow >::operator+=( const Vector& ac_roVector )
+{
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At(i) += ac_roVector[i];
+    }
+    return *this;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType&
+    NumericVectorBase< T, N, t_bIsRow >::operator+=( const TransverseType& ac_roVector )
+{
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At(i) += ac_roVector[i];
+    }
+    return *this;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+    NumericVectorBase< T, N, t_bIsRow >::operator+( const Vector& ac_roVector ) const
+{
+    ChildType oCopy(*this);
+    oCopy += ac_roVector;
+    return oCopy;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+    NumericVectorBase< T, N, t_bIsRow >::operator+( const TransverseType& ac_roVector ) const
+{
+    ChildType oCopy(*this);
+    oCopy += ac_roVector;
+    return oCopy;
+}
+
+// Subtraction
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType&
+    NumericVectorBase< T, N, t_bIsRow >::operator-=( const Vector& ac_roVector )
+{
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At(i) -= ac_roVector[i];
+    }
+    return *this;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType&
+    NumericVectorBase< T, N, t_bIsRow >::operator-=( const TransverseType& ac_roVector )
+{
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At(i) -= ac_roVector[i];
+    }
+    return *this;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+    NumericVectorBase< T, N, t_bIsRow >::operator-( const Vector& ac_roVector ) const
+{
+    ChildType oCopy(*this);
+    oCopy -= ac_roVector;
+    return oCopy;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+    NumericVectorBase< T, N, t_bIsRow >::operator-( const TransverseType& ac_roVector ) const
+{
+    ChildType oCopy(*this);
+    oCopy -= ac_roVector;
+    return oCopy;
+}
 
 }   // namespace Math
 

@@ -31,7 +31,7 @@ class VectorBase : public virtual MatrixBase< T,
 public:
 
     // Simplify typing
-    typedef Matrix< T, ( t_bIsRow ? 1 : N ), ( t_bIsRow ? N : 1 ) > BaseType;
+    typedef Matrix< T, ROWS, COLUMNS > BaseType;
     typedef VectorBase< T, M, false > ColumnVectorType;
     typedef VectorBase< T, N > RowVectorType;
     typedef VectorBase< T, N, !t_bIsRow > TransposeType;
@@ -50,25 +50,23 @@ public:
     VectorBase( VectorBase&& a_rroVector );
     VectorBase& operator=( VectorBase&& a_rroVector );
     VectorBase( BaseType&& a_rroMatrix );
-    template< typename U, unsigned int P, unsigned int Q >
-    VectorBase( const MatrixBase< U, P, Q >& ac_roMatrix,
-                const T& ac_rFill = DEFAULT_FILL );
     template< typename U >
-    VectorBase( const U& ac_rFill );
-    template< typename U, unsigned int t_uiSize >
-    VectorBase( const U (&ac_raData)[ t_uiSize ],
+    VectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
+    template< unsigned int P, unsigned int Q >
+    VectorBase( const MatrixBase< T, P, Q >& ac_roMatrix,
                 const T& ac_rFill = DEFAULT_FILL );
-    template< typename U >
-    VectorBase( const U* const ac_cpData,
+    VectorBase( const T& ac_rFill );
+    VectorBase( const T (&ac_raData)[ N ] );
+    VectorBase( const T* const ac_cpData,
                 const unsigned int ac_uiSize,
                 const T& ac_rFill = DEFAULT_FILL );
 
     // Construct from another type of vector
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    VectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    template< unsigned int Q, bool t_bOtherIsRow >
+    VectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
                 const T& ac_rFill = DEFAULT_FILL );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    VectorBase& operator=( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
+    template< unsigned int Q, bool t_bOtherIsRow >
+    VectorBase& operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector );
 
     // Element access - hides parent class row-returning implementation
     T& operator[]( unsigned int a_uiIndex );
@@ -82,20 +80,32 @@ public:
     // Transpose - override in child classes to return correct type
     virtual TransposeType Transpose() const override;
 
+    // Shift elements by the given number of places
+    void Shift( int a_iPlaces );
+
     static const unsigned int IS_ROW_VECTOR = t_bIsRow;
     static const unsigned int SIZE = N;
 
 protected:
 
     // used by assignment operator
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    VectorBase& Assign( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    VectorBase& Assign( VectorBase< U, Q, t_bOtherIsRow >&& a_rroVector );
+    template< unsigned int Q, bool t_bOtherIsRow >
+    VectorBase& Assign( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector );
+    template< unsigned int Q, bool t_bOtherIsRow >
+    VectorBase& Assign( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector );
 
     // used by operator[] and other places that need to get an element
     T& At( const unsigned int ac_uiIndex );
     const T& At( const unsigned int ac_uiIndex ) const;
+
+private:
+
+    // Hide parent class functions that you shouldn't be using unless you are
+    // explicitly treating this object as a matrix, either via casting or via
+    // a pointer or reference of the parent type
+    MatrixType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
+    MatrixType& operator=( const typename MatrixType::ColumnVectorType (&ac_raaData)[ COLUMNS ] );
+    MatrixType& operator=( const typename MatrixType::RowVectorType (&ac_raaData)[ ROWS ] );
 
 };
 

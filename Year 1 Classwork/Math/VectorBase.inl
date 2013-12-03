@@ -10,6 +10,7 @@
 #ifndef _VECTOR_BASE_INL_
 #define _VECTOR_BASE_INL_
 
+#include "Functions.h"
 // #include <type_traits>  // for std::is_whateverable checks
 #include <cassert>  // for assert
 #include <utility>  // for std::forward and std::move
@@ -49,40 +50,38 @@ inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     return Assign( std::forward( a_rroVector ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int P, unsigned int Q >
+template< typename U >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase( const MatrixBase< U, P, Q >& ac_roMatrix, const T& ac_rFill )
+    VectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix )
+    : BaseType( ac_roMatrix ) {}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< unsigned int P, unsigned int Q >
+inline VectorBase< T, N, t_bIsRow >::
+    VectorBase( const MatrixBase< T, P, Q >& ac_roMatrix, const T& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U >
-inline VectorBase< T, N, t_bIsRow >::VectorBase( const U& ac_rFill )
+inline VectorBase< T, N, t_bIsRow >::VectorBase( const T& ac_rFill )
     : BaseType( ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U >
-inline VectorBase< T, N, t_bIsRow >::VectorBase(const U* const ac_cpData,
+inline VectorBase< T, N, t_bIsRow >::VectorBase(const T* const ac_cpData,
                                                 const unsigned int ac_uiSize,
                                                 const T& ac_rFill )
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int t_uiSize >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase(const U (&ac_raData)[ t_uiSize ], const U& ac_rFill )
+    VectorBase(const T (&ac_raData)[ N ], const U& ac_rFill )
     : BaseType( ac_raData, ac_rFill ) {}
 
 // Copy construct from a different kind of vector
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+    VectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
                 const T& ac_rFill )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < N; ++i )
     {
@@ -94,17 +93,13 @@ inline VectorBase< T, N, t_bIsRow >::
 
 // Copy assign from a different type of vector
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    Assign( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector )
+    Assign( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < N && i < Q; ++i )
     {
@@ -112,17 +107,13 @@ inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     }
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    Assign( VectorBase< U, Q, t_bOtherIsRow >&& a_rroVector )
+    Assign( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector )
 {/*
     if( !std::is_move_assignable< T >::value )
     {
         throw exception("Non-move-assignable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < N && i < Q; ++i )
     {
@@ -131,9 +122,9 @@ inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     }
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    operator=( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector )
+    operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
 {
     Assign( ac_roVector );
 }
@@ -183,6 +174,17 @@ inline VectorBase< T, N, t_bIsRow >::TransposeType
     VectorBase< T, N, t_bIsRow >::Transpose() const
 {
     return TransposeType( *this );
+}
+
+// Shift elements by the given number of places
+template< typename T, unsigned int N, bool t_bIsRow >
+inline void VectorBase< T, N, t_bIsRow >::Shift( int a_iPlaces )
+{
+    VectorBase oCopy(*this);
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At( Scroll<int>( i + a_iPlaces, N ) ) = oCopy[i];
+    }
 }
 
 }   // namespace Math

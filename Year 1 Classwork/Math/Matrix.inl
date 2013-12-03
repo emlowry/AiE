@@ -61,32 +61,30 @@ template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( BaseType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
-inline Matrix< T, M, N >::Matrix( const MatrixBase< U, P, Q >& ac_roMatrix,
+template< typename U >
+inline Matrix< T, M, N >::Matrix( const MatrixBase< U, M, N >& ac_roMatrix )
+    : BaseType( ac_roMatrix ) {}
+template< typename T, unsigned int M, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline Matrix< T, M, N >::Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
                                   const T& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline Matrix< T, M, N >::Matrix( const U& ac_rFill ) : BaseType( ac_rFill ) {}
+inline Matrix< T, M, N >::Matrix( const T& ac_rFill ) : BaseType( ac_rFill ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiDataSize >
-inline Matrix< T, M, N >::Matrix( const U (&ac_raData)[ t_uiDataSize ],
-                                  const T& ac_rFill )
-    : BaseType( ac_raData, ac_rFill ) {}
+inline Matrix< T, M, N >::Matrix( const T (&ac_raData)[ M*N ] )
+    : BaseType( ac_raData ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline Matrix< T, M, N >::Matrix( const U* const ac_cpData,
+inline Matrix< T, M, N >::Matrix( const T* const ac_cpData,
                                   const unsigned int ac_uiSize,
                                   const T& ac_rFill )
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int t_uiRows, unsigned int t_uiColumns >
 inline Matrix< T, M, N >::
-    Matrix( const U (&ac_raaData)[ t_uiRows ][ t_uiColumns ], const T& ac_rFill)
-    : BaseType( ac_raaData, ac_rFill ) {}
+    Matrix( const T (&ac_raaData)[ M ][ N ] )
+    : BaseType( ac_raaDataS ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline Matrix< T, M, N >::Matrix( const U* const* const ac_cpcpData,
+inline Matrix< T, M, N >::Matrix( const T* const* const ac_cpcpData,
                                   const unsigned int ac_uiRows,
                                   const unsigned int ac_uiColumns,
                                   const T& ac_rFill)
@@ -95,20 +93,11 @@ inline Matrix< T, M, N >::Matrix( const U* const* const ac_cpcpData,
 // Construct with diagonal elements set to the second given value and all others
 // set to the first
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, typename V >
-inline Matrix< T, M, N >::Matrix( const U& ac_rFill, const V& ac_rIdentityFill )
+inline Matrix< T, M, N >::Matrix( const T& ac_rFill, const T& ac_rIdentityFill )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
-    }
-    if( !std::is_convertible< U, T >:: value )
-    {
-        throw exception("Non-convertable input type");
-    }
-    if( !std::is_convertible< V, T >:: value )
-    {
-        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < M; ++i )
     {

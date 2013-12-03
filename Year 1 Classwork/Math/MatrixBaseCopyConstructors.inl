@@ -90,9 +90,9 @@ inline MatrixBase< T, M, N >&
 
 // Copy construct from a different type of matrix
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
+template< typename U >
 inline MatrixBase< T, M, N >::
-    MatrixBase( const MatrixBase< U, P, Q >& ac_roMatrix, const T& ac_rFill )
+    MatrixBase( const MatrixBase< U, M, N >& ac_roMatrix )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
@@ -106,17 +106,33 @@ inline MatrixBase< T, M, N >::
     {
         for( unsigned int j = 0; j < N; ++j )
         {
-             m_aaData[i][j]( ( i < P && j < Q )
-                             ? (T)( ac_roMatrix[i][j] ) : ac_rFill );
+             m_aaData[i][j]( (T)( ac_roMatrix[i][j] ) );
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline MatrixBase< T, M, N >::
+    MatrixBase( const MatrixBase< T, P, Q >& ac_roMatrix, const T& ac_rFill )
+{/*
+    if( !std::is_copy_constructable< T >::value )
+    {
+        throw exception("Non-copy-constructable type");
+    } /**/
+    for( unsigned int i = 0; i < M; ++i )
+    {
+        for( unsigned int j = 0; j < N; ++j )
+        {
+             m_aaData[i][j]( ( i < P && j < Q ) ? ac_roMatrix[i][j] : ac_rFill );
         }
     }
 }
 
 // Copy assign from a different type of matrix
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
+template< typename U >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const MatrixBase< U, P, Q >& ac_roMatrix )
+    Assign( const MatrixBase< U, M, N >& ac_roMatrix )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
@@ -126,18 +142,42 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     {
         throw exception("Non-convertable input type");
     } /**/
-    for( unsigned int i = 0; i < M && i < P; ++i )
+    for( unsigned int i = 0; i < M; ++i )
     {
-        for( unsigned int j = 0; j < N && j < Q; ++j )
+        for( unsigned int j = 0; j < N; ++j )
         {
             m_aaData[i][j] = (T)( ac_roMatrix[i][j] );
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U, unsigned int P, unsigned int Q >
+template< typename U >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const MatrixBase< U, P, Q >& ac_roMatrix )
+    operator=( const MatrixBase< U, M, N >& ac_roMatrix )
+{
+    Assign( ac_roMatrix );
+}
+template< typename T, unsigned int M, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    Assign( const MatrixBase< T, P, Q >& ac_roMatrix )
+{/*
+    if( !std::is_copy_assignable< T >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    } /**/
+    for( unsigned int i = 0; i < M && i < P; ++i )
+    {
+        for( unsigned int j = 0; j < N && j < Q; ++j )
+        {
+            m_aaData[i][j] =  ac_roMatrix[i][j];
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    operator=( const MatrixBase< T, P, Q >& ac_roMatrix )
 {
     Assign( ac_roMatrix );
 }

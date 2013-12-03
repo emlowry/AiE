@@ -13,6 +13,8 @@
 // Separated out to keep individual file size down
 #include "MatrixBaseCopyConstructors.inl"
 #include "MatrixBaseFillConstructors.inl"
+
+#include "Functions.h"
 #include <cassert>  // for assert
 
 namespace Math
@@ -117,6 +119,25 @@ inline MatrixBase< T, M, N >::TransposeType
         oTranspose[i%N][i/N] = m_aaData[i/N][i%N];
     }
     return oTranspose;
+}
+
+// Shift elements right/down the given number of spaces, wrapping around the
+// ends of columns and rows
+// Example:
+// Matrix m = { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } };
+// m.Shift( 1, 1 );
+// // m == { { 22, 20, 21 }, { 2, 0, 1 }, { 12, 10, 11 } }
+// m.Shift( -1, -1 );
+// // m == { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } }
+template< typename T, unsigned int M, unsigned int N >
+inline void MatrixBase< T, M, N >::Shift( int a_iRight, int a_iDown )
+{
+    MatrixBase oCopy(*this);
+    for( unsigned int i = 0; i < M*N; ++i )
+    {
+        m_aaData[ Scroll<int>( a_iDown + i/N, M ) ]
+                [ Scroll<int>( a_iRight + i, N ) ] = oCopy[i/N][i%N];
+    }
 }
 
 }   // namespace Math
