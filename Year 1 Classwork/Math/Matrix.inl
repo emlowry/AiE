@@ -58,7 +58,7 @@ T Matrix< T, M, N >::Determinant() const
     T determinant = 0;
     for( unsigned int i = 0; i < N; i++ )
     {
-        determinant += ( (2*(i%2)) - 1 ) * Minor( 0, i ).Determinant();
+        determinant += Minor( 0, i ) * ( (i%2) == 1 ? -1 : 1 );
     }
     return determinant;
 }
@@ -170,8 +170,8 @@ bool Matrix< T, M, N >::
     }
     for( unsigned int i = 0; i < M*N; ++i )
     {
-        a_roMatrix[i%N][i/N] = Minor( i/N, i%N ).Determinant();
-        a_roMatrix[i%N][i/N] *= ( 2 * ( ( (i/N) + (i%N) ) % 2 ) ) - 1;
+        a_roMatrix[i%N][i/N] = Minor( i/N, i%N );
+        a_roMatrix[i%N][i/N] *= ( ( ( (i/N) + (i%N) ) % 2 ) == 1 ) ? -1 : 1;
     }
     a_roMatrix /= determinant;
     return true;

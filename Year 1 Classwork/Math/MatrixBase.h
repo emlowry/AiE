@@ -50,7 +50,7 @@ public:
     MatrixBase( MatrixBase&& a_rroMatrix );
     MatrixBase& operator=( MatrixBase&& a_rroMatrix );
 
-    // Construct/assign from a differently-sized matrix
+    // Construct/assign from a differently-sized/typed matrix
     template< typename U >
     MatrixBase( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >

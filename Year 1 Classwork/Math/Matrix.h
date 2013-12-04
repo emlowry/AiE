@@ -23,24 +23,16 @@
 namespace Math
 {
 
-// Used to determine type of matrix arithmetic operations
-template< typename T, typename U = T >
-struct CommonType
-{
-    // typedef std::common_type< T, U >:: type Type
-    typedef decltype( T() + U() ) Type;
-};
-template< typename T >
-struct CommonType< T >
-{
-    typedef T Type;
-};
-
 // Used to determine type of matrix inversion operations
 template< typename T >
 struct MatrixInverse
 {
-    typedef T Type;
+    typedef double Type;
+};
+template<>
+struct MatrixInverse< long double >
+{
+    typedef long double Type;
 };
 
 // Forward declare vector type, include vector definition *after* matrix
@@ -169,7 +161,8 @@ public:
     //
     // Operations are only defined for the matrix data type.
     // If you have a decimal parameter and you want a decimal result when your
-    // matrix is an integral type, you should explicitly convert.
+    // matrix is an integral type, you should explicitly convert your matrix to
+    // a decimal matrix.
     //
     // Non-assign operators are virtual so that child classes can override to
     // return the correct type.

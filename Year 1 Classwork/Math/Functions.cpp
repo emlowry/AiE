@@ -15,6 +15,7 @@ namespace Math
 
 // radian-related constants
 const long double PI = std::acos( (long double)(-1) );
-const long double RADIANS_IN_A_CIRCLE = 2*PI;
+const long double RADIANS_IN_A_CIRCLE = 2 * PI;
+const long double DEGREES_IN_A_RADIAN = 180L / PI;
 
 }
