@@ -187,6 +187,18 @@ inline void VectorBase< T, N, t_bIsRow >::Shift( int a_iPlaces )
     }
 }
 
+// Get a smaller vector by removing an element
+template< typename T, unsigned int N, bool t_bIsRow >
+inline VectorBase< T, N-1, t_bIsRow > VectorBase< T, N, t_bIsRow >::
+    MinusElement( unsigned int a_uiIndex ) const
+{
+    Vector oCopy(*this);
+    oCopy.Shift( -1 - a_uiIndex );
+    Vector< T, N-1, t_bIsRow > oResult( oCopy );
+    oResult.Shift( a_uiIndex );
+    return oResult;
+}
+
 }   // namespace Math
 
 #endif _VECTOR_BASE_INL_

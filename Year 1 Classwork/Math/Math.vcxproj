@@ -73,6 +73,8 @@
     <None Include="MatrixBase.inl" />
     <None Include="MatrixBaseCopyConstructors.inl" />
     <None Include="MatrixBaseFillConstructors.inl" />
+    <None Include="MatrixConstructors.inl" />
+    <None Include="MatrixOperators.inl" />
     <None Include="NumericVectorBase.inl" />
     <None Include="ReadMe.txt" />
     <None Include="Vector.inl" />

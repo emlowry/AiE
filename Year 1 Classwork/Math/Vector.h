@@ -36,6 +36,8 @@ public:
 
     // simplify typing
     typedef NumericVectorBase< T, N, true > BaseType;
+    typedef typename BaseType::MatrixType MatrixType;
+    typedef typename BaseType::RootType RootType;
     typedef typename BaseType::BaseType VectorBaseType;
 
     // inherit assignment operators
@@ -50,12 +52,12 @@ public:
     Vector& operator=( const Vector& ac_roVector );
     Vector( const BaseType& ac_roVector );
     Vector( const VectorBaseType& ac_roVector );
-    Vector( const MatrixType& ac_roMatrix );
+    Vector( const RootType& ac_roMatrix );
     Vector( Vector&& a_rroVector );
     Vector& operator=( Vector&& a_rroVector );
     Vector( BaseType&& a_rroVector );
     Vector( VectorBaseType&& a_rroVector );
-    Vector( MatrixType&& a_rroMatrix );
+    Vector( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill = DEFAULT_FILL );
@@ -73,14 +75,19 @@ public:
             const unsigned int ac_uiSize,
             const T& ac_rFill = DEFAULT_FILL );
 
+    // Inherit matrix implementation for multiplication by scalars
+    using MatrixType::operator*;
+    using MatrixType::operator/;
+
     // Matrix multiplication produces another row vector
     template< unsigned int P >
     virtual Vector< T, P >
         operator*( const Matrix< T, N, P >& ac_roMatrix ) const override;
     // Matrix "division" = multiplication by inverse, if one exists
     template< unsigned int P >
-    virtual Vector< MatrixInverse< T >::Type, P >
+    virtual Vector< typename MatrixInverse< T >::Type, P >
         operator/( const Matrix< T, P, N >& ac_roMatrix ) const override;
+
 };
 
 // Column vector
@@ -91,11 +98,11 @@ public:
 
     // simplify typing
     typedef NumericVectorBase< T, N, false > BaseType;
+    typedef typename BaseType::RootType RootType;
     typedef typename BaseType::BaseType VectorBaseType;
 
-    // Inherit matrix implementation for multiplication by 1xN (N>1) matrices
-    using MatrixType::operator*;
-    using MatrixType::operator/;
+    // inherit assignment operators
+    using BaseType::operator=;
 
     // virtual destructor needed due to virtual methods
     virtual ~Vector();
@@ -106,12 +113,12 @@ public:
     Vector& operator=( const Vector& ac_roVector );
     Vector( const BaseType& ac_roVector );
     Vector( const VectorBaseType& ac_roVector );
-    Vector( const MatrixType& ac_roMatrix );
+    Vector( const RootType& ac_roMatrix );
     Vector( Vector&& a_rroVector );
     Vector& operator=( Vector&& a_rroVector );
     Vector( BaseType&& a_rroVector );
     Vector( VectorBaseType&& a_rroVector );
-    Vector( MatrixType&& a_rroMatrix );
+    Vector( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
             const T& ac_rFill = DEFAULT_FILL );
@@ -129,14 +136,12 @@ public:
             const unsigned int ac_uiSize,
             const T& ac_rFill = DEFAULT_FILL );
 
-    // Matrix multiplication uses matrix implementation unless the multiplier is
-    // a 1x1 matrix, in which case another column matrix is produced.
-    virtual Vector< T, N, false >
-        operator*( const Matrix< T, 1 >& ac_roMatrix ) const override;
-    // Matrix "division" = multiplication by inverse, if one exists
-    virtual Vector< MatrixInverse< T >::Type, N, false >
-        operator/( const Matrix< T, 1 >& ac_roMatrix ) const override;
 };
+
+// Simplify Crossing a pair of 3x3 vectors
+template< typename T, bool t_IsRow, bool t_IsOtherRow >
+Vector< T, 3, t_IsRow > Cross( const Vector< T, 3, t_IsRow >& ac_roVector,
+                               const Vector< T, 3, t_IsOtherRow >& ac_roOtherVector );
 
 }   // namespace Math
 

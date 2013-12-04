@@ -83,10 +83,14 @@ public:
     MatrixBase& operator=( const T (&ac_raaData)[ M ][ N ] );
 
     // Construct/assign from a set of rows or columns
-    MatrixBase( const ColumnVectorType (&ac_raColumns)[ N ] );
-    MatrixBase& operator=( const ColumnVectorType (&ac_raColumns)[ N ] );
-    MatrixBase( const RowVectorType (&ac_raRows)[ M ] );
-    MatrixBase& operator=( const RowVectorType (&ac_raRows)[ M ] );
+    MatrixBase( const ColumnVectorType (&ac_raoColumns)[ N ] );
+    MatrixBase& operator=( const ColumnVectorType (&ac_raoColumns)[ N ] );
+    MatrixBase( const ColumnVectorType* const (&ac_racpoColumns)[ N ] );
+    MatrixBase& operator=( const ColumnVectorType* const (&ac_racpoColumns)[ N ] );
+    MatrixBase( const RowVectorType (&ac_raoRows)[ M ] );
+    MatrixBase& operator=( const RowVectorType (&ac_raoRows)[ M ] );
+    MatrixBase( const RowVectorType* const (&ac_racpoRows)[ M ] );
+    MatrixBase& operator=( const RowVectorType* const (&ac_racpoRows)[ M ] );
 
     // Equality and inequality checks
     bool operator==( const Matrix& ac_roMatrix ) const;
@@ -102,9 +106,6 @@ public:
     virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const;
     virtual RowVectorType Row( unsigned int ac_uiIndex ) const;
 
-    // Transpose - redefine in child classes to return correct type
-    virtual TransposeType Transpose() const;
-
     // Shift elements right/down the given number of spaces, wrapping around the
     // ends of columns and rows
     // Example:
@@ -114,6 +115,16 @@ public:
     // m.Shift( -1, -1 );
     // // m == { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } }
     void Shift( int a_iRight, int a_iDown = 0 );
+    
+    // Get smaller matrices by removing a row and/or column - redefine in child
+    // classes to return the correct type.
+    virtual MatrixBase< T, M-1, N-1 >
+        MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
+    virtual MatrixBase< T, M, N-1 > MinusColumn( unsigned int a_uiColumn ) const;
+    virtual MatrixBase< T, M-1, N > MinusRow( unsigned int a_uiRow ) const;
+
+    // Transpose - redefine in child classes to return correct type
+    virtual TransposeType Transpose() const;
 
     static const unsigned int ROWS = M;
     static const unsigned int COLUMNS = N;
@@ -132,7 +143,9 @@ protected:
     virtual MatrixBase& Assign( const T (&ac_raData)[ M*N ] );
     virtual MatrixBase& Assign( const T (&ac_raaData)[ M ][ N ] );
     virtual MatrixBase& Assign( const ColumnVectorType (&ac_raColumns)[ N ] );
+    virtual MatrixBase& Assign( const ColumnVectorType* const (&ac_rpoaColumns)[ N ] );
     virtual MatrixBase& Assign( const RowVectorType (&ac_raRows)[ M ] );
+    virtual MatrixBase& Assign( const RowVectorType* const (&ac_rpoaRows)[ M ] );
 
     // elements of the matrix
     T m_aaData[ M ][ N ];

@@ -94,6 +94,7 @@ template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::ColumnVectorType
     MatrixBase< T, M, N >::Column( unsigned int ac_uiIndex ) const
 {
+    assert( ac_uiIndex < N );
     ColumnVectorType oColumn;
     for( unsigned int i = 0; i < M; ++i )
     {
@@ -105,6 +106,7 @@ template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::RowVectorType
     MatrixBase< T, M, N >::Row( unsigned int ac_uiIndex ) const
 {
+    assert( ac_uiIndex < M );
     return RowVectorType( m_aaData[ ac_uiIndex ] );
 }
 
@@ -138,6 +140,39 @@ inline void MatrixBase< T, M, N >::Shift( int a_iRight, int a_iDown )
         m_aaData[ Scroll<int>( a_iDown + i/N, M ) ]
                 [ Scroll<int>( a_iRight + i, N ) ] = oCopy[i/N][i%N];
     }
+}
+    
+// Get smaller matrices by removing a row and/or column - redefine in child
+// classes to return the correct type.
+template< typename T, unsigned int M, unsigned int N >
+MatrixBase< T, M-1, N-1 > MatrixBase< T, M, N >::
+    MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const
+{
+    assert( a_uiRow < M && a_uiColumn < N );
+    MatrixBase oCopy(*this);
+    oCopy.Shift( -1 - a_uiColumn, -1 - a_uiRow );
+    MatrixBase< T, M-1, N-1 > oResult( oCopy );
+    oResult.Shift( a_uiColumn, a_uiRow );
+}
+template< typename T, unsigned int M, unsigned int N >
+MatrixBase< T, M, N-1 > MatrixBase< T, M, N >::
+    MinusColumn( unsigned int a_uiColumn ) const
+{
+    assert( a_uiColumn < N );
+    MatrixBase oCopy(*this);
+    oCopy.Shift( -1 - a_uiColumn );
+    MatrixBase< T, M-1, N > oResult( oCopy );
+    oResult.Shift( a_uiColumn );
+}
+template< typename T, unsigned int M, unsigned int N >
+MatrixBase< T, M-1, N > MatrixBase< T, M, N >::
+    MinusRow( unsigned int a_uiRow ) const
+{
+    assert( a_uiRow < M );
+    MatrixBase oCopy(*this);
+    oCopy.Shift( 0, -1 - a_uiRow );
+    MatrixBase< T, M, N-1 > oResult( oCopy );
+    oResult.Shift( 0, a_uiRow );
 }
 
 }   // namespace Math

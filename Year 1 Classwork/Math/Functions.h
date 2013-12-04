@@ -88,7 +88,7 @@ T FScroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin = 0 )
 
     // Otherwise, scroll.
     result -= ac_rMin;
-    result = fmod( result, ac_rMax - ac_rMin );
+    result = std::fmod( result, ac_rMax - ac_rMin );
     result += ( result < 0 ? ac_rMax : ac_rMin );
     return result;
 }
@@ -114,6 +114,54 @@ inline long double Scroll< long double >( const long double& ac_rValue,
                                           const long double& ac_rMin )
 {
     return FScroll( ac_rValue, ac_rMax, ac_rMin );
+}
+
+// Call fmod for floating-point types and operator% for everything else
+template< typename T >
+inline T& ModuloAssign( T& a_rDividend, const T& ac_rDivisor )
+{
+    a_rDividend %= ac_rDivisor;
+}
+template< typename T >
+inline T Modulo( const T& ac_rDividend, const T& ac_rDivisor )
+{
+    return ac_rDividend % ac_rDivisor;
+}
+template<>
+inline float& ModuloAssign< float >( float& a_rDividend,
+                                     const float& ac_rDivisor )
+{
+    a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+}
+template<>
+inline float Modulo< float >( const float& ac_rDividend,
+                              const float& ac_rDivisor )
+{
+    return std::fmod( a_rDividend, ac_rDivisor );
+}
+template<>
+inline double& ModuloAssign< double >( double& a_rDividend,
+                                       const double& ac_rDivisor )
+{
+    a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+}
+template<>
+inline double Modulo< double >( const double& ac_rDividend,
+                                const double& ac_rDivisor )
+{
+    return std::fmod( a_rDividend, ac_rDivisor );
+}
+template<>
+inline long double& ModuloAssign< long double >( long double& a_rDividend,
+                                                 const long double& ac_rDivisor )
+{
+    a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+}
+template<>
+inline long double Modulo< long double >( const long double& ac_rDividend,
+                                          const long double& ac_rDivisor )
+{
+    return std::fmod( a_rDividend, ac_rDivisor );
 }
 
 }   // namespace Math

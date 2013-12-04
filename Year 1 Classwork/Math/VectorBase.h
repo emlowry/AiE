@@ -32,7 +32,7 @@ public:
 
     // Simplify typing
     typedef Matrix< T, ROWS, COLUMNS > BaseType;
-    typedef VectorBase< T, M, false > ColumnVectorType;
+    typedef VectorBase< T, N, false > ColumnVectorType;
     typedef VectorBase< T, N > RowVectorType;
     typedef VectorBase< T, N, !t_bIsRow > TransposeType;
 
@@ -77,6 +77,10 @@ public:
     virtual ColumnVectorType Column() const;
     virtual RowVectorType Row() const;
 
+    // Get a smaller vector by removing an element
+    virtual VectorBase< T, N-1, t_bIsRow >
+        MinusElement( unsigned int a_uiIndex ) const;
+
     // Transpose - override in child classes to return correct type
     virtual TransposeType Transpose() const override;
 
@@ -103,9 +107,24 @@ private:
     // Hide parent class functions that you shouldn't be using unless you are
     // explicitly treating this object as a matrix, either via casting or via
     // a pointer or reference of the parent type
-    MatrixType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
-    MatrixType& operator=( const typename MatrixType::ColumnVectorType (&ac_raaData)[ COLUMNS ] );
-    MatrixType& operator=( const typename MatrixType::RowVectorType (&ac_raaData)[ ROWS ] );
+    BaseType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
+    typedef typename BaseType::ColumnVectorType BaseColumnVectorType;
+    BaseType& operator=( const BaseColumnVectorType (&ac_raColumns)[ COLUMNS ] );
+    BaseType& operator=( const BaseColumnVectorType* const (&ac_racpoColumns)[ COLUMNS ] );
+    typedef typename BaseType::RowVectorType BaseRowVectorType;
+    BaseType& operator=( const BaseRowVectorType (&ac_raRows)[ ROWS ] );
+    BaseType& operator=( const BaseRowVectorType* const (&ac_racpoRows)[ ROWS ] );
+
+    // Non-virtual override - if explicitly treated as a matrix, then matrix
+    // implementation should be available, otherwise no implementation should be
+    // available
+    BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
+    MatrixBase< T, M-1, N-1 >
+        MinusRowAndColumn( unsigned int a_uiRow,
+                           unsigned int a_uiColumn ) const;
+    MatrixBase< T, M, N-1 > MinusColumn( unsigned int a_uiColumn ) const;
+    MatrixBase< T, M-1, N > MinusRow( unsigned int a_uiRow ) const;
 
 };
 

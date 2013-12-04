@@ -40,7 +40,7 @@ template< typename T, unsigned int N >
 inline Vector< T, N >::Vector( const VectorBaseType& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N >
-inline Vector< T, N >::Vector( const MatrixType& ac_roMatrix )
+inline Vector< T, N >::Vector( const RootType& ac_roMatrix )
     : BaseType( ac_roMatrix ) {}
 template< typename T, unsigned int N >
 inline Vector< T, N >::Vector( Vector&& a_rroVector )
@@ -57,7 +57,7 @@ template< typename T, unsigned int N >
 inline Vector< T, N >::Vector( VectorBaseType&& a_rroVector )
     : BaseType( std::forward( a_rroVector ) ) {}
 template< typename T, unsigned int N >
-inline Vector< T, N >::Vector( MatrixType&& a_rroMatrix )
+inline Vector< T, N >::Vector( RootType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int N >
 template< unsigned int Q, bool t_bOtherIsRow >
@@ -123,7 +123,7 @@ template< typename T, unsigned int N >
 inline Vector< T, N, false >::Vector( VectorBaseType&& a_rroVector )
     : BaseType( std::forward( a_rroVector ) ) {}
 template< typename T, unsigned int N >
-inline Vector< T, N, false >::Vector( MatrixType&& a_rroMatrix )
+inline Vector< T, N, false >::Vector( RootType&& a_rroMatrix )
     : BaseType( std::forward( a_rroMatrix ) ) {}
 template< typename T, unsigned int N >
 template< unsigned int Q, bool t_bOtherIsRow >
@@ -167,28 +167,23 @@ inline Vector< T, P >
 }
 template< typename T, unsigned int N >
 template< unsigned int P >
-inline Vector< MatrixInverse< T >::Type, P, true >
+inline Vector< typename MatrixInverse< T >::Type, P, true >
     Vector< T, N >::operator/( const Matrix< T, P, N >& ac_roMatrix ) const
 {
-    Vector< MatrixInverse< T >::Type, P > Result;
+    Vector< typename MatrixInverse< T >::Type, P > Result;
     return Result( MatrixType::operator/( ac_roMatrix ) );
 }
 
-// Column vector 1x1 matrix multiplication produces another column matrix
-template< typename T, unsigned int N >
-inline Vector< T, N, false >
-    Vector< T, N, false >::
-    operator*( const Matrix< T, 1, 1 >& ac_roMatrix ) const
+// Simplify Crossing a pair of 3x3 vectors
+template< typename T, bool t_IsRow, bool t_IsOtherRow >
+Vector< T, 3, t_IsRow > Cross( const Vector< T, 3, t_IsRow >& ac_roVector,
+                               const Vector< T, 3, t_IsOtherRow >& ac_roOtherVector )
 {
-    return Vector< T, N, false >( MatrixType::operator*( ac_roMatrix ) );
-}
-template< typename T, unsigned int N >
-inline Vector< MatrixInverse< T >::Type, N, false >
-    Vector< T, N, false >::
-    operator/( const Matrix< T, 1, 1 >& ac_roMatrix ) const
-{
-    typedef Vector< MatrixInverse< T >::Type, N, false > Result;
-    return Result( MatrixType::operator/( ac_roMatrix ) );
+    Vector< T, 3, t_IsRow > aoOtherVector[1] =
+    {
+        Vector< T, 3, t_IsRow >( ac_roOtherVector )
+    };
+    return ac_roVector.Cross( aoOtherVector );
 }
 
 }   // namespace Math

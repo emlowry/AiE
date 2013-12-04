@@ -37,6 +37,12 @@
     <None Include="Vector.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="MatrixConstructors.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="MatrixOperators.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.h">

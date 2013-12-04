@@ -80,7 +80,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     {
         throw exception("Non-copy-assignable type");
     } /**/
-    for( unsigned int i = 0; i < M*N && i < t_uiSize; ++i )
+    for( unsigned int i = 0; i < M*N; ++i )
     {
         m_aaData[i/N][i%N] = ac_raData[i];
     }
@@ -144,81 +144,168 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
 // Construct/assign from a set of columns
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::
-    MatrixBase( const ColumnVectorType (&ac_raColumns)[ N ] )
+    MatrixBase( const ColumnVectorType (&ac_raoColumns)[ N ] )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
     } /**/
-    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    for( unsigned int i = 0; i < M; ++i )
     {
-        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        for( unsigned int j = 0; j < N; ++j )
         {
-            m_aaData[i][j]( ac_raColumns[j][i] );
+            m_aaData[i][j]( ac_raoColumns[j][i] );
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const ColumnVectorType (&ac_raColumns)[ N ] )
+    Assign( const ColumnVectorType (&ac_raoColumns)[ N ] )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
     } /**/
-    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    for( unsigned int i = 0; i < M; ++i )
     {
-        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        for( unsigned int j = 0; j < N; ++j )
         {
-            m_aaData[i][j] = ac_raColumns[j][i];
+            m_aaData[i][j] = ac_raoColumns[j][i];
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const ColumnVectorType (&ac_raColumns)[ N ] )
+    operator=( const ColumnVectorType (&ac_raoColumns)[ N ] )
 {
-    return Assign( ac_raRows );
+    return Assign( ac_raoColumns );
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >::
+    MatrixBase( const ColumnVectorType* const (&ac_racpoColumns)[ N ] )
+{/*
+    if( !std::is_copy_constructable< T >::value )
+    {
+        throw exception("Non-copy-constructable type");
+    } /**/
+    for( unsigned int i = 0; i < M; ++i )
+    {
+        for( unsigned int j = 0; j < N; ++j )
+        {
+            const ColumnVectorType* const cpcoColumn = ac_racpoColumns[j];
+            m_aaData[i][j]( nullptr == cpcoColumn ? DEFAULT_FILL
+                                                  : (*cpcoColumn)[i] );
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    Assign( const ColumnVectorType* const (&ac_racpoColumns)[ N ] )
+{/*
+    if( !std::is_copy_assignable< T >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    } /**/
+    for( unsigned int i = 0; i < M; ++i )
+    {
+        for( unsigned int j = 0; j < N; ++j )
+        {
+            const ColumnVectorType* const cpcoColumn = ac_racpoColumns[j];
+            if( nullptr != cpcoColumn )
+            {
+                m_aaData[i][j] = (*cpcoColumn)[i] ;
+            }
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    operator=( const ColumnVectorType* const (&ac_racpoColumns)[ N ] )
+{
+    return Assign( ac_racpoColumns );
 }
 
 // Construct/assign from a set of rows
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::
-    MatrixBase( const RowVectorType (&ac_raRows)[ M ] )
+    MatrixBase( const RowVectorType (&ac_raoRows)[ M ] )
 {/*
     if( !std::is_copy_constructable< T >::value )
     {
         throw exception("Non-copy-constructable type");
     } /**/
-    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    for( unsigned int i = 0; i < M; ++i )
     {
-        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        for( unsigned int j = 0; j < N; ++j )
         {
-            m_aaData[i][j]( ac_raRows[i][j] );
+            m_aaData[i][j]( ac_raoRows[i][j] );
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const RowVectorType (&ac_raRows)[ M ] )
+    Assign( const RowVectorType (&ac_raoRows)[ M ] )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
     } /**/
-    for( unsigned int i = 0 && i < t_uiRows; i < M; ++i )
+    for( unsigned int i = 0; i < M; ++i )
     {
-        for( unsigned int j = 0 && j < t_uiColumns; j < N; ++j )
+        for( unsigned int j = 0; j < N; ++j )
         {
-            m_aaData[i][j] = ac_raRows[i][j];
+            m_aaData[i][j] = ac_raoRows[i][j];
         }
     }
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const RowVectorType (&ac_raRows)[ M ] )
+    operator=( const RowVectorType (&ac_raoRows)[ M ] )
 {
-    return Assign( ac_raRows );
+    return Assign( ac_raoRows );
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >::
+    MatrixBase( const RowVectorType* const (&ac_racpoRows)[ M ] )
+{/*
+    if( !std::is_copy_constructable< T >::value )
+    {
+        throw exception("Non-copy-constructable type");
+    } /**/
+    for( unsigned int i = 0; i < M; ++i )
+    {
+        for( unsigned int j = 0; j < N; ++j )
+        {
+            const RowVectorType* const cpcoRow = ac_racpoRows[i];
+            m_aaData[i][j]( nullptr == cpcoRow ? DEFAULT_FILL : (*cpcoRow)[j] );
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    Assign( const RowVectorType* const (&ac_racpoRows)[ M ] )
+{/*
+    if( !std::is_copy_assignable< T >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    } /**/
+    for( unsigned int i = 0; i < M; ++i )
+    {
+        for( unsigned int j = 0; j < N; ++j )
+        {
+            const RowVectorType* const cpcoRow = ac_racpoRows[i];
+            if( nullptr != cpcoRow )
+            {
+                m_aaData[i][j] = (*cpcoRow)[j] ;
+            }
+        }
+    }
+}
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
+    operator=( const RowVectorType* const (&ac_racpoRows)[ M ] )
+{
+    return Assign( ac_racpoRows );
 }
 
 }   // namespace Math

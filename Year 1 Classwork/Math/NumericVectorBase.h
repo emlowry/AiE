@@ -40,15 +40,16 @@ class NumericVectorBase
 public:
 
     // simplify typing
+    typedef MatrixBase< T, ROWS, COLUMNS > RootType;
     typedef VectorBase< T, N, t_bIsRow > BaseType;
     typedef Vector< T, M, false > ColumnVectorType;
     typedef Vector< T, N > RowVectorType;
     typedef Matrix< T, ROWS, COLUMNS > MatrixType;
     typedef Vector< T, 1 > IdentityType;
-    typedef Vector< MatrixInverse< T >::Type, N, !t_bIsRow > InverseType;
+    typedef Vector< typename MatrixInverse< T >::Type, N, !t_bIsRow > InverseType;
     typedef Vector< T, N, !t_bIsRow > TransposeType;
     typedef Vector< T, N, t_bIsRow > ChildType;
-    typedef Vector< MatrixInverse< T >::Type, N, t_bIsRow > NormalType;
+    typedef Vector< typename MatrixInverse< T >::Type, N, t_bIsRow > NormalType;
 
     // inherit assignment operators
     using BaseType::operator=;
@@ -78,18 +79,31 @@ public:
     virtual InverseType Inverse() const override;
     virtual InverseType Inverse( bool& a_rbInvertable ) const override;
 
+    // Get a smaller vector by removing an element
+    virtual Vector< T, N-1, t_bIsRow >
+        MinusElement( unsigned int a_uiIndex ) const override;
+
     // Transpose
     virtual TransposeType Transpose() const override;
 
     // Dot and cross products
-    virtual ChildType Cross( const Vector& ac_roVector ) const;
-    T Dot( const Vector& ac_roVector ) const;
+    T Dot( const ChildType& ac_roVector ) const;
+    virtual ChildType
+        Cross( const ChildType (&ac_raoVectors)[ N - 2 ] ) const;
+    virtual ChildType
+        Cross( const ChildType* const (&ac_racpoVectors)[ N - 2 ] ) const;
 
     // Normalization
-    MatrixInverse< T >::Type Magnitude() const;
+    typename MatrixInverse< T >::Type Magnitude() const;
     T MagnitudeSquared() const; // for efficiency in complex calculations
     void Normalize();
     virtual NormalType Normal() const;
+
+    // Inherit matrix addition and subtraction
+    using MatrixType::operator+=;
+    using MatrixType::operator+;
+    using MatrixType::operator-=;
+    using MatrixType::operator-;
 
     // Vector addition and subtraction
     // Non-virtual overrides for arithmatic with another vector - vector
@@ -98,14 +112,32 @@ public:
     // being explicitly treated as matrices, then a user should expect matrix-
     // -style arithmatic.  If this object is instead being explicitly treated as
     // the vector it is, then a user should expect vector-style arithmatic.
-    ChildType& operator+=( const Vector& ac_roVector );
+    ChildType& operator+=( const ChildType& ac_roVector );
     ChildType& operator+=( const TransposeType& ac_roVector );
-    ChildType operator+( const Vector& ac_roVector ) const;
+    ChildType operator+( const ChildType& ac_roVector ) const;
     ChildType operator+( const TransposeType& ac_roVector ) const;
-    ChildType& operator-=( const Vector& ac_roVector );
+    ChildType& operator-=( const ChildType& ac_roVector );
     ChildType& operator-=( const TransposeType& ac_roVector );
-    ChildType operator-( const Vector& ac_roVector ) const;
+    ChildType operator-( const ChildType& ac_roVector ) const;
     ChildType operator-( const TransposeType& ac_roVector ) const;
+
+    // Override scalar multiplication/division/modulo operators to return the
+    // correct type
+    virtual ChildType operator*( const T& ac_rScalar ) const override;
+    virtual ChildType operator/( const T& ac_rScalar ) const override;
+    virtual ChildType operator%( const T& ac_rScalar ) const override;
+
+    // references to zero and unit vectors
+    static const ChildType& ZERO;
+    template< unsigned int I = 0 >
+    static const ChildType& UNIT;
+
+protected:
+
+    // Calculates the actual cross product, once the non-static functions have
+    // converted the required input into row vectors.
+    static ChildType
+        Cross( const RowVectorType (&ac_raoVectors)[ N - 1 ] ) const;
 
 private:
 
@@ -114,10 +146,10 @@ private:
     NumericVectorBase();
     NumericVectorBase( const NumericVectorBase& ac_roVector );
     NumericVectorBase( const BaseType& ac_roVector );
-    NumericVectorBase( const MatrixType& ac_roMatrix );
+    NumericVectorBase( const RootType& ac_roMatrix );
     NumericVectorBase( NumericVectorBase&& a_rroVector );
     NumericVectorBase( BaseType&& a_rroVector );
-    NumericVectorBase( MatrixType&& a_rroMatrix );
+    NumericVectorBase( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     NumericVectorBase( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
                        const T& ac_rFill = DEFAULT_FILL );
@@ -138,20 +170,35 @@ private:
     // Hide parent class functions that you shouldn't be using unless you are
     // explicitly treating this object as a matrix, either via casting or via
     // a pointer or reference of the parent type
-    MatrixType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
-    MatrixType& operator=( const typename MatrixType::BaseType::ColumnVectorType (&ac_raaData)[ COLUMNS ] );
-    MatrixType& operator=( const typename MatrixType::BaseType::RowVectorType (&ac_raaData)[ ROWS ] );
+    RootType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
+    typedef typename RootType::ColumnVectorType BaseColumnVectorType;
+    RootType& operator=( const BaseColumnVectorType (&ac_raColumns)[ COLUMNS ] );
+    RootType& operator=( const BaseColumnVectorType* const (&ac_racpoColumns)[ COLUMNS ] );
+    typedef typename RootType::RowVectorType BaseRowVectorType;
+    RootType& operator=( const BaseRowVectorType (&ac_raRows)[ ROWS ] );
+    RootType& operator=( const BaseRowVectorType* const (&ac_racpoRows)[ ROWS ] );
     T Determinant();
+    T Minor( unsigned int a_uiRow, unsigned int a_uiColumn );
 
     // Non-virtual override - if explicitly treated as a matrix, then matrix
     // implementation should be available, otherwise no implementation should be
     // available
-    ColumnVectorType Column( unsigned int ac_uiIndex ) const;
-    RowVectorType Row( unsigned int ac_uiIndex ) const;
+    BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
+    Matrix< T, M-1, N-1 > MinusRowAndColumn( unsigned int a_uiRow,
+                                             unsigned int a_uiColumn ) const;
+    Matrix< T, M, N-1 > MinusColumn( unsigned int a_uiColumn ) const;
+    Matrix< T, M-1, N > MinusRow( unsigned int a_uiRow ) const;
 
 };
 
+// Zero vector
+template< typename T, unsigned int N, bool t_IsRow = true >
+const NumericVectorBase< T, N, t_IsRow >::ChildType ZERO_VECTOR;
 
+// Unit vector
+template< typename T, unsigned int N, unsigned int I = 0, bool t_IsRow = true >
+const NumericVectorBase< T, N, t_IsRow >::ChildType UNIT_VECTOR;
 
 }   // namespace Math
 

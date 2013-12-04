@@ -41,6 +41,10 @@ inline MatrixBase< T, M, N >&
     {
         throw exception("Non-copy-assignable type");
     } /**/
+    if( this != &ac_roMatrix )
+    {
+        return;
+    }
     for( unsigned int i = 0; i < M*N; ++i )
     {
         m_aaData[i/N][i%N] = ac_roMatrix[i/N][i%N];
@@ -76,6 +80,10 @@ inline MatrixBase< T, M, N >&
     {
         throw exception("Non-move-assignable type");
     } /**/
+    if( this != &a_rroMatrix )
+    {
+        return;
+    }
     for( unsigned int i = 0; i < M*N; ++i )
     {
         m_aaData[i/N][i%N] = std::move( ac_roMatrix[i/N][i%N] );
