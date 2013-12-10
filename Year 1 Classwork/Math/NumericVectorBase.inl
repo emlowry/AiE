@@ -20,16 +20,30 @@ namespace Math
 
 // Zero vector
 template< typename T, unsigned int N, bool t_IsRow >
-ZERO_VECTOR< T, N, t_IsRow >( 0 );
-template< typename T, unsigned int N, bool t_IsRow >
-NumericVectorBase< T, N, t_IsRow >::ZERO = ZERO_VECTOR< T, N, t_IsRow >;
+const NumericVectorBase< T, N, t_IsRow >::ChildType&
+    NumericVectorBase< T, N, t_IsRow >::ZERO()
+{
+    static ChildType oZero(0);
+    return oZero;
+}
 
 // Unit vector
-template< typename T, unsigned int N, unsigned int I, bool t_IsRow >
-UNIT_VECTOR< T, N, I, t_IsRow >( IDENTITY_MATRIX< T, N >[ I ] );
 template< typename T, unsigned int N, bool t_IsRow >
-template< unsigned int I >
-NumericVectorBase< T, N, t_IsRow >::UNIT< I > = UNIT_VECTOR< T, N, I, t_IsRow >;
+const NumericVectorBase< T, N, t_IsRow >::ChildType&
+    NumericVectorBase< T, N, t_IsRow >::UNIT( unsigned int a_uiAxis )
+{
+    static ChildType aoUnits[N];
+    static bool abInitialized = false;
+    if( !abInitialized )
+    {
+        for( unsigned int i = 0; i < N; ++i )
+        {
+            aoUnits[i] = Matrix< T, N >::IDENTITY()[i];
+        }
+        abInitialized = true;
+    }
+    return ( a_uiAxis < N ? aoUnits[a_uiAxis] : ZERO() );
+}
 
 // Destructor doesn't need to do anything
 template< typename T, unsigned int N, bool t_bIsRow >
@@ -84,7 +98,7 @@ template< typename T, unsigned int N, bool t_bIsRow >
 template< unsigned int P, unsigned int Q >
 inline NumericVectorBase< T, N, t_bIsRow >::
     NumericVectorBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                       const T& ac_rFill = DEFAULT_FILL )
+                       const T& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
 inline NumericVectorBase< T, N, t_bIsRow >::
@@ -97,7 +111,7 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline NumericVectorBase< T, N, t_bIsRow >::
     NumericVectorBase( const T* const ac_cpData,
                        const unsigned int ac_uiSize,
-                       const T& ac_rFill = DEFAULT_FILL )
+                       const T& ac_rFill )
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}
 
 // Copy assign, move assign, and assign from a different type of numeric vector
@@ -172,10 +186,12 @@ inline NumericVectorBase< T, N, t_bIsRow >::InverseType
 
 // Get a smaller vector by removing an element
 template< typename T, unsigned int N, bool t_bIsRow >
-inline Vector< T, N-1, t_bIsRow > NumericVectorBase< T, N, t_bIsRow >::
+inline Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
+    NumericVectorBase< T, N, t_bIsRow >::
     MinusElement( unsigned int a_uiIndex ) const
 {
-    return Vector< T, N-1, t_bIsRow >( BaseType::MinusElement( a_uiIndex ) );
+    return Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >(
+                                          BaseType::MinusElement( a_uiIndex ) );
 }
 
 // Transpose
@@ -198,46 +214,58 @@ inline T NumericVectorBase< T, N, t_bIsRow >::
     }
     return T;
 }
+template< typename T, unsigned int N, bool t_bIsRow >
+inline T NumericVectorBase< T, N, t_bIsRow >::
+    Dot( const TransposeType& ac_roVector ) const
+{
+    return Dot( ac_roVector.Transpose() );
+}
 
 // Cross product
+// This really ought to be a variadic template, but Visual Studio 2010 doesn't
+//  support that feature of C++11, so just implement the one-parameter version.
+// For N < 2, "perpendicular" has no meaning, so return ZERO
+// For N == 2, ignore the parameter and just return a perpendicular vector
+// For N == 3, use the formal determinant method
+// For N > 3, use the formal determinant method with rows 3 through N-1 filled
+//  with unit vectors.
+// If this is redone for a compiler that supports variadic templates, then
+//  ignore parameters past the (N-2)th and use unit vectors for any missing ones
 template< typename T, unsigned int N, bool t_bIsRow >
-inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+NumericVectorBase< T, N, t_bIsRow >::ChildType
     NumericVectorBase< T, N, t_bIsRow >::
-    Cross( const ChildType (&ac_raoVectors)[ N - 2 ] ) const
+    Cross( const ChildType& ac_roVector ) const
 {
-    RowVectorType aoVectors[ N - 1 ];
-    acpcoVectors[0] = Row();
-    for( unsigned int i = 1; i < N; ++i )
+    if( N < 2 )
     {
-        acpcoVectors[i] = ac_raoVectors[i-1].Row();
+        return ZERO();
     }
-    return Cross( aoVectors );
-}
-template< typename T, unsigned int N, bool t_bIsRow >
-inline NumericVectorBase< T, N, t_bIsRow >::ChildType
-    NumericVectorBase< T, N, t_bIsRow >::
-    Cross( const ChildType* const (&ac_racpoVectors)[ N - 2 ] ) const
-{
-    const RowVectorType aoVectors[ N - 1 ];
-    acpcoVectors[0] = Row();
-    for( unsigned int i = 1; i < N; ++i )
+    if( N == 2 )
     {
-        acpcoVectors[i] = ac_raoVectors[i-1]->Row();
+        T aValues[2] = { At(1), -1 * At(0) };
+        return ChildType( aValues );
     }
-    return Cross( aoVectors );
-}
-template< typename T, unsigned int N, bool t_bIsRow >
-inline NumericVectorBase< T, N, t_bIsRow >::ChildType
-    NumericVectorBase< T, N, t_bIsRow >::
-    Cross( const RowVectorType (&ac_raoVectors)[ N - 1 ] )
-{
-    Matrix< T, N-1, N > oMatrix( ac_raoVectors );
-    ChildType oCross;
+    RowVectorType aoVectors[ N > 0 ? N - 1 : 0 ];
+    aoVectors[0] = Row();   // exception if N < 2
+    aoVectors[1] = ac_roVector.Row();
+    for( unsigned int i = 2; i < N - 1; ++i )
+    {
+        aoVectors[i] = RowVectorType( UNIT(i) );
+    }
+    Matrix<T, N, ( N > 0 ? N-1 : 0 ) > oMatrix( aoVectors );
+    ChildType oResult;
     for( unsigned int i = 0; i < N; ++i )
     {
-        oCross[i] = ( (2*(i%2)) - 1 ) * oMatrix.MinusColumn(i).Determinant();
+        oResult[i] = ( i%2 == 0 ? 1 : -1 ) * oMatrix.MinusColumn(i).Determinant();
     }
-    return oCross;
+    return oResult;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline NumericVectorBase< T, N, t_bIsRow >::ChildType
+    NumericVectorBase< T, N, t_bIsRow >::
+    Cross( const TransposeType& ac_roVector ) const
+{
+    return Cross( ac_roVector.Transpose() );
 }
 
 // Normalization

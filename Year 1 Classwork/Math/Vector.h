@@ -60,20 +60,24 @@ public:
     Vector( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     template< typename U >
     Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     Vector( const T& ac_rFill );
     Vector( const T (&ac_raData)[ N ] );
     Vector( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
+
+    // add parent class zero and unit vector "functions" to this namespace
+    using BaseType::ZERO;
+    using BaseType::UNIT;
 
     // Inherit matrix implementation for multiplication by scalars
     using MatrixType::operator*;
@@ -121,27 +125,26 @@ public:
     Vector( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     template< typename U >
     Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     Vector( const T& ac_rFill );
     Vector( const T (&ac_raData)[ N ] );
     Vector( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
+
+    // add parent class zero and unit vector "functions" to this namespace
+    using BaseType::ZERO;
+    using BaseType::UNIT;
 
 };
-
-// Simplify Crossing a pair of 3x3 vectors
-template< typename T, bool t_IsRow, bool t_IsOtherRow >
-Vector< T, 3, t_IsRow > Cross( const Vector< T, 3, t_IsRow >& ac_roVector,
-                               const Vector< T, 3, t_IsOtherRow >& ac_roOtherVector );
 
 }   // namespace Math
 

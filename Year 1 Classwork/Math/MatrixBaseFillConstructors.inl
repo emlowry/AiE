@@ -69,7 +69,7 @@ inline MatrixBase< T, M, N >::MatrixBase( const T* const ac_cpData,
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::MatrixBase( const T (&ac_raData)[ M*N ] )
-    : MatrixBase( ac_roData, M*N, DEFAULT_FILL ) {}
+    : MatrixBase( ac_roData, M*N, DEFAULT_FILL() ) {}
 
 // Assign parameter data one row at a time until end of parameter data
 template< typename T, unsigned int M, unsigned int N >
@@ -115,7 +115,7 @@ inline MatrixBase< T, M, N >::MatrixBase( const T* const* const ac_cpcpData,
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::
     MatrixBase( const T (&ac_raaData)[ M ][ N ] )
-    : MatrixBase( ac_raaData, M, N, DEFAULT_FILL ) {}
+    : MatrixBase( ac_raaData, M, N, DEFAULT_FILL() ) {}
 
 // Assign parameter data where given
 template< typename T, unsigned int M, unsigned int N >
@@ -193,7 +193,7 @@ inline MatrixBase< T, M, N >::
         for( unsigned int j = 0; j < N; ++j )
         {
             const ColumnVectorType* const cpcoColumn = ac_racpoColumns[j];
-            m_aaData[i][j]( nullptr == cpcoColumn ? DEFAULT_FILL
+            m_aaData[i][j]( nullptr == cpcoColumn ? DEFAULT_FILL()
                                                   : (*cpcoColumn)[i] );
         }
     }
@@ -277,7 +277,7 @@ inline MatrixBase< T, M, N >::
         for( unsigned int j = 0; j < N; ++j )
         {
             const RowVectorType* const cpcoRow = ac_racpoRows[i];
-            m_aaData[i][j]( nullptr == cpcoRow ? DEFAULT_FILL : (*cpcoRow)[j] );
+            m_aaData[i][j]( nullptr == cpcoRow ? DEFAULT_FILL() : (*cpcoRow)[j] );
         }
     }
 }

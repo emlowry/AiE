@@ -21,10 +21,11 @@ namespace Math
 {
 
 // Default matrix fill
-template< typename T >
-const T* MatrixFill< T* >::DEFAULT = nullptr;
 template< typename T, unsigned int M, unsigned int N >
-const T& MatrixBase< T, M, N >::DEFAULT_FILL = MatrixFill< T >::DEFAULT;
+const T& MatrixBase< T, M, N >::DEFAULT_FILL()
+{
+    return MatrixFill< T >::DEFAULT;
+}
 
 // Default destructor doesn't need to do anything
 template< typename T, unsigned int M, unsigned int N >
@@ -32,7 +33,7 @@ inline MatrixBase< T, M, N >::~MatrixBase() {}
 
 // Default constructor passes to fill constructor
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::MatrixBase() : MatrixBase( DEFAULT_FILL ) {}
+inline MatrixBase< T, M, N >::MatrixBase() : MatrixBase( DEFAULT_FILL() ) {}
 
 // Equality and inequality checks
 template< typename T, unsigned int M, unsigned int N >
@@ -145,33 +146,46 @@ inline void MatrixBase< T, M, N >::Shift( int a_iRight, int a_iDown )
 // Get smaller matrices by removing a row and/or column - redefine in child
 // classes to return the correct type.
 template< typename T, unsigned int M, unsigned int N >
-MatrixBase< T, M-1, N-1 > MatrixBase< T, M, N >::
+MatrixBase< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) > MatrixBase< T, M, N >::
     MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const
 {
+    if( N == 0 || M == 0 )
+    {
+        throw( std::out_of_range( "Cannot remove row and column if "
+                                  "there are none of either" ) );
+    }
     assert( a_uiRow < M && a_uiColumn < N );
     MatrixBase oCopy(*this);
     oCopy.Shift( -1 - a_uiColumn, -1 - a_uiRow );
-    MatrixBase< T, M-1, N-1 > oResult( oCopy );
+    MatrixBase< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) > oResult( oCopy );
     oResult.Shift( a_uiColumn, a_uiRow );
 }
 template< typename T, unsigned int M, unsigned int N >
-MatrixBase< T, M, N-1 > MatrixBase< T, M, N >::
+MatrixBase< T, M, ( N > 0 ? N-1 : 0 ) > MatrixBase< T, M, N >::
     MinusColumn( unsigned int a_uiColumn ) const
 {
+    if( N == 0 )
+    {
+        throw( std::out_of_range( "Cannot remove column if there are none" ) );
+    }
     assert( a_uiColumn < N );
     MatrixBase oCopy(*this);
     oCopy.Shift( -1 - a_uiColumn );
-    MatrixBase< T, M-1, N > oResult( oCopy );
+    MatrixBase< T, M, ( N > 0 ? N-1 : 0 ) > oResult( oCopy );
     oResult.Shift( a_uiColumn );
 }
 template< typename T, unsigned int M, unsigned int N >
-MatrixBase< T, M-1, N > MatrixBase< T, M, N >::
+MatrixBase< T, ( M > 0 ? M-1 : 0 ), N > MatrixBase< T, M, N >::
     MinusRow( unsigned int a_uiRow ) const
 {
+    if( M == 0 )
+    {
+        throw( std::out_of_range( "Cannot remove row if there are none" ) );
+    }
     assert( a_uiRow < M );
     MatrixBase oCopy(*this);
     oCopy.Shift( 0, -1 - a_uiRow );
-    MatrixBase< T, M, N-1 > oResult( oCopy );
+    MatrixBase< T, ( M > 0 ? M-1 : 0 ), N > oResult( oCopy );
     oResult.Shift( 0, a_uiRow );
 }
 

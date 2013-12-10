@@ -34,7 +34,7 @@ public:
     typedef VectorBase< T, M, false > ColumnVectorType;
     typedef VectorBase< T, N > RowVectorType;
     typedef MatrixBase< T, N, M > TransposeType;
-    static const T& DEFAULT_FILL;   // referance to MatrixFill< T >::DEFAULT
+    static const T& DEFAULT_FILL();   // referance to MatrixFill< T >::DEFAULT
 
     // Default constructor fills array with DEFAULT_FILL
     MatrixBase();
@@ -55,7 +55,7 @@ public:
     MatrixBase( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     MatrixBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                const T& ac_rFill = DEFAULT_FILL );
+                const T& ac_rFill = DEFAULT_FILL() );
     template< typename U >
     MatrixBase& operator=( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
@@ -69,7 +69,7 @@ public:
     // parameter data, then filled with default/previous data
     MatrixBase( const T* const ac_cpData,
                 const unsigned int ac_uiSize,
-                const T& ac_rFill = DEFAULT_FILL );
+                const T& ac_rFill = DEFAULT_FILL() );
     MatrixBase( const T (&ac_raData)[ M*N ] );
     MatrixBase& operator=( const T (&ac_raData)[ M*N ] );
 
@@ -78,7 +78,7 @@ public:
     MatrixBase( const T* const* const ac_cpcpData,
                 const unsigned int ac_uiRows,
                 const unsigned int ac_uiColumns,
-                const T& ac_rFill = DEFAULT_FILL );
+                const T& ac_rFill = DEFAULT_FILL() );
     MatrixBase( const T (&ac_raaData)[ M ][ N ] );
     MatrixBase& operator=( const T (&ac_raaData)[ M ][ N ] );
 
@@ -118,10 +118,12 @@ public:
     
     // Get smaller matrices by removing a row and/or column - redefine in child
     // classes to return the correct type.
-    virtual MatrixBase< T, M-1, N-1 >
+    virtual MatrixBase< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
         MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
-    virtual MatrixBase< T, M, N-1 > MinusColumn( unsigned int a_uiColumn ) const;
-    virtual MatrixBase< T, M-1, N > MinusRow( unsigned int a_uiRow ) const;
+    virtual MatrixBase< T, M, ( N > 0 ? N-1 : 0 ) >
+        MinusColumn( unsigned int a_uiColumn ) const;
+    virtual MatrixBase< T, ( M > 0 ? M-1 : 0 ), N >
+        MinusRow( unsigned int a_uiRow ) const;
 
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const;
@@ -159,11 +161,6 @@ struct MatrixFill
 {
     // redefine for non-numeric types
     static const T DEFAULT = 0;
-};
-template< typename T >
-struct MatrixFill< T* >
-{
-    static const T* DEFAULT;
 };
 
 //

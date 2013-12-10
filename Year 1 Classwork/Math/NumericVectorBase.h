@@ -80,7 +80,7 @@ public:
     virtual InverseType Inverse( bool& a_rbInvertable ) const override;
 
     // Get a smaller vector by removing an element
-    virtual Vector< T, N-1, t_bIsRow >
+    virtual Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
         MinusElement( unsigned int a_uiIndex ) const override;
 
     // Transpose
@@ -88,10 +88,12 @@ public:
 
     // Dot and cross products
     T Dot( const ChildType& ac_roVector ) const;
-    virtual ChildType
-        Cross( const ChildType (&ac_raoVectors)[ N - 2 ] ) const;
-    virtual ChildType
-        Cross( const ChildType* const (&ac_racpoVectors)[ N - 2 ] ) const;
+    T Dot( const TransposeType& ac_roVector ) const;
+    virtual ChildType Cross( const ChildType& ac_roVector
+                                = ( N > 2 ? UNIT(1) : ZERO() ) ) const;
+    virtual ChildType Cross( const TransposeType& ac_roVector
+                                = ( N > 2 ? TransposeType::UNIT(1)
+                                          : TransposeType::ZERO() ) ) const;
 
     // Normalization
     typename MatrixInverse< T >::Type Magnitude() const;
@@ -128,16 +130,8 @@ public:
     virtual ChildType operator%( const T& ac_rScalar ) const override;
 
     // references to zero and unit vectors
-    static const ChildType& ZERO;
-    template< unsigned int I = 0 >
-    static const ChildType& UNIT;
-
-protected:
-
-    // Calculates the actual cross product, once the non-static functions have
-    // converted the required input into row vectors.
-    static ChildType
-        Cross( const RowVectorType (&ac_raoVectors)[ N - 1 ] ) const;
+    static const ChildType& ZERO();
+    static const ChildType& UNIT( unsigned int a_uiAxis );
 
 private:
 
@@ -152,20 +146,20 @@ private:
     NumericVectorBase( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     NumericVectorBase( const NumericVectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-                       const T& ac_rFill = DEFAULT_FILL );
+                       const T& ac_rFill = DEFAULT_FILL() );
     template< unsigned int Q, bool t_bOtherIsRow >
     NumericVectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-                       const T& ac_rFill = DEFAULT_FILL);
+                       const T& ac_rFill = DEFAULT_FILL() );
     template< typename U >
     NumericVectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     NumericVectorBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                       const T& ac_rFill = DEFAULT_FILL );
+                       const T& ac_rFill = DEFAULT_FILL() );
     NumericVectorBase( const T& ac_rFill );
     NumericVectorBase( const T (&ac_raData)[ N ] );
     NumericVectorBase( const T* const ac_cpData,
                        const unsigned int ac_uiSize,
-                       const T& ac_rFill = DEFAULT_FILL );
+                       const T& ac_rFill = DEFAULT_FILL() );
 
     // Hide parent class functions that you shouldn't be using unless you are
     // explicitly treating this object as a matrix, either via casting or via
@@ -185,20 +179,14 @@ private:
     // available
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
-    Matrix< T, M-1, N-1 > MinusRowAndColumn( unsigned int a_uiRow,
-                                             unsigned int a_uiColumn ) const;
-    Matrix< T, M, N-1 > MinusColumn( unsigned int a_uiColumn ) const;
-    Matrix< T, M-1, N > MinusRow( unsigned int a_uiRow ) const;
+    Matrix< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+        MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
+    Matrix< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+        MinusColumn( unsigned int a_uiColumn ) const;
+    Matrix< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
+        MinusRow( unsigned int a_uiRow ) const;
 
 };
-
-// Zero vector
-template< typename T, unsigned int N, bool t_IsRow = true >
-const NumericVectorBase< T, N, t_IsRow >::ChildType ZERO_VECTOR;
-
-// Unit vector
-template< typename T, unsigned int N, unsigned int I = 0, bool t_IsRow = true >
-const NumericVectorBase< T, N, t_IsRow >::ChildType UNIT_VECTOR;
 
 }   // namespace Math
 

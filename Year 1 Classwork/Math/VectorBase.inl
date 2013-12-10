@@ -189,12 +189,16 @@ inline void VectorBase< T, N, t_bIsRow >::Shift( int a_iPlaces )
 
 // Get a smaller vector by removing an element
 template< typename T, unsigned int N, bool t_bIsRow >
-inline VectorBase< T, N-1, t_bIsRow > VectorBase< T, N, t_bIsRow >::
+VectorBase< T, ( N > 0 ? N-1 : 0 ), t_bIsRow > VectorBase< T, N, t_bIsRow >::
     MinusElement( unsigned int a_uiIndex ) const
 {
+    if( N == 0 )
+    {
+        throw( std::out_of_range( "Cannot remove element if there are none" ) );
+    }
     Vector oCopy(*this);
     oCopy.Shift( -1 - a_uiIndex );
-    Vector< T, N-1, t_bIsRow > oResult( oCopy );
+    Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow > oResult( oCopy );
     oResult.Shift( a_uiIndex );
     return oResult;
 }

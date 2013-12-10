@@ -21,16 +21,19 @@ namespace Math
 
 // Zero matrix
 template< typename T, unsigned int M, unsigned int N >
-ZERO_MATRIX< T, M, N >( 0 );
-template< typename T, unsigned int M, unsigned int N >
-const Matrix< T, M, N >& Matrix< T, M, N >::ZERO = ZERO_MATRIX< T, M, N >;
+const Matrix< T, M, N >& Matrix< T, M, N >::ZERO()
+{
+    static Matrix oZero(0);
+    return oZero;
+}
 
 // Identity matrix
-template< typename T, unsigned int N >
-IDENTITY_MATRIX< T, N >( 1, 0 );
 template< typename T, unsigned int M, unsigned int N >
-const Matrix< T, ( M < N ? M : N ) >&
-    Matrix< T, M, N >::IDENTITY = IDENTITY_MATRIX< T, ( M < N ? M : N ) >;
+const Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::IDENTITY()
+{
+    static IdentityType oIdentity( 1, 0 );
+    return oIdentity;
+}
 
 // Determinant - return 0 if non-square matrix
 template< typename T, unsigned int M, unsigned int N >
@@ -58,7 +61,7 @@ T Matrix< T, M, N >::Determinant() const
     T determinant = 0;
     for( unsigned int i = 0; i < N; i++ )
     {
-        determinant += Minor( 0, i ) * ( (i%2) == 1 ? -1 : 1 );
+        determinant += Minor( 0, i ) * ( (i%2) == 0 ? 1 : -1 );
     }
     return determinant;
 }
@@ -113,7 +116,7 @@ inline Matrix< T, M, N >::InverseType Matrix< T, M, N >::
     Inverse() const // if !invertable, return ZERO
 {
     InverseType oInverse;
-    return ( Inverse( oInverse ) ? oInverse : InverseType::ZERO );
+    return ( Inverse( oInverse ) ? oInverse : InverseType::ZERO() );
 }
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::InverseType Matrix< T, M, N >::
@@ -121,7 +124,7 @@ inline Matrix< T, M, N >::InverseType Matrix< T, M, N >::
 {
     InverseType oInverse;
     a_rbInvertable = Inverse( oInverse );
-    return a_rbInvertable ? oInverse : InverseType::ZERO;
+    return a_rbInvertable ? oInverse : InverseType::ZERO();
 }
 
 // For MxN matrix A where M > N, ( A^T * A )^(-1) * A^T * A
@@ -194,23 +197,24 @@ inline Matrix< T, M, N >::RowVectorType
 // Get smaller matrices by removing a row and/or column - redefine in child
 // classes to return the correct type.
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M-1, N-1 > Matrix< T, M, N >::
+inline Matrix< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) > Matrix< T, M, N >::
     MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const
 {
-    return Matrix< T, M-1, N-1 >( BaseType::MinusRowAndColumn( a_uiRow,
-                                                               a_uiColumn ) );
+    return Matrix< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >(
+                           BaseType::MinusRowAndColumn( a_uiRow, a_uiColumn ) );
 }
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N-1 > Matrix< T, M, N >::
+inline Matrix< T, M, ( N > 0 ? N-1 : 0 ) > Matrix< T, M, N >::
     MinusColumn( unsigned int a_uiColumn ) const
 {
-    return Matrix< T, M, N-1 >( BaseType::MinusColumn( a_uiColumn ) );
+    return Matrix< T, M, ( N > 0 ? N-1 : 0 ) >(
+                                          BaseType::MinusColumn( a_uiColumn ) );
 }
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M-1, N > Matrix< T, M, N >::
+inline Matrix< T, ( M > 0 ? M-1 : 0 ), N > Matrix< T, M, N >::
     MinusRow( unsigned int a_uiRow ) const
 {
-    return Matrix< T, M-1, N >( BaseType::MinusRow( a_uiRow ) );
+    return Matrix< T, ( M > 0 ? M-1 : 0 ), N >( BaseType::MinusRow( a_uiRow ) );
 }
     
 // Transpose - redefine in child classes to return correct type

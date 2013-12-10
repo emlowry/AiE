@@ -54,17 +54,17 @@ public:
     VectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     VectorBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                const T& ac_rFill = DEFAULT_FILL );
+                const T& ac_rFill = DEFAULT_FILL() );
     VectorBase( const T& ac_rFill );
     VectorBase( const T (&ac_raData)[ N ] );
     VectorBase( const T* const ac_cpData,
                 const unsigned int ac_uiSize,
-                const T& ac_rFill = DEFAULT_FILL );
+                const T& ac_rFill = DEFAULT_FILL() );
 
     // Construct from another type of vector
     template< unsigned int Q, bool t_bOtherIsRow >
     VectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-                const T& ac_rFill = DEFAULT_FILL );
+                const T& ac_rFill = DEFAULT_FILL() );
     template< unsigned int Q, bool t_bOtherIsRow >
     VectorBase& operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector );
 
@@ -78,7 +78,7 @@ public:
     virtual RowVectorType Row() const;
 
     // Get a smaller vector by removing an element
-    virtual VectorBase< T, N-1, t_bIsRow >
+    virtual VectorBase< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
         MinusElement( unsigned int a_uiIndex ) const;
 
     // Transpose - override in child classes to return correct type
@@ -120,11 +120,12 @@ private:
     // available
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
-    MatrixBase< T, M-1, N-1 >
-        MinusRowAndColumn( unsigned int a_uiRow,
-                           unsigned int a_uiColumn ) const;
-    MatrixBase< T, M, N-1 > MinusColumn( unsigned int a_uiColumn ) const;
-    MatrixBase< T, M-1, N > MinusRow( unsigned int a_uiRow ) const;
+    virtual MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+        MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
+    virtual MatrixBase< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+        MinusColumn( unsigned int a_uiColumn ) const;
+    virtual MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
+        MinusRow( unsigned int a_uiRow ) const;
 
 };
 

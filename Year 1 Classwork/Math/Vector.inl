@@ -174,18 +174,6 @@ inline Vector< typename MatrixInverse< T >::Type, P, true >
     return Result( MatrixType::operator/( ac_roMatrix ) );
 }
 
-// Simplify Crossing a pair of 3x3 vectors
-template< typename T, bool t_IsRow, bool t_IsOtherRow >
-Vector< T, 3, t_IsRow > Cross( const Vector< T, 3, t_IsRow >& ac_roVector,
-                               const Vector< T, 3, t_IsOtherRow >& ac_roOtherVector )
-{
-    Vector< T, 3, t_IsRow > aoOtherVector[1] =
-    {
-        Vector< T, 3, t_IsRow >( ac_roOtherVector )
-    };
-    return ac_roVector.Cross( aoOtherVector );
-}
-
 }   // namespace Math
 
 #endif  // _VECTOR_INL_

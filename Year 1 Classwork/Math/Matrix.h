@@ -72,17 +72,17 @@ public:
     Matrix( const MatrixBase< U, M, N >& ac_roMatrix )
     template< unsigned int P, unsigned int Q >
     Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     Matrix( const T& ac_rFill );
     Matrix( const T (&ac_raData)[ M*N ] );
     Matrix( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     Matrix( const T (&ac_raaData)[ M ][ N ] );
     Matrix( const T* const* const ac_cpcpData,
             const unsigned int ac_uiRows,
             const unsigned int ac_uiColumns,
-            const T& ac_rFill = DEFAULT_FILL );
+            const T& ac_rFill = DEFAULT_FILL() );
     Matrix( const ColumnVectorType (&ac_raoColumns)[ N ] );
     Matrix( const ColumnVectorType* const (&ac_rpoaColumns)[ N ] );
     Matrix( const RowVectorType (&ac_raoRows)[ M ] );
@@ -111,12 +111,12 @@ public:
     
     // Get smaller matrices by removing a row and/or column - redefine in child
     // classes to return the correct type.
-    virtual Matrix< T, M-1, N-1 >
+    virtual Matrix< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
         MinusRowAndColumn( unsigned int a_uiRow,
                            unsigned int a_uiColumn ) const override;
-    virtual Matrix< T, M, N-1 >
+    virtual Matrix< T, M, ( N > 0 ? N-1 : 0 ) >
         MinusColumn( unsigned int a_uiColumn ) const override;
-    virtual Matrix< T, M-1, N > MinusRow( unsigned int a_uiRow ) const override;
+    virtual Matrix< T, ( M > 0 ? M-1 : 0 ), N > MinusRow( unsigned int a_uiRow ) const override;
     
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const override;
@@ -174,8 +174,8 @@ public:
     Matrix& operator%=( const T& ac_rScalar );
     virtual Matrix operator%( const T& ac_rScalar ) const;
 
-    static const Matrix& ZERO;  // reference to ZERO_MATRIX< T, M, N >
-    static const IdentityType& IDENTITY;    // IDENTITY_MATRIX< T, min( M, N ) >
+    static const Matrix& ZERO();
+    static const IdentityType& IDENTITY();
 
 protected:
 
@@ -191,17 +191,7 @@ protected:
 
 };
 
-// Zero matrix
-template< typename T, unsigned int M, unsigned int N = M >
-const Matrix< T, M, N > ZERO_MATRIX;
-
-// Identity matrix
-template< typename T, unsigned int N >
-const Matrix< T, N > IDENTITY_MATRIX;
-
 }   // namespace Math
-
-
 
 // The Matrix class *must* be defined before the Vector class, since Vector is
 // a child class of Matrix.

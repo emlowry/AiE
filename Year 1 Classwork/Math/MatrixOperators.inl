@@ -47,7 +47,10 @@ template< unsigned int P >
 inline Matrix< typename MatrixInverse< T >::Type, M, P >
     Matrix< T, M, N >::operator/( const Matrix< T, P, N >& ac_roMatrix ) const
 {
-    assert( ac_roMatrix.IsInvertable() );
+    if( !ac_roMatrix.IsInvertable() )
+    {
+        throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
+    }
     return Product( ac_roMatrix.Inverse() );
 }
 
@@ -64,7 +67,10 @@ template< typename T, unsigned int M, unsigned int N >
 inline Vector< typename MatrixInverse< T >::Type, M, false >
     Matrix< T, M, N >::operator/( const Matrix< T, 1, N >& ac_roVector ) const
 {
-    assert( ac_roMatrix.IsInvertable() );
+    if( !ac_roMatrix.IsInvertable() )
+    {
+        throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
+    }
     typedef Vector< typename MatrixInverse< T >::Type, M, false > ResultType;
     return ResultType( Product( ac_roMatrix.Inverse() ) );
 }

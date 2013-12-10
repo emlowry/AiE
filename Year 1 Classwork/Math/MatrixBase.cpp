@@ -1,47 +1,48 @@
 /******************************************************************************
- * File:               Matrix.cpp
+ * File:               MatrixBase.cpp
  * Author:             Elizabeth Lowry
- * Date Created:       November 18, 2013
- * Description:        Explicit instantiation of Matrix types - these classes
- *                      will be compiled as part of the library, so users can
- *                      use them without having to include the template inline
- *                      function implementations themselves.
+ * Date Created:       December 9, 2013
+ * Description:        Explicit instantiation of MatrixBase types - these
+ *                      classes will be compiled as part of the library, so
+ *                      users can use them without having to include the
+ *                      template inline function implementations themselves.
  * Last Modified:      December 9, 2013
  * Last Modification:  Finished writing and using macros.
  ******************************************************************************/
 
-#include "T_Matrix.h"
+#include "T_MatrixBase.h"
+#include <string>
 
 namespace Math
 {
 
 #define MATRIX_TYPE( T ) \
-template struct MatrixInverse< T >; \
-template class Matrix< T, 0, 0 >; \
-template class Matrix< T, 0, 1 >; \
-template class Matrix< T, 0, 2 >; \
-template class Matrix< T, 0, 3 >; \
-template class Matrix< T, 0, 4 >; \
-template class Matrix< T, 1, 0 >; \
-template class Matrix< T, 1, 1 >; \
-template class Matrix< T, 1, 2 >; \
-template class Matrix< T, 1, 3 >; \
-template class Matrix< T, 1, 4 >; \
-template class Matrix< T, 2, 0 >; \
-template class Matrix< T, 2, 1 >; \
-template class Matrix< T, 2, 2 >; \
-template class Matrix< T, 2, 3 >; \
-template class Matrix< T, 2, 4 >; \
-template class Matrix< T, 3, 0 >; \
-template class Matrix< T, 3, 1 >; \
-template class Matrix< T, 3, 2 >; \
-template class Matrix< T, 3, 3 >; \
-template class Matrix< T, 3, 4 >; \
-template class Matrix< T, 4, 0 >; \
-template class Matrix< T, 4, 1 >; \
-template class Matrix< T, 4, 2 >; \
-template class Matrix< T, 4, 3 >; \
-template class Matrix< T, 4, 4 >;
+template struct MatrixFill< T >; \
+template class MatrixBase< T, 0, 0 >; \
+template class MatrixBase< T, 0, 1 >; \
+template class MatrixBase< T, 0, 2 >; \
+template class MatrixBase< T, 0, 3 >; \
+template class MatrixBase< T, 0, 4 >; \
+template class MatrixBase< T, 1, 0 >; \
+template class MatrixBase< T, 1, 1 >; \
+template class MatrixBase< T, 1, 2 >; \
+template class MatrixBase< T, 1, 3 >; \
+template class MatrixBase< T, 1, 4 >; \
+template class MatrixBase< T, 2, 0 >; \
+template class MatrixBase< T, 2, 1 >; \
+template class MatrixBase< T, 2, 2 >; \
+template class MatrixBase< T, 2, 3 >; \
+template class MatrixBase< T, 2, 4 >; \
+template class MatrixBase< T, 3, 0 >; \
+template class MatrixBase< T, 3, 1 >; \
+template class MatrixBase< T, 3, 2 >; \
+template class MatrixBase< T, 3, 3 >; \
+template class MatrixBase< T, 3, 4 >; \
+template class MatrixBase< T, 4, 0 >; \
+template class MatrixBase< T, 4, 1 >; \
+template class MatrixBase< T, 4, 2 >; \
+template class MatrixBase< T, 4, 3 >; \
+template class MatrixBase< T, 4, 4 >;
     
 MATRIX_TYPE( char )
 MATRIX_TYPE( signed char )
@@ -57,60 +58,166 @@ MATRIX_TYPE( unsigned long long )
 MATRIX_TYPE( float )
 MATRIX_TYPE( double )
 MATRIX_TYPE( long double )
+MATRIX_TYPE( bool )
+MATRIX_TYPE( void* )
+MATRIX_TYPE( const void* )
+MATRIX_TYPE( char* )
+MATRIX_TYPE( const char* )
+MATRIX_TYPE( std::string )
 
 #undef MATRIX_TYPE
 
 #define MATRIX_TYPE_CONVERSION( T, U ) \
-template Matrix< T, 0, 0 >:: \
-    Matrix< U >( const MatrixBase< U, 0, 0 >& ac_roMatrix ); \
-template Matrix< T, 0, 1 >:: \
-    Matrix< U >( const MatrixBase< U, 0, 1 >& ac_roMatrix ); \
-template Matrix< T, 0, 2 >:: \
-    Matrix< U >( const MatrixBase< U, 0, 2 >& ac_roMatrix ); \
-template Matrix< T, 0, 3 >:: \
-    Matrix< U >( const MatrixBase< U, 0, 3 >& ac_roMatrix ); \
-template Matrix< T, 0, 4 >:: \
-    Matrix< U >( const MatrixBase< U, 0, 4 >& ac_roMatrix ); \
-template Matrix< T, 1, 0 >:: \
-    Matrix< U >( const MatrixBase< U, 1, 0 >& ac_roMatrix ); \
-template Matrix< T, 1, 1 >:: \
-    Matrix< U >( const MatrixBase< U, 1, 1 >& ac_roMatrix ); \
-template Matrix< T, 1, 2 >:: \
-    Matrix< U >( const MatrixBase< U, 1, 2 >& ac_roMatrix ); \
-template Matrix< T, 1, 3 >:: \
-    Matrix< U >( const MatrixBase< U, 1, 3 >& ac_roMatrix ); \
-template Matrix< T, 1, 4 >:: \
-    Matrix< U >( const MatrixBase< U, 1, 4 >& ac_roMatrix ); \
-template Matrix< T, 2, 0 >:: \
-    Matrix< U >( const MatrixBase< U, 2, 0 >& ac_roMatrix ); \
-template Matrix< T, 2, 1 >:: \
-    Matrix< U >( const MatrixBase< U, 2, 1 >& ac_roMatrix ); \
-template Matrix< T, 2, 2 >:: \
-    Matrix< U >( const MatrixBase< U, 2, 2 >& ac_roMatrix ); \
-template Matrix< T, 2, 3 >:: \
-    Matrix< U >( const MatrixBase< U, 2, 3 >& ac_roMatrix ); \
-template Matrix< T, 2, 4 >:: \
-    Matrix< U >( const MatrixBase< U, 2, 4 >& ac_roMatrix ); \
-template Matrix< T, 3, 0 >:: \
-    Matrix< U >( const MatrixBase< U, 3, 0 >& ac_roMatrix ); \
-template Matrix< T, 3, 1 >:: \
-    Matrix< U >( const MatrixBase< U, 3, 1 >& ac_roMatrix ); \
-template Matrix< T, 3, 2 >:: \
-    Matrix< U >( const MatrixBase< U, 3, 2 >& ac_roMatrix ); \
-template Matrix< T, 3, 3 >:: \
-    Matrix< U >( const MatrixBase< U, 3, 3 >& ac_roMatrix ); \
-template Matrix< T, 3, 4 >:: \
-    Matrix< U >( const MatrixBase< U, 3, 4 >& ac_roMatrix ); \
-template Matrix< T, 4, 0 >:: \
-    Matrix< U >( const MatrixBase< U, 4, 0 >& ac_roMatrix ); \
-template Matrix< T, 4, 1 >:: \
-    Matrix< U >( const MatrixBase< U, 4, 1 >& ac_roMatrix ); \
-template Matrix< T, 4, 2 >:: \
-    Matrix< U >( const MatrixBase< U, 4, 2 >& ac_roMatrix ); \
-template Matrix< T, 4, 3 >:: \
-    Matrix< U >( const MatrixBase< U, 4, 3 >& ac_roMatrix ); \
-template Matrix< T, 4, 4 >:: \
-    Matrix< U >( const MatrixBase< U, 4, 4 >& ac_roMatrix );
+template MatrixBase< T, 0, 0 >:: \
+    MatrixBase< U >( const MatrixBase< U, 0, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 1 >:: \
+    MatrixBase< U >( const MatrixBase< U, 0, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 2 >:: \
+    MatrixBase< U >( const MatrixBase< U, 0, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 3 >:: \
+    MatrixBase< U >( const MatrixBase< U, 0, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 4 >:: \
+    MatrixBase< U >( const MatrixBase< U, 0, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 0 >:: \
+    MatrixBase< U >( const MatrixBase< U, 1, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 1 >:: \
+    MatrixBase< U >( const MatrixBase< U, 1, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 2 >:: \
+    MatrixBase< U >( const MatrixBase< U, 1, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 3 >:: \
+    MatrixBase< U >( const MatrixBase< U, 1, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 4 >:: \
+    MatrixBase< U >( const MatrixBase< U, 1, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 0 >:: \
+    MatrixBase< U >( const MatrixBase< U, 2, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 1 >:: \
+    MatrixBase< U >( const MatrixBase< U, 2, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 2 >:: \
+    MatrixBase< U >( const MatrixBase< U, 2, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 3 >:: \
+    MatrixBase< U >( const MatrixBase< U, 2, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 4 >:: \
+    MatrixBase< U >( const MatrixBase< U, 2, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 0 >:: \
+    MatrixBase< U >( const MatrixBase< U, 3, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 1 >:: \
+    MatrixBase< U >( const MatrixBase< U, 3, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 2 >:: \
+    MatrixBase< U >( const MatrixBase< U, 3, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 3 >:: \
+    MatrixBase< U >( const MatrixBase< U, 3, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 4 >:: \
+    MatrixBase< U >( const MatrixBase< U, 3, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 0 >:: \
+    MatrixBase< U >( const MatrixBase< U, 4, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 1 >:: \
+    MatrixBase< U >( const MatrixBase< U, 4, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 2 >:: \
+    MatrixBase< U >( const MatrixBase< U, 4, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 3 >:: \
+    MatrixBase< U >( const MatrixBase< U, 4, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 4 >:: \
+    MatrixBase< U >( const MatrixBase< U, 4, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 0 >& MatrixBase< T, 0, 0 >:: \
+    Assign< U >( const MatrixBase< U, 0, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 1 >& MatrixBase< T, 0, 1 >:: \
+    Assign< U >( const MatrixBase< U, 0, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 2 >& MatrixBase< T, 0, 2 >:: \
+    Assign< U >( const MatrixBase< U, 0, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 3 >& MatrixBase< T, 0, 3 >:: \
+    Assign< U >( const MatrixBase< U, 0, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 4 >& MatrixBase< T, 0, 4 >:: \
+    Assign< U >( const MatrixBase< U, 0, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 0 >& MatrixBase< T, 1, 0 >:: \
+    Assign< U >( const MatrixBase< U, 1, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 1 >& MatrixBase< T, 1, 1 >:: \
+    Assign< U >( const MatrixBase< U, 1, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 2 >& MatrixBase< T, 1, 2 >:: \
+    Assign< U >( const MatrixBase< U, 1, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 3 >& MatrixBase< T, 1, 3 >:: \
+    Assign< U >( const MatrixBase< U, 1, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 4 >& MatrixBase< T, 1, 4 >:: \
+    Assign< U >( const MatrixBase< U, 1, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 0 >& MatrixBase< T, 2, 0 >:: \
+    Assign< U >( const MatrixBase< U, 2, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 1 >& MatrixBase< T, 2, 1 >:: \
+    Assign< U >( const MatrixBase< U, 2, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 2 >& MatrixBase< T, 2, 2 >:: \
+    Assign< U >( const MatrixBase< U, 2, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 3 >& MatrixBase< T, 2, 3 >:: \
+    Assign< U >( const MatrixBase< U, 2, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 4 >& MatrixBase< T, 2, 4 >:: \
+    Assign< U >( const MatrixBase< U, 2, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 0 >& MatrixBase< T, 3, 0 >:: \
+    Assign< U >( const MatrixBase< U, 3, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 1 >& MatrixBase< T, 3, 1 >:: \
+    Assign< U >( const MatrixBase< U, 3, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 2 >& MatrixBase< T, 3, 2 >:: \
+    Assign< U >( const MatrixBase< U, 3, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 3 >& MatrixBase< T, 3, 3 >:: \
+    Assign< U >( const MatrixBase< U, 3, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 4 >& MatrixBase< T, 3, 4 >:: \
+    Assign< U >( const MatrixBase< U, 3, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 0 >& MatrixBase< T, 4, 0 >:: \
+    Assign< U >( const MatrixBase< U, 4, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 1 >& MatrixBase< T, 4, 1 >:: \
+    Assign< U >( const MatrixBase< U, 4, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 2 >& MatrixBase< T, 4, 2 >:: \
+    Assign< U >( const MatrixBase< U, 4, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 3 >& MatrixBase< T, 4, 3 >:: \
+    Assign< U >( const MatrixBase< U, 4, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 4 >& MatrixBase< T, 4, 4 >:: \
+    Assign< U >( const MatrixBase< U, 4, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 0 >& MatrixBase< T, 0, 0 >:: \
+    operator=< U >( const MatrixBase< U, 0, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 1 >& MatrixBase< T, 0, 1 >:: \
+    operator=< U >( const MatrixBase< U, 0, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 2 >& MatrixBase< T, 0, 2 >:: \
+    operator=< U >( const MatrixBase< U, 0, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 3 >& MatrixBase< T, 0, 3 >:: \
+    operator=< U >( const MatrixBase< U, 0, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 0, 4 >& MatrixBase< T, 0, 4 >:: \
+    operator=< U >( const MatrixBase< U, 0, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 0 >& MatrixBase< T, 1, 0 >:: \
+    operator=< U >( const MatrixBase< U, 1, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 1 >& MatrixBase< T, 1, 1 >:: \
+    operator=< U >( const MatrixBase< U, 1, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 2 >& MatrixBase< T, 1, 2 >:: \
+    operator=< U >( const MatrixBase< U, 1, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 3 >& MatrixBase< T, 1, 3 >:: \
+    operator=< U >( const MatrixBase< U, 1, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 1, 4 >& MatrixBase< T, 1, 4 >:: \
+    operator=< U >( const MatrixBase< U, 1, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 0 >& MatrixBase< T, 2, 0 >:: \
+    operator=< U >( const MatrixBase< U, 2, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 1 >& MatrixBase< T, 2, 1 >:: \
+    operator=< U >( const MatrixBase< U, 2, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 2 >& MatrixBase< T, 2, 2 >:: \
+    operator=< U >( const MatrixBase< U, 2, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 3 >& MatrixBase< T, 2, 3 >:: \
+    operator=< U >( const MatrixBase< U, 2, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 2, 4 >& MatrixBase< T, 2, 4 >:: \
+    operator=< U >( const MatrixBase< U, 2, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 0 >& MatrixBase< T, 3, 0 >:: \
+    operator=< U >( const MatrixBase< U, 3, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 1 >& MatrixBase< T, 3, 1 >:: \
+    operator=< U >( const MatrixBase< U, 3, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 2 >& MatrixBase< T, 3, 2 >:: \
+    operator=< U >( const MatrixBase< U, 3, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 3 >& MatrixBase< T, 3, 3 >:: \
+    operator=< U >( const MatrixBase< U, 3, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 3, 4 >& MatrixBase< T, 3, 4 >:: \
+    operator=< U >( const MatrixBase< U, 3, 4 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 0 >& MatrixBase< T, 4, 0 >:: \
+    operator=< U >( const MatrixBase< U, 4, 0 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 1 >& MatrixBase< T, 4, 1 >:: \
+    operator=< U >( const MatrixBase< U, 4, 1 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 2 >& MatrixBase< T, 4, 2 >:: \
+    operator=< U >( const MatrixBase< U, 4, 2 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 3 >& MatrixBase< T, 4, 3 >:: \
+    operator=< U >( const MatrixBase< U, 4, 3 >& ac_roMatrix ); \
+template MatrixBase< T, 4, 4 >& MatrixBase< T, 4, 4 >:: \
+    operator=< U >( const MatrixBase< U, 4, 4 >& ac_roMatrix );
 
 MATRIX_TYPE_CONVERSION( char, signed char )
 MATRIX_TYPE_CONVERSION( char, unsigned char )
@@ -125,6 +232,11 @@ MATRIX_TYPE_CONVERSION( char, unsigned long long )
 MATRIX_TYPE_CONVERSION( char, float )
 MATRIX_TYPE_CONVERSION( char, double )
 MATRIX_TYPE_CONVERSION( char, long double )
+MATRIX_TYPE_CONVERSION( char, bool )
+MATRIX_TYPE_CONVERSION( char, void* )
+MATRIX_TYPE_CONVERSION( char, const void* )
+MATRIX_TYPE_CONVERSION( char, char* )
+MATRIX_TYPE_CONVERSION( char, const char* )
 
 MATRIX_TYPE_CONVERSION( signed char, char )
 MATRIX_TYPE_CONVERSION( signed char, unsigned char )
@@ -139,6 +251,11 @@ MATRIX_TYPE_CONVERSION( signed char, unsigned long long )
 MATRIX_TYPE_CONVERSION( signed char, float )
 MATRIX_TYPE_CONVERSION( signed char, double )
 MATRIX_TYPE_CONVERSION( signed char, long double )
+MATRIX_TYPE_CONVERSION( signed char, bool )
+MATRIX_TYPE_CONVERSION( signed char, void* )
+MATRIX_TYPE_CONVERSION( signed char, const void* )
+MATRIX_TYPE_CONVERSION( signed char, char* )
+MATRIX_TYPE_CONVERSION( signed char, const char* )
 
 MATRIX_TYPE_CONVERSION( unsigned char, char )
 MATRIX_TYPE_CONVERSION( unsigned char, signed char )
@@ -153,6 +270,11 @@ MATRIX_TYPE_CONVERSION( unsigned char, unsigned long long )
 MATRIX_TYPE_CONVERSION( unsigned char, float )
 MATRIX_TYPE_CONVERSION( unsigned char, double )
 MATRIX_TYPE_CONVERSION( unsigned char, long double )
+MATRIX_TYPE_CONVERSION( unsigned char, bool )
+MATRIX_TYPE_CONVERSION( unsigned char, void* )
+MATRIX_TYPE_CONVERSION( unsigned char, const void* )
+MATRIX_TYPE_CONVERSION( unsigned char, char* )
+MATRIX_TYPE_CONVERSION( unsigned char, const char* )
 
 MATRIX_TYPE_CONVERSION( short, char )
 MATRIX_TYPE_CONVERSION( short, signed char )
@@ -167,6 +289,11 @@ MATRIX_TYPE_CONVERSION( short, unsigned long long )
 MATRIX_TYPE_CONVERSION( short, float )
 MATRIX_TYPE_CONVERSION( short, double )
 MATRIX_TYPE_CONVERSION( short, long double )
+MATRIX_TYPE_CONVERSION( short, bool )
+MATRIX_TYPE_CONVERSION( short, void* )
+MATRIX_TYPE_CONVERSION( short, const void* )
+MATRIX_TYPE_CONVERSION( short, char* )
+MATRIX_TYPE_CONVERSION( short, const char* )
 
 MATRIX_TYPE_CONVERSION( unsigned short, char )
 MATRIX_TYPE_CONVERSION( unsigned short, signed char )
@@ -181,6 +308,11 @@ MATRIX_TYPE_CONVERSION( unsigned short, unsigned long long )
 MATRIX_TYPE_CONVERSION( unsigned short, float )
 MATRIX_TYPE_CONVERSION( unsigned short, double )
 MATRIX_TYPE_CONVERSION( unsigned short, long double )
+MATRIX_TYPE_CONVERSION( unsigned short, bool )
+MATRIX_TYPE_CONVERSION( unsigned short, void* )
+MATRIX_TYPE_CONVERSION( unsigned short, const void* )
+MATRIX_TYPE_CONVERSION( unsigned short, char* )
+MATRIX_TYPE_CONVERSION( unsigned short, const char* )
 
 MATRIX_TYPE_CONVERSION( int, char )
 MATRIX_TYPE_CONVERSION( int, signed char )
@@ -195,6 +327,11 @@ MATRIX_TYPE_CONVERSION( int, unsigned long long )
 MATRIX_TYPE_CONVERSION( int, float )
 MATRIX_TYPE_CONVERSION( int, double )
 MATRIX_TYPE_CONVERSION( int, long double )
+MATRIX_TYPE_CONVERSION( int, bool )
+MATRIX_TYPE_CONVERSION( int, void* )
+MATRIX_TYPE_CONVERSION( int, const void* )
+MATRIX_TYPE_CONVERSION( int, char* )
+MATRIX_TYPE_CONVERSION( int, const char* )
 
 MATRIX_TYPE_CONVERSION( unsigned int, char )
 MATRIX_TYPE_CONVERSION( unsigned int, signed char )
@@ -209,6 +346,11 @@ MATRIX_TYPE_CONVERSION( unsigned int, unsigned long long )
 MATRIX_TYPE_CONVERSION( unsigned int, float )
 MATRIX_TYPE_CONVERSION( unsigned int, double )
 MATRIX_TYPE_CONVERSION( unsigned int, long double )
+MATRIX_TYPE_CONVERSION( unsigned int, bool )
+MATRIX_TYPE_CONVERSION( unsigned int, void* )
+MATRIX_TYPE_CONVERSION( unsigned int, const void* )
+MATRIX_TYPE_CONVERSION( unsigned int, char* )
+MATRIX_TYPE_CONVERSION( unsigned int, const char* )
 
 MATRIX_TYPE_CONVERSION( long, char )
 MATRIX_TYPE_CONVERSION( long, signed char )
@@ -223,6 +365,11 @@ MATRIX_TYPE_CONVERSION( long, unsigned long long )
 MATRIX_TYPE_CONVERSION( long, float )
 MATRIX_TYPE_CONVERSION( long, double )
 MATRIX_TYPE_CONVERSION( long, long double )
+MATRIX_TYPE_CONVERSION( long, bool )
+MATRIX_TYPE_CONVERSION( long, void* )
+MATRIX_TYPE_CONVERSION( long, const void* )
+MATRIX_TYPE_CONVERSION( long, char* )
+MATRIX_TYPE_CONVERSION( long, const char* )
 
 MATRIX_TYPE_CONVERSION( unsigned long, char )
 MATRIX_TYPE_CONVERSION( unsigned long, signed char )
@@ -237,6 +384,11 @@ MATRIX_TYPE_CONVERSION( unsigned long, unsigned long long )
 MATRIX_TYPE_CONVERSION( unsigned long, float )
 MATRIX_TYPE_CONVERSION( unsigned long, double )
 MATRIX_TYPE_CONVERSION( unsigned long, long double )
+MATRIX_TYPE_CONVERSION( unsigned long, bool )
+MATRIX_TYPE_CONVERSION( unsigned long, void* )
+MATRIX_TYPE_CONVERSION( unsigned long, const void* )
+MATRIX_TYPE_CONVERSION( unsigned long, char* )
+MATRIX_TYPE_CONVERSION( unsigned long, const char* )
 
 MATRIX_TYPE_CONVERSION( long long, char )
 MATRIX_TYPE_CONVERSION( long long, signed char )
@@ -251,6 +403,11 @@ MATRIX_TYPE_CONVERSION( long long, unsigned long long )
 MATRIX_TYPE_CONVERSION( long long, float )
 MATRIX_TYPE_CONVERSION( long long, double )
 MATRIX_TYPE_CONVERSION( long long, long double )
+MATRIX_TYPE_CONVERSION( long long, bool )
+MATRIX_TYPE_CONVERSION( long long, void* )
+MATRIX_TYPE_CONVERSION( long long, const void* )
+MATRIX_TYPE_CONVERSION( long long, char* )
+MATRIX_TYPE_CONVERSION( long long, const char* )
 
 MATRIX_TYPE_CONVERSION( unsigned long long, char )
 MATRIX_TYPE_CONVERSION( unsigned long long, signed char )
@@ -265,6 +422,11 @@ MATRIX_TYPE_CONVERSION( unsigned long long, long long )
 MATRIX_TYPE_CONVERSION( unsigned long long, float )
 MATRIX_TYPE_CONVERSION( unsigned long long, double )
 MATRIX_TYPE_CONVERSION( unsigned long long, long double )
+MATRIX_TYPE_CONVERSION( unsigned long long, bool )
+MATRIX_TYPE_CONVERSION( unsigned long long, void* )
+MATRIX_TYPE_CONVERSION( unsigned long long, const void* )
+MATRIX_TYPE_CONVERSION( unsigned long long, char* )
+MATRIX_TYPE_CONVERSION( unsigned long long, const char* )
 
 MATRIX_TYPE_CONVERSION( float, char )
 MATRIX_TYPE_CONVERSION( float, signed char )
@@ -279,6 +441,11 @@ MATRIX_TYPE_CONVERSION( float, long long )
 MATRIX_TYPE_CONVERSION( float, unsigned long long )
 MATRIX_TYPE_CONVERSION( float, double )
 MATRIX_TYPE_CONVERSION( float, long double )
+MATRIX_TYPE_CONVERSION( float, bool )
+MATRIX_TYPE_CONVERSION( float, void* )
+MATRIX_TYPE_CONVERSION( float, const void* )
+MATRIX_TYPE_CONVERSION( float, char* )
+MATRIX_TYPE_CONVERSION( float, const char* )
 
 MATRIX_TYPE_CONVERSION( double, char )
 MATRIX_TYPE_CONVERSION( double, signed char )
@@ -293,6 +460,11 @@ MATRIX_TYPE_CONVERSION( double, long long )
 MATRIX_TYPE_CONVERSION( double, unsigned long long )
 MATRIX_TYPE_CONVERSION( double, float )
 MATRIX_TYPE_CONVERSION( double, long double )
+MATRIX_TYPE_CONVERSION( double, bool )
+MATRIX_TYPE_CONVERSION( double, void* )
+MATRIX_TYPE_CONVERSION( double, const void* )
+MATRIX_TYPE_CONVERSION( double, char* )
+MATRIX_TYPE_CONVERSION( double, const char* )
 
 MATRIX_TYPE_CONVERSION( long double, char )
 MATRIX_TYPE_CONVERSION( long double, signed char )
@@ -307,52 +479,251 @@ MATRIX_TYPE_CONVERSION( long double, long long )
 MATRIX_TYPE_CONVERSION( long double, unsigned long long )
 MATRIX_TYPE_CONVERSION( long double, float )
 MATRIX_TYPE_CONVERSION( long double, double )
+MATRIX_TYPE_CONVERSION( long double, bool )
+MATRIX_TYPE_CONVERSION( long double, void* )
+MATRIX_TYPE_CONVERSION( long double, const void* )
+MATRIX_TYPE_CONVERSION( long double, char* )
+MATRIX_TYPE_CONVERSION( long double, const char* )
+
+MATRIX_TYPE_CONVERSION( bool, char )
+MATRIX_TYPE_CONVERSION( bool, signed char )
+MATRIX_TYPE_CONVERSION( bool, unsigned char )
+MATRIX_TYPE_CONVERSION( bool, short )
+MATRIX_TYPE_CONVERSION( bool, unsigned short )
+MATRIX_TYPE_CONVERSION( bool, int )
+MATRIX_TYPE_CONVERSION( bool, unsigned int )
+MATRIX_TYPE_CONVERSION( bool, long )
+MATRIX_TYPE_CONVERSION( bool, unsigned long )
+MATRIX_TYPE_CONVERSION( bool, long long )
+MATRIX_TYPE_CONVERSION( bool, unsigned long long )
+MATRIX_TYPE_CONVERSION( bool, float )
+MATRIX_TYPE_CONVERSION( bool, double )
+MATRIX_TYPE_CONVERSION( bool, long double )
+MATRIX_TYPE_CONVERSION( bool, void* )
+MATRIX_TYPE_CONVERSION( bool, const void* )
+MATRIX_TYPE_CONVERSION( bool, char* )
+MATRIX_TYPE_CONVERSION( bool, const char* )
+
+MATRIX_TYPE_CONVERSION( void*, char )
+MATRIX_TYPE_CONVERSION( void*, signed char )
+MATRIX_TYPE_CONVERSION( void*, unsigned char )
+MATRIX_TYPE_CONVERSION( void*, short )
+MATRIX_TYPE_CONVERSION( void*, unsigned short )
+MATRIX_TYPE_CONVERSION( void*, int )
+MATRIX_TYPE_CONVERSION( void*, unsigned int )
+MATRIX_TYPE_CONVERSION( void*, long )
+MATRIX_TYPE_CONVERSION( void*, unsigned long )
+MATRIX_TYPE_CONVERSION( void*, long long )
+MATRIX_TYPE_CONVERSION( void*, unsigned long long )
+MATRIX_TYPE_CONVERSION( void*, float )
+MATRIX_TYPE_CONVERSION( void*, double )
+MATRIX_TYPE_CONVERSION( void*, long double )
+MATRIX_TYPE_CONVERSION( void*, bool )
+MATRIX_TYPE_CONVERSION( void*, char* )
+
+MATRIX_TYPE_CONVERSION( const void*, char )
+MATRIX_TYPE_CONVERSION( const void*, signed char )
+MATRIX_TYPE_CONVERSION( const void*, unsigned char )
+MATRIX_TYPE_CONVERSION( const void*, short )
+MATRIX_TYPE_CONVERSION( const void*, unsigned short )
+MATRIX_TYPE_CONVERSION( const void*, int )
+MATRIX_TYPE_CONVERSION( const void*, unsigned int )
+MATRIX_TYPE_CONVERSION( const void*, long )
+MATRIX_TYPE_CONVERSION( const void*, unsigned long )
+MATRIX_TYPE_CONVERSION( const void*, long long )
+MATRIX_TYPE_CONVERSION( const void*, unsigned long long )
+MATRIX_TYPE_CONVERSION( const void*, float )
+MATRIX_TYPE_CONVERSION( const void*, double )
+MATRIX_TYPE_CONVERSION( const void*, long double )
+MATRIX_TYPE_CONVERSION( const void*, bool )
+MATRIX_TYPE_CONVERSION( const void*, void* )
+MATRIX_TYPE_CONVERSION( const void*, const void* )
+MATRIX_TYPE_CONVERSION( const void*, char* )
+MATRIX_TYPE_CONVERSION( const void*, const char* )
+
+MATRIX_TYPE_CONVERSION( char*, char )
+MATRIX_TYPE_CONVERSION( char*, signed char )
+MATRIX_TYPE_CONVERSION( char*, unsigned char )
+MATRIX_TYPE_CONVERSION( char*, short )
+MATRIX_TYPE_CONVERSION( char*, unsigned short )
+MATRIX_TYPE_CONVERSION( char*, int )
+MATRIX_TYPE_CONVERSION( char*, unsigned int )
+MATRIX_TYPE_CONVERSION( char*, long )
+MATRIX_TYPE_CONVERSION( char*, unsigned long )
+MATRIX_TYPE_CONVERSION( char*, long long )
+MATRIX_TYPE_CONVERSION( char*, unsigned long long )
+MATRIX_TYPE_CONVERSION( char*, float )
+MATRIX_TYPE_CONVERSION( char*, double )
+MATRIX_TYPE_CONVERSION( char*, long double )
+MATRIX_TYPE_CONVERSION( char*, bool )
+MATRIX_TYPE_CONVERSION( char*, void* )
+
+MATRIX_TYPE_CONVERSION( const char*, char )
+MATRIX_TYPE_CONVERSION( const char*, signed char )
+MATRIX_TYPE_CONVERSION( const char*, unsigned char )
+MATRIX_TYPE_CONVERSION( const char*, short )
+MATRIX_TYPE_CONVERSION( const char*, unsigned short )
+MATRIX_TYPE_CONVERSION( const char*, int )
+MATRIX_TYPE_CONVERSION( const char*, unsigned int )
+MATRIX_TYPE_CONVERSION( const char*, long )
+MATRIX_TYPE_CONVERSION( const char*, unsigned long )
+MATRIX_TYPE_CONVERSION( const char*, long long )
+MATRIX_TYPE_CONVERSION( const char*, unsigned long long )
+MATRIX_TYPE_CONVERSION( const char*, float )
+MATRIX_TYPE_CONVERSION( const char*, double )
+MATRIX_TYPE_CONVERSION( const char*, long double )
+MATRIX_TYPE_CONVERSION( const char*, bool )
+MATRIX_TYPE_CONVERSION( const char*, void* )
+MATRIX_TYPE_CONVERSION( const char*, const void* )
+MATRIX_TYPE_CONVERSION( const char*, char* )
+MATRIX_TYPE_CONVERSION( const char*, const char* )
+
+MATRIX_TYPE_CONVERSION( std::string, char* )
+MATRIX_TYPE_CONVERSION( std::string, const char* )
 
 #undef MATRIX_TYPE_CONVERSION
 
 #define MATRIX_SIZE_CONVERSION( M, N, P, Q ) \
-template Matrix< char, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< char, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< signed char, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< signed char, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< unsigned char, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< unsigned char, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< short, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< short, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< unsigned short, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< unsigned short, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< int, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< int, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< unsigned int, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< unsigned int, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< long, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< long, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< unsigned long, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< unsigned long, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< long long, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< long long, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< unsigned long long, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< unsigned long long, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< float, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< float, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< double, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< double, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill ); \
-template Matrix< long double, M, N >:: \
-    Matrix< P, Q >( const MatrixBase< long double, P, Q >& ac_roMatrix, \
-                    const T& ac_rFill );
+template MatrixBase< char, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< char, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< signed char, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< signed char, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< unsigned char, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< unsigned char, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< short, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< short, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< unsigned short, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< unsigned short, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< int, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< int, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< unsigned int, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< unsigned int, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< long, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< long, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< unsigned long, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< unsigned long, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< long long, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< long long, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< unsigned long long, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< unsigned long long, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< float, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< float, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< double, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< double, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< long double, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< long double, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< bool, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< bool, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< void*, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< void*, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< const void*, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< const void*, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< char*, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< char*, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< const char*, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< const char*, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< std::string, M, N >:: \
+    MatrixBase< P, Q >( const MatrixBase< std::string, P, Q >& ac_roMatrix, \
+                        const T& ac_rFill ); \
+template MatrixBase< char, M, N >& MatrixBase< char, M, N >:: \
+    Assign< P, Q >( const MatrixBase< char, P, Q >& ac_roMatrix ); \
+template MatrixBase< signed char, M, N >& MatrixBase< signed char, M, N >:: \
+    Assign< P, Q >( const MatrixBase< signed char, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned char, M, N >& MatrixBase< unsigned char, M, N >:: \
+    Assign< P, Q >( const MatrixBase< unsigned char, P, Q >& ac_roMatrix ); \
+template MatrixBase< short, M, N >& MatrixBase< short, M, N >:: \
+    Assign< P, Q >( const MatrixBase< short, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned short, M, N >& MatrixBase< unsigned short, M, N >:: \
+    Assign< P, Q >( const MatrixBase< unsigned short, P, Q >& ac_roMatrix ); \
+template MatrixBase< int, M, N >& MatrixBase< int, M, N >:: \
+    Assign< P, Q >( const MatrixBase< int, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned int, M, N >& MatrixBase< unsigned int, M, N >:: \
+    Assign< P, Q >( const MatrixBase< unsigned int, P, Q >& ac_roMatrix ); \
+template MatrixBase< long, M, N >& MatrixBase< long, M, N >:: \
+    Assign< P, Q >( const MatrixBase< long, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned long, M, N >& MatrixBase< unsigned long, M, N >:: \
+    Assign< P, Q >( const MatrixBase< unsigned long, P, Q >& ac_roMatrix ); \
+template MatrixBase< long long, M, N >& MatrixBase< long long, M, N >:: \
+    Assign< P, Q >( const MatrixBase< long long, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned long long, M, N >& MatrixBase< unsigned long long, M, N >:: \
+    Assign< P, Q >( const MatrixBase< unsigned long long, P, Q >& ac_roMatrix ); \
+template MatrixBase< float, M, N >& MatrixBase< float, M, N >:: \
+    Assign< P, Q >( const MatrixBase< float, P, Q >& ac_roMatrix ); \
+template MatrixBase< double, M, N >& MatrixBase< double, M, N >:: \
+    Assign< P, Q >( const MatrixBase< double, P, Q >& ac_roMatrix ); \
+template MatrixBase< long double, M, N >& MatrixBase< long double, M, N >:: \
+    Assign< P, Q >( const MatrixBase< long double, P, Q >& ac_roMatrix ); \
+template MatrixBase< bool, M, N >& MatrixBase< bool, M, N >:: \
+    Assign< P, Q >( const MatrixBase< bool, P, Q >& ac_roMatrix ); \
+template MatrixBase< void*, M, N >& MatrixBase< void*, M, N >:: \
+    Assign< P, Q >( const MatrixBase< void*, P, Q >& ac_roMatrix ); \
+template MatrixBase< const void*, M, N >& MatrixBase< const void*, M, N >:: \
+    Assign< P, Q >( const MatrixBase< const void*, P, Q >& ac_roMatrix ); \
+template MatrixBase< char*, M, N >& MatrixBase< char*, M, N >:: \
+    Assign< P, Q >( const MatrixBase< char*, P, Q >& ac_roMatrix ); \
+template MatrixBase< const char*, M, N >& MatrixBase< const char*, M, N >:: \
+    Assign< P, Q >( const MatrixBase< const char*, P, Q >& ac_roMatrix ); \
+template MatrixBase< std::string, M, N >& MatrixBase< std::string, M, N >:: \
+    Assign< P, Q >( const MatrixBase< std::string, P, Q >& ac_roMatrix ); \
+template MatrixBase< char, M, N >& MatrixBase< char, M, N >:: \
+    operator=< P, Q >( const MatrixBase< char, P, Q >& ac_roMatrix ); \
+template MatrixBase< signed char, M, N >& MatrixBase< signed char, M, N >:: \
+    operator=< P, Q >( const MatrixBase< signed char, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned char, M, N >& MatrixBase< unsigned char, M, N >:: \
+    operator=< P, Q >( const MatrixBase< unsigned char, P, Q >& ac_roMatrix ); \
+template MatrixBase< short, M, N >& MatrixBase< short, M, N >:: \
+    operator=< P, Q >( const MatrixBase< short, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned short, M, N >& MatrixBase< unsigned short, M, N >:: \
+    operator=< P, Q >( const MatrixBase< unsigned short, P, Q >& ac_roMatrix ); \
+template MatrixBase< int, M, N >& MatrixBase< int, M, N >:: \
+    operator=< P, Q >( const MatrixBase< int, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned int, M, N >& MatrixBase< unsigned int, M, N >:: \
+    operator=< P, Q >( const MatrixBase< unsigned int, P, Q >& ac_roMatrix ); \
+template MatrixBase< long, M, N >& MatrixBase< long, M, N >:: \
+    operator=< P, Q >( const MatrixBase< long, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned long, M, N >& MatrixBase< unsigned long, M, N >:: \
+    operator=< P, Q >( const MatrixBase< unsigned long, P, Q >& ac_roMatrix ); \
+template MatrixBase< long long, M, N >& MatrixBase< long long, M, N >:: \
+    operator=< P, Q >( const MatrixBase< long long, P, Q >& ac_roMatrix ); \
+template MatrixBase< unsigned long long, M, N >& MatrixBase< unsigned long long, M, N >:: \
+    operator=< P, Q >( const MatrixBase< unsigned long long, P, Q >& ac_roMatrix ); \
+template MatrixBase< float, M, N >& MatrixBase< float, M, N >:: \
+    operator=< P, Q >( const MatrixBase< float, P, Q >& ac_roMatrix ); \
+template MatrixBase< double, M, N >& MatrixBase< double, M, N >:: \
+    operator=< P, Q >( const MatrixBase< double, P, Q >& ac_roMatrix ); \
+template MatrixBase< long double, M, N >& MatrixBase< long double, M, N >:: \
+    operator=< P, Q >( const MatrixBase< long double, P, Q >& ac_roMatrix ); \
+template MatrixBase< bool, M, N >& MatrixBase< bool, M, N >:: \
+    operator=< P, Q >( const MatrixBase< bool, P, Q >& ac_roMatrix ); \
+template MatrixBase< void*, M, N >& MatrixBase< void*, M, N >:: \
+    operator=< P, Q >( const MatrixBase< void*, P, Q >& ac_roMatrix ); \
+template MatrixBase< const void*, M, N >& MatrixBase< const void*, M, N >:: \
+    operator=< P, Q >( const MatrixBase< const void*, P, Q >& ac_roMatrix ); \
+template MatrixBase< char*, M, N >& MatrixBase< char*, M, N >:: \
+    operator=< P, Q >( const MatrixBase< char*, P, Q >& ac_roMatrix ); \
+template MatrixBase< const char*, M, N >& MatrixBase< const char*, M, N >:: \
+    operator=< P, Q >( const MatrixBase< const char*, P, Q >& ac_roMatrix ); \
+template MatrixBase< std::string, M, N >& MatrixBase< std::string, M, N >:: \
+    operator=< P, Q >( const MatrixBase< std::string, P, Q >& ac_roMatrix );
 
 MATRIX_SIZE_CONVERSION( 0, 0, 0, 1 )
 MATRIX_SIZE_CONVERSION( 0, 0, 0, 2 )
@@ -980,393 +1351,5 @@ MATRIX_SIZE_CONVERSION( 4, 4, 4, 2 )
 MATRIX_SIZE_CONVERSION( 4, 4, 4, 3 )
 
 #undef MATRIX_SIZE_CONVERSION
-
-#define MATRIX_MULTIPLY( T, M, N ) \
-template Matrix< T, M, 1 > Matrix< T, M, N >:: \
-    Product< 1 >( const Matrix< T, N, 1 >& ac_roMatrix ) const; \
-template Matrix< T, M, 2 > Matrix< T, M, N >:: \
-    Product< 2 >( const Matrix< T, N, 2 >& ac_roMatrix ) const; \
-template Matrix< T, M, 3 > Matrix< T, M, N >:: \
-    Product< 3 >( const Matrix< T, N, 3 >& ac_roMatrix ) const; \
-template Matrix< T, M, 4 > Matrix< T, M, N >:: \
-    Product< 4 >( const Matrix< T, N, 4 >& ac_roMatrix ) const; \
-template Matrix< T, M, 2 > Matrix< T, M, N >:: \
-    operator*< 2 >( const Matrix< T, N, 2 >& ac_roMatrix ) const; \
-template Matrix< T, M, 3 > Matrix< T, M, N >:: \
-    operator*< 3 >( const Matrix< T, N, 3 >& ac_roMatrix ) const; \
-template Matrix< T, M, 4 > Matrix< T, M, N >:: \
-    operator*< 4 >( const Matrix< T, N, 4 >& ac_roMatrix ) const; \
-template Matrix< typename MatrixInverse< T >::Type, M, 2 > Matrix< T, M, N >:: \
-    operator/< 2 >( const Matrix< T, 2, N >& ac_roMatrix ) const; \
-template Matrix< typename MatrixInverse< T >::Type, M, 3 > Matrix< T, M, N >:: \
-    operator/< 3 >( const Matrix< T, 3, N >& ac_roMatrix ) const; \
-template Matrix< typename MatrixInverse< T >::Type, M, 4 > Matrix< T, M, N >:: \
-    operator/< 4 >( const Matrix< T, 4, N >& ac_roMatrix ) const;
-
-MATRIX_MULTIPLY( char, 0, 0 )
-MATRIX_MULTIPLY( char, 0, 1 )
-MATRIX_MULTIPLY( char, 0, 2 )
-MATRIX_MULTIPLY( char, 0, 3 )
-MATRIX_MULTIPLY( char, 0, 4 )
-MATRIX_MULTIPLY( char, 1, 0 )
-MATRIX_MULTIPLY( char, 1, 1 )
-MATRIX_MULTIPLY( char, 1, 2 )
-MATRIX_MULTIPLY( char, 1, 3 )
-MATRIX_MULTIPLY( char, 1, 4 )
-MATRIX_MULTIPLY( char, 2, 0 )
-MATRIX_MULTIPLY( char, 2, 1 )
-MATRIX_MULTIPLY( char, 2, 2 )
-MATRIX_MULTIPLY( char, 2, 3 )
-MATRIX_MULTIPLY( char, 2, 4 )
-MATRIX_MULTIPLY( char, 3, 0 )
-MATRIX_MULTIPLY( char, 3, 1 )
-MATRIX_MULTIPLY( char, 3, 2 )
-MATRIX_MULTIPLY( char, 3, 3 )
-MATRIX_MULTIPLY( char, 3, 4 )
-MATRIX_MULTIPLY( char, 4, 0 )
-MATRIX_MULTIPLY( char, 4, 1 )
-MATRIX_MULTIPLY( char, 4, 2 )
-MATRIX_MULTIPLY( char, 4, 3 )
-MATRIX_MULTIPLY( char, 4, 4 )
-
-MATRIX_MULTIPLY( signed char, 0, 0 )
-MATRIX_MULTIPLY( signed char, 0, 1 )
-MATRIX_MULTIPLY( signed char, 0, 2 )
-MATRIX_MULTIPLY( signed char, 0, 3 )
-MATRIX_MULTIPLY( signed char, 0, 4 )
-MATRIX_MULTIPLY( signed char, 1, 0 )
-MATRIX_MULTIPLY( signed char, 1, 1 )
-MATRIX_MULTIPLY( signed char, 1, 2 )
-MATRIX_MULTIPLY( signed char, 1, 3 )
-MATRIX_MULTIPLY( signed char, 1, 4 )
-MATRIX_MULTIPLY( signed char, 2, 0 )
-MATRIX_MULTIPLY( signed char, 2, 1 )
-MATRIX_MULTIPLY( signed char, 2, 2 )
-MATRIX_MULTIPLY( signed char, 2, 3 )
-MATRIX_MULTIPLY( signed char, 2, 4 )
-MATRIX_MULTIPLY( signed char, 3, 0 )
-MATRIX_MULTIPLY( signed char, 3, 1 )
-MATRIX_MULTIPLY( signed char, 3, 2 )
-MATRIX_MULTIPLY( signed char, 3, 3 )
-MATRIX_MULTIPLY( signed char, 3, 4 )
-MATRIX_MULTIPLY( signed char, 4, 0 )
-MATRIX_MULTIPLY( signed char, 4, 1 )
-MATRIX_MULTIPLY( signed char, 4, 2 )
-MATRIX_MULTIPLY( signed char, 4, 3 )
-MATRIX_MULTIPLY( signed char, 4, 4 )
-
-MATRIX_MULTIPLY( unsigned char, 0, 0 )
-MATRIX_MULTIPLY( unsigned char, 0, 1 )
-MATRIX_MULTIPLY( unsigned char, 0, 2 )
-MATRIX_MULTIPLY( unsigned char, 0, 3 )
-MATRIX_MULTIPLY( unsigned char, 0, 4 )
-MATRIX_MULTIPLY( unsigned char, 1, 0 )
-MATRIX_MULTIPLY( unsigned char, 1, 1 )
-MATRIX_MULTIPLY( unsigned char, 1, 2 )
-MATRIX_MULTIPLY( unsigned char, 1, 3 )
-MATRIX_MULTIPLY( unsigned char, 1, 4 )
-MATRIX_MULTIPLY( unsigned char, 2, 0 )
-MATRIX_MULTIPLY( unsigned char, 2, 1 )
-MATRIX_MULTIPLY( unsigned char, 2, 2 )
-MATRIX_MULTIPLY( unsigned char, 2, 3 )
-MATRIX_MULTIPLY( unsigned char, 2, 4 )
-MATRIX_MULTIPLY( unsigned char, 3, 0 )
-MATRIX_MULTIPLY( unsigned char, 3, 1 )
-MATRIX_MULTIPLY( unsigned char, 3, 2 )
-MATRIX_MULTIPLY( unsigned char, 3, 3 )
-MATRIX_MULTIPLY( unsigned char, 3, 4 )
-MATRIX_MULTIPLY( unsigned char, 4, 0 )
-MATRIX_MULTIPLY( unsigned char, 4, 1 )
-MATRIX_MULTIPLY( unsigned char, 4, 2 )
-MATRIX_MULTIPLY( unsigned char, 4, 3 )
-MATRIX_MULTIPLY( unsigned char, 4, 4 )
-
-MATRIX_MULTIPLY( short, 0, 0 )
-MATRIX_MULTIPLY( short, 0, 1 )
-MATRIX_MULTIPLY( short, 0, 2 )
-MATRIX_MULTIPLY( short, 0, 3 )
-MATRIX_MULTIPLY( short, 0, 4 )
-MATRIX_MULTIPLY( short, 1, 0 )
-MATRIX_MULTIPLY( short, 1, 1 )
-MATRIX_MULTIPLY( short, 1, 2 )
-MATRIX_MULTIPLY( short, 1, 3 )
-MATRIX_MULTIPLY( short, 1, 4 )
-MATRIX_MULTIPLY( short, 2, 0 )
-MATRIX_MULTIPLY( short, 2, 1 )
-MATRIX_MULTIPLY( short, 2, 2 )
-MATRIX_MULTIPLY( short, 2, 3 )
-MATRIX_MULTIPLY( short, 2, 4 )
-MATRIX_MULTIPLY( short, 3, 0 )
-MATRIX_MULTIPLY( short, 3, 1 )
-MATRIX_MULTIPLY( short, 3, 2 )
-MATRIX_MULTIPLY( short, 3, 3 )
-MATRIX_MULTIPLY( short, 3, 4 )
-MATRIX_MULTIPLY( short, 4, 0 )
-MATRIX_MULTIPLY( short, 4, 1 )
-MATRIX_MULTIPLY( short, 4, 2 )
-MATRIX_MULTIPLY( short, 4, 3 )
-MATRIX_MULTIPLY( short, 4, 4 )
-
-MATRIX_MULTIPLY( unsigned short, 0, 0 )
-MATRIX_MULTIPLY( unsigned short, 0, 1 )
-MATRIX_MULTIPLY( unsigned short, 0, 2 )
-MATRIX_MULTIPLY( unsigned short, 0, 3 )
-MATRIX_MULTIPLY( unsigned short, 0, 4 )
-MATRIX_MULTIPLY( unsigned short, 1, 0 )
-MATRIX_MULTIPLY( unsigned short, 1, 1 )
-MATRIX_MULTIPLY( unsigned short, 1, 2 )
-MATRIX_MULTIPLY( unsigned short, 1, 3 )
-MATRIX_MULTIPLY( unsigned short, 1, 4 )
-MATRIX_MULTIPLY( unsigned short, 2, 0 )
-MATRIX_MULTIPLY( unsigned short, 2, 1 )
-MATRIX_MULTIPLY( unsigned short, 2, 2 )
-MATRIX_MULTIPLY( unsigned short, 2, 3 )
-MATRIX_MULTIPLY( unsigned short, 2, 4 )
-MATRIX_MULTIPLY( unsigned short, 3, 0 )
-MATRIX_MULTIPLY( unsigned short, 3, 1 )
-MATRIX_MULTIPLY( unsigned short, 3, 2 )
-MATRIX_MULTIPLY( unsigned short, 3, 3 )
-MATRIX_MULTIPLY( unsigned short, 3, 4 )
-MATRIX_MULTIPLY( unsigned short, 4, 0 )
-MATRIX_MULTIPLY( unsigned short, 4, 1 )
-MATRIX_MULTIPLY( unsigned short, 4, 2 )
-MATRIX_MULTIPLY( unsigned short, 4, 3 )
-MATRIX_MULTIPLY( unsigned short, 4, 4 )
-
-MATRIX_MULTIPLY( int, 0, 0 )
-MATRIX_MULTIPLY( int, 0, 1 )
-MATRIX_MULTIPLY( int, 0, 2 )
-MATRIX_MULTIPLY( int, 0, 3 )
-MATRIX_MULTIPLY( int, 0, 4 )
-MATRIX_MULTIPLY( int, 1, 0 )
-MATRIX_MULTIPLY( int, 1, 1 )
-MATRIX_MULTIPLY( int, 1, 2 )
-MATRIX_MULTIPLY( int, 1, 3 )
-MATRIX_MULTIPLY( int, 1, 4 )
-MATRIX_MULTIPLY( int, 2, 0 )
-MATRIX_MULTIPLY( int, 2, 1 )
-MATRIX_MULTIPLY( int, 2, 2 )
-MATRIX_MULTIPLY( int, 2, 3 )
-MATRIX_MULTIPLY( int, 2, 4 )
-MATRIX_MULTIPLY( int, 3, 0 )
-MATRIX_MULTIPLY( int, 3, 1 )
-MATRIX_MULTIPLY( int, 3, 2 )
-MATRIX_MULTIPLY( int, 3, 3 )
-MATRIX_MULTIPLY( int, 3, 4 )
-MATRIX_MULTIPLY( int, 4, 0 )
-MATRIX_MULTIPLY( int, 4, 1 )
-MATRIX_MULTIPLY( int, 4, 2 )
-MATRIX_MULTIPLY( int, 4, 3 )
-MATRIX_MULTIPLY( int, 4, 4 )
-
-MATRIX_MULTIPLY( unsigned int, 0, 0 )
-MATRIX_MULTIPLY( unsigned int, 0, 1 )
-MATRIX_MULTIPLY( unsigned int, 0, 2 )
-MATRIX_MULTIPLY( unsigned int, 0, 3 )
-MATRIX_MULTIPLY( unsigned int, 0, 4 )
-MATRIX_MULTIPLY( unsigned int, 1, 0 )
-MATRIX_MULTIPLY( unsigned int, 1, 1 )
-MATRIX_MULTIPLY( unsigned int, 1, 2 )
-MATRIX_MULTIPLY( unsigned int, 1, 3 )
-MATRIX_MULTIPLY( unsigned int, 1, 4 )
-MATRIX_MULTIPLY( unsigned int, 2, 0 )
-MATRIX_MULTIPLY( unsigned int, 2, 1 )
-MATRIX_MULTIPLY( unsigned int, 2, 2 )
-MATRIX_MULTIPLY( unsigned int, 2, 3 )
-MATRIX_MULTIPLY( unsigned int, 2, 4 )
-MATRIX_MULTIPLY( unsigned int, 3, 0 )
-MATRIX_MULTIPLY( unsigned int, 3, 1 )
-MATRIX_MULTIPLY( unsigned int, 3, 2 )
-MATRIX_MULTIPLY( unsigned int, 3, 3 )
-MATRIX_MULTIPLY( unsigned int, 3, 4 )
-MATRIX_MULTIPLY( unsigned int, 4, 0 )
-MATRIX_MULTIPLY( unsigned int, 4, 1 )
-MATRIX_MULTIPLY( unsigned int, 4, 2 )
-MATRIX_MULTIPLY( unsigned int, 4, 3 )
-MATRIX_MULTIPLY( unsigned int, 4, 4 )
-
-MATRIX_MULTIPLY( long, 0, 0 )
-MATRIX_MULTIPLY( long, 0, 1 )
-MATRIX_MULTIPLY( long, 0, 2 )
-MATRIX_MULTIPLY( long, 0, 3 )
-MATRIX_MULTIPLY( long, 0, 4 )
-MATRIX_MULTIPLY( long, 1, 0 )
-MATRIX_MULTIPLY( long, 1, 1 )
-MATRIX_MULTIPLY( long, 1, 2 )
-MATRIX_MULTIPLY( long, 1, 3 )
-MATRIX_MULTIPLY( long, 1, 4 )
-MATRIX_MULTIPLY( long, 2, 0 )
-MATRIX_MULTIPLY( long, 2, 1 )
-MATRIX_MULTIPLY( long, 2, 2 )
-MATRIX_MULTIPLY( long, 2, 3 )
-MATRIX_MULTIPLY( long, 2, 4 )
-MATRIX_MULTIPLY( long, 3, 0 )
-MATRIX_MULTIPLY( long, 3, 1 )
-MATRIX_MULTIPLY( long, 3, 2 )
-MATRIX_MULTIPLY( long, 3, 3 )
-MATRIX_MULTIPLY( long, 3, 4 )
-MATRIX_MULTIPLY( long, 4, 0 )
-MATRIX_MULTIPLY( long, 4, 1 )
-MATRIX_MULTIPLY( long, 4, 2 )
-MATRIX_MULTIPLY( long, 4, 3 )
-MATRIX_MULTIPLY( long, 4, 4 )
-
-MATRIX_MULTIPLY( unsigned long, 0, 0 )
-MATRIX_MULTIPLY( unsigned long, 0, 1 )
-MATRIX_MULTIPLY( unsigned long, 0, 2 )
-MATRIX_MULTIPLY( unsigned long, 0, 3 )
-MATRIX_MULTIPLY( unsigned long, 0, 4 )
-MATRIX_MULTIPLY( unsigned long, 1, 0 )
-MATRIX_MULTIPLY( unsigned long, 1, 1 )
-MATRIX_MULTIPLY( unsigned long, 1, 2 )
-MATRIX_MULTIPLY( unsigned long, 1, 3 )
-MATRIX_MULTIPLY( unsigned long, 1, 4 )
-MATRIX_MULTIPLY( unsigned long, 2, 0 )
-MATRIX_MULTIPLY( unsigned long, 2, 1 )
-MATRIX_MULTIPLY( unsigned long, 2, 2 )
-MATRIX_MULTIPLY( unsigned long, 2, 3 )
-MATRIX_MULTIPLY( unsigned long, 2, 4 )
-MATRIX_MULTIPLY( unsigned long, 3, 0 )
-MATRIX_MULTIPLY( unsigned long, 3, 1 )
-MATRIX_MULTIPLY( unsigned long, 3, 2 )
-MATRIX_MULTIPLY( unsigned long, 3, 3 )
-MATRIX_MULTIPLY( unsigned long, 3, 4 )
-MATRIX_MULTIPLY( unsigned long, 4, 0 )
-MATRIX_MULTIPLY( unsigned long, 4, 1 )
-MATRIX_MULTIPLY( unsigned long, 4, 2 )
-MATRIX_MULTIPLY( unsigned long, 4, 3 )
-MATRIX_MULTIPLY( unsigned long, 4, 4 )
-
-MATRIX_MULTIPLY( long long, 0, 0 )
-MATRIX_MULTIPLY( long long, 0, 1 )
-MATRIX_MULTIPLY( long long, 0, 2 )
-MATRIX_MULTIPLY( long long, 0, 3 )
-MATRIX_MULTIPLY( long long, 0, 4 )
-MATRIX_MULTIPLY( long long, 1, 0 )
-MATRIX_MULTIPLY( long long, 1, 1 )
-MATRIX_MULTIPLY( long long, 1, 2 )
-MATRIX_MULTIPLY( long long, 1, 3 )
-MATRIX_MULTIPLY( long long, 1, 4 )
-MATRIX_MULTIPLY( long long, 2, 0 )
-MATRIX_MULTIPLY( long long, 2, 1 )
-MATRIX_MULTIPLY( long long, 2, 2 )
-MATRIX_MULTIPLY( long long, 2, 3 )
-MATRIX_MULTIPLY( long long, 2, 4 )
-MATRIX_MULTIPLY( long long, 3, 0 )
-MATRIX_MULTIPLY( long long, 3, 1 )
-MATRIX_MULTIPLY( long long, 3, 2 )
-MATRIX_MULTIPLY( long long, 3, 3 )
-MATRIX_MULTIPLY( long long, 3, 4 )
-MATRIX_MULTIPLY( long long, 4, 0 )
-MATRIX_MULTIPLY( long long, 4, 1 )
-MATRIX_MULTIPLY( long long, 4, 2 )
-MATRIX_MULTIPLY( long long, 4, 3 )
-MATRIX_MULTIPLY( long long, 4, 4 )
-
-MATRIX_MULTIPLY( unsigned long long, 0, 0 )
-MATRIX_MULTIPLY( unsigned long long, 0, 1 )
-MATRIX_MULTIPLY( unsigned long long, 0, 2 )
-MATRIX_MULTIPLY( unsigned long long, 0, 3 )
-MATRIX_MULTIPLY( unsigned long long, 0, 4 )
-MATRIX_MULTIPLY( unsigned long long, 1, 0 )
-MATRIX_MULTIPLY( unsigned long long, 1, 1 )
-MATRIX_MULTIPLY( unsigned long long, 1, 2 )
-MATRIX_MULTIPLY( unsigned long long, 1, 3 )
-MATRIX_MULTIPLY( unsigned long long, 1, 4 )
-MATRIX_MULTIPLY( unsigned long long, 2, 0 )
-MATRIX_MULTIPLY( unsigned long long, 2, 1 )
-MATRIX_MULTIPLY( unsigned long long, 2, 2 )
-MATRIX_MULTIPLY( unsigned long long, 2, 3 )
-MATRIX_MULTIPLY( unsigned long long, 2, 4 )
-MATRIX_MULTIPLY( unsigned long long, 3, 0 )
-MATRIX_MULTIPLY( unsigned long long, 3, 1 )
-MATRIX_MULTIPLY( unsigned long long, 3, 2 )
-MATRIX_MULTIPLY( unsigned long long, 3, 3 )
-MATRIX_MULTIPLY( unsigned long long, 3, 4 )
-MATRIX_MULTIPLY( unsigned long long, 4, 0 )
-MATRIX_MULTIPLY( unsigned long long, 4, 1 )
-MATRIX_MULTIPLY( unsigned long long, 4, 2 )
-MATRIX_MULTIPLY( unsigned long long, 4, 3 )
-MATRIX_MULTIPLY( unsigned long long, 4, 4 )
-
-MATRIX_MULTIPLY( float, 0, 0 )
-MATRIX_MULTIPLY( float, 0, 1 )
-MATRIX_MULTIPLY( float, 0, 2 )
-MATRIX_MULTIPLY( float, 0, 3 )
-MATRIX_MULTIPLY( float, 0, 4 )
-MATRIX_MULTIPLY( float, 1, 0 )
-MATRIX_MULTIPLY( float, 1, 1 )
-MATRIX_MULTIPLY( float, 1, 2 )
-MATRIX_MULTIPLY( float, 1, 3 )
-MATRIX_MULTIPLY( float, 1, 4 )
-MATRIX_MULTIPLY( float, 2, 0 )
-MATRIX_MULTIPLY( float, 2, 1 )
-MATRIX_MULTIPLY( float, 2, 2 )
-MATRIX_MULTIPLY( float, 2, 3 )
-MATRIX_MULTIPLY( float, 2, 4 )
-MATRIX_MULTIPLY( float, 3, 0 )
-MATRIX_MULTIPLY( float, 3, 1 )
-MATRIX_MULTIPLY( float, 3, 2 )
-MATRIX_MULTIPLY( float, 3, 3 )
-MATRIX_MULTIPLY( float, 3, 4 )
-MATRIX_MULTIPLY( float, 4, 0 )
-MATRIX_MULTIPLY( float, 4, 1 )
-MATRIX_MULTIPLY( float, 4, 2 )
-MATRIX_MULTIPLY( float, 4, 3 )
-MATRIX_MULTIPLY( float, 4, 4 )
-
-MATRIX_MULTIPLY( double, 0, 0 )
-MATRIX_MULTIPLY( double, 0, 1 )
-MATRIX_MULTIPLY( double, 0, 2 )
-MATRIX_MULTIPLY( double, 0, 3 )
-MATRIX_MULTIPLY( double, 0, 4 )
-MATRIX_MULTIPLY( double, 1, 0 )
-MATRIX_MULTIPLY( double, 1, 1 )
-MATRIX_MULTIPLY( double, 1, 2 )
-MATRIX_MULTIPLY( double, 1, 3 )
-MATRIX_MULTIPLY( double, 1, 4 )
-MATRIX_MULTIPLY( double, 2, 0 )
-MATRIX_MULTIPLY( double, 2, 1 )
-MATRIX_MULTIPLY( double, 2, 2 )
-MATRIX_MULTIPLY( double, 2, 3 )
-MATRIX_MULTIPLY( double, 2, 4 )
-MATRIX_MULTIPLY( double, 3, 0 )
-MATRIX_MULTIPLY( double, 3, 1 )
-MATRIX_MULTIPLY( double, 3, 2 )
-MATRIX_MULTIPLY( double, 3, 3 )
-MATRIX_MULTIPLY( double, 3, 4 )
-MATRIX_MULTIPLY( double, 4, 0 )
-MATRIX_MULTIPLY( double, 4, 1 )
-MATRIX_MULTIPLY( double, 4, 2 )
-MATRIX_MULTIPLY( double, 4, 3 )
-MATRIX_MULTIPLY( double, 4, 4 )
-
-MATRIX_MULTIPLY( long double, 0, 0 )
-MATRIX_MULTIPLY( long double, 0, 1 )
-MATRIX_MULTIPLY( long double, 0, 2 )
-MATRIX_MULTIPLY( long double, 0, 3 )
-MATRIX_MULTIPLY( long double, 0, 4 )
-MATRIX_MULTIPLY( long double, 1, 0 )
-MATRIX_MULTIPLY( long double, 1, 1 )
-MATRIX_MULTIPLY( long double, 1, 2 )
-MATRIX_MULTIPLY( long double, 1, 3 )
-MATRIX_MULTIPLY( long double, 1, 4 )
-MATRIX_MULTIPLY( long double, 2, 0 )
-MATRIX_MULTIPLY( long double, 2, 1 )
-MATRIX_MULTIPLY( long double, 2, 2 )
-MATRIX_MULTIPLY( long double, 2, 3 )
-MATRIX_MULTIPLY( long double, 2, 4 )
-MATRIX_MULTIPLY( long double, 3, 0 )
-MATRIX_MULTIPLY( long double, 3, 1 )
-MATRIX_MULTIPLY( long double, 3, 2 )
-MATRIX_MULTIPLY( long double, 3, 3 )
-MATRIX_MULTIPLY( long double, 3, 4 )
-MATRIX_MULTIPLY( long double, 4, 0 )
-MATRIX_MULTIPLY( long double, 4, 1 )
-MATRIX_MULTIPLY( long double, 4, 2 )
-MATRIX_MULTIPLY( long double, 4, 3 )
-MATRIX_MULTIPLY( long double, 4, 4 )
-
-#undef MATRIX_MULTIPLY
 
 }   // namespace Math
