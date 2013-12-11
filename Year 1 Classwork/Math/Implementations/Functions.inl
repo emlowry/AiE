@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 4, 2013
  * Description:        Inline and template function implementations.
- * Last Modified:      December 4, 2013
- * Last Modification:  Creation.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _FUNCTIONS_INL_
@@ -31,7 +31,7 @@ inline double Radians( const T& ac_rDegrees )
 template< typename T >
 inline T Interpolate( const T& ac_rPointA,
                       const T& ac_rPointB,
-                      float a_fProgress = 0.5 )
+                      float a_fProgress )
 {
     return ac_roPointA + ( a_fProgress * ( ac_roPointB - ac_roPointA ) );
 }
@@ -41,6 +41,7 @@ template< typename T >
 inline T& ModuloAssign( T& a_rDividend, const T& ac_rDivisor )
 {
     a_rDividend %= ac_rDivisor;
+    return a_rDividend;
 }
 template< typename T >
 inline T Modulo( const T& ac_rDividend, const T& ac_rDivisor )
@@ -52,36 +53,39 @@ inline float& ModuloAssign< float >( float& a_rDividend,
                                      const float& ac_rDivisor )
 {
     a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+    return a_rDividend;
 }
 template<>
 inline float Modulo< float >( const float& ac_rDividend,
                               const float& ac_rDivisor )
 {
-    return std::fmod( a_rDividend, ac_rDivisor );
+    return std::fmod( ac_rDividend, ac_rDivisor );
 }
 template<>
 inline double& ModuloAssign< double >( double& a_rDividend,
                                        const double& ac_rDivisor )
 {
     a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+    return a_rDividend;
 }
 template<>
 inline double Modulo< double >( const double& ac_rDividend,
                                 const double& ac_rDivisor )
 {
-    return std::fmod( a_rDividend, ac_rDivisor );
+    return std::fmod( ac_rDividend, ac_rDivisor );
 }
 template<>
 inline long double& ModuloAssign< long double >( long double& a_rDividend,
                                                  const long double& ac_rDivisor )
 {
     a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+    return a_rDividend;
 }
 template<>
 inline long double Modulo< long double >( const long double& ac_rDividend,
                                           const long double& ac_rDivisor )
 {
-    return std::fmod( a_rDividend, ac_rDivisor );
+    return std::fmod( ac_rDividend, ac_rDivisor );
 }
 
 // Return the power of two closest to the given value
@@ -92,12 +96,12 @@ inline T NearestPowerOfTwo( const T& ac_rValue )
     T cielPower = (T)std::exp2( std::ciel( std::log2( ac_rValue ) ) );
     T floorPower = (T)std::exp2( std::floor( std::log2( ac_rValue ) ) );
     return ( std::fdim( ac_rValue, cielPower ) >
-             std::fdim( ac_rValue, floorPower ) ) ) ? floorPower : cielPower;
+             std::fdim( ac_rValue, floorPower ) ) ? floorPower : cielPower;
 }
 
 // Scroll a value into the given bounds.
 template< typename T >
-T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin = 0 )
+T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
 {
     // If the upper and lower bounds are the same number, than the only result
     // in range is said number.

@@ -16,84 +16,58 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="Matrix.inl">
+    <None Include="Implementations\Functions.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="MatrixBase.inl">
+    <None Include="Implementations\Matrix.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="MatrixBaseCopyConstructors.inl">
+    <None Include="Implementations\Matrix_Constructors.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="MatrixBaseFillConstructors.inl">
+    <None Include="Implementations\Matrix_Operators.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="VectorBase.inl">
+    <None Include="Implementations\MatrixBase.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="NumericVectorBase.inl">
+    <None Include="Implementations\MatrixBase_CopyConstructors.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Vector.inl">
+    <None Include="Implementations\MatrixBase_FillConstructors.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="MatrixConstructors.inl">
+    <None Include="Implementations\VectorBase.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="MatrixOperators.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Functions.inl">
+    <None Include="Implementations\Vector.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Matrix.h">
+    <ClInclude Include="StaticMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="T_Matrix.h">
+    <ClInclude Include="Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MatrixBase.h">
+    <ClInclude Include="DynamicMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="T_MatrixBase.h">
+    <ClInclude Include="Declarations\Functions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VectorBase.h">
+    <ClInclude Include="Declarations\Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="T_VectorBase.h">
+    <ClInclude Include="Declarations\MatrixBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vector.h">
+    <ClInclude Include="Declarations\VectorBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NumericVectorBase.h">
+    <ClInclude Include="Declarations\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="T_NumericVectorBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="T_Vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="T_Functions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Matrix.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Functions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MatrixBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

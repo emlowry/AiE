@@ -1,10 +1,10 @@
 /******************************************************************************
- * File:               MatrixConstructors.inl
+ * File:               Matrix_Constructors.inl
  * Author:             Elizabeth Lowry
  * Date Created:       December 3, 2013
  * Description:        Constructor implementations for Matrix template class.
- * Last Modified:      December 3, 2013
- * Last Modification:  Creation.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_CONSTRUCTORS_INL_
@@ -30,7 +30,7 @@ template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
     operator=( const Matrix& ac_roMatrix )
 {
-    return Assign( ac_roMatrix );
+    return BaseType::operator=( ac_roMatrix );
 }
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( const BaseType& ac_roMatrix )
@@ -42,7 +42,7 @@ template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
     operator=( Matrix&& a_rroMatrix )
 {
-    return Assign( std::forward( a_rroMatrix ) );
+    return BaseType::operator=( std::forward( a_rroMatrix ) );
 }
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( BaseType&& a_rroMatrix )

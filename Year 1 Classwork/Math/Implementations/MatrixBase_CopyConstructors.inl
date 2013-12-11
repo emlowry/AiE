@@ -1,12 +1,11 @@
 /******************************************************************************
- * File:               MatrixBaseCopyConstructors.inl
+ * File:               MatrixBase_CopyConstructors.inl
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
- * Description:        MatrixBase (and VectorBase) constructors and assignment
- *                      operators that copy or move data from other MatrixBase
- *                      (or VectorBase) objects.
- * Last Modified:      November 25, 2013
- * Last Modification:  Moving code out of MatrixBase.inl.
+ * Description:        MatrixBase constructors and assignment operators that
+ *                      copy or move data from other MatrixBase objects.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_BASE_COPY_CONSTRUCTORS_INL_
@@ -35,7 +34,7 @@ inline MatrixBase< T, M, N >::MatrixBase( const MatrixBase& ac_roMatrix )
 // Copy assignment
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >&
-    MatrixBase< T, M, N >::Assign( const MatrixBase& ac_roMatrix )
+    MatrixBase< T, M, N >::operator=( const MatrixBase& ac_roMatrix )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
@@ -50,16 +49,10 @@ inline MatrixBase< T, M, N >&
         m_aaData[i/N][i%N] = ac_roMatrix[i/N][i%N];
     }
 }
-template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >&
-    MatrixBase< T, M, N >::operator=( const MatrixBase& ac_roMatrix )
-{
-    Assign( ac_roMatrix );
-}
 
 // Move constructor
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::MatrixBase( Matrix&& a_rroMatrixBase )
+inline MatrixBase< T, M, N >::MatrixBase( MatrixBase&& a_rroMatrixBase )
 {/*
     if( !std::is_move_constructable< T >::value )
     {
@@ -74,7 +67,7 @@ inline MatrixBase< T, M, N >::MatrixBase( Matrix&& a_rroMatrixBase )
 // Move assignment
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >&
-    MatrixBase< T, M, N >::Assign( MatrixBase&& a_rroMatrix )
+    MatrixBase< T, M, N >::operator=( MatrixBase&& a_rroMatrix )
 {/*
     if( !std::is_move_assignable< T >::value )
     {
@@ -88,12 +81,6 @@ inline MatrixBase< T, M, N >&
     {
         m_aaData[i/N][i%N] = std::move( ac_roMatrix[i/N][i%N] );
     }
-}
-template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >&
-    MatrixBase< T, M, N >::operator=( MatrixBase&& a_rroMatrix )
-{
-    Assign( std::forward< MatrixBase< T, M, N >( a_rroMatrix ) );
 }
 
 // Copy construct from a different type of matrix
@@ -140,7 +127,7 @@ inline MatrixBase< T, M, N >::
 template< typename T, unsigned int M, unsigned int N >
 template< typename U >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const MatrixBase< U, M, N >& ac_roMatrix )
+    operator=( const MatrixBase< U, M, N >& ac_roMatrix )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
@@ -159,16 +146,9 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     }
 }
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const MatrixBase< U, M, N >& ac_roMatrix )
-{
-    Assign( ac_roMatrix );
-}
-template< typename T, unsigned int M, unsigned int N >
 template< unsigned int P, unsigned int Q >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    Assign( const MatrixBase< T, P, Q >& ac_roMatrix )
+    operator=( const MatrixBase< T, P, Q >& ac_roMatrix )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
@@ -181,13 +161,6 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
             m_aaData[i][j] =  ac_roMatrix[i][j];
         }
     }
-}
-template< typename T, unsigned int M, unsigned int N >
-template< unsigned int P, unsigned int Q >
-inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const MatrixBase< T, P, Q >& ac_roMatrix )
-{
-    Assign( ac_roMatrix );
 }
 
 }   // namespace Math

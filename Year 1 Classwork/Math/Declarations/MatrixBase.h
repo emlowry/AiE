@@ -3,13 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 20, 2013
  * Description:        Base class for matrices of any type.
- *                      The library compiles MatrixBase classes with dimensions
- *                      of any combination of 1, 2, 3, or 4 for string, char*,
- *                      and void* types.  If a user needs to instantiate a
- *                      MatrixBase class with type or dimensions beyond these,
- *                      then they need to include T_MatrixBase.h instead.
- * Last Modified:      November 25, 2013
- * Last Modification:  Adding the closely-entwined VectorBase class.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_BASE_H_
@@ -20,7 +15,7 @@ namespace Math
 
 // Forward-declare VectorBase, include definition *after* MatrixBase definition,
 // since MatrixBase is the parent of VectorBase.
-template< typename T, unsigned int N, bool t_bIsRow = true >
+template< typename T, unsigned int N, bool t_bIsRow/* = true*/ >
 class VectorBase;
 
 // Base class for matrices.  For matrices with mathematical operations beyond
@@ -32,16 +27,14 @@ public:
 
     // Simplify typing
     typedef VectorBase< T, M, false > ColumnVectorType;
-    typedef VectorBase< T, N > RowVectorType;
+    typedef VectorBase< T, N, true > RowVectorType;
     typedef MatrixBase< T, N, M > TransposeType;
     static const T& DEFAULT_FILL();   // referance to MatrixFill< T >::DEFAULT
 
     // Default constructor fills array with DEFAULT_FILL
     MatrixBase();
 
-    // Virtual destructor needed, since Transpose and assignment functions
-    // are virtual.  Assignment operators are implemented in terms of virtual
-    // Assign functions in case child classes have more fields to set.
+    // Virtual destructor needed, since there are virtual functions.
     virtual ~MatrixBase();
     
     // Copy/move constructor/operator
@@ -93,14 +86,14 @@ public:
     MatrixBase& operator=( const RowVectorType* const (&ac_racpoRows)[ M ] );
 
     // Equality and inequality checks
-    bool operator==( const Matrix& ac_roMatrix ) const;
-    bool operator!=( const Matrix& ac_roMatrix ) const;
+    bool operator==( const MatrixBase& ac_roMatrix ) const;
+    bool operator!=( const MatrixBase& ac_roMatrix ) const;
     
     // Array access - *non-virtual* override in VectorBase child class
-    T (&operator[])( unsigned int a_uiRow )[ N ];
-    const T (&operator[])( unsigned int a_uiRow )[ N ] const;
-    T& operator[]( unsigned int a_uiRow, unsigned int a_uiColumn );
-    const T& operator[]( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
+    T (&operator[]( unsigned int a_uiRow ))[ N ];
+    const T (&operator[]( unsigned int a_uiRow ) const)[ N ];
+    T& At( unsigned int a_uiRow, unsigned int a_uiColumn );
+    const T& At( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
 
     // Get row/column vectors - redefine in child classes to return correct type
     virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const;
@@ -133,22 +126,6 @@ public:
 
 protected:
 
-    // Used by assignment operators so that only child classes with genuinely
-    // different behavior need to override.
-    virtual MatrixBase& Assign( const MatrixBase& ac_roMatrix );
-    virtual MatrixBase& Assign( MatrixBase&& a_rroMatrix );
-    template< typename U >
-    virtual MatrixBase& Assign( const MatrixBase< U, M, N >& ac_roMatrix );
-    template< unsigned int P, unsigned int Q >
-    virtual MatrixBase& Assign( const MatrixBase< T, P, Q >& ac_roMatrix );
-    virtual MatrixBase& Assign( const T& ac_rFill );
-    virtual MatrixBase& Assign( const T (&ac_raData)[ M*N ] );
-    virtual MatrixBase& Assign( const T (&ac_raaData)[ M ][ N ] );
-    virtual MatrixBase& Assign( const ColumnVectorType (&ac_raColumns)[ N ] );
-    virtual MatrixBase& Assign( const ColumnVectorType* const (&ac_rpoaColumns)[ N ] );
-    virtual MatrixBase& Assign( const RowVectorType (&ac_raRows)[ M ] );
-    virtual MatrixBase& Assign( const RowVectorType* const (&ac_rpoaRows)[ M ] );
-
     // elements of the matrix
     T m_aaData[ M ][ N ];
 
@@ -179,7 +156,9 @@ struct MatrixFill
 
 }   // namespace Math
 
-// MatrixBase *must* be defined before VectorBase.
+// MatrixBase *must* be defined before VectorBase, but VectorBase must be defined
+// before MatrixBase implementations.
 #include "VectorBase.h"
+#include "Implementations/MatrixBase.inl"
 
 #endif  // _MATRIX_BASE_H_

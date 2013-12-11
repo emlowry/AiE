@@ -3,13 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Base class for vectors of any type.
- *                      The library compiles VectorBase classes with dimensions
- *                      of 1, 2, 3, andor 4 for string, char*, and void* types.
- *                      If a user needs to instantiate a MatrixBase class with
- *                      type or dimensions beyond these, then they need to
- *                      include T_VectorBase.h instead.
- * Last Modified:      November 25, 2013
- * Last Modification:  Creation.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _VECTOR_BASE_H_
@@ -31,7 +26,7 @@ class VectorBase : public virtual MatrixBase< T,
 public:
 
     // Simplify typing
-    typedef Matrix< T, ROWS, COLUMNS > BaseType;
+    typedef MatrixBase< T, ROWS, COLUMNS > BaseType;
     typedef VectorBase< T, N, false > ColumnVectorType;
     typedef VectorBase< T, N > RowVectorType;
     typedef VectorBase< T, N, !t_bIsRow > TransposeType;
@@ -92,12 +87,6 @@ public:
 
 protected:
 
-    // used by assignment operator
-    template< unsigned int Q, bool t_bOtherIsRow >
-    VectorBase& Assign( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    VectorBase& Assign( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector );
-
     // used by operator[] and other places that need to get an element
     T& At( const unsigned int ac_uiIndex );
     const T& At( const unsigned int ac_uiIndex ) const;
@@ -130,5 +119,7 @@ private:
 };
 
 }   // namespace Math
+
+#include "Implementations/VectorBase.inl"
 
 #endif  // _VECTOR_BASE_H_

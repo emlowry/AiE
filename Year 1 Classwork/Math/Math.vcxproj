@@ -69,36 +69,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Functions.inl" />
-    <None Include="Matrix.inl" />
-    <None Include="MatrixBase.inl" />
-    <None Include="MatrixBaseCopyConstructors.inl" />
-    <None Include="MatrixBaseFillConstructors.inl" />
-    <None Include="MatrixConstructors.inl" />
-    <None Include="MatrixOperators.inl" />
-    <None Include="NumericVectorBase.inl" />
+    <None Include="Implementations\Functions.inl" />
+    <None Include="Implementations\Matrix.inl" />
+    <None Include="Implementations\MatrixBase.inl" />
+    <None Include="Implementations\MatrixBase_CopyConstructors.inl" />
+    <None Include="Implementations\MatrixBase_FillConstructors.inl" />
+    <None Include="Implementations\Matrix_Constructors.inl" />
+    <None Include="Implementations\Matrix_Operators.inl" />
+    <None Include="Implementations\Vector.inl" />
     <None Include="ReadMe.txt" />
-    <None Include="Vector.inl" />
-    <None Include="VectorBase.inl" />
+    <None Include="Implementations\VectorBase.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Functions.h" />
-    <ClInclude Include="Matrix.h" />
-    <ClInclude Include="MatrixBase.h" />
-    <ClInclude Include="NumericVectorBase.h" />
-    <ClInclude Include="T_Functions.h" />
-    <ClInclude Include="T_Matrix.h" />
-    <ClInclude Include="T_MatrixBase.h" />
-    <ClInclude Include="T_NumericVectorBase.h" />
-    <ClInclude Include="T_Vector.h" />
-    <ClInclude Include="T_VectorBase.h" />
-    <ClInclude Include="Vector.h" />
-    <ClInclude Include="VectorBase.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Functions.cpp" />
-    <ClCompile Include="Matrix.cpp" />
-    <ClCompile Include="MatrixBase.cpp" />
+    <ClInclude Include="Declarations\Functions.h" />
+    <ClInclude Include="DynamicMath.h" />
+    <ClInclude Include="Math.h" />
+    <ClInclude Include="StaticMath.h" />
+    <ClInclude Include="Declarations\Matrix.h" />
+    <ClInclude Include="Declarations\MatrixBase.h" />
+    <ClInclude Include="Declarations\Vector.h" />
+    <ClInclude Include="Declarations\VectorBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

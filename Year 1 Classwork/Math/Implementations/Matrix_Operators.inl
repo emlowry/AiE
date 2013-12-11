@@ -1,16 +1,16 @@
 /******************************************************************************
- * File:               MatrixOperators.inl
+ * File:               Matrix_Operators.inl
  * Author:             Elizabeth Lowry
  * Date Created:       December 3, 2013
  * Description:        Operator implementations for Matrix template class.
- * Last Modified:      December 3, 2013
- * Last Modification:  Creation.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_OPERATORS_INL_
 #define _MATRIX_OPERATORS_INL_
 
-#include "Functions.h"
+#include "Declarations/Functions.h"
 
 namespace Math
 {
@@ -19,7 +19,7 @@ namespace Math
 template< typename T, unsigned int M, unsigned int N >
 template< unsigned int P >
 inline Matrix< T, M, P > Matrix< T, M, N >::
-    Product( const Matrix< T, N, P >& ac_roMatrix ) const
+    operator*( const Matrix< T, N, P >& ac_roMatrix ) const
 {
     Matrix< T, M, P > oResult;
     for( unsigned int i = 0; i < M*P; i++ )
@@ -27,13 +27,6 @@ inline Matrix< T, M, P > Matrix< T, M, N >::
         oResult[i/P][i%P] = Row( i/P ).Dot( ac_roMatrix.Column( i%P ) );
     }
     return oResult;
-}
-template< typename T, unsigned int M, unsigned int N >
-template< unsigned int P >
-inline Matrix< T, M, P > Matrix< T, M, N >::
-    operator*( const Matrix< T, N, P >& ac_roMatrix ) const
-{
-    return Product( ac_roMatrix );
 }
 
 // Matrix "division" = multiplication by inverse
@@ -51,28 +44,7 @@ inline Matrix< typename MatrixInverse< T >::Type, M, P >
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }
-    return Product( ac_roMatrix.Inverse() );
-}
-
-// multiplication by a column vector produces another column vector
-template< typename T, unsigned int M, unsigned int N >
-inline Vector< T, M, false >
-    Matrix< T, M, N >::operator*( const Matrix< T, N, 1 >& ac_roVector ) const
-{
-    return Vector< T, M, false >( Product( ac_roVector ) );
-}
-
-// "division" by a row vector = multiplication by its inverse, if it has one
-template< typename T, unsigned int M, unsigned int N >
-inline Vector< typename MatrixInverse< T >::Type, M, false >
-    Matrix< T, M, N >::operator/( const Matrix< T, 1, N >& ac_roVector ) const
-{
-    if( !ac_roMatrix.IsInvertable() )
-    {
-        throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
-    }
-    typedef Vector< typename MatrixInverse< T >::Type, M, false > ResultType;
-    return ResultType( Product( ac_roMatrix.Inverse() ) );
+    return operator*( ac_roMatrix.Inverse() );
 }
 
 // Matrix addition and subtraction

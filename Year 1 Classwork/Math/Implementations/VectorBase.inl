@@ -3,14 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Inline and other function implementations for VectorBase.
- * Last Modified:      November 25, 2013
- * Last Modification:  Creation.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _VECTOR_BASE_INL_
 #define _VECTOR_BASE_INL_
 
-#include "Functions.h"
+#include "Declarations/Functions.h"
 // #include <type_traits>  // for std::is_whateverable checks
 #include <cassert>  // for assert
 #include <utility>  // for std::forward and std::move
@@ -35,7 +35,7 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     operator=( const VectorBase& ac_roVector )
 {
-    return Assign( ac_roVector );
+    return BaseType::operator=( ac_roVector );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( BaseType&& a_rroMatrix )
@@ -47,7 +47,7 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     operator=( VectorBase&& a_rroVector )
 {
-    return Assign( std::forward( a_rroVector ) );
+    return BaseType::operator=( std::forward( a_rroVector ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
@@ -69,8 +69,8 @@ inline VectorBase< T, N, t_bIsRow >::VectorBase(const T* const ac_cpData,
     : BaseType( ac_cpData, ac_uiSize, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase(const T (&ac_raData)[ N ], const U& ac_rFill )
-    : BaseType( ac_raData, ac_rFill ) {}
+    VectorBase( const T (&ac_raData)[ N ] )
+    : BaseType( ac_raData ) {}
 
 // Copy construct from a different kind of vector
 template< typename T, unsigned int N, bool t_bIsRow >
@@ -95,7 +95,7 @@ inline VectorBase< T, N, t_bIsRow >::
 template< typename T, unsigned int N, bool t_bIsRow >
 template< unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    Assign( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
+    operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
@@ -105,28 +105,6 @@ inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
     {
         m_aaData[ t_bIsRow ? 1 : i][ t_bIsRow ? i : 1 ] = ac_roVector[i];
     }
-}
-template< typename T, unsigned int N, bool t_bIsRow >
-template< unsigned int Q, bool t_bOtherIsRow >
-inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    Assign( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector )
-{/*
-    if( !std::is_move_assignable< T >::value )
-    {
-        throw exception("Non-move-assignable type");
-    } /**/
-    for( unsigned int i = 0; i < N && i < Q; ++i )
-    {
-        m_aaData[ t_bIsRow ? 1 : i][ t_bIsRow ? i : 1 ] =
-            std::move( ac_roVector[i] );
-    }
-}
-template< typename T, unsigned int N, bool t_bIsRow >
-template< unsigned int Q, bool t_bOtherIsRow >
-inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
-{
-    Assign( ac_roVector );
 }
 
 // Vector element access
@@ -156,21 +134,21 @@ inline const T& VectorBase< T, N, t_bIsRow >::
 
 // Get this vector as a row/column vector
 template< typename T, unsigned int N, bool t_bIsRow >
-inline VectorBase< T, N, t_bIsRow >::ColumnVectorType
-    VectorBase< T, N, t_bIsRow >::Column( unsigned int a_uiIndex ) const
+inline typename VectorBase< T, N, t_bIsRow >::ColumnVectorType
+    VectorBase< T, N, t_bIsRow >::Column() const
 {
     return ( t_bIsRow ? ColumnVectorType( *this ) : *this );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-inline VectorBase< T, N, t_bIsRow >::RowVectorType
-    VectorBase< T, N, t_bIsRow >::Row( unsigned int a_uiIndex ) const
+inline typename VectorBase< T, N, t_bIsRow >::RowVectorType
+    VectorBase< T, N, t_bIsRow >::Row() const
 {
     return ( t_bIsRow ? *this : RowVectorType( *this ) );
 }
 
 // Make row vector from column vector and vice-versa
 template< typename T, unsigned int N, bool t_bIsRow >
-inline VectorBase< T, N, t_bIsRow >::TransposeType
+inline typename VectorBase< T, N, t_bIsRow >::TransposeType
     VectorBase< T, N, t_bIsRow >::Transpose() const
 {
     return TransposeType( *this );

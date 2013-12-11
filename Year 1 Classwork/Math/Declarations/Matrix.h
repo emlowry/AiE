@@ -3,15 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 18, 2013
  * Description:        Base class for matrices of numeric type.
- *                      The library compiles Matrix classes with dimensions of
- *                      any combination of 1, 2, 3, or 4 for all of the numeric
- *                      primitive types.  If a user needs to instantiate a
- *                      Matrix class with dimensions beyond these, then they
- *                      need to include T_Matrix.h instead.  For a type that
- *                      doesn't have the arithmatic operations defined, include
- *                      T_MatrixBase.h to use the base class.
- * Last Modified:      November 20, 2013
- * Last Modification:  Moving certain functions to MatrixBase.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_H_
@@ -30,6 +23,11 @@ struct MatrixInverse
     typedef double Type;
 };
 template<>
+struct MatrixInverse< float >
+{
+    typedef float Type;
+};
+template<>
 struct MatrixInverse< long double >
 {
     typedef long double Type;
@@ -37,7 +35,7 @@ struct MatrixInverse< long double >
 
 // Forward declare vector type, include vector definition *after* matrix
 // definition, since matrix is parent of vector
-template< typename T, unsigned int N, bool t_bIsRow = true >
+template< typename T, unsigned int N, bool t_bIsRow/* = true*/ >
 class Vector;
 
 // Represents a matrix of values of a set type with set dimensions.
@@ -49,7 +47,7 @@ public:
     // simplify typing
     typedef MatrixBase< T, M, N > BaseType;
     typedef Vector< T, M, false > ColumnVectorType;
-    typedef Vector< T, N > RowVectorType;
+    typedef Vector< T, N, true > RowVectorType;
     typedef Matrix< T, ( M < N ? M : N ) > IdentityType;
     typedef Matrix< typename MatrixInverse< T >::Type, N, M > InverseType;
     typedef Matrix< T, N, M > TransposeType;
@@ -69,7 +67,7 @@ public:
     Matrix& operator=( Matrix&& a_rroMatrix );
     Matrix( BaseType&& a_rroMatrix );
     template< typename U >
-    Matrix( const MatrixBase< U, M, N >& ac_roMatrix )
+    Matrix( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
             const T& ac_rFill = DEFAULT_FILL() );
@@ -116,7 +114,8 @@ public:
                            unsigned int a_uiColumn ) const override;
     virtual Matrix< T, M, ( N > 0 ? N-1 : 0 ) >
         MinusColumn( unsigned int a_uiColumn ) const override;
-    virtual Matrix< T, ( M > 0 ? M-1 : 0 ), N > MinusRow( unsigned int a_uiRow ) const override;
+    virtual Matrix< T, ( M > 0 ? M-1 : 0 ), N >
+        MinusRow( unsigned int a_uiRow ) const override;
     
     // Transpose - redefine in child classes to return correct type
     virtual TransposeType Transpose() const override;
@@ -131,7 +130,7 @@ public:
 
     // Matrix multiplication
     template< unsigned int P >
-    virtual Matrix< T, M, P >
+    Matrix< T, M, P >
         operator*( const Matrix< T, N, P >& ac_roMatrix ) const;
     // Matrix "division" = multiplication by inverse
     // Returns error if parameter is not invertable
@@ -140,15 +139,8 @@ public:
     //  ac_roMatrix.Inverse() * ac_roMatrix = IDENTITY but
     //  ac_roMatrix * ac_roMatrix.Inverse() != IDENTITY_MATRIX< T, P >
     template< unsigned int P >
-    virtual Matrix< typename MatrixInverse< T >::Type, M, P >
+    Matrix< typename MatrixInverse< T >::Type, M, P >
         operator/( const Matrix< T, P, N >& ac_roMatrix ) const;
-
-    // multiplication by a column vector produces another column vector
-    virtual Vector< T, M, false >
-        operator*( const Matrix< T, N, 1 >& ac_roVector ) const;
-    // "division" by a row vector = multiplication by its inverse, if it has one
-    virtual Vector< typename MatrixInverse< T >::Type, M, false >
-        operator/( const Matrix< T, 1, N >& ac_roVector ) const;
 
     // Matrix addition and subtraction
     Matrix& operator+=( const Matrix& ac_roMatrix );
@@ -168,11 +160,11 @@ public:
     // return the correct type.
     //
     Matrix& operator*=( const T& ac_rScalar );
-    virtual Matrix operator*( const T& ac_rScalar ) const;
+    Matrix operator*( const T& ac_rScalar ) const;
     Matrix& operator/=( const T& ac_rScalar );
-    virtual Matrix operator/( const T& ac_rScalar ) const;
+    Matrix operator/( const T& ac_rScalar ) const;
     Matrix& operator%=( const T& ac_rScalar );
-    virtual Matrix operator%( const T& ac_rScalar ) const;
+    Matrix operator%( const T& ac_rScalar ) const;
 
     static const Matrix& ZERO();
     static const IdentityType& IDENTITY();
@@ -180,21 +172,18 @@ public:
 protected:
 
     // if not invertable by given method, change nothing & return false
-    bool LeftInverse( InverseType& a_roMatrix );
-    bool RightInverse( InverseType& a_roMatrix );
-    bool TrueInverse( InverseType& a_roMatrix );
-
-    // Used by multiplication and division operators
-    template< unsigned int P >
-    virtual Matrix< T, M, P >
-        Product( const Matrix< T, N, P >& ac_roMatrix ) const;
+    bool LeftInverse( InverseType& a_roMatrix ) const;
+    bool RightInverse( InverseType& a_roMatrix ) const;
+    bool TrueInverse( InverseType& a_roMatrix ) const;
 
 };
 
 }   // namespace Math
 
 // The Matrix class *must* be defined before the Vector class, since Vector is
-// a child class of Matrix.
+// a child class of Matrix, but Vector must also be defined before the Matrix
+// implementations, since they rely on Vector functions.
 #include "Vector.h"
+#include "Implementations/Matrix.inl"
 
 #endif  // _MATRIX_H_

@@ -3,18 +3,18 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 18, 2013
  * Description:        Function implementations for Matrix template class.
- * Last Modified:      December 3, 2013
- * Last Modification:  Moving code into separate files.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_INL_
 #define _MATRIX_INL_
 
 // Code separated out into separate files to cut down the size of this one
-#include "MatrixConstructors.inl"
-#include "MatrixOperators.inl"
+#include "Matrix_Constructors.inl"
+#include "Matrix_Operators.inl"
 
-#include "Functions.h"
+#include "Declarations/Functions.h"
 
 namespace Math
 {
@@ -29,7 +29,7 @@ const Matrix< T, M, N >& Matrix< T, M, N >::ZERO()
 
 // Identity matrix
 template< typename T, unsigned int M, unsigned int N >
-const Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::IDENTITY()
+const typename Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::IDENTITY()
 {
     static IdentityType oIdentity( 1, 0 );
     return oIdentity;
@@ -112,19 +112,19 @@ inline bool Matrix< T, M, N >::
     return TrueInverse( a_roMatrix );
 }
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >::InverseType Matrix< T, M, N >::
+inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
     Inverse() const // if !invertable, return ZERO
 {
     InverseType oInverse;
     return ( Inverse( oInverse ) ? oInverse : InverseType::ZERO() );
 }
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >::InverseType Matrix< T, M, N >::
+inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
     Inverse( bool& a_rbInvertable ) const   // as above
 {
     InverseType oInverse;
     a_rbInvertable = Inverse( oInverse );
-    return a_rbInvertable ? oInverse : InverseType::ZERO();
+    return ( a_rbInvertable ? oInverse : InverseType::ZERO() );
 }
 
 // For MxN matrix A where M > N, ( A^T * A )^(-1) * A^T * A
@@ -182,13 +182,13 @@ bool Matrix< T, M, N >::
 
 // Get row/column vectors - redefine in child classes to return correct type
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >::ColumnVectorType
+inline typename Matrix< T, M, N >::ColumnVectorType
     Matrix< T, M, N >::Column( unsigned int ac_uiIndex ) const
 {
     return ColumnVectorType( BaseType::Column( ac_uiIndex ) );
 }
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >::RowVectorType
+inline typename Matrix< T, M, N >::RowVectorType
     Matrix< T, M, N >::Row( unsigned int ac_uiIndex ) const
 {
     return RowVectorType( BaseType::Row( ac_uiIndex ) );
@@ -219,7 +219,7 @@ inline Matrix< T, ( M > 0 ? M-1 : 0 ), N > Matrix< T, M, N >::
     
 // Transpose - redefine in child classes to return correct type
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >::TransposeType Matrix< T, M, N >::Transpose() const
+inline typename Matrix< T, M, N >::TransposeType Matrix< T, M, N >::Transpose() const
 {
     return TransposeType( BaseType::Transpose() );
 }

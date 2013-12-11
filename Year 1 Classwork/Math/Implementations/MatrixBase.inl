@@ -3,18 +3,18 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 20, 2013
  * Description:        Inline and other function implementations for MatrixBase.
- * Last Modified:      November 25, 2013
- * Last Modification:  Separating out non-default constructor code.
+ * Last Modified:      December 10, 2013
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef _MATRIX_BASE_INL_
 #define _MATRIX_BASE_INL_
 
 // Separated out to keep individual file size down
-#include "MatrixBaseCopyConstructors.inl"
-#include "MatrixBaseFillConstructors.inl"
+#include "MatrixBase_CopyConstructors.inl"
+#include "MatrixBase_FillConstructors.inl"
 
-#include "Functions.h"
+#include "Declarations/Functions.h"
 #include <cassert>  // for assert
 
 namespace Math
@@ -38,37 +38,37 @@ inline MatrixBase< T, M, N >::MatrixBase() : MatrixBase( DEFAULT_FILL() ) {}
 // Equality and inequality checks
 template< typename T, unsigned int M, unsigned int N >
 inline bool MatrixBase< T, M, N >::
-    operator==( const Matrix& ac_roMatrix ) const
+    operator==( const MatrixBase& ac_roMatrix ) const
 {
     bool bResult = true;
     for( unsigned int i = 0; bResult && i < M*N; ++i )
     {
-        bResult = ( m_aaData[i/N][i%N] == ac_roMatrix[i/N][i%N] ) );
+        bResult = ( m_aaData[i/N][i%N] == ac_roMatrix[i/N][i%N] );
     }
     return bResult;
 }
 template< typename T, unsigned int M, unsigned int N >
 inline bool MatrixBase< T, M, N >::
-    operator!=( const Matrix& ac_roMatrix ) const
+    operator!=( const MatrixBase& ac_roMatrix ) const
 {
     bool bResult = false;
-    for( unsigned int i = 0; bResult && i < M*N; ++i )
+    for( unsigned int i = 0; !bResult && i < M*N; ++i )
     {
-        bResult = !( m_aaData[i/N][i%N] != ac_roMatrix[i/N][i%N] ) );
+        bResult = !( m_aaData[i/N][i%N] != ac_roMatrix[i/N][i%N] );
     }
     return bResult;
 }
 
 // Row access
 template< typename T, unsigned int M, unsigned int N >
-inline T (&MatrixBase< T, M, N >::operator[])( unsigned int a_uiRow )[ N ]
+inline T (&MatrixBase< T, M, N >::operator[]( unsigned int a_uiRow ))[ N ]
 {
     assert( a_uiRow < M );
     return m_aaData[a_uiRow];
 }
 template< typename T, unsigned int M, unsigned int N >
 inline const
-    T (&MatrixBase< T, M, N >::operator[])( unsigned int a_uiRow )[ N ] const
+    T (&MatrixBase< T, M, N >::operator[]( unsigned int a_uiRow ) const)[ N ]
 {
     assert( a_uiRow < M )
     return m_aaData[a_uiRow];
@@ -77,14 +77,14 @@ inline const
 // Element access
 template< typename T, unsigned int M, unsigned int N >
 inline T& MatrixBase< T, M, N >::
-    operator[]( unsigned int a_uiRow, unsigned int a_uiColumn )
+    At( unsigned int a_uiRow, unsigned int a_uiColumn )
 {
     assert( a_uiRow < M && a_uiColumn < N );
     return m_aaData[a_uiRow][a_uiColumn];
 }
 template< typename T, unsigned int M, unsigned int N >
 inline const T& MatrixBase< T, M, N >::
-    operator[]( unsigned int a_uiRow, unsigned int a_uiColumn ) const
+    At( unsigned int a_uiRow, unsigned int a_uiColumn ) const
 {
     assert( a_uiRow < M && a_uiColumn < N );
     return m_aaData[a_uiRow][a_uiColumn];
@@ -92,7 +92,7 @@ inline const T& MatrixBase< T, M, N >::
 
 // Get row/column vectors
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::ColumnVectorType
+inline typename MatrixBase< T, M, N >::ColumnVectorType
     MatrixBase< T, M, N >::Column( unsigned int ac_uiIndex ) const
 {
     assert( ac_uiIndex < N );
@@ -104,7 +104,7 @@ inline MatrixBase< T, M, N >::ColumnVectorType
     return oColumn;
 }
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::RowVectorType
+inline typename MatrixBase< T, M, N >::RowVectorType
     MatrixBase< T, M, N >::Row( unsigned int ac_uiIndex ) const
 {
     assert( ac_uiIndex < M );
@@ -113,7 +113,7 @@ inline MatrixBase< T, M, N >::RowVectorType
 
 // Return transpose of a matrix
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::TransposeType
+inline typename MatrixBase< T, M, N >::TransposeType
     MatrixBase< T, M, N >::Transpose() const
 {
     TransposeType oTranspose;
