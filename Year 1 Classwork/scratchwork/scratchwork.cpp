@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "tinyxml2.h"
+#include<iomanip>
 #include <iostream>
 #include <list>
 #include <string>

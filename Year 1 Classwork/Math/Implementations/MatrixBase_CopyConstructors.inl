@@ -8,8 +8,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_BASE_COPY_CONSTRUCTORS_INL_
-#define _MATRIX_BASE_COPY_CONSTRUCTORS_INL_
+#ifndef MATRIX_BASE__COPY_CONSTRUCTORS__INL
+#define MATRIX_BASE__COPY_CONSTRUCTORS__INL
 
 // #include <type_traits>  // for std::is_whateverable checks
 #include <utility>  // for std::forward and std::move
@@ -165,4 +165,4 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
 
 }   // namespace Math
 
-#endif  // _MATRIX_BASE_COPY_CONSTRUCTORS_INL_
+#endif  // MATRIX_BASE__COPY_CONSTRUCTORS__INL

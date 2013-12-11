@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _VECTOR_INL_
-#define _VECTOR_INL_
+#ifndef VECTOR__INL
+#define VECTOR__INL
 
 #include <cmath>    // for std::sqrt
 // #include <type_traits>  // for std::is_whateverable checks
@@ -19,7 +19,7 @@ namespace Math
 
 // Zero vector
 template< typename T, unsigned int N, bool t_IsRow >
-const Vector< T, N, t_IsRow >& Vector< T, N, t_IsRow >::ZERO()
+const Vector< T, N, t_IsRow >& Vector< T, N, t_IsRow >::Zero()
 {
     static Vector oZero(0);
     return oZero;
@@ -28,7 +28,7 @@ const Vector< T, N, t_IsRow >& Vector< T, N, t_IsRow >::ZERO()
 // Unit vector
 template< typename T, unsigned int N, bool t_IsRow >
 const Vector< T, N, t_IsRow >&
-    Vector< T, N, t_IsRow >::UNIT( unsigned int a_uiAxis )
+    Vector< T, N, t_IsRow >::Unit( unsigned int a_uiAxis )
 {
     static Vector aoUnits[N];
     static bool abInitialized = false;
@@ -36,11 +36,11 @@ const Vector< T, N, t_IsRow >&
     {
         for( unsigned int i = 0; i < N; ++i )
         {
-            aoUnits[i] = Matrix< T, N >::IDENTITY()[i];
+            aoUnits[i] = Matrix< T, N >::Identity()[i];
         }
         abInitialized = true;
     }
-    return ( a_uiAxis < N ? aoUnits[a_uiAxis] : ZERO() );
+    return ( a_uiAxis < N ? aoUnits[a_uiAxis] : Zero() );
 }
 
 // Destructor doesn't need to do anything
@@ -206,7 +206,7 @@ inline T Vector< T, N, t_bIsRow >::Dot( const TransposeType& ac_roVector ) const
 // Cross product
 // This really ought to be a variadic template, but Visual Studio 2010 doesn't
 //  support that feature of C++11, so just implement the one-parameter version.
-// For N < 2, "perpendicular" has no meaning, so return ZERO
+// For N < 2, "perpendicular" has no meaning, so return Zero
 // For N == 2, ignore the parameter and just return a perpendicular vector
 // For N == 3, use the formal determinant method
 // For N > 3, use the formal determinant method with rows 3 through N-1 filled
@@ -219,7 +219,7 @@ Vector< T, N, t_bIsRow >
 {
     if( N < 2 )
     {
-        return ZERO();
+        return Zero();
     }
     if( N == 2 )
     {
@@ -231,7 +231,7 @@ Vector< T, N, t_bIsRow >
     aoVectors[1] = ac_roVector.Row();
     for( unsigned int i = 2; i < N - 1; ++i )
     {
-        aoVectors[i] = RowVectorType( UNIT(i) );
+        aoVectors[i] = RowVectorType( Unit(i) );
     }
     Matrix<T, N, ( N > 0 ? N-1 : 0 ) > oMatrix( aoVectors );
     Vector oResult;
@@ -360,4 +360,4 @@ inline Vector< T, N, t_bIsRow > Vector< T, N, t_bIsRow >::
 
 }   // namespace Math
 
-#endif  // _VECTOR_INL
+#endif  // VECTOR__INL

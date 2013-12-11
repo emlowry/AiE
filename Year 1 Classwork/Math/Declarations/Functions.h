@@ -4,37 +4,22 @@
  * Date Created:       December 2, 2013
  * Description:        Various library functions not contained in a class.
  * Last Modified:      December 10, 2013
- * Last Modification:  Added import/export declarations to constants.
+ * Last Modification:  Switched from calculating PI to defining it literally.
  ******************************************************************************/
 
-#ifndef _FUNCTIONS_H_
-#define _FUNCTIONS_H_
+#ifndef FUNCTIONS__H
+#define FUNCTIONS__H
 
 #include "Vector.h"
-#include <cmath>    // for acos
 
 namespace Math
 {
 
 // Degrees/Radians in a circle
 const unsigned short DEGREES_IN_A_CIRCLE = 360;
-#ifdef _STATIC_MATH_H_
-extern const long double PI;
-extern const long double RADIANS_IN_A_CIRCLE;
-extern const long double DEGREES_IN_A_RADIAN;
-#elif defined _DYNAMIC_MATH_H_
-__declspec(dllimport) const long double PI;
-__declspec(dllimport) const long double RADIANS_IN_A_CIRCLE;
-__declspec(dllimport) const long double DEGREES_IN_A_RADIAN;
-#elif defined COMPILING_DLL
-__declspec(dllexport) const long double PI = std::acos( (long double)(-1) );
-__declspec(dllexport) const long double RADIANS_IN_A_CIRCLE = 2 * PI;
-__declspec(dllexport) const long double DEGREES_IN_A_RADIAN = 180L / PI;
-#else
-const long double PI = std::acos( (long double)(-1) );
+const long double PI = 3.14159265358979323846264338327950288419716939937510582L;
 const long double RADIANS_IN_A_CIRCLE = 2 * PI;
 const long double DEGREES_IN_A_RADIAN = 180L / PI;
-#endif
 
 // Convert between degrees and radians
 template< typename T >
@@ -82,4 +67,4 @@ T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin = 0 );
 
 #include "Implementations/Functions.inl"
 
-#endif  // _FUNCTIONS_H_
+#endif  // FUNCTIONS__H

@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_BASE_INL_
-#define _MATRIX_BASE_INL_
+#ifndef MATRIX_BASE__INL
+#define MATRIX_BASE__INL
 
 // Separated out to keep individual file size down
 #include "MatrixBase_CopyConstructors.inl"
@@ -22,7 +22,7 @@ namespace Math
 
 // Default matrix fill
 template< typename T, unsigned int M, unsigned int N >
-const T& MatrixBase< T, M, N >::DEFAULT_FILL()
+const T& MatrixBase< T, M, N >::DefaultFill()
 {
     return MatrixFill< T >::DEFAULT;
 }
@@ -33,7 +33,7 @@ inline MatrixBase< T, M, N >::~MatrixBase() {}
 
 // Default constructor passes to fill constructor
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::MatrixBase() : MatrixBase( DEFAULT_FILL() ) {}
+inline MatrixBase< T, M, N >::MatrixBase() : MatrixBase( DefaultFill() ) {}
 
 // Equality and inequality checks
 template< typename T, unsigned int M, unsigned int N >
@@ -191,4 +191,4 @@ MatrixBase< T, ( M > 0 ? M-1 : 0 ), N > MatrixBase< T, M, N >::
 
 }   // namespace Math
 
-#endif  // _MATRIX_BASE_INL_
+#endif  // MATRIX_BASE__INL

@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _VECTOR_BASE_H_
-#define _VECTOR_BASE_H_
+#ifndef VECTOR_BASE__H
+#define VECTOR_BASE__H
 
 #include "MatrixBase.h"
 
@@ -49,17 +49,17 @@ public:
     VectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     VectorBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                const T& ac_rFill = DEFAULT_FILL() );
+                const T& ac_rFill = DefaultFill() );
     VectorBase( const T& ac_rFill );
     VectorBase( const T (&ac_raData)[ N ] );
     VectorBase( const T* const ac_cpData,
                 const unsigned int ac_uiSize,
-                const T& ac_rFill = DEFAULT_FILL() );
+                const T& ac_rFill = DefaultFill() );
 
     // Construct from another type of vector
     template< unsigned int Q, bool t_bOtherIsRow >
     VectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-                const T& ac_rFill = DEFAULT_FILL() );
+                const T& ac_rFill = DefaultFill() );
     template< unsigned int Q, bool t_bOtherIsRow >
     VectorBase& operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector );
 
@@ -122,4 +122,4 @@ private:
 
 #include "Implementations/VectorBase.inl"
 
-#endif  // _VECTOR_BASE_H_
+#endif  // VECTOR_BASE__H

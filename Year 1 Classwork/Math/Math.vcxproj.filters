@@ -69,5 +69,11 @@
     <ClInclude Include="Declarations\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\ColorVectors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\ColorHexValues.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

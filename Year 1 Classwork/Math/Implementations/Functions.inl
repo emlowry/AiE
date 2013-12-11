@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _FUNCTIONS_INL_
-#define _FUNCTIONS_INL_
+#ifndef FUNCTIONS__INL
+#define FUNCTIONS__INL
 
 #include <cmath>    // for fmod, log2, ciel, floor, exp2, fdim
 
@@ -95,8 +95,8 @@ inline T NearestPowerOfTwo( const T& ac_rValue )
     assert( ac_rValue > 0 );
     T cielPower = (T)std::exp2( std::ciel( std::log2( ac_rValue ) ) );
     T floorPower = (T)std::exp2( std::floor( std::log2( ac_rValue ) ) );
-    return ( std::fdim( ac_rValue, cielPower ) >
-             std::fdim( ac_rValue, floorPower ) ) ? floorPower : cielPower;
+    return ( std::fdim( ac_rValue, cielPower ) <
+             std::fdim( ac_rValue, floorPower ) ) ? ceilPower : floorPower;
 }
 
 // Scroll a value into the given bounds.
@@ -118,7 +118,7 @@ T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
     if( ac_rMax < ac_rMin )
     {
         result = Scroll( ac_rValue, ac_rMin, ac_rMax );
-        return ( ac_rValue == ac_rMax ? ac_rMin : result );
+        return ( result == ac_rMax ? ac_rMin : result );
     }
 
     // Otherwise, scroll normally.
@@ -149,4 +149,4 @@ T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
 
 }   // namespace Math
 
-#endif  // _FUNCTIONS_INL_
+#endif  // FUNCTIONS__INL

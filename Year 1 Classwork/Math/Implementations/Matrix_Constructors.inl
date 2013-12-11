@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_CONSTRUCTORS_INL_
-#define _MATRIX_CONSTRUCTORS_INL_
+#ifndef MATRIX__CONSTRUCTORS__INL
+#define MATRIX__CONSTRUCTORS__INL
 
 // #include <type_traits>  // for is_whateverable checks
 #include <utility>  // for forward
@@ -111,4 +111,4 @@ inline Matrix< T, M, N >::Matrix( const T& ac_rFill, const T& ac_rIdentityFill )
 
 }   // namespace Math
 
-#endif  // _MATRIX_CONSTRUCTORS_INL_
+#endif  // MATRIX__CONSTRUCTORS__INL

@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _VECTOR_BASE_INL_
-#define _VECTOR_BASE_INL_
+#ifndef VECTOR_BASE__INL
+#define VECTOR_BASE__INL
 
 #include "Declarations/Functions.h"
 // #include <type_traits>  // for std::is_whateverable checks
@@ -183,4 +183,4 @@ VectorBase< T, ( N > 0 ? N-1 : 0 ), t_bIsRow > VectorBase< T, N, t_bIsRow >::
 
 }   // namespace Math
 
-#endif _VECTOR_BASE_INL_
+#endif VECTOR_BASE__INL

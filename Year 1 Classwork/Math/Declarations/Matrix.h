@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_H_
-#define _MATRIX_H_
+#ifndef MATRIX__H
+#define MATRIX__H
 
 #include "MatrixBase.h"
 // #include <type_traits>   // for common_type
@@ -70,17 +70,17 @@ public:
     Matrix( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
     Matrix( const T& ac_rFill );
     Matrix( const T (&ac_raData)[ M*N ] );
     Matrix( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
     Matrix( const T (&ac_raaData)[ M ][ N ] );
     Matrix( const T* const* const ac_cpcpData,
             const unsigned int ac_uiRows,
             const unsigned int ac_uiColumns,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
     Matrix( const ColumnVectorType (&ac_raoColumns)[ N ] );
     Matrix( const ColumnVectorType* const (&ac_rpoaColumns)[ N ] );
     Matrix( const RowVectorType (&ac_raoRows)[ M ] );
@@ -100,7 +100,7 @@ public:
     bool IsInvertable() const;
     bool Invert();  // If !TrueInvertable, !change; also, beware int truncation
     bool Inverse( InverseType& a_roMatrix ) const;  // !invertable = !change
-    virtual InverseType Inverse() const;    // if !invertable, return ZERO
+    virtual InverseType Inverse() const;    // if !invertable, return Zero
     virtual InverseType Inverse( bool& a_rbInvertable ) const;  // as above
 
     // Get row/column vectors - redefine in child classes to return correct type
@@ -136,8 +136,8 @@ public:
     // Returns error if parameter is not invertable
     // Order is (*this) * ( ac_roMatrix.Inverse() ) even if P > N
     // (P > N means the matrix can only be left-invertable, where
-    //  ac_roMatrix.Inverse() * ac_roMatrix = IDENTITY but
-    //  ac_roMatrix * ac_roMatrix.Inverse() != IDENTITY_MATRIX< T, P >
+    //  ac_roMatrix.Inverse() * ac_roMatrix = Identity() but
+    //  ac_roMatrix * ac_roMatrix.Inverse() != Matrix< T, P >::Identity()
     template< unsigned int P >
     Matrix< typename MatrixInverse< T >::Type, M, P >
         operator/( const Matrix< T, P, N >& ac_roMatrix ) const;
@@ -166,8 +166,9 @@ public:
     Matrix& operator%=( const T& ac_rScalar );
     Matrix operator%( const T& ac_rScalar ) const;
 
-    static const Matrix& ZERO();
-    static const IdentityType& IDENTITY();
+    // constant references to Zero and Identity matrices
+    static const Matrix& Zero();
+    static const IdentityType& Identity();
 
 protected:
 
@@ -186,4 +187,4 @@ protected:
 #include "Vector.h"
 #include "Implementations/Matrix.inl"
 
-#endif  // _MATRIX_H_
+#endif  // MATRIX__H

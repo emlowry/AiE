@@ -9,8 +9,8 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
-#ifndef _MATH_H_
-#define _MATH_H_
+#ifndef MATH__H
+#define MATH__H
 
 #include "Classes/Functions.h"
 #include "Classes/MatrixBase.h"
@@ -18,4 +18,4 @@
 #include "Classes/VectorBase.h"
 #include "Classes/Vector.h"
 
-#endif  // _MATH_H_
+#endif  // MATH__H

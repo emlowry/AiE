@@ -8,9 +8,9 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
-#ifndef _STATIC_MATH_H_
-#define _STATIC_MATH_H_
+#ifndef STATIC_MATH__H
+#define STATIC_MATH__H
 
 #include "Math.h"
 
-#endif  // _STATIC_MATH_H_
+#endif  // STATIC_MATH__H

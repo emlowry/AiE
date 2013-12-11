@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _VECTOR_H_
-#define _VECTOR_H_
+#ifndef VECTOR__H
+#define VECTOR__H
 
 #include "Matrix.h"
 #include "VectorBase.h"
@@ -81,10 +81,10 @@ public:
     T Dot( const Vector& ac_roVector ) const;
     T Dot( const TransposeType& ac_roVector ) const;
     virtual Vector Cross( const Vector& ac_roVector
-                            = ( N > 2 ? UNIT(1) : ZERO() ) ) const;
+                            = ( N > 2 ? Unit(1) : Zero() ) ) const;
     virtual Vector Cross( const TransposeType& ac_roVector
-                            = ( N > 2 ? TransposeType::UNIT(1)
-                                      : TransposeType::ZERO() ) ) const;
+                            = ( N > 2 ? TransposeType::Unit(1)
+                                      : TransposeType::Zero() ) ) const;
 
     // Normalization
     typename MatrixInverse< T >::Type Magnitude() const;
@@ -114,9 +114,9 @@ public:
     Vector operator-( const Vector& ac_roVector ) const;
     Vector operator-( const TransposeType& ac_roVector ) const;
 
-    // references to zero and unit vectors
-    static const Vector& ZERO();
-    static const Vector& UNIT( unsigned int a_uiAxis );
+    // constant references to zero and unit vectors
+    static const Vector& Zero();
+    static const Vector& Unit( unsigned int a_uiAxis );
 
 private:
 
@@ -131,20 +131,20 @@ private:
     Vector( RootType&& a_rroMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const Vector< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
     template< unsigned int Q, bool t_bOtherIsRow >
     Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
     template< typename U >
     Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
     Vector( const T& ac_rFill );
     Vector( const T (&ac_raData)[ N ] );
     Vector( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DEFAULT_FILL() );
+            const T& ac_rFill = DefaultFill() );
 
     // Hide parent class functions that you shouldn't be using unless you are
     // explicitly treating this object as a matrix, either via casting or via
@@ -177,4 +177,4 @@ private:
 
 #include "Implementations/Vector.inl"
 
-#endif  // _VECTOR_H_
+#endif  // VECTOR__H

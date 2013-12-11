@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_BASE_H_
-#define _MATRIX_BASE_H_
+#ifndef MATRIX_BASE__H
+#define MATRIX_BASE__H
 
 namespace Math
 {
@@ -29,9 +29,9 @@ public:
     typedef VectorBase< T, M, false > ColumnVectorType;
     typedef VectorBase< T, N, true > RowVectorType;
     typedef MatrixBase< T, N, M > TransposeType;
-    static const T& DEFAULT_FILL();   // referance to MatrixFill< T >::DEFAULT
+    static const T& DefaultFill();   // referance to MatrixFill< T >::DEFAULT
 
-    // Default constructor fills array with DEFAULT_FILL
+    // Default constructor fills array with DefaultFill
     MatrixBase();
 
     // Virtual destructor needed, since there are virtual functions.
@@ -48,7 +48,7 @@ public:
     MatrixBase( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
     MatrixBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                const T& ac_rFill = DEFAULT_FILL() );
+                const T& ac_rFill = DefaultFill() );
     template< typename U >
     MatrixBase& operator=( const MatrixBase< U, M, N >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
@@ -62,7 +62,7 @@ public:
     // parameter data, then filled with default/previous data
     MatrixBase( const T* const ac_cpData,
                 const unsigned int ac_uiSize,
-                const T& ac_rFill = DEFAULT_FILL() );
+                const T& ac_rFill = DefaultFill() );
     MatrixBase( const T (&ac_raData)[ M*N ] );
     MatrixBase& operator=( const T (&ac_raData)[ M*N ] );
 
@@ -71,7 +71,7 @@ public:
     MatrixBase( const T* const* const ac_cpcpData,
                 const unsigned int ac_uiRows,
                 const unsigned int ac_uiColumns,
-                const T& ac_rFill = DEFAULT_FILL() );
+                const T& ac_rFill = DefaultFill() );
     MatrixBase( const T (&ac_raaData)[ M ][ N ] );
     MatrixBase& operator=( const T (&ac_raaData)[ M ][ N ] );
 
@@ -161,4 +161,4 @@ struct MatrixFill
 #include "VectorBase.h"
 #include "Implementations/MatrixBase.inl"
 
-#endif  // _MATRIX_BASE_H_
+#endif  // MATRIX_BASE__H

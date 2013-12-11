@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_INL_
-#define _MATRIX_INL_
+#ifndef MATRIX__INL
+#define MATRIX__INL
 
 // Code separated out into separate files to cut down the size of this one
 #include "Matrix_Constructors.inl"
@@ -21,7 +21,7 @@ namespace Math
 
 // Zero matrix
 template< typename T, unsigned int M, unsigned int N >
-const Matrix< T, M, N >& Matrix< T, M, N >::ZERO()
+const Matrix< T, M, N >& Matrix< T, M, N >::Zero()
 {
     static Matrix oZero(0);
     return oZero;
@@ -29,7 +29,7 @@ const Matrix< T, M, N >& Matrix< T, M, N >::ZERO()
 
 // Identity matrix
 template< typename T, unsigned int M, unsigned int N >
-const typename Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::IDENTITY()
+const typename Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::Identity()
 {
     static IdentityType oIdentity( 1, 0 );
     return oIdentity;
@@ -113,10 +113,10 @@ inline bool Matrix< T, M, N >::
 }
 template< typename T, unsigned int M, unsigned int N >
 inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
-    Inverse() const // if !invertable, return ZERO
+    Inverse() const // if !invertable, return Zero
 {
     InverseType oInverse;
-    return ( Inverse( oInverse ) ? oInverse : InverseType::ZERO() );
+    return ( Inverse( oInverse ) ? oInverse : InverseType::Zero() );
 }
 template< typename T, unsigned int M, unsigned int N >
 inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
@@ -124,7 +124,7 @@ inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
 {
     InverseType oInverse;
     a_rbInvertable = Inverse( oInverse );
-    return ( a_rbInvertable ? oInverse : InverseType::ZERO() );
+    return ( a_rbInvertable ? oInverse : InverseType::Zero() );
 }
 
 // For MxN matrix A where M > N, ( A^T * A )^(-1) * A^T * A
@@ -226,4 +226,4 @@ inline typename Matrix< T, M, N >::TransposeType Matrix< T, M, N >::Transpose() 
 
 }   // namespace Math
 
-#endif _MATRIX_INL_
+#endif MATRIX__INL

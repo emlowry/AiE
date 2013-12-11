@@ -8,9 +8,9 @@
  * Last Modification:  Creation.
  ******************************************************************************/
 
-#ifndef _DYNAMIC_MATH_H_
-#define _DYNAMIC_MATH_H_
+#ifndef DYNAMIC_MATH__H
+#define DYNAMIC_MATH__H
 
 #include "Math.h"
 
-#endif  // _DYNAMIC_MATH_H_
+#endif  // DYNAMIC_MATH__H

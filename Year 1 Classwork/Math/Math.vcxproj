@@ -81,6 +81,8 @@
     <None Include="Implementations\VectorBase.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Declarations\ColorHexValues.h" />
+    <ClInclude Include="Declarations\ColorVectors.h" />
     <ClInclude Include="Declarations\Functions.h" />
     <ClInclude Include="DynamicMath.h" />
     <ClInclude Include="Math.h" />

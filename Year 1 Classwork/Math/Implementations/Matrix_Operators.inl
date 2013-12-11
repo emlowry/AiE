@@ -7,8 +7,8 @@
  * Last Modification:  Debugging.
  ******************************************************************************/
 
-#ifndef _MATRIX_OPERATORS_INL_
-#define _MATRIX_OPERATORS_INL_
+#ifndef MATRIX__OPERATORS__INL
+#define MATRIX__OPERATORS__INL
 
 #include "Declarations/Functions.h"
 
@@ -33,8 +33,8 @@ inline Matrix< T, M, P > Matrix< T, M, N >::
 // Returns error if parameter is not invertable
 // Order is (*this) * ( ac_roMatrix.Inverse() ) even if P > N
 // (P > N means the matrix can only be left-invertable, where
-//  ac_roMatrix.Inverse() * ac_roMatrix = IDENTITY but
-//  ac_roMatrix * ac_roMatrix.Inverse() != IDENTITY_MATRIX< T, P >
+//  ac_roMatrix.Inverse() * ac_roMatrix = Identity() but
+//  ac_roMatrix * ac_roMatrix.Inverse() != Matrix< T, P >::Identity()
 template< typename T, unsigned int M, unsigned int N >
 template< unsigned int P >
 inline Matrix< typename MatrixInverse< T >::Type, M, P >
@@ -145,4 +145,4 @@ inline Matrix< T, M, N > Matrix< T, M, N >::
 
 }   // namespace Math
 
-#endif  // _MATRIX_OPERATORS_INL_
+#endif  // MATRIX__OPERATORS__INL
