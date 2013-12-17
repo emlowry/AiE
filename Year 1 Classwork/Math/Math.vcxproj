@@ -69,6 +69,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Implementations\ColorVector.inl" />
+    <None Include="Implementations\ColorVector_AssignmentOperators.inl" />
+    <None Include="Implementations\ColorVector_Constructors.inl" />
     <None Include="Implementations\Functions.inl" />
     <None Include="Implementations\Matrix.inl" />
     <None Include="Implementations\MatrixBase.inl" />
@@ -81,8 +84,9 @@
     <None Include="Implementations\VectorBase.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Declarations\ColorHexValues.h" />
-    <ClInclude Include="Declarations\ColorVectors.h" />
+    <ClInclude Include="Declarations\ColorConstants.h" />
+    <ClInclude Include="Declarations\Hex.h" />
+    <ClInclude Include="Declarations\ColorVector.h" />
     <ClInclude Include="Declarations\Functions.h" />
     <ClInclude Include="DynamicMath.h" />
     <ClInclude Include="Math.h" />
@@ -91,6 +95,9 @@
     <ClInclude Include="Declarations\MatrixBase.h" />
     <ClInclude Include="Declarations\Vector.h" />
     <ClInclude Include="Declarations\VectorBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

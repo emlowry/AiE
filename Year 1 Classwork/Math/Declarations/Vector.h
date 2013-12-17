@@ -18,17 +18,11 @@ namespace Math
 {
     
 // A vector handles some things a bit differently than a matrix of the same size
-// Most functionality is defined in this intermediate base class, but
-//  multiplication with matrices is handled by specializing the Vector class
-// descended from this one.
 template< typename T, unsigned int N, bool t_bIsRow = true >
 class Vector
     : public virtual VectorBase< T, N, t_bIsRow >,
       public virtual Matrix< T, ( t_bIsRow ? 1 : N ), ( t_bIsRow ? N : 1 ) >
 {
-    // Only the actual Vector class can call this class's constructors
-    friend class Vector< T, N, t_bIsRow >;
-
 public:
 
     // simplify typing
@@ -48,6 +42,31 @@ public:
     // virtual destructor needed due to virtual methods
     virtual ~Vector();
 
+    // Constructors that forward to base class constructors
+    Vector();
+    Vector( const Vector& ac_roVector );
+    Vector( const BaseType& ac_roVector );
+    Vector( const RootType& ac_roMatrix );
+    Vector( Vector&& a_rroVector );
+    Vector( BaseType&& a_rroVector );
+    Vector( RootType&& a_rroMatrix );
+    template< unsigned int Q, bool t_bOtherIsRow >
+    Vector( const Vector< T, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DefaultFill() );
+    template< unsigned int Q, bool t_bOtherIsRow >
+    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DefaultFill() );
+    template< typename U >
+    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
+    template< unsigned int P, unsigned int Q >
+    Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
+            const T& ac_rFill = DefaultFill() );
+    Vector( const T& ac_rFill );
+    Vector( const T (&ac_raData)[ N ] );
+    Vector( const T* const ac_cpData,
+            const unsigned int ac_uiSize,
+            const T& ac_rFill = DefaultFill() );
+
     // Copy assign, move assign, and assign from a different type of vector
     // These are specified to remove ambiguity between MatrixBase::operator= and
     // VectorBase::operator=, since both could work - MatrixBase::operator= is
@@ -63,8 +82,8 @@ public:
     const T& operator[]( unsigned int a_uiIndex ) const;
 
     // Get this vector in row/column form
-    virtual ColumnVectorType Column() const;
-    virtual RowVectorType Row() const;
+    virtual ColumnVectorType Column() const override;
+    virtual RowVectorType Row() const override;
 
     // Inverse - if not invertable, return zero vector
     virtual InverseType Inverse() const override;
@@ -120,49 +139,18 @@ public:
 
 private:
 
-    // Constructors that forward to base class constructors
-    // Private so they can only be called by the friend child class
-    Vector();
-    Vector( const Vector& ac_roVector );
-    Vector( const BaseType& ac_roVector );
-    Vector( const RootType& ac_roMatrix );
-    Vector( Vector&& a_rroVector );
-    Vector( BaseType&& a_rroVector );
-    Vector( RootType&& a_rroMatrix );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    Vector( const Vector< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill() );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill() );
-    template< typename U >
-    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
-    template< unsigned int P, unsigned int Q >
-    Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DefaultFill() );
-    Vector( const T& ac_rFill );
-    Vector( const T (&ac_raData)[ N ] );
-    Vector( const T* const ac_cpData,
-            const unsigned int ac_uiSize,
-            const T& ac_rFill = DefaultFill() );
-
     // Hide parent class functions that you shouldn't be using unless you are
     // explicitly treating this object as a matrix, either via casting or via
     // a pointer or reference of the parent type
-    RootType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
-    typedef typename RootType::ColumnVectorType BaseColumnVectorType;
-    RootType& operator=( const BaseColumnVectorType (&ac_raColumns)[ COLUMNS ] );
-    RootType& operator=( const BaseColumnVectorType* const (&ac_racpoColumns)[ COLUMNS ] );
-    typedef typename RootType::RowVectorType BaseRowVectorType;
-    RootType& operator=( const BaseRowVectorType (&ac_raRows)[ ROWS ] );
-    RootType& operator=( const BaseRowVectorType* const (&ac_racpoRows)[ ROWS ] );
     T Determinant();
     T Minor( unsigned int a_uiRow, unsigned int a_uiColumn );
 
     // Non-virtual override - if explicitly treated as a matrix, then matrix
     // implementation should be available, otherwise no implementation should be
     // available
+    typedef typename MatrixType::ColumnVectorType BaseColumnVectorType;
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    typedef typename MatrixType::RowVectorType BaseRowVectorType;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
     Matrix< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
         MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
@@ -170,6 +158,7 @@ private:
         MinusColumn( unsigned int a_uiColumn ) const;
     Matrix< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
         MinusRow( unsigned int a_uiRow ) const;
+    void Shift( int a_iRight, int a_iDown = 0 );
 
 };
 

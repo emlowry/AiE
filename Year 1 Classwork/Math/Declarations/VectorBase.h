@@ -93,28 +93,20 @@ protected:
 
 private:
 
-    // Hide parent class functions that you shouldn't be using unless you are
-    // explicitly treating this object as a matrix, either via casting or via
-    // a pointer or reference of the parent type
-    BaseType& operator=( const T (&ac_raaData)[ ROWS ][ COLUMNS ] );
-    typedef typename BaseType::ColumnVectorType BaseColumnVectorType;
-    BaseType& operator=( const BaseColumnVectorType (&ac_raColumns)[ COLUMNS ] );
-    BaseType& operator=( const BaseColumnVectorType* const (&ac_racpoColumns)[ COLUMNS ] );
-    typedef typename BaseType::RowVectorType BaseRowVectorType;
-    BaseType& operator=( const BaseRowVectorType (&ac_raRows)[ ROWS ] );
-    BaseType& operator=( const BaseRowVectorType* const (&ac_racpoRows)[ ROWS ] );
-
     // Non-virtual override - if explicitly treated as a matrix, then matrix
     // implementation should be available, otherwise no implementation should be
     // available
+    typedef typename BaseType::ColumnVectorType BaseColumnVectorType;
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    typedef typename BaseType::RowVectorType BaseRowVectorType;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
-    virtual MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+    MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
         MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
-    virtual MatrixBase< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+    MatrixBase< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
         MinusColumn( unsigned int a_uiColumn ) const;
-    virtual MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
+    MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
         MinusRow( unsigned int a_uiRow ) const;
+    void Shift( int a_iRight, int a_iDown = 0 );
 
 };
 
