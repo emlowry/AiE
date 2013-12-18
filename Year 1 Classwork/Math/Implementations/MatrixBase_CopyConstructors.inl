@@ -21,77 +21,23 @@ namespace Math
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::MatrixBase( const MatrixBase& ac_roMatrix )
 {/*
-    if( !std::is_copy_constructable< T >::value )
-    {
-        throw exception("Non-copy-constructable type");
-    } /**/
-    for( unsigned int i = 0; i < M*N; ++i )
-    {
-        m_aaData[i/N][i%N]( ac_roMatrix[i/N][i%N] );
-    }
-}
-
-// Copy assignment
-template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >&
-    MatrixBase< T, M, N >::operator=( const MatrixBase& ac_roMatrix )
-{/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
     } /**/
-    if( this != &ac_roMatrix )
-    {
-        return;
-    }
     for( unsigned int i = 0; i < M*N; ++i )
     {
         m_aaData[i/N][i%N] = ac_roMatrix[i/N][i%N];
     }
 }
-
-// Move constructor
 template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::MatrixBase( MatrixBase&& a_rroMatrixBase )
-{/*
-    if( !std::is_move_constructable< T >::value )
-    {
-        throw exception("Non-move-constructable type");
-    } /**/
-    for( unsigned int i = 0; i < M*N; ++i )
-    {
-        m_aaData[i/N][i%N]( std::move( ac_roMatrix[i/N][i%N] ) );
-    }
-}
-
-// Move assignment
-template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >&
-    MatrixBase< T, M, N >::operator=( MatrixBase&& a_rroMatrix )
-{/*
-    if( !std::is_move_assignable< T >::value )
-    {
-        throw exception("Non-move-assignable type");
-    } /**/
-    if( this != &a_rroMatrix )
-    {
-        return;
-    }
-    for( unsigned int i = 0; i < M*N; ++i )
-    {
-        m_aaData[i/N][i%N] = std::move( ac_roMatrix[i/N][i%N] );
-    }
-}
-
-// Copy construct from a different type of matrix
-template< typename T, unsigned int M, unsigned int N >
-template< typename U >
+template< typename U, unsigned int P, unsigned int Q >
 inline MatrixBase< T, M, N >::
-    MatrixBase( const MatrixBase< U, M, N >& ac_roMatrix )
+    MatrixBase( const MatrixBase< U, P, Q >& ac_roMatrix, const T& ac_rFill )
 {/*
-    if( !std::is_copy_constructable< T >::value )
+    if( !std::is_copy_assignable< T >::value )
     {
-        throw exception("Non-copy-constructable type");
+        throw exception("Non-copy-assignable type");
     }
     if( !std::is_convertible< U, T >:: value )
     {
@@ -101,33 +47,49 @@ inline MatrixBase< T, M, N >::
     {
         for( unsigned int j = 0; j < N; ++j )
         {
-             m_aaData[i][j]( (T)( ac_roMatrix[i][j] ) );
+             m_aaData[i][j] =
+                 ( ( i < P && j < Q ) ? (T)( ac_roMatrix[i][j] ) : ac_rFill );
         }
+    }
+}
+
+// Move constructor
+template< typename T, unsigned int M, unsigned int N >
+inline MatrixBase< T, M, N >::MatrixBase( MatrixBase&& a_rroMatrix )
+{/*
+    if( !std::is_move_assignable< T >::value )
+    {
+        throw exception("Non-move-assignable type");
+    } /**/
+    for( unsigned int i = 0; i < M*N; ++i )
+    {
+        m_aaData[i/N][i%N] = std::move( a_rroMatrix[i/N][i%N] );
     }
 }
 template< typename T, unsigned int M, unsigned int N >
 template< unsigned int P, unsigned int Q >
 inline MatrixBase< T, M, N >::
-    MatrixBase( const MatrixBase< T, P, Q >& ac_roMatrix, const T& ac_rFill )
+    MatrixBase( MatrixBase< T, P, Q >&& a_rroMatrix, const T& ac_rFill )
 {/*
-    if( !std::is_copy_constructable< T >::value )
+    if( !std::is_move_assignable< T >::value )
     {
-        throw exception("Non-copy-constructable type");
+        throw exception("Non-move-assignable type");
     } /**/
     for( unsigned int i = 0; i < M; ++i )
     {
         for( unsigned int j = 0; j < N; ++j )
         {
-             m_aaData[i][j]( ( i < P && j < Q ) ? ac_roMatrix[i][j] : ac_rFill );
+             m_aaData[i][j] =
+                 ( ( i < P && j < Q ) ? std::move( ac_roMatrix[i][j] ) : ac_rFill );
         }
     }
 }
 
 // Copy assign from a different type of matrix
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
+template< typename U, unsigned int P, unsigned int Q >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const MatrixBase< U, M, N >& ac_roMatrix )
+    operator=( const MatrixBase< U, P, Q >& ac_roMatrix )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
@@ -136,31 +98,41 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     if( !std::is_convertible< U, T >:: value )
     {
         throw exception("Non-convertable input type");
-    } /**/
-    for( unsigned int i = 0; i < M; ++i )
+    }  /**/
+    if( Address() != ac_roMatrix.Address() )
     {
-        for( unsigned int j = 0; j < N; ++j )
+        for( unsigned int i = 0; i < M && i < P; ++i )
         {
-            m_aaData[i][j] = (T)( ac_roMatrix[i][j] );
+            for( unsigned int j = 0; j < N && j < Q; ++j )
+            {
+                m_aaData[i][j] =  (T)( ac_roMatrix[i][j] );
+            }
         }
     }
+    return *this;
 }
+
+// Move assign from a different type of matrix
 template< typename T, unsigned int M, unsigned int N >
 template< unsigned int P, unsigned int Q >
 inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
-    operator=( const MatrixBase< T, P, Q >& ac_roMatrix )
+    operator=( MatrixBase< T, P, Q >&& a_rroMatrix )
 {/*
-    if( !std::is_copy_assignable< T >::value )
+    if( !std::is_move_assignable< T >::value )
     {
-        throw exception("Non-copy-assignable type");
-    } /**/
-    for( unsigned int i = 0; i < M && i < P; ++i )
+        throw exception("Non-move-assignable type");
+    }  /**/
+    if( Address() != ac_roMatrix.Address() )
     {
-        for( unsigned int j = 0; j < N && j < Q; ++j )
+        for( unsigned int i = 0; i < M && i < P; ++i )
         {
-            m_aaData[i][j] =  ac_roMatrix[i][j];
+            for( unsigned int j = 0; j < N && j < Q; ++j )
+            {
+                m_aaData[i][j] =  std::move( a_rroMatrix[i][j] );
+            }
         }
     }
+    return *this;
 }
 
 }   // namespace Math

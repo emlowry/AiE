@@ -10,6 +10,8 @@
 #ifndef MATRIX_BASE__H
 #define MATRIX_BASE__H
 
+#include "MostDerivedAddress.h"
+
 namespace Math
 {
 
@@ -21,7 +23,7 @@ class VectorBase;
 // Base class for matrices.  For matrices with mathematical operations beyond
 // transposition, use the child Matrix class instead.
 template< typename T, unsigned int M, unsigned int N = M >
-class MatrixBase
+class MatrixBase : public virtual MostDerivedAddress
 {
 public:
 
@@ -29,40 +31,35 @@ public:
     typedef VectorBase< T, M, false > ColumnVectorType;
     typedef VectorBase< T, N, true > RowVectorType;
     typedef MatrixBase< T, N, M > TransposeType;
-    static const T& DefaultFill();   // referance to MatrixFill< T >::DEFAULT
 
-    // Default constructor fills array with DefaultFill
-    MatrixBase();
-
-    // Virtual destructor needed, since there are virtual functions.
+    // destructor
     virtual ~MatrixBase();
     
-    // Copy/move constructor/operator
+    // Copy/move constructor
     MatrixBase( const MatrixBase& ac_roMatrix );
-    MatrixBase& operator=( const MatrixBase& ac_roMatrix );
     MatrixBase( MatrixBase&& a_rroMatrix );
-    MatrixBase& operator=( MatrixBase&& a_rroMatrix );
 
     // Construct/assign from a differently-sized/typed matrix
-    template< typename U >
-    MatrixBase( const MatrixBase< U, M, N >& ac_roMatrix );
+    template< typename U, unsigned int P, unsigned int Q >
+    MatrixBase( const MatrixBase< U, P, Q >& ac_roMatrix,
+                const T& ac_rFill = DefaultFill< T >() );
     template< unsigned int P, unsigned int Q >
-    MatrixBase( const MatrixBase< T, P, Q >& ac_roMatrix,
-                const T& ac_rFill = DefaultFill() );
-    template< typename U >
-    MatrixBase& operator=( const MatrixBase< U, M, N >& ac_roMatrix );
+    MatrixBase( MatrixBase< T, P, Q >&& a_rroMatrix,
+                const T& ac_rFill = DefaultFill< T >() );
+    template< typename U, unsigned int P, unsigned int Q >
+    MatrixBase& operator=( const MatrixBase< U, P, Q >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
-    MatrixBase& operator=( const MatrixBase< T, P, Q >& ac_roMatrix );
+    MatrixBase& operator=( MatrixBase< T, P, Q >&& a_rroMatrix );
 
     // Construct/assign all values equal to parameter
-    MatrixBase( const T& ac_rFill );
+    MatrixBase( const T& ac_rFill = DefaultFill< T >() );
     MatrixBase& operator=( const T& ac_rFill );
 
     // Construct/assign with parameter data one row at a time until end of
     // parameter data, then filled with default/previous data
     MatrixBase( const T* const ac_cpData,
                 const unsigned int ac_uiSize,
-                const T& ac_rFill = DefaultFill() );
+                const T& ac_rFill = DefaultFill< T >() );
     MatrixBase( const T (&ac_raData)[ M*N ] );
     MatrixBase& operator=( const T (&ac_raData)[ M*N ] );
 
@@ -71,7 +68,7 @@ public:
     MatrixBase( const T* const* const ac_cpcpData,
                 const unsigned int ac_uiRows,
                 const unsigned int ac_uiColumns,
-                const T& ac_rFill = DefaultFill() );
+                const T& ac_rFill = DefaultFill< T >() );
     MatrixBase( const T (&ac_raaData)[ M ][ N ] );
     MatrixBase& operator=( const T (&ac_raaData)[ M ][ N ] );
 
@@ -95,9 +92,11 @@ public:
     T& At( unsigned int a_uiRow, unsigned int a_uiColumn );
     const T& At( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
 
-    // Get row/column vectors - redefine in child classes to return correct type
-    virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const;
-    virtual RowVectorType Row( unsigned int ac_uiIndex ) const;
+    // Get row/column vectors - redefine non-virtually in child classes to
+    // return correct type, since return type is concrete and not a pointer or
+    // reference.
+    ColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    RowVectorType Row( unsigned int ac_uiIndex ) const;
 
     // Shift elements right/down the given number of spaces, wrapping around the
     // ends of columns and rows
@@ -109,17 +108,19 @@ public:
     // // m == { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } }
     void Shift( int a_iRight, int a_iDown = 0 );
     
-    // Get smaller matrices by removing a row and/or column - redefine in child
-    // classes to return the correct type.
-    virtual MatrixBase< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
-        MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
-    virtual MatrixBase< T, M, ( N > 0 ? N-1 : 0 ) >
+    // Get smaller matrices by removing a row and/or column - redefine
+    // non-virtually in child classes to return the correct type.
+    MatrixBase< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
+        MinusRowAndColumn( unsigned int a_uiRow,
+                           unsigned int a_uiColumn ) const;
+    MatrixBase< T, M, ( N > 0 ? N-1 : 0 ) >
         MinusColumn( unsigned int a_uiColumn ) const;
-    virtual MatrixBase< T, ( M > 0 ? M-1 : 0 ), N >
+    MatrixBase< T, ( M > 0 ? M-1 : 0 ), N >
         MinusRow( unsigned int a_uiRow ) const;
 
-    // Transpose - redefine in child classes to return correct type
-    virtual TransposeType Transpose() const;
+    // Transpose - redefine non-virtually in child classes to return the correct
+    // type
+    TransposeType Transpose() const;
 
     static const unsigned int ROWS = M;
     static const unsigned int COLUMNS = N;
@@ -134,24 +135,21 @@ protected:
 // Used whenever values at a given coordinate aren't specified, as in
 // constructing a matrix from another matrix with smaller dimensions.
 template< typename T >
-struct MatrixFill
-{
-    // redefine for non-numeric types
-    static const T DEFAULT = 0;
-};
+const T& DefaultFill();
 
 //
 // For non-numeric types, be sure to define the following:
 //
 //  // YourType.h:
-//  template<>
-//  struct MatrixFill< YourType >
-//  {
-//      static const YourType DEFAULT;
-//  };
+//  const YourType& DefaultFill();
 //
 //  // YourType.cpp:
-//  const YourType MatrixFill< YourType >::DEFAULT = /* default YourType */;
+//  const YourType& DefaultFill()
+//  {
+//      // Instead of this, you could just return some other static constant
+//      static YourType fill = /* default YourType */;
+//      return fill;
+//  }
 //
 
 }   // namespace Math

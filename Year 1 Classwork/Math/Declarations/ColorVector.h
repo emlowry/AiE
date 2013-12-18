@@ -22,13 +22,14 @@ public:
 
     // simplify typing
     typedef Vector< Channel, 4 > BaseType;
-    typedef typename BaseType::RootType RootType;
-    typedef typename BaseType::BaseType VectorBaseType;
+    typedef BaseType::RootType RootType;
+    typedef BaseType::BaseType VectorBaseType;
+    typedef BaseType::InverseType InverseType;
 
     // inherit assignment operators
     using BaseType::operator=;
     
-    // virtual destructor needed due to virtual methods
+    // destructor
     virtual ~ColorVector();
 
     // Constructors that forward to base class constructors
@@ -41,103 +42,91 @@ public:
     ColorVector( BaseType&& a_rroVector );
     ColorVector( VectorBaseType&& a_rroVector );
     ColorVector( RootType&& a_rroMatrix );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    ColorVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
-    ColorVector( const Vector< Channel, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
+    ColorVector( Vector< Channel, Q, t_bOtherIsRow >&& a_rroVector,
+                 const Channel& ac_rFill = 0 );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    ColorVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
-    ColorVector( const VectorBase< Channel, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
-    template< typename U >
-    ColorVector( const MatrixBase< U, 1, 4 >& ac_roMatrix );
+    ColorVector( VectorBase< Channel, Q, t_bOtherIsRow >&& a_rroVector,
+                 const Channel& ac_rFill = 0 );
+    template< typename U, unsigned int P, unsigned int Q >
+    ColorVector( const MatrixBase< U, P, Q >& ac_roMatrix,
+                 const Channel& ac_rFill = 0 );
     template< unsigned int P, unsigned int Q >
-    ColorVector( const MatrixBase< Channel, P, Q >& ac_roMatrix,
-                 const Channel& ac_rFill = DefaultFill() );
+    ColorVector( MatrixBase< Channel, P, Q >&& a_rroMatrix,
+                 const Channel& ac_rFill = 0 );
     ColorVector( const Channel& ac_rFill );
     ColorVector( const Channel (&ac_raData)[ 4 ] );
     ColorVector( const Channel* const ac_cpData,
                  const unsigned int ac_uiSize,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
 
-    // Convert from vectors or matrices of floating-point types
-    template<>
-    ColorVector( const MatrixBase< float, 1, 4 >& ac_roMatrix );
+    // Construct from vectors or matrices of floating-point types
     template< unsigned int P, unsigned int Q >
     ColorVector( const MatrixBase< float, P, Q >& ac_roMatrix,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const Vector< float, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
-    template<>
-    ColorVector( const MatrixBase< double, 1, 4 >& ac_roMatrix );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int P, unsigned int Q >
     ColorVector( const MatrixBase< double, P, Q >& ac_roMatrix,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const Vector< double, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
-    template<>
-    ColorVector( const MatrixBase< long double, 1, 4 >& ac_roMatrix );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int P, unsigned int Q >
     ColorVector( const MatrixBase< long double, P, Q >& ac_roMatrix,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const Vector< long double, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = DefaultFill() );
+                 const Channel& ac_rFill = 0 );
 
     // Assign from vectors/matrices of floating-point type
-    ColorVector& operator=( const MatrixBase< float, 1, 4 >& ac_roMatrix );
     template< unsigned int P, unsigned int Q >
-    ColorVector& operator=( const MatrixBase< float, P, Q >& ac_roMatrix,
-                            const Channel& ac_rFill = DefaultFill() );
+    ColorVector& operator=( const MatrixBase< float, P, Q >& ac_roMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector&
-        operator=( const Vector< float, Q, t_bOtherIsRow >& ac_roVector,
-                   const Channel& ac_rFill = DefaultFill() );
+        operator=( const Vector< float, Q, t_bOtherIsRow >& ac_roVector );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector&
-        operator=( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector,
-                   const Channel& ac_rFill = DefaultFill() );
-    ColorVector& operator=( const MatrixBase< double, 1, 4 >& ac_roMatrix );
+        operator=( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector );
     template< unsigned int P, unsigned int Q >
-    ColorVector& operator=( const MatrixBase< double, P, Q >& ac_roMatrix,
-                            const Channel& ac_rFill = DefaultFill() );
+    ColorVector& operator=( const MatrixBase< double, P, Q >& ac_roMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector&
-        operator=( const Vector< double, Q, t_bOtherIsRow >& ac_roVector,
-                   const Channel& ac_rFill = DefaultFill() );
+        operator=( const Vector< double, Q, t_bOtherIsRow >& ac_roVector );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector&
-        operator=( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector,
-                   const Channel& ac_rFill = DefaultFill() );
-    ColorVector&
-        operator=( const MatrixBase< long double, 1, 4 >& ac_roMatrix );
+        operator=( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector );
     template< unsigned int P, unsigned int Q >
     ColorVector&
-        operator=( const MatrixBase< long double, P, Q >& ac_roMatrix,
-                   const Channel& ac_rFill = DefaultFill() );
+        operator=( const MatrixBase< long double, P, Q >& ac_roMatrix );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector&
-        operator=( const Vector< long double, Q, t_bOtherIsRow >& ac_roVector,
-                   const Channel& ac_rFill = DefaultFill() );
+        operator=( const Vector< long double, Q, t_bOtherIsRow >& ac_roVector );
     template< unsigned int Q, bool t_bOtherIsRow >
     ColorVector&
-        operator=( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector,
-                   const Channel& ac_rFill = DefaultFill() );
+        operator=( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector );
 
     // Construct/assign from or convert to hex value
-    ColorVector( Channel a_uiRed,
-                 Channel a_uiGreen,
-                 Channel a_uiBlue,
-                 Channel a_uiAlpha = 0xFF );
+    ColorVector( Channel a_ucRed,
+                 Channel a_ucGreen,
+                 Channel a_ucBlue,
+                 Channel a_ucAlpha = 0xFF );
     ColorVector( float a_fRed,
                  float a_fGreen,
                  float a_fBlue,
@@ -179,9 +168,13 @@ public:
     template< typename T >
     ColorVector operator/( const T& ac_rScalar ) const;
     template< typename T >
+    ColorVector operator%( const T& ac_rScalar ) const;
+    template< typename T >
     ColorVector& operator*=( const T& ac_rScalar );
     template< typename T >
     ColorVector& operator/=( const T& ac_rScalar );
+    template< typename T >
+    ColorVector& operator%=( const T& ac_rScalar );
 
     // arithmatic operators for use with other color vectors
     ColorVector operator+( const ColorVector& ac_roVector ) const;
@@ -214,9 +207,18 @@ public:
     Channel& r; // m_aaData[0][1]
     Channel& g; // m_aaData[0][2]
     Channel& b; // m_aaData[0][3]
+
 };
 
 }   // namespace Color
+
+// ColorVector scalar multiplication and division in the other direction
+template< typename U >
+Color::ColorVector
+    operator*( const U& ac_roScalar, const Color::ColorVector ac_roVector );
+template< typename U >
+Color::ColorVector
+    operator/( const U& ac_roScalar, const Color::ColorVector ac_roVector );
 
 #include "Implementations/ColorVector.inl"
 

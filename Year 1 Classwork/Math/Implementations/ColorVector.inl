@@ -51,29 +51,29 @@ inline ColorVector& ColorVector::operator^=( const ColorVector& ac_roVector )
 }
 inline ColorVector ColorVector::operator&( const Hex& ac_rHex ) const
 {
-    return ( (Hex)(*this) & (Hex)(ac_roVector) );
+    return ( (Hex)(*this) & ac_rHex );
 }
 inline ColorVector ColorVector::operator|( const Hex& ac_rHex ) const
 {
-    return ( (Hex)(*this) | (Hex)(ac_roVector) );
+    return ( (Hex)(*this) | ac_rHex );
 }
 inline ColorVector ColorVector::operator^( const Hex& ac_rHex ) const
 {
-    return ( (Hex)(*this) ^ (Hex)(ac_roVector) );
+    return ( (Hex)(*this) ^ ac_rHex );
 }
 inline ColorVector& ColorVector::operator&=( const Hex& ac_rHex )
 {
-    *this = operator&( ac_roHex );
+    operator=( operator&( ac_rHex ) );
     return *this;
 }
 inline ColorVector& ColorVector::operator|=( const Hex& ac_rHex )
 {
-    *this = operator|( ac_roHex );
+    operator=( operator|( ac_rHex ) );
     return *this;
 }
 inline ColorVector& ColorVector::operator^=( const Hex& ac_rHex )
 {
-    *this = operator^( ac_roHex );
+    operator=( operator^( ac_rHex ) );
     return *this;
 }
 
@@ -81,12 +81,17 @@ inline ColorVector& ColorVector::operator^=( const Hex& ac_rHex )
 template< typename T >
 inline ColorVector ColorVector::operator*( const T& ac_rScalar ) const
 {
-    return Hex( (Hex)(*this) * ac_rScalar );
+    return ColorVector( (Hex)(*this) * ac_rScalar );
 }
 template< typename T >
 inline ColorVector ColorVector::operator/( const T& ac_rScalar ) const
 {
-    return Hex( (Hex)(*this) / ac_rScalar );
+    return ColorVector( (Hex)(*this) / ac_rScalar );
+}
+template< typename T >
+inline ColorVector ColorVector::operator%( const T& ac_rScalar ) const
+{
+    return ColorVector( BaseType::operator%( ac_rScalar ) );
 }
 template< typename T >
 inline ColorVector& ColorVector::operator*=( const T& ac_rScalar )
@@ -98,6 +103,12 @@ template< typename T >
 inline ColorVector& ColorVector::operator/=( const T& ac_rScalar )
 {
     *this = operator/( ac_rScalar );
+    return *this;
+}
+template< typename T >
+inline ColorVector& ColorVector::operator%=( const T& ac_rScalar )
+{
+    *this = operator%( ac_rScalar );
     return *this;
 }
 
@@ -196,5 +207,19 @@ inline float ColorVector::fBlue() const
 }
 
 }   // namespace Color
+
+// ColorVector scalar multiplication and division in the other direction
+template< typename U >
+inline Color::ColorVector
+    operator*( const U& ac_roScalar, const Color::ColorVector ac_roVector )
+{
+    return ac_roVector.operator*( ac_roScalar );
+}
+template< typename U >
+inline Color::ColorVector
+    operator/( const U& ac_roScalar, const Color::ColorVector ac_roVector )
+{
+    return Color::ColorVector().operator*( ac_roScalar ).operator/( ac_roVector );
+}
 
 #endif  // COLOR_VECTOR__INL

@@ -39,7 +39,7 @@ public:
     // inherit assignment operators
     using BaseType::operator=;
 
-    // virtual destructor needed due to virtual methods
+    // destructor
     virtual ~Vector();
 
     // Constructors that forward to base class constructors
@@ -50,78 +50,99 @@ public:
     Vector( Vector&& a_rroVector );
     Vector( BaseType&& a_rroVector );
     Vector( RootType&& a_rroMatrix );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DefaultFill< T >() );
     template< unsigned int Q, bool t_bOtherIsRow >
-    Vector( const Vector< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill() );
+    Vector( Vector< T, Q, t_bOtherIsRow >&& a_rroVector,
+            const T& ac_rFill = DefaultFill< T >() );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DefaultFill< T >() );
     template< unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill() );
-    template< typename U >
-    Vector( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix );
+    Vector( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector,
+            const T& ac_rFill = DefaultFill< T >() );
+    template< typename U, unsigned int P, unsigned int Q >
+    Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
+            const T& ac_rFill = DefaultFill< T >() );
     template< unsigned int P, unsigned int Q >
-    Vector( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DefaultFill() );
+    Vector( MatrixBase< T, P, Q >&& a_rroMatrix,
+            const T& ac_rFill = DefaultFill< T >() );
     Vector( const T& ac_rFill );
     Vector( const T (&ac_raData)[ N ] );
     Vector( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DefaultFill() );
-
+            const T& ac_rFill = DefaultFill< T >() );
+    
     // Copy assign, move assign, and assign from a different type of vector
     // These are specified to remove ambiguity between MatrixBase::operator= and
     // VectorBase::operator=, since both could work - MatrixBase::operator= is
     // available through inheritance from Matrix, VectorBase::operator= through
     // inheritance from VectorBase.
-    Vector& operator=( const Vector& ac_roVector );
-    Vector& operator=( Vector&& a_rroVector );
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    Vector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
     template< unsigned int Q, bool t_bOtherIsRow >
-    Vector& operator=( const Vector< T, Q, t_bOtherIsRow >& ac_roVector );
-
+    Vector& operator=( Vector< T, Q, t_bOtherIsRow >&& a_rroVector );
+    
     // Element access - hides matrix class row-returning implementation
-    T& operator[]( unsigned int a_uiIndex );
-    const T& operator[]( unsigned int a_uiIndex ) const;
+    //T& operator[]( unsigned int a_uiIndex );
+    //const T& operator[]( unsigned int a_uiIndex ) const;
+    using BaseType::operator[];
 
-    // Get this vector in row/column form
-    virtual ColumnVectorType Column() const override;
-    virtual RowVectorType Row() const override;
-
-    // Inverse - if not invertable, return zero vector
-    virtual InverseType Inverse() const override;
-    virtual InverseType Inverse( bool& a_rbInvertable ) const override;
-
-    // Get a smaller vector by removing an element
-    virtual Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
-        MinusElement( unsigned int a_uiIndex ) const override;
-
-    // Transpose
-    virtual TransposeType Transpose() const override;
+    // Non-virtual overrides to return correct type, since return type is
+    // concrete and not a pointer or reference.
+    ColumnVectorType Column() const;
+    RowVectorType Row() const;
+    InverseType Inverse() const;
+    InverseType Inverse( bool& a_rbInvertable ) const;
+    Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
+        MinusElement( unsigned int a_uiIndex ) const;
+    TransposeType Transpose() const;
 
     // Dot and cross products
     T Dot( const Vector& ac_roVector ) const;
     T Dot( const TransposeType& ac_roVector ) const;
-    virtual Vector Cross( const Vector& ac_roVector
-                            = ( N > 2 ? Unit(1) : Zero() ) ) const;
-    virtual Vector Cross( const TransposeType& ac_roVector
-                            = ( N > 2 ? TransposeType::Unit(1)
-                                      : TransposeType::Zero() ) ) const;
+    Vector Cross( const Vector& ac_roVector
+                        = ( N > 2 ? Unit(1) : Zero() ) ) const;
+    Vector Cross( const TransposeType& ac_roVector
+                        = ( N > 2 ? TransposeType::Unit(1)
+                                  : TransposeType::Zero() ) ) const;
 
     // Normalization
     typename MatrixInverse< T >::Type Magnitude() const;
     T MagnitudeSquared() const; // for efficiency in complex calculations
     void Normalize();
-    virtual NormalType Normal() const;
+    NormalType Normal() const;
 
-    // Inherit matrix addition and subtraction
-    using MatrixType::operator+=;
-    using MatrixType::operator+;
-    using MatrixType::operator-=;
-    using MatrixType::operator-;
+    // Inherit matrix multiplication and division
+    using MatrixType::operator*;
+    using MatrixType::operator/;
+
+    // Scalar multiplication/division/modulo overrides to return correct type
+    template< typename U >
+    Vector& operator*=( const U& ac_rScalar );
+    template< typename U >
+    Vector operator*( const U& ac_rScalar ) const;
+    template< typename U >
+    Vector& operator/=( const U& ac_rScalar );
+    template< typename U >
+    Vector operator/( const U& ac_rScalar ) const;
+    template< typename U >
+    Vector& operator%=( const U& ac_rScalar );
+    template< typename U >
+    Vector operator%( const U& ac_rScalar ) const;
+
+    // Matrix addition/subtraction overrides to return correct type
+    Vector& operator+=( const MatrixType& ac_roMatrix );
+    Vector operator+( const MatrixType& ac_roMatrix ) const;
+    Vector& operator-=( const MatrixType& ac_roMatrix );
+    Vector operator-( const MatrixType& ac_roMatrix ) const;
 
     // Vector addition and subtraction
     // Non-virtual overrides for arithmatic with another vector - vector
     // implementation doesn't care whether the other vector is a row vector or a
-    // column vector, as arithmatic with a matrix does.  If both objects are
-    // being explicitly treated as matrices, then a user should expect matrix-
+    // column vector, as arithmatic with a matrix does.  If either object is
+    // being explicitly treated a a matrix, then a user should expect matrix-
     // -style arithmatic.  If this object is instead being explicitly treated as
     // the vector it is, then a user should expect vector-style arithmatic.
     Vector& operator+=( const Vector& ac_roVector );
@@ -163,6 +184,16 @@ private:
 };
 
 }   // namespace Math
+
+// Vector scalar multiplication and division in the other direction
+template< typename U, typename T, unsigned int N, bool t_bIsRow >
+Math::Vector< T, N, t_bIsRow >
+    operator*( const U& ac_roScalar,
+               const Math::Vector< T, N, t_bIsRow > ac_roVector );
+template< typename U, typename T, unsigned int N, bool t_bIsRow >
+typename Math::Vector< T, N, t_bIsRow >::InverseType
+    operator/( const U& ac_roScalar,
+               const Math::Vector< T, N, t_bIsRow > ac_roVector );
 
 #include "Implementations/Vector.inl"
 

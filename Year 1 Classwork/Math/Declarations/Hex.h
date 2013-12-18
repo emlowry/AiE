@@ -35,7 +35,7 @@ union Hex
 
     // Union constructors and assignment operators
     Hex() : i( 0xFF000000 ) {}
-    Hex( Channel a_r, Channel a_g, Channel a_b, Channel a_a = 1 )
+    Hex( Channel a_r, Channel a_g, Channel a_b, Channel a_a = 0xFF )
         : a( a_a ), r( a_r ), g( a_g ), b( a_b ) {}
     Hex( float a_r, float a_g, float a_b, float a_a = 1.0 )
         : a( a_a < 0.0 ? 0 : a_a > 1.0 ? 0xFF : (Channel)( a_a * 0xFF ) ),

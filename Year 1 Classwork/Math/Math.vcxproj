@@ -79,7 +79,10 @@
     <None Include="Implementations\MatrixBase_FillConstructors.inl" />
     <None Include="Implementations\Matrix_Constructors.inl" />
     <None Include="Implementations\Matrix_Operators.inl" />
+    <None Include="Implementations\PointVector.inl" />
     <None Include="Implementations\Vector.inl" />
+    <None Include="Implementations\Vector_Constructors.inl" />
+    <None Include="Implementations\Vector_Operators.inl" />
     <None Include="ReadMe.txt" />
     <None Include="Implementations\VectorBase.inl" />
   </ItemGroup>
@@ -88,6 +91,8 @@
     <ClInclude Include="Declarations\Hex.h" />
     <ClInclude Include="Declarations\ColorVector.h" />
     <ClInclude Include="Declarations\Functions.h" />
+    <ClInclude Include="Declarations\MostDerivedAddress.h" />
+    <ClInclude Include="Declarations\PointVector.h" />
     <ClInclude Include="DynamicMath.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="StaticMath.h" />

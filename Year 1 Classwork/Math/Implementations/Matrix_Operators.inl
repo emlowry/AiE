@@ -85,10 +85,11 @@ inline Matrix< T, M, N > Matrix< T, M, N >::
     return oCopy;
 }
 
-    // Scalar math - multiplication, division, and modulo
+// Scalar math - multiplication, division, and modulo
 template< typename T, unsigned int M, unsigned int N >
+template< typename U >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
-    operator*=( const T& ac_rScalar )
+    operator*=( const U& ac_rScalar )
 {
     for( unsigned int i = 0; i < M*N; ++i )
     {
@@ -97,16 +98,18 @@ inline Matrix< T, M, N >& Matrix< T, M, N >::
     return *this;
 }
 template< typename T, unsigned int M, unsigned int N >
+template< typename U >
 inline Matrix< T, M, N > Matrix< T, M, N >::
-    operator*( const T& ac_rScalar ) const
+    operator*( const U& ac_rScalar ) const
 {
     Matrix oCopy(*this);
     oCopy *= ac_rScalar;
     return oCopy;
 }
 template< typename T, unsigned int M, unsigned int N >
+template< typename U >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
-    operator/=( const T& ac_rScalar )
+    operator/=( const U& ac_rScalar )
 {
     assert( ac_roScalar != 0 );
     for( unsigned int i = 0; i < M*N; ++i )
@@ -116,16 +119,18 @@ inline Matrix< T, M, N >& Matrix< T, M, N >::
     return *this;
 }
 template< typename T, unsigned int M, unsigned int N >
+template< typename U >
 inline Matrix< T, M, N > Matrix< T, M, N >::
-    operator/( const T& ac_rScalar ) const
+    operator/( const U& ac_rScalar ) const
 {
     Matrix oCopy(*this);
     oCopy /= ac_rScalar;
     return oCopy;
 }
 template< typename T, unsigned int M, unsigned int N >
+template< typename U >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
-    operator%=( const T& ac_rScalar )
+    operator%=( const U& ac_rScalar )
 {
     assert( ac_roScalar != 0 );
     for( unsigned int i = 0; i < M*N; ++i )
@@ -135,8 +140,9 @@ inline Matrix< T, M, N >& Matrix< T, M, N >::
     return *this;
 }
 template< typename T, unsigned int M, unsigned int N >
+template< typename U >
 inline Matrix< T, M, N > Matrix< T, M, N >::
-    operator%( const T& ac_rScalar ) const
+    operator%( const U& ac_rScalar ) const
 {
     Matrix oCopy(*this);
     oCopy %= ac_rScalar;
@@ -144,5 +150,24 @@ inline Matrix< T, M, N > Matrix< T, M, N >::
 }
 
 }   // namespace Math
+
+// Matrix scalar multiplication and division in the other direction
+template< typename U, typename T, unsigned int M, unsigned int N >
+inline Math::Matrix< T, M, N >
+    operator*( const U& ac_roScalar, const Math::Matrix< T, M, N > ac_roMatrix )
+{
+    return ac_roMatrix.operator*( ac_roScalar );
+}
+template< typename U, typename T, unsigned int M, unsigned int N >
+inline typename Math::Matrix< T, M, N >::InverseType
+    operator/( const U& ac_roScalar,
+               const Math::Matrix< T, M, N > ac_roMatrix )
+{
+    if( !ac_roMatrix.IsInvertable() )
+    {
+        throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
+    }
+    return ac_roMatrix.Inverse().operator*( ac_roScalar );
+}
 
 #endif  // MATRIX__OPERATORS__INL

@@ -32,33 +32,21 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( const VectorBase& ac_roVector )
     : BaseType( ac_roVector ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    operator=( const VectorBase& ac_roVector )
-{
-    return BaseType::operator=( ac_roVector );
-}
-template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( BaseType&& a_rroMatrix )
-    : BaseType( std::forward( a_rroMatrix ) ) {}
+    : BaseType( std::forward< BaseType >( a_rroMatrix ) ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( VectorBase&& a_rroVector )
-    : BaseType( std::forward( a_rroVector ) ) {}
+    : BaseType( std::forward< VectorBase >( a_rroVector ) ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
-inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    operator=( VectorBase&& a_rroVector )
-{
-    return BaseType::operator=( std::forward( a_rroVector ) );
-}
-template< typename T, unsigned int N, bool t_bIsRow >
-template< typename U >
+template< typename U, unsigned int P, unsigned int Q >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase( const MatrixBase< U, ROWS, COLUMNS >& ac_roMatrix )
-    : BaseType( ac_roMatrix ) {}
+    VectorBase( const MatrixBase< U, P, Q >& ac_roMatrix, const T& ac_rFill )
+    : BaseType( ac_roMatrix, ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
 template< unsigned int P, unsigned int Q >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase( const MatrixBase< T, P, Q >& ac_roMatrix, const T& ac_rFill )
-    : BaseType( ac_roMatrix, ac_rFill ) {}
+    VectorBase( MatrixBase< T, P, Q >&& a_rroMatrix, const T& ac_rFill )
+    : BaseType( std::forward< MatrixBase< T, P, Q > >( a_rroMatrix ), ac_rFill ) {}
 template< typename T, unsigned int N, bool t_bIsRow >
 inline VectorBase< T, N, t_bIsRow >::VectorBase( const T& ac_rFill )
     : BaseType( ac_rFill ) {}
@@ -74,37 +62,84 @@ inline VectorBase< T, N, t_bIsRow >::
 
 // Copy construct from a different kind of vector
 template< typename T, unsigned int N, bool t_bIsRow >
-template< unsigned int Q, bool t_bOtherIsRow >
+template< typename U, unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >::
-    VectorBase( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector,
+    VectorBase( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
                 const T& ac_rFill )
 {/*
-    if( !std::is_copy_constructable< T >::value )
+    if( !std::is_copy_assignable< T >::value )
     {
-        throw exception("Non-copy-constructable type");
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< U, T >:: value )
+    {
+        throw exception("Non-convertable input type");
     } /**/
     for( unsigned int i = 0; i < N; ++i )
     {
-        m_aaData[ t_bIsRow ? 1 : i][ t_bIsRow ? i : 1 ]( ( i < Q )
-                                                         ? ac_roVector[i]
-                                                         : ac_rFill );
+        At(i) = ( i < Q ) ? (T)( ac_roVector[i] ) : ac_rFill;
     }
 }
 
 // Copy assign from a different type of vector
 template< typename T, unsigned int N, bool t_bIsRow >
-template< unsigned int Q, bool t_bOtherIsRow >
+template< typename U, unsigned int Q, bool t_bOtherIsRow >
 inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
-    operator=( const VectorBase< T, Q, t_bOtherIsRow >& ac_roVector )
+    operator=( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {
         throw exception("Non-copy-assignable type");
-    } /**/
-    for( unsigned int i = 0; i < N && i < Q; ++i )
-    {
-        m_aaData[ t_bIsRow ? 1 : i][ t_bIsRow ? i : 1 ] = ac_roVector[i];
     }
+    if( !std::is_convertible< U, T >:: value )
+    {
+        throw exception("Non-convertable input type");
+    } /**/
+    if( Address() != ac_roVector.Address() )
+    {
+        for( unsigned int i = 0; i < N && i < Q; ++i )
+        {
+            At(i) = (T)( ac_roVector[i] );
+        }
+    }
+    return *this;
+}
+
+// Move construct from a different kind of vector
+template< typename T, unsigned int N, bool t_bIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
+inline VectorBase< T, N, t_bIsRow >::
+    VectorBase( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector,
+                const T& ac_rFill )
+{/*
+    if( !std::is_move_assignable< T >::value )
+    {
+        throw exception("Non-move-assignable type");
+    } /**/
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At(i) = ( i < Q ) ? std::move( a_rroVector[i] ) : ac_rFill;
+    }
+}
+
+// Move assign from a different type of vector
+template< typename T, unsigned int N, bool t_bIsRow >
+template< unsigned int Q, bool t_bOtherIsRow >
+inline VectorBase< T, N, t_bIsRow >& VectorBase< T, N, t_bIsRow >::
+    operator=( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector )
+{/*
+    if( !std::is_move_assignable< T >::value )
+    {
+        throw exception("Non-move-assignable type");
+    } /**/
+    if( Address() != a_rroVector.Address() )
+    {
+        for( unsigned int i = 0; i < N && i < Q; ++i )
+        {
+            At(i) = std::move( a_rroVector[i] );
+        }
+    }
+    return *this;
 }
 
 // Vector element access

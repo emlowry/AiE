@@ -14,26 +14,19 @@ namespace Color
 {
 
 // Assign from vectors/matrices of floating-point type
-inline ColorVector& ColorVector::
-    operator=( const MatrixBase< float, 1, 4 >& ac_roMatrix )
-{
-    return BaseType::operator=( ac_roMatrix * 255.0f );
-}
 template< unsigned int P, unsigned int Q >
 inline ColorVector& ColorVector::
-    operator=( const MatrixBase< float, P, Q >& ac_roMatrix,
-               const Channel& ac_rFill )
+    operator=( const MatrixBase< float, P, Q >& ac_roMatrix )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
-    BaseType::operator=( ac_roMatrix * 255.0f );
+    BaseType::operator=( (Matrix< float, P, Q >)ac_roMatrix * 255.0f );
     Shift( -1 * iShift );
     return *this;
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector& ColorVector::
-    operator=( const Vector< float, Q, t_bOtherIsRow >& ac_roVector,
-               const Channel& ac_rFill )
+    operator=( const Vector< float, Q, t_bOtherIsRow >& ac_roVector )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
@@ -43,35 +36,27 @@ inline ColorVector& ColorVector::
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector& ColorVector::
-    operator=( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector,
-               const Channel& ac_rFill )
+    operator=( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
-    BaseType::operator=( ac_roVector * 255.0f );
+    BaseType::operator=( (Vector< float, Q, t_bOtherIsRow >)ac_roVector * 255.0f );
     Shift( -1 * iShift );
     return *this;
 }
-inline ColorVector& ColorVector::
-    operator=( const MatrixBase< double, 1, 4 >& ac_roMatrix )
-{
-    return BaseType::operator=( ac_roMatrix * 255.0 );
-}
 template< unsigned int P, unsigned int Q >
 inline ColorVector& ColorVector::
-    operator=( const MatrixBase< double, P, Q >& ac_roMatrix,
-               const Channel& ac_rFill )
+    operator=( const MatrixBase< double, P, Q >& ac_roMatrix )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
-    BaseType::operator=( ac_roMatrix * 255.0 );
+    BaseType::operator=( (Matrix< double, P, Q >)ac_roMatrix * 255.0 );
     Shift( -1 * iShift );
     return *this;
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector& ColorVector::
-    operator=( const Vector< double, Q, t_bOtherIsRow >& ac_roVector,
-               const Channel& ac_rFill )
+    operator=( const Vector< double, Q, t_bOtherIsRow >& ac_roVector )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
@@ -81,35 +66,27 @@ inline ColorVector& ColorVector::
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector& ColorVector::
-    operator=( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector,
-               const Channel& ac_rFill )
+    operator=( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
-    BaseType::operator=( ac_roVector * 255.0 );
+    BaseType::operator=( (Vector< double, Q, t_bOtherIsRow >)ac_roVector * 255.0 );
     Shift( -1 * iShift );
     return *this;
-}
-inline ColorVector& ColorVector::
-    operator=( const MatrixBase< long double, 1, 4 >& ac_roMatrix )
-{
-    return BaseType::operator=( ac_roMatrix * 255.0L );
 }
 template< unsigned int P, unsigned int Q >
 inline ColorVector& ColorVector::
-    operator=( const MatrixBase< long double, P, Q >& ac_roMatrix,
-               const Channel& ac_rFill )
+    operator=( const MatrixBase< long double, P, Q >& ac_roMatrix )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
-    BaseType::operator=( ac_roMatrix * 255.0L );
+    BaseType::operator=( (Matrix< long double, P, Q >)ac_roMatrix * 255.0L );
     Shift( -1 * iShift );
     return *this;
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector& ColorVector::
-    operator=( const Vector< long double, Q, t_bOtherIsRow >& ac_roVector,
-               const Channel& ac_rFill )
+    operator=( const Vector< long double, Q, t_bOtherIsRow >& ac_roVector )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
@@ -119,22 +96,21 @@ inline ColorVector& ColorVector::
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector& ColorVector::
-    operator=( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector,
-               const Channel& ac_rFill )
+    operator=( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector )
 {
     int iShift = ( Q < 4 ? -1 : 0 );
     Shift( iShift );
-    BaseType::operator=( ac_roVector * 255.0L );
+    BaseType::operator=( (Vector< long double, Q, t_bOtherIsRow >)ac_roVector * 255.0L );
     Shift( -1 * iShift );
     return *this;
 }
 
 // Assign from or convert to color Hex value
-inline ColorVector::ColorVector& operator=( FourChannelInt a_uiHex )
+inline ColorVector& ColorVector::operator=( FourChannelInt a_uiHex )
 {
     return operator=( Hex( a_uiHex ) );
 }
-inline ColorVector::ColorVector& operator=( const Hex& ac_rHex )
+inline ColorVector& ColorVector::operator=( const Hex& ac_rHex )
 {
     a = ac_rHex.a;
     r = ac_rHex.r;

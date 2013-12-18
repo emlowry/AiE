@@ -55,32 +55,31 @@ public:
     // inherit assignment operators
     using BaseType::operator=;
 
-    // virtual destructor needed due to virtual methods
+    // destructor
     virtual ~Matrix();
     
     // Constructors that forward to base class constructors
     Matrix();
     Matrix( const Matrix& ac_roMatrix );
-    Matrix& operator=( const Matrix& ac_roMatrix );
     Matrix( const BaseType& ac_roMatrix );
     Matrix( Matrix&& a_rroMatrix );
-    Matrix& operator=( Matrix&& a_rroMatrix );
     Matrix( BaseType&& a_rroMatrix );
-    template< typename U >
-    Matrix( const MatrixBase< U, M, N >& ac_roMatrix );
+    template< typename U, unsigned int P, unsigned int Q >
+    Matrix( const MatrixBase< U, P, Q >& ac_roMatrix,
+            const T& ac_rFill = DefaultFill< T >() );
     template< unsigned int P, unsigned int Q >
-    Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DefaultFill() );
+    Matrix( MatrixBase< T, P, Q >&& a_rroMatrix,
+            const T& ac_rFill = DefaultFill< T >() );
     Matrix( const T& ac_rFill );
     Matrix( const T (&ac_raData)[ M*N ] );
     Matrix( const T* const ac_cpData,
             const unsigned int ac_uiSize,
-            const T& ac_rFill = DefaultFill() );
+            const T& ac_rFill = DefaultFill< T >() );
     Matrix( const T (&ac_raaData)[ M ][ N ] );
     Matrix( const T* const* const ac_cpcpData,
             const unsigned int ac_uiRows,
             const unsigned int ac_uiColumns,
-            const T& ac_rFill = DefaultFill() );
+            const T& ac_rFill = DefaultFill< T >() );
     Matrix( const ColumnVectorType (&ac_raoColumns)[ N ] );
     Matrix( const ColumnVectorType* const (&ac_rpoaColumns)[ N ] );
     Matrix( const RowVectorType (&ac_raoRows)[ M ] );
@@ -95,37 +94,35 @@ public:
     T Minor( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
 
     // Inverse
-    // The second two functions are invertable so that derived classes can
-    // redefine them to return the correct type
     bool IsInvertable() const;
     bool Invert();  // If !TrueInvertable, !change; also, beware int truncation
     bool Inverse( InverseType& a_roMatrix ) const;  // !invertable = !change
-    virtual InverseType Inverse() const;    // if !invertable, return Zero
-    virtual InverseType Inverse( bool& a_rbInvertable ) const;  // as above
+    InverseType Inverse() const;    // if !invertable, return Zero
+    InverseType Inverse( bool& a_rbInvertable ) const;  // as above
 
-    // Get row/column vectors - redefine in child classes to return correct type
-    virtual ColumnVectorType Column( unsigned int ac_uiIndex ) const override;
-    virtual RowVectorType Row( unsigned int ac_uiIndex ) const override;
-    
-    // Get smaller matrices by removing a row and/or column - redefine in child
-    // classes to return the correct type.
-    virtual Matrix< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
+    // Return true if this matrix is an orthogonal matrix
+    bool IsOrthogonal() const;
+
+    // Non-virtual overrides to return the correct type, since return type is
+    // concrete and not a reference or pointer
+    ColumnVectorType Column( unsigned int ac_uiIndex ) const;
+    RowVectorType Row( unsigned int ac_uiIndex ) const;
+    Matrix< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
         MinusRowAndColumn( unsigned int a_uiRow,
-                           unsigned int a_uiColumn ) const override;
-    virtual Matrix< T, M, ( N > 0 ? N-1 : 0 ) >
-        MinusColumn( unsigned int a_uiColumn ) const override;
-    virtual Matrix< T, ( M > 0 ? M-1 : 0 ), N >
-        MinusRow( unsigned int a_uiRow ) const override;
-    
-    // Transpose - redefine in child classes to return correct type
-    virtual TransposeType Transpose() const override;
+                           unsigned int a_uiColumn ) const;
+    Matrix< T, M, ( N > 0 ? N-1 : 0 ) >
+        MinusColumn( unsigned int a_uiColumn ) const;
+    Matrix< T, ( M > 0 ? M-1 : 0 ), N >
+        MinusRow( unsigned int a_uiRow ) const;
+    TransposeType Transpose() const;
 
     //
     // Matrix math
     //
     // Operations are only defined for the matrix data type.
-    // If you have a decimal parameter and you want a decimal result when your
-    // matrix is an integral type, you should explicitly convert.
+    // If you have a floating-point parameter and you want a floating-point
+    // result when your matrix is an integral type, you should explicitly
+    // convert to a floating-point matrix.
     //
 
     // Matrix multiplication
@@ -156,15 +153,18 @@ public:
     // matrix is an integral type, you should explicitly convert your matrix to
     // a decimal matrix.
     //
-    // Non-assign operators are virtual so that child classes can override to
-    // return the correct type.
-    //
-    Matrix& operator*=( const T& ac_rScalar );
-    Matrix operator*( const T& ac_rScalar ) const;
-    Matrix& operator/=( const T& ac_rScalar );
-    Matrix operator/( const T& ac_rScalar ) const;
-    Matrix& operator%=( const T& ac_rScalar );
-    Matrix operator%( const T& ac_rScalar ) const;
+    template< typename U >
+    Matrix& operator*=( const U& ac_rScalar );
+    template< typename U >
+    Matrix operator*( const U& ac_rScalar ) const;
+    template< typename U >
+    Matrix& operator/=( const U& ac_rScalar );
+    template< typename U >
+    Matrix operator/( const U& ac_rScalar ) const;
+    template< typename U >
+    Matrix& operator%=( const U& ac_rScalar );
+    template< typename U >
+    Matrix operator%( const U& ac_rScalar ) const;
 
     // constant references to Zero and Identity matrices
     static const Matrix& Zero();
@@ -180,6 +180,15 @@ protected:
 };
 
 }   // namespace Math
+
+// Matrix scalar multiplication and division in the other direction
+template< typename U, typename T, unsigned int M, unsigned int N >
+Math::Matrix< T, M, N > operator*( const U& ac_roScalar,
+                                   const Math::Matrix< T, M, N > ac_roMatrix );
+template< typename U, typename T, unsigned int M, unsigned int N >
+typename Math::Matrix< T, M, N >::InverseType
+    operator/( const U& ac_roScalar,
+               const Math::Matrix< T, M, N > ac_roMatrix );
 
 // The Matrix class *must* be defined before the Vector class, since Vector is
 // a child class of Matrix, but Vector must also be defined before the Matrix

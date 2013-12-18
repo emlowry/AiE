@@ -84,7 +84,7 @@ inline bool Matrix< T, M, N >::IsInvertable() const
     {
         return ( (*this) * Transpose() ).IsInvertable();
     }
-    return 0 != Determinant();  // is the matrix truely invertable?
+    return ( 0 != Determinant() );  // is the matrix truely invertable?
 }
 template< typename T, unsigned int M, unsigned int N >
 inline bool Matrix< T, M, N >::Invert()
@@ -178,6 +178,22 @@ bool Matrix< T, M, N >::
     }
     a_roMatrix /= determinant;
     return true;
+}
+
+// Return true if this matrix is an orthogonal matrix
+template< typename T, unsigned int M, unsigned int N >
+inline bool Matrix< T, M, N >::IsOrthogonal() const
+{
+    if( M != N || N == 0 )
+    {
+        return false;
+    }
+    if( N == 1 )
+    {
+        return ( m_aaData[0][0] == (T)1 );
+    }
+    return ( Identity() == ( M < N ? (*this) * Transpose()
+                                   : Transpose() * (*this) ) );
 }
 
 // Get row/column vectors - redefine in child classes to return correct type

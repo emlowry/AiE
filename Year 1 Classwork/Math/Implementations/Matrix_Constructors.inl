@@ -27,35 +27,24 @@ template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( const Matrix& ac_roMatrix )
     : BaseType( ac_roMatrix ) {}
 template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >& Matrix< T, M, N >::
-    operator=( const Matrix& ac_roMatrix )
-{
-    return BaseType::operator=( ac_roMatrix );
-}
-template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( const BaseType& ac_roMatrix )
     : BaseType( ac_roMatrix ) {}
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( Matrix&& a_rroMatrix )
-    : BaseType( std::forward( a_rroMatrix ) ) {}
-template< typename T, unsigned int M, unsigned int N >
-inline Matrix< T, M, N >& Matrix< T, M, N >::
-    operator=( Matrix&& a_rroMatrix )
-{
-    return BaseType::operator=( std::forward( a_rroMatrix ) );
-}
+    : BaseType( std::forward< Matrix >( a_rroMatrix ) ) {}
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( BaseType&& a_rroMatrix )
-    : BaseType( std::forward( a_rroMatrix ) ) {}
+    : BaseType( std::forward< BaseType >( a_rroMatrix ) ) {}
 template< typename T, unsigned int M, unsigned int N >
-template< typename U >
-inline Matrix< T, M, N >::Matrix( const MatrixBase< U, M, N >& ac_roMatrix )
-    : BaseType( ac_roMatrix ) {}
-template< typename T, unsigned int M, unsigned int N >
-template< unsigned int P, unsigned int Q >
-inline Matrix< T, M, N >::Matrix( const MatrixBase< T, P, Q >& ac_roMatrix,
+template< typename U, unsigned int P, unsigned int Q >
+inline Matrix< T, M, N >::Matrix( const MatrixBase< U, P, Q >& ac_roMatrix,
                                   const T& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ) {}
+template< typename T, unsigned int M, unsigned int N >
+template< unsigned int P, unsigned int Q >
+inline Matrix< T, M, N >::Matrix( MatrixBase< T, P, Q >&& a_rroMatrix,
+                                  const T& ac_rFill )
+    : BaseType( std::forward< MatrixBase< T, P, Q > >( a_rroMatrix ), ac_rFill ) {}
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( const T& ac_rFill ) : BaseType( ac_rFill ) {}
 template< typename T, unsigned int M, unsigned int N >
@@ -96,15 +85,15 @@ inline Matrix< T, M, N >::
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( const T& ac_rFill, const T& ac_rIdentityFill )
 {/*
-    if( !std::is_copy_constructable< T >::value )
+    if( !std::is_copy_assignable< T >::value )
     {
-        throw exception("Non-copy-constructable type");
+        throw exception("Non-copy-assignable type");
     } /**/
     for( unsigned int i = 0; i < M; ++i )
     {
         for( unsigned int j = 0; j < N; ++j )
         {
-            m_aaData[i][j]( (T)( ( i == j ) ? ac_rIdentityFill : ac_rFill ) );
+            m_aaData[i][j] = ( ( i == j ) ? ac_rIdentityFill : ac_rFill );
         }
     }
 }

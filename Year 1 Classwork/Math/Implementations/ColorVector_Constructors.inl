@@ -20,7 +20,7 @@ inline ColorVector::~ColorVector() {}
 
 // Constructors that forward to base class constructors
 inline ColorVector::ColorVector()
-    : ColorVector( WHITE ) {}
+    : BaseType( 0xFF ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( const ColorVector& ac_roVector )
     : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( const BaseType& ac_roVector )
@@ -28,22 +28,22 @@ inline ColorVector::ColorVector( const BaseType& ac_roVector )
 inline ColorVector::ColorVector( const VectorBaseType& ac_roVector )
     : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( const RootType& ac_roMatrix )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : BaseType( ac_roMatrix ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( ColorVector&& a_rroVector )
-    : BaseType( std::forward( a_rroVector ) ),
+    : BaseType( std::forward< ColorVector >( a_rroVector ) ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( BaseType&& a_rroVector )
-    : BaseType( std::forward( a_rroVector ) ),
+    : BaseType( std::forward< BaseType >( a_rroVector ) ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( VectorBaseType&& a_rroVector )
-    : BaseType( std::forward( a_rroVector ) ),
+    : BaseType( std::forward< VectorBaseType >( a_rroVector ) ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 inline ColorVector::ColorVector( RootType&& a_rroMatrix )
-    : BaseType( std::forward( a_rroMatrix ) ),
+    : BaseType( std::forward< RootType >( a_rroMatrix ) ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
+template< typename U, unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
-    ColorVector( const Vector< Channel, Q, t_bOtherIsRow >& ac_roVector,
+    ColorVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
                  const Channel& ac_rFill )
     : BaseType( ac_roVector, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
@@ -56,7 +56,21 @@ inline ColorVector::
 }
 template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
-    ColorVector( const VectorBase< Channel, Q, t_bOtherIsRow >& ac_roVector,
+    ColorVector( Vector< Channel, Q, t_bOtherIsRow >&& a_rroVector,
+                 const Channel& ac_rFill )
+    : BaseType( std::forward< Vector< Channel, Q, t_bOtherIsRow > >( a_rroVector ),
+                ac_rFill ),
+      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    if( Q < SIZE )
+    {
+        Shift( 1 );
+        *this |= OPAQUE;
+    }
+}
+template< typename U, unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector::
+    ColorVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
                  const Channel& ac_rFill )
     : BaseType( ac_roVector, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
@@ -67,13 +81,37 @@ inline ColorVector::
         *this |= OPAQUE;
     }
 }
-template< typename U >
-inline ColorVector::ColorVector( const MatrixBase< U, 1, 4 >& ac_roMatrix )
-    : BaseType( ac_roMatrix ) {}
-template< unsigned int P, unsigned int Q >
-inline ColorVector::ColorVector( const MatrixBase< Channel, P, Q >& ac_roMatrix,
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector::
+    ColorVector( VectorBase< Channel, Q, t_bOtherIsRow >&& a_rroVector,
+                 const Channel& ac_rFill )
+    : BaseType( std::forward< VectorBase< Channel, Q, t_bOtherIsRow > >( a_rroVector ),
+                ac_rFill ),
+      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    if( Q < SIZE )
+    {
+        Shift( 1 );
+        *this |= OPAQUE;
+    }
+}
+template< typename U, unsigned int P, unsigned int Q >
+inline ColorVector::ColorVector( const MatrixBase< U, P, Q >& ac_roMatrix,
                                  const Channel& ac_rFill )
     : BaseType( ac_roMatrix, ac_rFill ),
+      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    if( Q < SIZE )
+    {
+        Shift( 1 );
+        *this |= OPAQUE;
+    }
+}
+template< unsigned int P, unsigned int Q >
+inline ColorVector::ColorVector( MatrixBase< Channel, P, Q >&& a_rroMatrix,
+                                 const Channel& ac_rFill )
+    : BaseType( std::forward< MatrixBase< Channel, P, Q > >( a_rroMatrix ),
+                ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -93,14 +131,10 @@ inline ColorVector::ColorVector( const Channel* const ac_cpData,
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 
 // Construct from vectors or matrices of floating-point types
-template<>
-inline ColorVector::ColorVector( const MatrixBase< float, 1, 4 >& ac_roMatrix )
-    : BaseType( ac_roMatrix * 255.0f ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 template< unsigned int P, unsigned int Q >
 inline ColorVector::ColorVector( const MatrixBase< float, P, Q >& ac_roMatrix,
                                  const Channel& ac_rFill )
-    : BaseType( ac_roMatrix * 255.0f, ac_rFill ),
+    : BaseType( (Matrix< float, P, Q >)ac_roMatrix * 255.0f, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -126,7 +160,7 @@ template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
     ColorVector( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector,
                  const Channel& ac_rFill )
-    : BaseType( ac_roVector * 255.0f, ac_rFill ),
+    : BaseType( (Vector< float, Q, t_bOtherIsRow >)ac_roVector * 255.0f, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -135,15 +169,10 @@ inline ColorVector::
         *this |= OPAQUE;
     }
 }
-template<>
-inline ColorVector::
-    ColorVector( const MatrixBase< double, 1, 4 >& ac_roMatrix )
-    : BaseType( ac_roMatrix * 255.0 ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 template< unsigned int P, unsigned int Q >
 inline ColorVector::ColorVector( const MatrixBase< double, P, Q >& ac_roMatrix,
                                  const Channel& ac_rFill )
-    : BaseType( ac_roMatrix * 255.0, ac_rFill ),
+    : BaseType( (Matrix< double, P, Q >)ac_roMatrix * 255.0, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -169,7 +198,7 @@ template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
     ColorVector( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector,
                  const Channel& ac_rFill )
-    : BaseType( ac_roVector * 255.0, ac_rFill ),
+    : BaseType( (Vector< double, Q, t_bOtherIsRow >)ac_roVector * 255.0, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -178,16 +207,11 @@ inline ColorVector::
         *this |= OPAQUE;
     }
 }
-template<>
-inline ColorVector::
-    ColorVector( const MatrixBase< long double, 1, 4 >& ac_roMatrix )
-    : BaseType( ac_roMatrix * 255.0L ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 template< unsigned int P, unsigned int Q >
 inline ColorVector::
     ColorVector( const MatrixBase< long double, P, Q >& ac_roMatrix,
                  const Channel& ac_rFill )
-    : BaseType( ac_roMatrix * 255.0L, ac_rFill ),
+    : BaseType( (Matrix< long double, P, Q >)ac_roMatrix * 255.0L, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -213,7 +237,7 @@ template< unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
     ColorVector( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector,
                  const Channel& ac_rFill )
-    : BaseType( ac_roVector * 255.0L, ac_rFill ),
+    : BaseType( (Vector< long double, Q, t_bOtherIsRow >)ac_roVector * 255.0L, ac_rFill ),
       a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
 {
     if( Q < SIZE )
@@ -224,21 +248,44 @@ inline ColorVector::
 }
 
 // Construct from hex value
-inline ColorVector::ColorVector( Channel a_uiRed,
-                                 Channel a_uiGreen,
-                                 Channel a_uiBlue,
-                                 Channel a_uiAlpha = 0xFF )
-    : ColorVector( Hex( a_uiRed, a_uiGreen, a_uiBlue, a_uiAlpha ) ) {}
+inline ColorVector::ColorVector( Channel a_ucRed,
+                                 Channel a_ucGreen,
+                                 Channel a_ucBlue,
+                                 Channel a_ucAlpha )
+    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    a = a_ucAlpha;
+    r = a_ucRed;
+    g = a_ucGreen;
+    b = a_ucBlue;
+}
 inline ColorVector::ColorVector( float a_fRed,
                                  float a_fGreen,
                                  float a_fBlue,
-                                 float a_fAlpha = 1.0 )
-    : ColorVector( Hex( a_fRed, a_fGreen, a_fBlue, a_fAlpha ) ) {}
+                                 float a_fAlpha )
+    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    a = (Channel)( a_fAlpha * 0xFF );
+    r = (Channel)( a_fRed * 0xFF );
+    g = (Channel)( a_fGreen * 0xFF );
+    b = (Channel)( a_fBlue * 0xFF );
+}
 inline ColorVector::ColorVector( FourChannelInt a_uiHex )
-    : ColorVector( Hex( a_uiHex ) ) {}
+    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    a = Hex(a_uiHex).a;
+    r = Hex(a_uiHex).r;
+    g = Hex(a_uiHex).g;
+    b = Hex(a_uiHex).b;
+}
 inline ColorVector::ColorVector( const Hex& ac_rHex )
-    : m_aaData( { { ac_rHex.a, ac_rHex.r, ac_rHex.g, ac_rHex.b } } ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+{
+    a = ac_rHex.a;
+    r = ac_rHex.r;
+    g = ac_rHex.g;
+    b = ac_rHex.b;
+}
 
 }   // namespace Color
 

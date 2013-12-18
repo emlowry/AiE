@@ -20,20 +20,18 @@
 namespace Math
 {
 
-// Default matrix fill
-template< typename T, unsigned int M, unsigned int N >
-const T& MatrixBase< T, M, N >::DefaultFill()
+// Used whenever values at a given coordinate aren't specified, as in
+// constructing a matrix from another matrix with smaller dimensions.
+template< typename T >
+const T& DefaultFill()
 {
-    return MatrixFill< T >::DEFAULT;
+    static T fill = 0;
+    return fill;
 }
 
 // Default destructor doesn't need to do anything
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::~MatrixBase() {}
-
-// Default constructor passes to fill constructor
-template< typename T, unsigned int M, unsigned int N >
-inline MatrixBase< T, M, N >::MatrixBase() : MatrixBase( DefaultFill() ) {}
 
 // Equality and inequality checks
 template< typename T, unsigned int M, unsigned int N >
@@ -70,7 +68,7 @@ template< typename T, unsigned int M, unsigned int N >
 inline const
     T (&MatrixBase< T, M, N >::operator[]( unsigned int a_uiRow ) const)[ N ]
 {
-    assert( a_uiRow < M )
+    assert( a_uiRow < M );
     return m_aaData[a_uiRow];
 }
 
