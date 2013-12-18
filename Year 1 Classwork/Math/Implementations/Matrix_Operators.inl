@@ -111,7 +111,7 @@ template< typename U >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
     operator/=( const U& ac_rScalar )
 {
-    assert( ac_roScalar != 0 );
+    assert( ac_rScalar != 0 );
     for( unsigned int i = 0; i < M*N; ++i )
     {
         m_aaData[i/N][i%N] /= ac_rScalar;
@@ -132,7 +132,7 @@ template< typename U >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
     operator%=( const U& ac_rScalar )
 {
-    assert( ac_roScalar != 0 );
+    assert( ac_rScalar != 0 );
     for( unsigned int i = 0; i < M*N; ++i )
     {
         ModuloAssign( m_aaData[i/N][i%N], ac_rScalar );
@@ -154,20 +154,20 @@ inline Matrix< T, M, N > Matrix< T, M, N >::
 // Matrix scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int M, unsigned int N >
 inline Math::Matrix< T, M, N >
-    operator*( const U& ac_roScalar, const Math::Matrix< T, M, N > ac_roMatrix )
+    operator*( const U& ac_rScalar, const Math::Matrix< T, M, N > ac_roMatrix )
 {
-    return ac_roMatrix.operator*( ac_roScalar );
+    return ac_roMatrix.operator*( ac_rScalar );
 }
 template< typename U, typename T, unsigned int M, unsigned int N >
 inline typename Math::Matrix< T, M, N >::InverseType
-    operator/( const U& ac_roScalar,
+    operator/( const U& ac_rScalar,
                const Math::Matrix< T, M, N > ac_roMatrix )
 {
     if( !ac_roMatrix.IsInvertable() )
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }
-    return ac_roMatrix.Inverse().operator*( ac_roScalar );
+    return ac_roMatrix.Inverse().operator*( ac_rScalar );
 }
 
 #endif  // MATRIX__OPERATORS__INL

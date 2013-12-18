@@ -61,6 +61,12 @@
     <None Include="Implementations\PointVector.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Implementations\HomogeneousVector_Plane.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\HomogeneousVector_Space.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaticMath.h">
@@ -100,6 +106,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Declarations\PointVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\HomogeneousVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

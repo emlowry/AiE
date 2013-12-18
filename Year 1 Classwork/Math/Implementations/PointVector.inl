@@ -3,12 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 17, 2013
  * Description:        Inline implementations for PointVector constructors.
- * Last Modified:      December 17, 2013
- * Last Modification:  Creation.
+ * Last Modified:      December 18, 2013
+ * Last Modification:  Added Origin function.
  ******************************************************************************/
 
-#ifndef POINT_VECTORS__INL
-#define POINT_VECTORS__INL
+#ifndef POINT_VECTOR__INL
+#define POINT_VECTOR__INL
+
+#include "Declarations/HomogeneousVector.h"
 
 namespace Plane
 {
@@ -87,6 +89,26 @@ inline PointVector::PointVector( double a_dX, double a_dY )
 {
     x = a_dX;
     y = a_dY;
+}
+
+// Construct from homogenous vector
+inline PointVector::PointVector( const HomogeneousVector& ac_roVector )
+    : x( At(0) ), y( At(1) )
+{
+    operator=( ac_roVector );
+}
+inline PointVector& PointVector::operator=( const HomogeneousVector& ac_roVector )
+{
+    x = ac_roVector.x / ac_roVector.h;
+    y = ac_roVector.y / ac_roVector.h;
+    return *this;
+}
+
+// Origin of the coordinate system
+inline const PointVector& PointVector::Origin()
+{
+    static PointVector oOrigin;
+    return oOrigin;
 }
 
 }   // namespace Plane
@@ -173,6 +195,27 @@ inline PointVector::PointVector( double a_dX, double a_dY, double a_dZ )
     z = a_dZ;
 }
 
+// Construct from homogenous vector
+inline PointVector::PointVector( const HomogeneousVector& ac_roVector )
+    : x( At(0) ), y( At(1) ), z( At(2) )
+{
+    operator=( ac_roVector );
+}
+inline PointVector& PointVector::operator=( const HomogeneousVector& ac_roVector )
+{
+    x = ac_roVector.x / ac_roVector.h;
+    y = ac_roVector.y / ac_roVector.h;
+    z = ac_roVector.z / ac_roVector.h;
+    return *this;
+}
+
+// Origin of the coordinate system
+inline const PointVector& PointVector::Origin()
+{
+    static PointVector oOrigin;
+    return oOrigin;
+}
+
 }   // namespace Space
 
-#endif  // POINT_VECTORS__INL
+#endif  // POINT_VECTOR__INL

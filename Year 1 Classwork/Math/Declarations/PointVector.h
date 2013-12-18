@@ -3,17 +3,26 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 17, 2013
  * Description:        Vectors for representing points in 2D or 3D space.
- * Last Modified:      December 17, 2013
- * Last Modification:  Creation.
+ *                      Row vectors are used so that transformations can be
+ *                      applied using the =* operator.  This means that
+ *                      transformed point = original point * transform matrix,
+ *                      instead of transform matrix * original point as it
+ *                      would be if column vectors were used.
+ * Last Modified:      December 18, 2013
+ * Last Modification:  Added Origin function.
  ******************************************************************************/
 
-#ifndef POINT_VECTORS__H
-#define POINT_VECTORS__H
+#ifndef POINT_VECTOR__H
+#define POINT_VECTOR__H
 
 #include "Vector.h"
+#include "Matrix.h"
 
 namespace Plane
 {
+
+// forward declare HomogeneousVector
+class HomogeneousVector;
 
 // Represent a point in 2D space
 class PointVector : public Math::Vector< double, 2 >
@@ -21,6 +30,9 @@ class PointVector : public Math::Vector< double, 2 >
 public:
 
     // simplify typing
+    typedef Math::Matrix< double, 2 > Transform;
+    typedef Math::Matrix< double, 2, 1 > LineProjection;
+    typedef Math::Matrix< double, 3, 3 > SpaceProjection;
     typedef Math::Vector< double, 2 > BaseType;
     typedef BaseType::BaseType VectorBaseType;
     typedef BaseType::RootType RootType;
@@ -52,7 +64,7 @@ public:
                  double a_dFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     PointVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double _dFill = 0 );
+                 double a_dFill = 0 );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector( const MatrixBase< U, P, Q >& ac_roMatrix,
                  double a_dFill = 0 );
@@ -68,16 +80,89 @@ public:
     // Construct from the given coordinates
     PointVector( double a_dX, double a_dY );
 
+    // Construct from homogenous vector
+    PointVector( const HomogeneousVector& ac_roVector );
+    PointVector& operator=( const HomogeneousVector& ac_roVector );
+
+    // Origin of the coordinate system
+    static const PointVector& Origin();
+
+    // Scale
+    static Transform Scaling( double a_dFactor,
+                              const PointVector& ac_roOrigin = Origin() );
+    void Scale( double a_dFactor,
+                const PointVector& ac_roOrigin = Origin() );
+    static Transform Scaling( double a_dFactorX, double a_dFactorY,
+                              const PointVector& ac_roOrigin = Origin() );
+    void Scale( double a_dFactorX, double a_dFactorY,
+                const PointVector& ac_roOrigin = Origin() );
+    static Transform Scaling( const PointVector& ac_roFactor,
+                              const PointVector& ac_roOrigin = Origin() );
+    void Scale( const PointVector& ac_roFactor,
+                const PointVector& ac_roOrigin = Origin() );
+
+    // Translate
+    static Transform Translation( double a_dX, double a_dY );
+    void Translate( double a_dX, double a_dY );
+    static Transform Translation( const PointVector& ac_roDirection,
+                                  double a_dDistance );
+    void Translate( const PointVector& ac_roDirection, double a_dDistance );
+    static Transform TranslationTowards( const PointVector& ac_roTarget,
+                                         double a_dDistance );
+    void TranslateTowards( const PointVector& ac_roTarget, double a_dDistance );
+    static Transform TranslationTo( const PointVector& ac_roTarget,
+                                    const PointVector& ac_roOrigin = Origin() );
+    void TranslateTo( const PointVector& ac_roTarget,
+                      const PointVector& ac_roOrigin = Origin() );
+
+    // Rotate
+    static Transform Rotation( double a_dRadians,
+                               const PointVector& ac_roOrigin = Origin() );
+    void Rotate( double a_dRadians, const PointVector& ac_roOrigin = Origin() );
+    static Transform RotationTowards( const PointVector& ac_roTarget,
+                                      double a_dRadians,
+                                      const PointVector& ac_roOrigin = Origin() );
+    void RotateTowards( const PointVector& ac_roTarget,
+                        double a_dRadians,
+                        const PointVector& ac_roOrigin = Origin() );
+    static Transform RotationTowards( const PointVector& ac_roTarget,
+                                      const PointVector& ac_roOrigin = Origin() );
+    void RotateTowards( const PointVector& ac_roTarget,
+                        const PointVector& ac_roOrigin = Origin() );
+    static Transform RotationTo( double a_dRadians,
+                                 const PointVector& ac_roOrigin = Origin() );
+    void RotateTo( double a_dRadians, const PointVector& ac_roOrigin = Origin() );
+
+    // Project
+    static LineProjection
+        ProjectionToAxis( double a_dFocalLength,
+                          const PointVector& ac_roAxisDirection = Unit(0),
+                          const PointVector& ac_roAxisOrigin = Origin() );
+    double ProjectToAxis( double a_dFocalLength,
+                          const PointVector& ac_roAxisDirection = Unit(0),
+                          const PointVector& ac_roAxisOrigin = Origin() ) const;
+    static LineProjection
+        ProjectionToAxis( const PointVector& ac_roAxisDirection = Unit(0),
+                          const PointVector& ac_roAxisOrigin = Origin() );
+    double ProjectToAxis( const PointVector& ac_roAxisDirection = Unit(0),
+                          const PointVector& ac_roAxisOrigin = Origin() ) const;
+
     // public access to X and Y coordinates
     double& x;
     double& y;
 
 };   // Plane::PointVector
+typedef PointVector Point;
 
 }   // namespace Plane
+typedef Plane::PointVector PointVector2D;
+typedef Plane::Point Point2D;
 
 namespace Space
 {
+
+// forward declare HomogeneousVector
+class HomogeneousVector;
 
 // Represent a point in 3D space
 class PointVector : public Math::Vector< double, 3 >
@@ -85,6 +170,8 @@ class PointVector : public Math::Vector< double, 3 >
 public:
 
     // simplify typing
+    typedef Math::Matrix< double, 3 > Transform;
+    typedef Math::Matrix< double, 3, 2 > PlaneProjection;
     typedef Math::Vector< double, 3 > BaseType;
     typedef BaseType::BaseType VectorBaseType;
     typedef BaseType::RootType RootType;
@@ -116,7 +203,7 @@ public:
                  double a_dFill = 0 );
     template< unsigned int Q, bool t_bOtherIsRow >
     PointVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double _dFill = 0 );
+                 double a_dFill = 0 );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector( const MatrixBase< U, P, Q >& ac_roMatrix,
                  double a_dFill = 0 );
@@ -132,15 +219,25 @@ public:
     // Construct from the given coordinates
     PointVector( double a_dX, double a_dY, double a_dZ );
 
+    // Construct from HomogeneousVector
+    PointVector( const HomogeneousVector& ac_roVector );
+    PointVector& operator=( const HomogeneousVector& ac_roVector );
+
+    // Origin of the coordinate system
+    static const PointVector& Origin();
+
     // public access to X, Y, and Z coordinates
     double& x;
     double& y;
     double& z;
 
 };   // Space::PointVector
+typedef PointVector Point;
 
 }   // namespace Space
+typedef Space::PointVector PointVector3D;
+typedef Space::Point Point3D;
 
 #include "Implementations/PointVector.inl"
 
-#endif // POINT_VECTORS__H
+#endif // POINT_VECTOR__H

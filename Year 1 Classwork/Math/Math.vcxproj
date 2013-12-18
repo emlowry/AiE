@@ -73,6 +73,8 @@
     <None Include="Implementations\ColorVector_AssignmentOperators.inl" />
     <None Include="Implementations\ColorVector_Constructors.inl" />
     <None Include="Implementations\Functions.inl" />
+    <None Include="Implementations\HomogeneousVector_Plane.inl" />
+    <None Include="Implementations\HomogeneousVector_Space.inl" />
     <None Include="Implementations\Matrix.inl" />
     <None Include="Implementations\MatrixBase.inl" />
     <None Include="Implementations\MatrixBase_CopyConstructors.inl" />
@@ -91,6 +93,7 @@
     <ClInclude Include="Declarations\Hex.h" />
     <ClInclude Include="Declarations\ColorVector.h" />
     <ClInclude Include="Declarations\Functions.h" />
+    <ClInclude Include="Declarations\HomogeneousVector.h" />
     <ClInclude Include="Declarations\MostDerivedAddress.h" />
     <ClInclude Include="Declarations\PointVector.h" />
     <ClInclude Include="DynamicMath.h" />

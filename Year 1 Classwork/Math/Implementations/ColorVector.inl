@@ -211,15 +211,15 @@ inline float ColorVector::fBlue() const
 // ColorVector scalar multiplication and division in the other direction
 template< typename U >
 inline Color::ColorVector
-    operator*( const U& ac_roScalar, const Color::ColorVector ac_roVector )
+    operator*( const U& ac_rScalar, const Color::ColorVector ac_roVector )
 {
-    return ac_roVector.operator*( ac_roScalar );
+    return ac_roVector.operator*( ac_rScalar );
 }
 template< typename U >
 inline Color::ColorVector
-    operator/( const U& ac_roScalar, const Color::ColorVector ac_roVector )
+    operator/( const U& ac_rScalar, const Color::ColorVector ac_roVector )
 {
-    return Color::ColorVector().operator*( ac_roScalar ).operator/( ac_roVector );
+    return Color::ColorVector().operator*( ac_rScalar ).operator/( ac_roVector );
 }
 
 #endif  // COLOR_VECTOR__INL

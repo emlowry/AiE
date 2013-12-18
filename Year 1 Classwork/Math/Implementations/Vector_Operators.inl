@@ -169,21 +169,21 @@ inline Vector< T, N, t_bIsRow > Vector< T, N, t_bIsRow >::
 // Vector scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 inline Math::Vector< T, N, t_bIsRow >
-    operator*( const U& ac_roScalar,
+    operator*( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow > ac_roVector )
 {
-    return ac_roVector.operator*( ac_roScalar );
+    return ac_roVector.operator*( ac_rScalar );
 }
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 inline typename Math::Vector< T, N, t_bIsRow >::InverseType
-    operator/( const U& ac_roScalar,
+    operator/( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow > ac_roVector )
 {
     if( !ac_roVectorMatrix.IsInvertable() )
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }
-    return ac_roVector.Inverse().operator*( ac_roScalar );
+    return ac_roVector.Inverse().operator*( ac_rScalar );
 }
 
 #endif  // VECTOR__OPERATORS__INL

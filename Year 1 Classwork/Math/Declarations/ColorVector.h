@@ -152,7 +152,7 @@ public:
     ColorVector& operator|=( const Hex& ac_rHex );
     ColorVector& operator^=( const Hex& ac_rHex );
 
-    // inherit regular arithmatic operators
+    // inherit vector and matrix arithmatic operators
     using BaseType::operator+;
     using BaseType::operator+=;
     using BaseType::operator-;
@@ -215,10 +215,10 @@ public:
 // ColorVector scalar multiplication and division in the other direction
 template< typename U >
 Color::ColorVector
-    operator*( const U& ac_roScalar, const Color::ColorVector ac_roVector );
+    operator*( const U& ac_rScalar, const Color::ColorVector ac_roVector );
 template< typename U >
 Color::ColorVector
-    operator/( const U& ac_roScalar, const Color::ColorVector ac_roVector );
+    operator/( const U& ac_rScalar, const Color::ColorVector ac_roVector );
 
 #include "Implementations/ColorVector.inl"
 

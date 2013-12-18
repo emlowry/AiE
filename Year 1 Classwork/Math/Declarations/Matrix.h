@@ -183,11 +183,11 @@ protected:
 
 // Matrix scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int M, unsigned int N >
-Math::Matrix< T, M, N > operator*( const U& ac_roScalar,
+Math::Matrix< T, M, N > operator*( const U& ac_rScalar,
                                    const Math::Matrix< T, M, N > ac_roMatrix );
 template< typename U, typename T, unsigned int M, unsigned int N >
 typename Math::Matrix< T, M, N >::InverseType
-    operator/( const U& ac_roScalar,
+    operator/( const U& ac_rScalar,
                const Math::Matrix< T, M, N > ac_roMatrix );
 
 // The Matrix class *must* be defined before the Vector class, since Vector is

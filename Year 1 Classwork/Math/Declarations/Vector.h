@@ -188,11 +188,11 @@ private:
 // Vector scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 Math::Vector< T, N, t_bIsRow >
-    operator*( const U& ac_roScalar,
+    operator*( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow > ac_roVector );
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 typename Math::Vector< T, N, t_bIsRow >::InverseType
-    operator/( const U& ac_roScalar,
+    operator/( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow > ac_roVector );
 
 #include "Implementations/Vector.inl"
