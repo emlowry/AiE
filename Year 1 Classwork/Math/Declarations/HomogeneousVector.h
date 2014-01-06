@@ -8,27 +8,22 @@
  *                      transformed vector = original vector * transform matrix,
  *                      instead of transform matrix * original vector as it
  *                      would be if column vectors were used.
- * Last Modified:      December 18, 2013
- * Last Modification:  Creation.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Added import/export macro.
  ******************************************************************************/
 
 #ifndef HOMOGENEOUS_VECTOR__H
 #define HOMOGENEOUS_VECTOR__H
 
+#include "ImExportMacro.h"
 #include "Vector.h"
 #include "PointVector.h"
-
-// forward declare homogeneous space vector
-namespace Space
-{
-class HomogeneousVector;
-}
 
 namespace Plane
 {
 
 // Represent homogeneous coordinates for a point in 2D space
-class HomogeneousVector : public Math::Vector< double, 3 >
+IMEXPORT_CLASS class HomogeneousVector : public Math::Vector< double, 3 >
 {
 public:
 
@@ -83,10 +78,9 @@ public:
     // Construct from the given coordinates
     HomogeneousVector( double a_dX, double a_dY, double a_dH = 1.0 );
 
-    // Construct from a 2D point or a 3D homogeneous vector
+    // Construct from a 2D point
     HomogeneousVector( const PointVector& ac_roPoint, double a_dH = 1.0 );
-    HomogeneousVector( const Space::HomogeneousVector& ac_roVector );
-    HomogeneousVector& operator=( const Space::HomogeneousVector& ac_roVector );
+    HomogeneousVector& operator=( const PointVector& ac_roVector );
 
     // re-implement addition and subtraction to account for h value
     // this will hide all parent class addition and subtraction operators.
@@ -94,6 +88,43 @@ public:
     HomogeneousVector& operator+=( const HomogeneousVector& ac_roVector );
     HomogeneousVector operator-( const HomogeneousVector& ac_roVector ) const;
     HomogeneousVector& operator-=( const HomogeneousVector& ac_roVector );
+
+    // re-implement scalar multiplication to account for h value
+    template< typename T >
+    HomogeneousVector operator*( const T& ac_rScalar ) const;
+    template< typename T >
+    HomogeneousVector& operator*=( const T& ac_rScalar );
+    template< typename T >
+    HomogeneousVector operator/( const T& ac_rScalar ) const;
+    template< typename T >
+    HomogeneousVector& operator/=( const T& ac_rScalar );
+    template< typename T >
+    HomogeneousVector operator%( const T& ac_rScalar ) const;
+    template< typename T >
+    HomogeneousVector& operator%=( const T& ac_rScalar );
+
+    // re-implement matrix multiplication and division to homogenize first
+    template< unsigned int N >
+    Math::Matrix< double, 1, N >
+        operator*( const Math::Matrix< double, 3, N >& ac_roMatrix ) const;
+    template< unsigned int N >
+    Math::Matrix< double, 1, N >
+        operator/( const Math::Matrix< double, N, 3 >& ac_roMatrix ) const;
+    HomogeneousVector& operator*=( const Math::Matrix< double, 3 >& ac_roMatrix );
+    HomogeneousVector& operator/=( const Math::Matrix< double, 3 >& ac_roMatrix );
+
+    // re-implement equality and inequality checks to account for h
+    bool operator==( const HomogeneousVector& ac_roVector ) const;
+    bool operator!=( const HomogeneousVector& ac_roVector ) const;
+
+    // re-implement normalization to account for h value
+    double Magnitude() const;
+    double MagnitudeSquared() const; // for efficiency in complex calculations
+    void Normalize();
+    HomogeneousVector Normal() const;
+
+    // Adjust values so that h = 1 or 0
+    HomogeneousVector& Homogenize();
 
     // Origin of the coordinate system
     static const HomogeneousVector& Origin();
@@ -110,11 +141,21 @@ typedef HomogeneousVector HVector;
 typedef Plane::HVector HVector2D;
 typedef Plane::HomogeneousVector HomogeneousVector2D;
 
+// Vector scalar multiplication and division in the other direction
+template< typename U >
+Plane::HomogeneousVector
+    operator*( const U& ac_rScalar,
+               const Plane::HomogeneousVector& ac_roVector );
+template< typename U >
+Plane::HomogeneousVector
+    operator/( const U& ac_rScalar,
+               const Plane::HomogeneousVector& ac_roVector );
+
 namespace Space
 {
 
 // Represent homogenous coordinates for a point in 3D space
-class HomogeneousVector : public Math::Vector< double, 4 >
+IMEXPORT_CLASS class HomogeneousVector : public Math::Vector< double, 4 >
 {
 public:
 
@@ -168,12 +209,9 @@ public:
     // Construct from the given coordinates
     HomogeneousVector( double a_dX, double a_dY, double a_dZ, double a_dH = 1.0 );
 
-    // Construct from a 3D point or a 2D homogeneous vector
+    // Construct from a 3D point
     HomogeneousVector( const PointVector& ac_roPoint, double a_dH = 1.0 );
-    HomogeneousVector( const Plane::HomogeneousVector& ac_roVector,
-                       double a_dH = 1.0 );
-    HomogeneousVector( const Plane::HomogeneousVector& ac_roVector,
-                       double a_dH, double a_dZ );
+    HomogeneousVector& operator=( const PointVector& ac_roPoint );
 
     // re-implement addition and subtraction to account for h value
     // this will hide all parent class addition and subtraction operators.
@@ -181,6 +219,43 @@ public:
     HomogeneousVector& operator+=( const HomogeneousVector& ac_roVector );
     HomogeneousVector operator-( const HomogeneousVector& ac_roVector ) const;
     HomogeneousVector& operator-=( const HomogeneousVector& ac_roVector );
+
+    // re-implement scalar multiplication to account for h value
+    template< typename T >
+    HomogeneousVector operator*( const T& ac_rScalar ) const;
+    template< typename T >
+    HomogeneousVector& operator*=( const T& ac_rScalar );
+    template< typename T >
+    HomogeneousVector operator/( const T& ac_rScalar ) const;
+    template< typename T >
+    HomogeneousVector& operator/=( const T& ac_rScalar );
+    template< typename T >
+    HomogeneousVector operator%( const T& ac_rScalar ) const;
+    template< typename T >
+    HomogeneousVector& operator%=( const T& ac_rScalar );
+
+    // re-implement matrix multiplication and division to homogenize first
+    template< unsigned int N >
+    Math::Matrix< double, 1, N >
+        operator*( const Math::Matrix< double, 4, N >& ac_roMatrix ) const;
+    template< unsigned int N >
+    Math::Matrix< double, 1, N >
+        operator/( const Math::Matrix< double, N, 4 >& ac_roMatrix ) const;
+    HomogeneousVector& operator*=( const Math::Matrix< double, 4 >& ac_roMatrix );
+    HomogeneousVector& operator/=( const Math::Matrix< double, 4 >& ac_roMatrix );
+
+    // re-implement equality and inequality checks to account for h
+    bool operator==( const HomogeneousVector& ac_roVector ) const;
+    bool operator!=( const HomogeneousVector& ac_roVector ) const;
+
+    // re-implement normalization to account for h value
+    double Magnitude() const;
+    double MagnitudeSquared() const; // for efficiency in complex calculations
+    void Normalize();
+    HomogeneousVector Normal() const;
+
+    // Adjust values so that h = 1 or 0
+    HomogeneousVector& Homogenize();
 
     // Origin of the coordinate system
     static const HomogeneousVector& Origin();
@@ -198,7 +273,17 @@ typedef HomogeneousVector HVector;
 typedef Space::HVector HVector3D;
 typedef Space::HomogeneousVector HomogeneousVector3D;
 
-#include "Implementations/HomogeneousVector_Plane.inl"
-#include "Implementations/HomogeneousVector_Space.inl"
+// Vector scalar multiplication and division in the other direction
+template< typename U >
+Space::HomogeneousVector
+    operator*( const U& ac_rScalar,
+               const Space::HomogeneousVector& ac_roVector );
+template< typename U >
+Space::HomogeneousVector
+    operator/( const U& ac_rScalar,
+               const Space::HomogeneousVector& ac_roVector );
+
+// Always include template function implementations with this header
+#include "Implementations/HomogeneousVector_Templates.inl"
 
 #endif  // HOMOGENEOUS_VECTOR__H

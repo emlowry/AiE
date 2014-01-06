@@ -114,7 +114,6 @@ inline MatrixBase< T, M, N >::MatrixBase( const T* const* const ac_cpcpData,
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::
     MatrixBase( const T (&ac_raaData)[ M ][ N ] )
-    : MatrixBase( ac_raaData, M, N, DefaultFill< T >() )
 {/*
     if( !std::is_copy_assignable< T >::value )
     {

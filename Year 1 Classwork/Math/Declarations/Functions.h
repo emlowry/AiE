@@ -65,6 +65,7 @@ T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin = 0 );
 
 }   // namespace Math
 
+// Always include template function implementations with this header
 #include "Implementations/Functions.inl"
 
 #endif  // FUNCTIONS__H

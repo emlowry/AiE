@@ -1,46 +1,22 @@
 /******************************************************************************
- * File:               ColorVectorConstructors.h
+ * File:               ColorVector_Templates.inl
  * Author:             Elizabeth Lowry
- * Date Created:       December 16, 2013
- * Description:        Destructor and constructors for color vector class.
- * Last Modified:      December 16, 2013
+ * Date Created:       January 5, 2014
+ * Description:        Template function implementations for ColorVector class.
+ * Last Modified:      January 5, 2014
  * Last Modification:  Creation.
  ******************************************************************************/
 
-#ifndef COLOR_VECTOR__CONSTRUCTORS__INL
-#define COLOR_VECTOR__CONSTRUCTORS__INL
+#ifndef COLOR_VECTOR__TEMPLATES__INL
+#define COLOR_VECTOR__TEMPLATES__INL
 
 #include "Declarations/ColorConstants.h"
+#include "Declarations/ColorVector.h"
 
 namespace Color
 {
 
-// Destructor does nothing
-inline ColorVector::~ColorVector() {}
-
 // Constructors that forward to base class constructors
-inline ColorVector::ColorVector()
-    : BaseType( 0xFF ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const ColorVector& ac_roVector )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const BaseType& ac_roVector )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const VectorBaseType& ac_roVector )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const RootType& ac_roMatrix )
-    : BaseType( ac_roMatrix ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( ColorVector&& a_rroVector )
-    : BaseType( std::forward< ColorVector >( a_rroVector ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( BaseType&& a_rroVector )
-    : BaseType( std::forward< BaseType >( a_rroVector ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( VectorBaseType&& a_rroVector )
-    : BaseType( std::forward< VectorBaseType >( a_rroVector ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( RootType&& a_rroMatrix )
-    : BaseType( std::forward< RootType >( a_rroMatrix ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 template< typename U, unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
     ColorVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
@@ -120,15 +96,6 @@ inline ColorVector::ColorVector( MatrixBase< Channel, P, Q >&& a_rroMatrix,
         *this |= OPAQUE;
     }
 }
-inline ColorVector::ColorVector( const Channel& ac_rFill )
-    : BaseType( ac_rFill ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const Channel (&ac_raData)[ 4 ] )
-    : BaseType( ac_raData ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const Channel* const ac_cpData,
-                                 const unsigned int ac_uiSize,
-                                 const Channel& ac_rFill )
-    : BaseType( ac_cpData, ac_uiSize, ac_rFill ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
 
 // Construct from vectors or matrices of floating-point types
 template< unsigned int P, unsigned int Q >
@@ -247,46 +214,147 @@ inline ColorVector::
     }
 }
 
-// Construct from hex value
-inline ColorVector::ColorVector( Channel a_ucRed,
-                                 Channel a_ucGreen,
-                                 Channel a_ucBlue,
-                                 Channel a_ucAlpha )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+// Assign from vectors/matrices of floating-point type
+template< unsigned int P, unsigned int Q >
+inline ColorVector& ColorVector::
+    operator=( const MatrixBase< float, P, Q >& ac_roMatrix )
 {
-    a = a_ucAlpha;
-    r = a_ucRed;
-    g = a_ucGreen;
-    b = a_ucBlue;
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( (Matrix< float, P, Q >)ac_roMatrix * 255.0f );
+    Shift( -1 * iShift );
+    return *this;
 }
-inline ColorVector::ColorVector( float a_fRed,
-                                 float a_fGreen,
-                                 float a_fBlue,
-                                 float a_fAlpha )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector& ColorVector::
+    operator=( const Vector< float, Q, t_bOtherIsRow >& ac_roVector )
 {
-    a = (Channel)( a_fAlpha * 0xFF );
-    r = (Channel)( a_fRed * 0xFF );
-    g = (Channel)( a_fGreen * 0xFF );
-    b = (Channel)( a_fBlue * 0xFF );
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( ac_roVector * 255.0f );
+    Shift( -1 * iShift );
+    return *this;
 }
-inline ColorVector::ColorVector( FourChannelInt a_uiHex )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector& ColorVector::
+    operator=( const VectorBase< float, Q, t_bOtherIsRow >& ac_roVector )
 {
-    a = Hex(a_uiHex).a;
-    r = Hex(a_uiHex).r;
-    g = Hex(a_uiHex).g;
-    b = Hex(a_uiHex).b;
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( (Vector< float, Q, t_bOtherIsRow >)ac_roVector * 255.0f );
+    Shift( -1 * iShift );
+    return *this;
 }
-inline ColorVector::ColorVector( const Hex& ac_rHex )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+template< unsigned int P, unsigned int Q >
+inline ColorVector& ColorVector::
+    operator=( const MatrixBase< double, P, Q >& ac_roMatrix )
 {
-    a = ac_rHex.a;
-    r = ac_rHex.r;
-    g = ac_rHex.g;
-    b = ac_rHex.b;
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( (Matrix< double, P, Q >)ac_roMatrix * 255.0 );
+    Shift( -1 * iShift );
+    return *this;
+}
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector& ColorVector::
+    operator=( const Vector< double, Q, t_bOtherIsRow >& ac_roVector )
+{
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( ac_roVector * 255.0 );
+    Shift( -1 * iShift );
+    return *this;
+}
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector& ColorVector::
+    operator=( const VectorBase< double, Q, t_bOtherIsRow >& ac_roVector )
+{
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( (Vector< double, Q, t_bOtherIsRow >)ac_roVector * 255.0 );
+    Shift( -1 * iShift );
+    return *this;
+}
+template< unsigned int P, unsigned int Q >
+inline ColorVector& ColorVector::
+    operator=( const MatrixBase< long double, P, Q >& ac_roMatrix )
+{
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( (Matrix< long double, P, Q >)ac_roMatrix * 255.0L );
+    Shift( -1 * iShift );
+    return *this;
+}
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector& ColorVector::
+    operator=( const Vector< long double, Q, t_bOtherIsRow >& ac_roVector )
+{
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( ac_roVector * 255.0L );
+    Shift( -1 * iShift );
+    return *this;
+}
+template< unsigned int Q, bool t_bOtherIsRow >
+inline ColorVector& ColorVector::
+    operator=( const VectorBase< long double, Q, t_bOtherIsRow >& ac_roVector )
+{
+    int iShift = ( Q < 4 ? -1 : 0 );
+    Shift( iShift );
+    BaseType::operator=( (Vector< long double, Q, t_bOtherIsRow >)ac_roVector * 255.0L );
+    Shift( -1 * iShift );
+    return *this;
+}
+
+// arithmatic operators for use with scalars
+template< typename T >
+inline ColorVector ColorVector::operator*( const T& ac_rScalar ) const
+{
+    return ColorVector( (Hex)(*this) * ac_rScalar );
+}
+template< typename T >
+inline ColorVector ColorVector::operator/( const T& ac_rScalar ) const
+{
+    return ColorVector( (Hex)(*this) / ac_rScalar );
+}
+template< typename T >
+inline ColorVector ColorVector::operator%( const T& ac_rScalar ) const
+{
+    return ColorVector( BaseType::operator%( ac_rScalar ) );
+}
+template< typename T >
+inline ColorVector& ColorVector::operator*=( const T& ac_rScalar )
+{
+    *this = operator*( ac_rScalar );
+    return *this;
+}
+template< typename T >
+inline ColorVector& ColorVector::operator/=( const T& ac_rScalar )
+{
+    *this = operator/( ac_rScalar );
+    return *this;
+}
+template< typename T >
+inline ColorVector& ColorVector::operator%=( const T& ac_rScalar )
+{
+    *this = operator%( ac_rScalar );
+    return *this;
+}
+
+// ColorVector scalar multiplication and division in the other direction
+template< typename U >
+inline Color::ColorVector
+    operator*( const U& ac_rScalar, const Color::ColorVector& ac_roVector )
+{
+    return ac_roVector.operator*( ac_rScalar );
+}
+template< typename U >
+inline Color::ColorVector
+    operator/( const U& ac_rScalar, const Color::ColorVector& ac_roVector )
+{
+    return Color::ColorVector().operator*( ac_rScalar ).operator/( ac_roVector );
 }
 
 }   // namespace Color
 
-#endif  // COLOR_VECTOR__CONSTRUCTORS__INL
+#endif  // COLOR_VECTOR__TEMPLATES__INL

@@ -10,9 +10,12 @@
 #ifndef VECTOR__INL
 #define VECTOR__INL
 
+#include "Declarations/Vector.h"
+#include <cmath>    // for std::sqrt
+
+// separate files to keep file size down
 #include "Vector_Constructors.inl"
 #include "Vector_Operators.inl"
-#include <cmath>    // for std::sqrt
 
 namespace Math
 {
@@ -73,10 +76,10 @@ inline typename Vector< T, N, t_bIsRow >::InverseType
 
 // Get a smaller vector by removing an element
 template< typename T, unsigned int N, bool t_bIsRow >
-inline Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
+inline Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
     Vector< T, N, t_bIsRow >::MinusElement( unsigned int a_uiIndex ) const
 {
-    return Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >(
+    return Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >(
                                           BaseType::MinusElement( a_uiIndex ) );
 }
 
@@ -97,7 +100,7 @@ inline T Vector< T, N, t_bIsRow >::Dot( const Vector& ac_roVector ) const
     {
         tResult += At(i) * ac_roVector[i];
     }
-    return T;
+    return tResult;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline T Vector< T, N, t_bIsRow >::Dot( const TransposeType& ac_roVector ) const

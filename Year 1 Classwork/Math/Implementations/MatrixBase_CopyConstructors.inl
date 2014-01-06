@@ -80,7 +80,7 @@ inline MatrixBase< T, M, N >::
         for( unsigned int j = 0; j < N; ++j )
         {
              m_aaData[i][j] =
-                 ( ( i < P && j < Q ) ? std::move( ac_roMatrix[i][j] ) : ac_rFill );
+                 ( ( i < P && j < Q ) ? std::move( a_rroMatrix[i][j] ) : ac_rFill );
         }
     }
 }
@@ -122,7 +122,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     {
         throw exception("Non-move-assignable type");
     }  /**/
-    if( Address() != ac_roMatrix.Address() )
+    if( Address() != a_rroMatrix.Address() )
     {
         for( unsigned int i = 0; i < M && i < P; ++i )
         {

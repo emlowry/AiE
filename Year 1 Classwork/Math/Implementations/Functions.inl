@@ -10,6 +10,7 @@
 #ifndef FUNCTIONS__INL
 #define FUNCTIONS__INL
 
+#include "Declarations/Functions.h"
 #include <cmath>    // for fmod, log2, ciel, floor, exp2, fdim
 
 namespace Math
@@ -105,7 +106,7 @@ T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
 {
     // If the upper and lower bounds are the same number, than the only result
     // in range is said number.
-    if( ac_riMax == ac_rMin )
+    if( ac_rMax == ac_rMin )
     {
         return ac_rMin;
     }

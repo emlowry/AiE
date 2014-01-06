@@ -3,12 +3,16 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 18, 2013
  * Description:        Inline function implementations for 3D HomogeneousVector.
- * Last Modified:      December 18, 2013
- * Last Modification:  Creation.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Moving template function implementations to another file.
  ******************************************************************************/
 
 #ifndef HOMOGENEOUS_VECTOR__SPACE__INL
 #define HOMOGENEOUS_VECTOR__SPACE__INL
+
+#include "Declarations/HomogeneousVector.h"
+#include "Declarations/PointVector.h"
+#include <stdexcept>    // for std::invalid_argument
 
 namespace Space
 {
@@ -44,42 +48,6 @@ inline HomogeneousVector::HomogeneousVector( VectorBaseType&& a_rroVector )
 inline HomogeneousVector::HomogeneousVector( RootType&& a_rroMatrix )
     : BaseType( std::forward< RootType >( a_rroMatrix ) ),
       x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline HomogeneousVector::
-    HomogeneousVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                       double a_dFill )
-    : BaseType( ac_roVector, a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
-inline HomogeneousVector::
-    HomogeneousVector( Vector< double, Q, t_bOtherIsRow >&& a_rroVector,
-                       double a_dFill )
-    : BaseType( std::forward< Vector< double, Q, t_bOtherIsRow > >( a_rroVector ),
-                a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline HomogeneousVector::
-    HomogeneousVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-                       double a_dFill )
-    : BaseType( ac_roVector, a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
-inline HomogeneousVector::
-    HomogeneousVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                       double a_dFill )
-    : BaseType( std::forward< VectorBase< double, Q, t_bOtherIsRow > >( a_rroVector ),
-                a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
-template< typename U, unsigned int P, unsigned int Q >
-inline HomogeneousVector::
-    HomogeneousVector( const MatrixBase< U, P, Q >& ac_roMatrix,
-                       double a_dFill )
-    : BaseType( ac_roMatrix, a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
-template< unsigned int P, unsigned int Q >
-inline HomogeneousVector::
-    HomogeneousVector( MatrixBase< double, P, Q >&& a_rroMatrix,
-                       double a_dFill )
-    : BaseType( std::forward< MatrixBase< double, P, Q > >( a_rroMatrix ),
-                a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
 inline HomogeneousVector::HomogeneousVector( double a_dFill )
     : BaseType( a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) ) {}
 inline HomogeneousVector::HomogeneousVector( const double (&ac_radData)[ 4 ] )
@@ -101,27 +69,19 @@ inline HomogeneousVector::
     h = a_dH;
 }
 
-// Construct from a 3D point or a 2D homogeneous vector
+// Construct from a homogeneous vector
 inline HomogeneousVector::
     HomogeneousVector( const PointVector& ac_roPoint, double a_dH )
     : BaseType( ac_roPoint ), x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) )
 {
     h = a_dH;
+    operator=( ac_roPoint );
 }
-inline HomogeneousVector::
-    HomogeneousVector( const Plane::HomogeneousVector& ac_roVector,
-                       double a_dH )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) )
+inline HomogeneousVector& HomogeneousVector::operator=( const PointVector& ac_roPoint )
 {
-    h = a_dH;
-}
-inline HomogeneousVector::
-    HomogeneousVector( const Plane::HomogeneousVector& ac_roVector,
-                       double a_dH, double a_dZ )
-    : BaseType( ac_roVector * ( ac_roVector.h == 0.0 ? 1.0 : a_dZ / ac_roVector.h ) ),
-      x( At(0) ), y( At(1) ), z( At(2) ), h( At(3) )
-{
-    h = a_dH;
+    x = ac_roPoint.x * h;
+    y = ac_roPoint.y * h;
+    z = ac_roPoint.z * h;
 }
 
 // re-implement addition and subtraction to account for h value
@@ -131,13 +91,16 @@ inline HomogeneousVector
 {
     HomogeneousVector oArgument = ac_roVector;
     oArgument *= ( ac_roVector.h == 0.0 ? 1.0 : h / ac_roVector.h );
+    oArgument.h = 0.0;
     return HomogeneousVector( BaseType::operator+( oArgument ) );
 }
 inline HomogeneousVector&
     HomogeneousVector::operator+=( const HomogeneousVector& ac_roVector )
 {
-    BaseType::operator+=( ac_roVector *
-                          ( ac_roVector.h == 0.0 ? 1.0 : h / ac_roVector.h ) );
+    HomogeneousVector oArgument = ac_roVector;
+    oArgument *= ( ac_roVector.h == 0.0 ? 1.0 : h / ac_roVector.h );
+    oArgument.h = 0.0;
+    BaseType::operator+=( oArgument );
     return *this;
 }
 inline HomogeneousVector
@@ -145,20 +108,84 @@ inline HomogeneousVector
 {
     HomogeneousVector oArgument = ac_roVector;
     oArgument *= ( ac_roVector.h == 0.0 ? 1.0 : h / ac_roVector.h );
+    oArgument.h = 0.0;
     return HomogeneousVector( BaseType::operator-( oArgument ) );
 }
 inline HomogeneousVector&
     HomogeneousVector::operator-=( const HomogeneousVector& ac_roVector )
 {
-    BaseType::operator-=( ac_roVector *
-                          ( ac_roVector.h == 0.0 ? 1.0 : h / ac_roVector.h ) );
+    HomogeneousVector oArgument = ac_roVector;
+    oArgument *= ( ac_roVector.h == 0.0 ? 1.0 : h / ac_roVector.h );
+    oArgument.h = 0.0;
+    BaseType::operator-=( oArgument );
+    return *this;
+}
+
+// Matrix multiplication and division
+inline HomogeneousVector& HomogeneousVector::
+    operator*=( const Math::Matrix< double, 4 >& ac_roMatrix )
+{
+    Homogenize();
+    BaseType::operator*=( ac_roMatrix );
+    return *this;
+}
+inline HomogeneousVector& HomogeneousVector::
+    operator/=( const Math::Matrix< double, 4 >& ac_roMatrix )
+{
+    if( !ac_roMatrix.IsInvertable() )
+    {
+        throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
+    }
+    Homogenize();
+    BaseType::operator/=( ac_roMatrix );
+    return *this;
+}
+
+// re-implement equality and inequality checks to account for h
+inline bool HomogeneousVector::
+    operator==( const HomogeneousVector& ac_roVector ) const
+{
+    return ( PointVector( *this ) == PointVector( ac_roVector ) );
+}
+inline bool HomogeneousVector::
+    operator!=( const HomogeneousVector& ac_roVector ) const
+{
+    return ( PointVector( *this ) != PointVector( ac_roVector ) );
+}
+
+// re-implement normalization to account for h value
+inline double HomogeneousVector::Magnitude() const
+{
+    return PointVector( *this ).Magnitude();
+}
+inline double HomogeneousVector::MagnitudeSquared() const
+{
+    return PointVector( *this ).Magnitude();
+}
+inline void HomogeneousVector::Normalize()
+{
+    Homogenize();
+    BaseType::Normalize();
+}
+inline HomogeneousVector HomogeneousVector::Normal() const
+{
+    return HomogeneousVector( PointVector( *this ).Normal() );
+}
+
+// Adjust values so that h = 1 or 0
+inline HomogeneousVector& HomogeneousVector::Homogenize()
+{
+    if( h != 0.0 )
+    {
+        operator/=( h );
+    }
     return *this;
 }
 
 // Origin of the coordinate system
 inline const HomogeneousVector& HomogeneousVector::Origin()
 {
-    static HomogeneousVector oOrigin;
+    static HomogeneousVector oOrigin( 0.0, 0.0, 0.0, 1.0 );
     return oOrigin;
 }
 

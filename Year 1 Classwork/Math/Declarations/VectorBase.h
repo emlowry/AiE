@@ -77,7 +77,7 @@ public:
     RowVectorType Row() const;
 
     // Get a smaller vector by removing an element
-    VectorBase< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
+    VectorBase< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
         MinusElement( unsigned int a_uiIndex ) const;
 
     // Transpose - non-virtual override, since result is a concrete type instead
@@ -105,11 +105,11 @@ private:
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
     typedef typename BaseType::RowVectorType BaseRowVectorType;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
-    MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+    MatrixBase< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
         MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
-    MatrixBase< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+    MatrixBase< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
         MinusColumn( unsigned int a_uiColumn ) const;
-    MatrixBase< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
+    MatrixBase< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow ? N : 1 ) >
         MinusRow( unsigned int a_uiRow ) const;
     void Shift( int a_iRight, int a_iDown = 0 );
 
@@ -117,6 +117,7 @@ private:
 
 }   // namespace Math
 
+// Always include template function implementations with this header
 #include "Implementations/VectorBase.inl"
 
 #endif  // VECTOR_BASE__H

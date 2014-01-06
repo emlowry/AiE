@@ -11,7 +11,6 @@
 #define MATRIX__H
 
 #include "MatrixBase.h"
-// #include <type_traits>   // for common_type
 
 namespace Math
 {
@@ -33,8 +32,7 @@ struct MatrixInverse< long double >
     typedef long double Type;
 };
 
-// Forward declare vector type, include vector definition *after* matrix
-// definition, since matrix is parent of vector
+// Forward declare vector type
 template< typename T, unsigned int N, bool t_bIsRow/* = true*/ >
 class Vector;
 
@@ -107,12 +105,12 @@ public:
     // concrete and not a reference or pointer
     ColumnVectorType Column( unsigned int ac_uiIndex ) const;
     RowVectorType Row( unsigned int ac_uiIndex ) const;
-    Matrix< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
+    Matrix< T, ( M > 1 ? M-1 : 1 ), ( N > 1 ? N-1 : 1 ) >
         MinusRowAndColumn( unsigned int a_uiRow,
                            unsigned int a_uiColumn ) const;
-    Matrix< T, M, ( N > 0 ? N-1 : 0 ) >
+    Matrix< T, M, ( N > 1 ? N-1 : 1 ) >
         MinusColumn( unsigned int a_uiColumn ) const;
-    Matrix< T, ( M > 0 ? M-1 : 0 ), N >
+    Matrix< T, ( M > 1 ? M-1 : 1 ), N >
         MinusRow( unsigned int a_uiRow ) const;
     TransposeType Transpose() const;
 
@@ -138,6 +136,10 @@ public:
     template< unsigned int P >
     Matrix< typename MatrixInverse< T >::Type, M, P >
         operator/( const Matrix< T, P, N >& ac_roMatrix ) const;
+
+    // transform assign
+    Matrix& operator*=( const Matrix< T, N >& ac_roMatrix );
+    Matrix& operator/=( const Matrix< T, N >& ac_roMatrix );
 
     // Matrix addition and subtraction
     Matrix& operator+=( const Matrix& ac_roMatrix );
@@ -184,16 +186,13 @@ protected:
 // Matrix scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int M, unsigned int N >
 Math::Matrix< T, M, N > operator*( const U& ac_rScalar,
-                                   const Math::Matrix< T, M, N > ac_roMatrix );
+                                   const Math::Matrix< T, M, N >& ac_roMatrix );
 template< typename U, typename T, unsigned int M, unsigned int N >
 typename Math::Matrix< T, M, N >::InverseType
     operator/( const U& ac_rScalar,
-               const Math::Matrix< T, M, N > ac_roMatrix );
+               const Math::Matrix< T, M, N >& ac_roMatrix );
 
-// The Matrix class *must* be defined before the Vector class, since Vector is
-// a child class of Matrix, but Vector must also be defined before the Matrix
-// implementations, since they rely on Vector functions.
-#include "Vector.h"
+// Always include template function implementations with this header
 #include "Implementations/Matrix.inl"
 
 #endif  // MATRIX__H

@@ -58,7 +58,7 @@ inline Matrix< T, M, N >::Matrix( const T* const ac_cpData,
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::
     Matrix( const T (&ac_raaData)[ M ][ N ] )
-    : BaseType( ac_raaDataS ) {}
+    : BaseType( ac_raaData ) {}
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >::Matrix( const T* const* const ac_cpcpData,
                                   const unsigned int ac_uiRows,

@@ -70,11 +70,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl" />
-    <None Include="Implementations\ColorVector_AssignmentOperators.inl" />
-    <None Include="Implementations\ColorVector_Constructors.inl" />
+    <None Include="Implementations\ColorVector_Templates.inl" />
     <None Include="Implementations\Functions.inl" />
+    <None Include="Implementations\HomogeneousVector.inl" />
     <None Include="Implementations\HomogeneousVector_Plane.inl" />
     <None Include="Implementations\HomogeneousVector_Space.inl" />
+    <None Include="Implementations\HomogeneousVector_Templates.inl" />
     <None Include="Implementations\Matrix.inl" />
     <None Include="Implementations\MatrixBase.inl" />
     <None Include="Implementations\MatrixBase_CopyConstructors.inl" />
@@ -82,6 +83,10 @@
     <None Include="Implementations\Matrix_Constructors.inl" />
     <None Include="Implementations\Matrix_Operators.inl" />
     <None Include="Implementations\PointVector.inl" />
+    <None Include="Implementations\PointVector_Templates.inl" />
+    <None Include="Implementations\Transform.inl" />
+    <None Include="Implementations\Transform_Scale.inl" />
+    <None Include="Implementations\Transform_TranslateRotate.inl" />
     <None Include="Implementations\Vector.inl" />
     <None Include="Implementations\Vector_Constructors.inl" />
     <None Include="Implementations\Vector_Operators.inl" />
@@ -94,10 +99,12 @@
     <ClInclude Include="Declarations\ColorVector.h" />
     <ClInclude Include="Declarations\Functions.h" />
     <ClInclude Include="Declarations\HomogeneousVector.h" />
+    <ClInclude Include="Declarations\ImExportMacro.h" />
     <ClInclude Include="Declarations\MostDerivedAddress.h" />
     <ClInclude Include="Declarations\PointVector.h" />
+    <ClInclude Include="Declarations\Transform.h" />
     <ClInclude Include="DynamicMath.h" />
-    <ClInclude Include="Math.h" />
+    <ClInclude Include="InlineMath.h" />
     <ClInclude Include="StaticMath.h" />
     <ClInclude Include="Declarations\Matrix.h" />
     <ClInclude Include="Declarations\MatrixBase.h" />
@@ -105,7 +112,7 @@
     <ClInclude Include="Declarations\VectorBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Math.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

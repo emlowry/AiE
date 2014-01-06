@@ -38,6 +38,8 @@ public:
     // Copy/move constructor
     MatrixBase( const MatrixBase& ac_roMatrix );
     MatrixBase( MatrixBase&& a_rroMatrix );
+    MatrixBase& operator=( const MatrixBase& ac_roMatrix );
+    MatrixBase& operator=( MatrixBase&& a_rroMatrix );
 
     // Construct/assign from a differently-sized/typed matrix
     template< typename U, unsigned int P, unsigned int Q >
@@ -110,12 +112,12 @@ public:
     
     // Get smaller matrices by removing a row and/or column - redefine
     // non-virtually in child classes to return the correct type.
-    MatrixBase< T, ( M > 0 ? M-1 : 0 ), ( N > 0 ? N-1 : 0 ) >
+    MatrixBase< T, ( M > 1 ? M-1 : 1 ), ( N > 1 ? N-1 : 1 ) >
         MinusRowAndColumn( unsigned int a_uiRow,
                            unsigned int a_uiColumn ) const;
-    MatrixBase< T, M, ( N > 0 ? N-1 : 0 ) >
+    MatrixBase< T, M, ( N > 1 ? N-1 : 1 ) >
         MinusColumn( unsigned int a_uiColumn ) const;
-    MatrixBase< T, ( M > 0 ? M-1 : 0 ), N >
+    MatrixBase< T, ( M > 1 ? M-1 : 1 ), N >
         MinusRow( unsigned int a_uiRow ) const;
 
     // Transpose - redefine non-virtually in child classes to return the correct
@@ -141,10 +143,12 @@ const T& DefaultFill();
 // For non-numeric types, be sure to define the following:
 //
 //  // YourType.h:
-//  const YourType& DefaultFill();
+//  template<>
+//  const YourType& DefaultFill< YourType >();
 //
 //  // YourType.cpp:
-//  const YourType& DefaultFill()
+//  template<>
+//  const YourType& DefaultFill< YourType >()
 //  {
 //      // Instead of this, you could just return some other static constant
 //      static YourType fill = /* default YourType */;
@@ -154,9 +158,7 @@ const T& DefaultFill();
 
 }   // namespace Math
 
-// MatrixBase *must* be defined before VectorBase, but VectorBase must be defined
-// before MatrixBase implementations.
-#include "VectorBase.h"
+// Always include template function implementations with this header
 #include "Implementations/MatrixBase.inl"
 
 #endif  // MATRIX_BASE__H

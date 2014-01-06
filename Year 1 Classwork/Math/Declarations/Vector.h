@@ -95,7 +95,7 @@ public:
     RowVectorType Row() const;
     InverseType Inverse() const;
     InverseType Inverse( bool& a_rbInvertable ) const;
-    Vector< T, ( N > 0 ? N-1 : 0 ), t_bIsRow >
+    Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
         MinusElement( unsigned int a_uiIndex ) const;
     TransposeType Transpose() const;
 
@@ -114,9 +114,16 @@ public:
     void Normalize();
     NormalType Normal() const;
 
-    // Inherit matrix multiplication and division
-    using MatrixType::operator*;
-    using MatrixType::operator/;
+    // Matrix multiplication and division overrides so the operators won't be
+    // hidden by the scalar multiplication and division operator overrides
+    template< unsigned int P >
+    Matrix< T, ( t_bIsRow ? 1 : N ), P >
+        operator*( const Matrix< T, ( t_bIsRow ? N : 1 ), P >& ac_roMatrix ) const;
+    template< unsigned int P >
+    Matrix< typename MatrixInverse< T >::Type, ( t_bIsRow ? 1 : N ), P >
+        operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const;
+    Vector& operator*=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
+    Vector& operator/=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
 
     // Scalar multiplication/division/modulo overrides to return correct type
     template< typename U >
@@ -173,11 +180,11 @@ private:
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
     typedef typename MatrixType::RowVectorType BaseRowVectorType;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
-    Matrix< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+    Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
         MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
-    Matrix< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 0 ? N-1 : 0 ) >
+    Matrix< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
         MinusColumn( unsigned int a_uiColumn ) const;
-    Matrix< T, ( !t_bIsRow && N > 0 ? N-1 : 0 ), ( t_bIsRow ? N : 1 ) >
+    Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow ? N : 1 ) >
         MinusRow( unsigned int a_uiRow ) const;
     void Shift( int a_iRight, int a_iDown = 0 );
 
@@ -189,12 +196,13 @@ private:
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 Math::Vector< T, N, t_bIsRow >
     operator*( const U& ac_rScalar,
-               const Math::Vector< T, N, t_bIsRow > ac_roVector );
+               const Math::Vector< T, N, t_bIsRow >& ac_roVector );
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 typename Math::Vector< T, N, t_bIsRow >::InverseType
     operator/( const U& ac_rScalar,
-               const Math::Vector< T, N, t_bIsRow > ac_roVector );
+               const Math::Vector< T, N, t_bIsRow >& ac_roVector );
 
+// Always include template function implementations with this header
 #include "Implementations/Vector.inl"
 
 #endif  // VECTOR__H

@@ -47,6 +47,22 @@ inline Matrix< typename MatrixInverse< T >::Type, M, P >
     return operator*( ac_roMatrix.Inverse() );
 }
 
+// Transform assign
+template< typename T, unsigned int M, unsigned int N >
+Matrix< T, M, N >& Matrix< T, M, N >::
+    operator*=( const Math::Matrix< T, N >& ac_roMatrix )
+{
+    operator=( operator*( ac_roMatrix ) );
+    return *this;
+}
+template< typename T, unsigned int M, unsigned int N >
+Matrix< T, M, N >& Matrix< T, M, N >::
+    operator/=( const Math::Matrix< T, N >& ac_roMatrix )
+{
+    operator=( operator/( ac_roMatrix ) );
+    return *this;
+}
+
 // Matrix addition and subtraction
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, N >& Matrix< T, M, N >::
@@ -154,14 +170,14 @@ inline Matrix< T, M, N > Matrix< T, M, N >::
 // Matrix scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int M, unsigned int N >
 inline Math::Matrix< T, M, N >
-    operator*( const U& ac_rScalar, const Math::Matrix< T, M, N > ac_roMatrix )
+    operator*( const U& ac_rScalar, const Math::Matrix< T, M, N >& ac_roMatrix )
 {
     return ac_roMatrix.operator*( ac_rScalar );
 }
 template< typename U, typename T, unsigned int M, unsigned int N >
 inline typename Math::Matrix< T, M, N >::InverseType
     operator/( const U& ac_rScalar,
-               const Math::Matrix< T, M, N > ac_roMatrix )
+               const Math::Matrix< T, M, N >& ac_roMatrix )
 {
     if( !ac_roMatrix.IsInvertable() )
     {

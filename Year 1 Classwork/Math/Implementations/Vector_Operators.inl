@@ -13,6 +13,38 @@
 namespace Math
 {
 
+// Matrix multiplication and division overrides so the operators won't be
+// hidden by the scalar multiplication and division operator overrides
+template< typename T, unsigned int N, bool t_bIsRow >
+template< unsigned int P >
+inline Matrix< T, ( t_bIsRow ? 1 : N ), P > Vector< T, N, t_bIsRow >::
+    operator*( const Matrix< T, ( t_bIsRow ? N : 1 ), P >& ac_roMatrix ) const
+{
+    return MatrixType::operator*( ac_roMatrix );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< unsigned int P >
+inline Matrix< typename MatrixInverse< T >::Type, ( t_bIsRow ? 1 : N ), P >
+    Vector< T, N, t_bIsRow >::
+    operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const
+{
+    return MatrixType::operator/( ac_roMatrix );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::
+    operator*=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix )
+{
+    Matrix::operator*=( ac_roMatrix );
+    return *this;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::
+    operator/=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix )
+{
+    Matrix::operator/=( ac_roMatrix );
+    return *this;
+}
+
 // Scalar multiplication, division, and modulo overrides to return correct type
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
@@ -170,16 +202,16 @@ inline Vector< T, N, t_bIsRow > Vector< T, N, t_bIsRow >::
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 inline Math::Vector< T, N, t_bIsRow >
     operator*( const U& ac_rScalar,
-               const Math::Vector< T, N, t_bIsRow > ac_roVector )
+               const Math::Vector< T, N, t_bIsRow >& ac_roVector )
 {
     return ac_roVector.operator*( ac_rScalar );
 }
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
 inline typename Math::Vector< T, N, t_bIsRow >::InverseType
     operator/( const U& ac_rScalar,
-               const Math::Vector< T, N, t_bIsRow > ac_roVector )
+               const Math::Vector< T, N, t_bIsRow >& ac_roVector )
 {
-    if( !ac_roVectorMatrix.IsInvertable() )
+    if( !ac_roVector.IsInvertable() )
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }

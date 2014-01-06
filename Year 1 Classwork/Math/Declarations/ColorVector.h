@@ -3,20 +3,21 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 11, 2013
  * Description:        Vector for representing RGBA colors.
- * Last Modified:      December 11, 2013
- * Last Modification:  Creation.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Added import/export macro.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__H
 #define COLOR_VECTOR__H
 
 #include "Hex.h"
+#include "ImExportMacro.h"
 #include "Vector.h"
 
 namespace Color
 {
-// Handles RGB colors (no transparency)
-class ColorVector : public Math::Vector< Channel, 4 >
+// Handles RGBA colors
+IMEXPORT_CLASS class ColorVector : public Math::Vector< Channel, 4 >
 {
 public:
 
@@ -215,11 +216,12 @@ public:
 // ColorVector scalar multiplication and division in the other direction
 template< typename U >
 Color::ColorVector
-    operator*( const U& ac_rScalar, const Color::ColorVector ac_roVector );
+    operator*( const U& ac_rScalar, const Color::ColorVector& ac_roVector );
 template< typename U >
 Color::ColorVector
-    operator/( const U& ac_rScalar, const Color::ColorVector ac_roVector );
+    operator/( const U& ac_rScalar, const Color::ColorVector& ac_roVector );
 
-#include "Implementations/ColorVector.inl"
+// Always include template function implementations with this header
+#include "Implementations/ColorVector_Templates.inl"
 
 #endif  // COLOR_VECTOR__H

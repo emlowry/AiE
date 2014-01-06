@@ -8,13 +8,14 @@
  *                      transformed point = original point * transform matrix,
  *                      instead of transform matrix * original point as it
  *                      would be if column vectors were used.
- * Last Modified:      December 18, 2013
- * Last Modification:  Added Origin function.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Added import/export macro.
  ******************************************************************************/
 
 #ifndef POINT_VECTOR__H
 #define POINT_VECTOR__H
 
+#include "ImExportMacro.h"
 #include "Vector.h"
 #include "Matrix.h"
 
@@ -25,14 +26,10 @@ namespace Plane
 class HomogeneousVector;
 
 // Represent a point in 2D space
-class PointVector : public Math::Vector< double, 2 >
+IMEXPORT_CLASS class PointVector : public Math::Vector< double, 2 >
 {
 public:
 
-    // simplify typing
-    typedef Math::Matrix< double, 2 > Transform;
-    typedef Math::Matrix< double, 2, 1 > LineProjection;
-    typedef Math::Matrix< double, 3, 3 > SpaceProjection;
     typedef Math::Vector< double, 2 > BaseType;
     typedef BaseType::BaseType VectorBaseType;
     typedef BaseType::RootType RootType;
@@ -87,66 +84,6 @@ public:
     // Origin of the coordinate system
     static const PointVector& Origin();
 
-    // Scale
-    static Transform Scaling( double a_dFactor,
-                              const PointVector& ac_roOrigin = Origin() );
-    void Scale( double a_dFactor,
-                const PointVector& ac_roOrigin = Origin() );
-    static Transform Scaling( double a_dFactorX, double a_dFactorY,
-                              const PointVector& ac_roOrigin = Origin() );
-    void Scale( double a_dFactorX, double a_dFactorY,
-                const PointVector& ac_roOrigin = Origin() );
-    static Transform Scaling( const PointVector& ac_roFactor,
-                              const PointVector& ac_roOrigin = Origin() );
-    void Scale( const PointVector& ac_roFactor,
-                const PointVector& ac_roOrigin = Origin() );
-
-    // Translate
-    static Transform Translation( double a_dX, double a_dY );
-    void Translate( double a_dX, double a_dY );
-    static Transform Translation( const PointVector& ac_roDirection,
-                                  double a_dDistance );
-    void Translate( const PointVector& ac_roDirection, double a_dDistance );
-    static Transform TranslationTowards( const PointVector& ac_roTarget,
-                                         double a_dDistance );
-    void TranslateTowards( const PointVector& ac_roTarget, double a_dDistance );
-    static Transform TranslationTo( const PointVector& ac_roTarget,
-                                    const PointVector& ac_roOrigin = Origin() );
-    void TranslateTo( const PointVector& ac_roTarget,
-                      const PointVector& ac_roOrigin = Origin() );
-
-    // Rotate
-    static Transform Rotation( double a_dRadians,
-                               const PointVector& ac_roOrigin = Origin() );
-    void Rotate( double a_dRadians, const PointVector& ac_roOrigin = Origin() );
-    static Transform RotationTowards( const PointVector& ac_roTarget,
-                                      double a_dRadians,
-                                      const PointVector& ac_roOrigin = Origin() );
-    void RotateTowards( const PointVector& ac_roTarget,
-                        double a_dRadians,
-                        const PointVector& ac_roOrigin = Origin() );
-    static Transform RotationTowards( const PointVector& ac_roTarget,
-                                      const PointVector& ac_roOrigin = Origin() );
-    void RotateTowards( const PointVector& ac_roTarget,
-                        const PointVector& ac_roOrigin = Origin() );
-    static Transform RotationTo( double a_dRadians,
-                                 const PointVector& ac_roOrigin = Origin() );
-    void RotateTo( double a_dRadians, const PointVector& ac_roOrigin = Origin() );
-
-    // Project
-    static LineProjection
-        ProjectionToAxis( double a_dFocalLength,
-                          const PointVector& ac_roAxisDirection = Unit(0),
-                          const PointVector& ac_roAxisOrigin = Origin() );
-    double ProjectToAxis( double a_dFocalLength,
-                          const PointVector& ac_roAxisDirection = Unit(0),
-                          const PointVector& ac_roAxisOrigin = Origin() ) const;
-    static LineProjection
-        ProjectionToAxis( const PointVector& ac_roAxisDirection = Unit(0),
-                          const PointVector& ac_roAxisOrigin = Origin() );
-    double ProjectToAxis( const PointVector& ac_roAxisDirection = Unit(0),
-                          const PointVector& ac_roAxisOrigin = Origin() ) const;
-
     // public access to X and Y coordinates
     double& x;
     double& y;
@@ -165,13 +102,11 @@ namespace Space
 class HomogeneousVector;
 
 // Represent a point in 3D space
-class PointVector : public Math::Vector< double, 3 >
+IMEXPORT_CLASS class PointVector : public Math::Vector< double, 3 >
 {
 public:
 
     // simplify typing
-    typedef Math::Matrix< double, 3 > Transform;
-    typedef Math::Matrix< double, 3, 2 > PlaneProjection;
     typedef Math::Vector< double, 3 > BaseType;
     typedef BaseType::BaseType VectorBaseType;
     typedef BaseType::RootType RootType;
@@ -238,6 +173,7 @@ typedef PointVector Point;
 typedef Space::PointVector PointVector3D;
 typedef Space::Point Point3D;
 
-#include "Implementations/PointVector.inl"
+// Always include template function implementations with this header
+#include "Implementations/PointVector_Templates.inl"
 
 #endif // POINT_VECTOR__H

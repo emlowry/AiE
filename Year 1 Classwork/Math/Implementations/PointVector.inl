@@ -2,15 +2,19 @@
  * File:               PointVector.inl
  * Author:             Elizabeth Lowry
  * Date Created:       December 17, 2013
- * Description:        Inline implementations for PointVector constructors.
- * Last Modified:      December 18, 2013
- * Last Modification:  Added Origin function.
+ * Description:        Inline function implementations for PointVector.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Moved templated constructors to another file.
  ******************************************************************************/
 
 #ifndef POINT_VECTOR__INL
 #define POINT_VECTOR__INL
 
+#include "Declarations/PointVector.h"
 #include "Declarations/HomogeneousVector.h"
+
+// separate file to reduce file size
+#include "PointVector_Templates.inl"
 
 namespace Plane
 {
@@ -40,40 +44,6 @@ inline PointVector::PointVector( VectorBaseType&& a_rroVector )
 inline PointVector::PointVector( RootType&& a_rroMatrix )
     : BaseType( std::forward< RootType >( a_rroMatrix ) ),
       x( At(0) ), y( At(1) ) {}
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill )
-    : BaseType( ac_roVector, a_dFill ), x( At(0) ), y( At(1) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( Vector< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill )
-    : BaseType( std::forward< Vector< double, Q, t_bOtherIsRow > >( a_rroVector ),
-                a_dFill ),
-      x( At(0) ), y( At(1) ) {}
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill )
-    : BaseType( ac_roVector, a_dFill ), x( At(0) ), y( At(1) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill )
-    : BaseType( std::forward< VectorBase< double, Q, t_bOtherIsRow > >( a_rroVector ),
-                a_dFill ),
-      x( At(0) ), y( At(1) ) {}
-template< typename U, unsigned int P, unsigned int Q >
-inline PointVector::PointVector( const MatrixBase< U, P, Q >& ac_roMatrix,
-                                 double a_dFill )
-    : BaseType( ac_roMatrix, a_dFill ), x( At(0) ), y( At(1) ) {}
-template< unsigned int P, unsigned int Q >
-inline PointVector::PointVector( MatrixBase< double, P, Q >&& a_rroMatrix,
-                                 double a_dFill )
-    : BaseType( std::forward< MatrixBase< double, Q, t_bOtherIsRow > >( a_rroMatrix ),
-                a_dFill ),
-      x( At(0) ), y( At(1) ) {}
 inline PointVector::PointVector( double a_dFill )
     : BaseType( a_dFill ), x( At(0) ), y( At(1) ) {}
 inline PointVector::PointVector( const double (&ac_radData)[ 2 ] )
@@ -99,15 +69,15 @@ inline PointVector::PointVector( const HomogeneousVector& ac_roVector )
 }
 inline PointVector& PointVector::operator=( const HomogeneousVector& ac_roVector )
 {
-    x = ac_roVector.x / ac_roVector.h;
-    y = ac_roVector.y / ac_roVector.h;
+    x = ac_roVector.x / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
+    y = ac_roVector.y / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
     return *this;
 }
 
 // Origin of the coordinate system
 inline const PointVector& PointVector::Origin()
 {
-    static PointVector oOrigin;
+    static PointVector oOrigin( 0.0, 0.0 );
     return oOrigin;
 }
 
@@ -142,40 +112,6 @@ inline PointVector::PointVector( VectorBaseType&& a_rroVector )
 inline PointVector::PointVector( RootType&& a_rroMatrix )
     : BaseType( std::forward< RootType >( a_rroMatrix ) ),
       x( At(0) ), y( At(1) ), z( At(2) ) {}
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill )
-    : BaseType( ac_roVector, a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( Vector< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill )
-    : BaseType( std::forward< Vector< double, Q, t_bOtherIsRow > >( a_rroVector ),
-                a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
-template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill )
-    : BaseType( ac_roVector, a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-template< unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
-    PointVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill )
-    : BaseType( std::forward< VectorBase< double, Q, t_bOtherIsRow > >( a_rroVector ),
-                a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
-template< typename U, unsigned int P, unsigned int Q >
-inline PointVector::PointVector( const MatrixBase< U, P, Q >& ac_roMatrix,
-                                 double a_dFill )
-    : BaseType( ac_roMatrix, a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-template< unsigned int P, unsigned int Q >
-inline PointVector::PointVector( MatrixBase< double, P, Q >&& a_rroMatrix,
-                                 double a_dFill )
-    : BaseType( std::forward< MatrixBase< double, Q, t_bOtherIsRow > >( a_rroMatrix ),
-                a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
 inline PointVector::PointVector( double a_dFill )
     : BaseType( a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ) {}
 inline PointVector::PointVector( const double (&ac_radData)[ 3 ] )
@@ -203,16 +139,16 @@ inline PointVector::PointVector( const HomogeneousVector& ac_roVector )
 }
 inline PointVector& PointVector::operator=( const HomogeneousVector& ac_roVector )
 {
-    x = ac_roVector.x / ac_roVector.h;
-    y = ac_roVector.y / ac_roVector.h;
-    z = ac_roVector.z / ac_roVector.h;
+    x = ac_roVector.x / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
+    y = ac_roVector.y / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
+    z = ac_roVector.z / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
     return *this;
 }
 
 // Origin of the coordinate system
 inline const PointVector& PointVector::Origin()
 {
-    static PointVector oOrigin;
+    static PointVector oOrigin( 0.0, 0.0, 0.0 );
     return oOrigin;
 }
 

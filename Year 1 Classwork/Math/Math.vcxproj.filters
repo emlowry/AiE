@@ -46,12 +46,6 @@
     <None Include="Implementations\ColorVector.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Implementations\ColorVector_Constructors.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\ColorVector_AssignmentOperators.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="Implementations\Vector_Constructors.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -67,12 +61,30 @@
     <None Include="Implementations\HomogeneousVector_Space.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Implementations\HomogeneousVector.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\ColorVector_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\HomogeneousVector_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\PointVector_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Transform.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Transform_Scale.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Transform_TranslateRotate.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaticMath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DynamicMath.h">
@@ -111,9 +123,18 @@
     <ClInclude Include="Declarations\HomogeneousVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="InlineMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\ImExportMacro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp">
+    <ClCompile Include="Math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
