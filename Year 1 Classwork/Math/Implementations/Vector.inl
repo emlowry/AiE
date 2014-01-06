@@ -168,6 +168,7 @@ inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
     {
         result += At(i) * At(i);
     }
+    return result;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline void Vector< T, N, t_bIsRow >::Normalize()

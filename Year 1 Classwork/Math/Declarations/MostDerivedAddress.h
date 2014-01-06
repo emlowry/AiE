@@ -12,7 +12,9 @@
 #ifndef MOST_DERIVED_ADDRESS__H
 #define MOST_DERIVED_ADDRESS__H
 
-class MostDerivedAddress
+#include "ImExportMacro.h"
+
+class IMEXPORT_CLASS MostDerivedAddress
 {
 public:
     virtual ~MostDerivedAddress() {}

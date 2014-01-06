@@ -42,7 +42,7 @@ union Hex
           r( a_r < 0.0 ? 0 : a_r > 1.0 ? 0xFF : (Channel)( a_r * 0xFF ) ),
           g( a_g < 0.0 ? 0 : a_g > 1.0 ? 0xFF : (Channel)( a_g * 0xFF ) ),
           b( a_b < 0.0 ? 0 : a_b > 1.0 ? 0xFF : (Channel)( a_b * 0xFF ) ) {}
-    Hex( FourChannelInt a_i ) : i( a ) {}
+    Hex( FourChannelInt a_i ) : i( a_i ) {}
     Hex& operator=( FourChannelInt a_i )
     {
         i = a_i;

@@ -26,7 +26,7 @@ namespace Plane
 class HomogeneousVector;
 
 // Represent a point in 2D space
-IMEXPORT_CLASS class PointVector : public Math::Vector< double, 2 >
+class IMEXPORT_CLASS PointVector : public Math::Vector< double, 2 >
 {
 public:
 
@@ -102,7 +102,7 @@ namespace Space
 class HomogeneousVector;
 
 // Represent a point in 3D space
-IMEXPORT_CLASS class PointVector : public Math::Vector< double, 3 >
+class IMEXPORT_CLASS PointVector : public Math::Vector< double, 3 >
 {
 public:
 

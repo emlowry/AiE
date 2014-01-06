@@ -17,7 +17,7 @@
 namespace Color
 {
 // Handles RGBA colors
-IMEXPORT_CLASS class ColorVector : public Math::Vector< Channel, 4 >
+class IMEXPORT_CLASS ColorVector : public Math::Vector< Channel, 4 >
 {
 public:
 

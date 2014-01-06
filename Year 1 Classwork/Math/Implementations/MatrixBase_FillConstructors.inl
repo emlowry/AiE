@@ -88,6 +88,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
     {
         m_aaData[i/N][i%N] = ac_raData[i];
     }
+    return *this;
 }
 
 // Construct with parameter data where given and fill data elsewhere
@@ -144,6 +145,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
             m_aaData[i][j] = ac_raaData[i][j];
         }
     }
+    return *this;
 }
 
 // Construct/assign from a set of columns
@@ -178,6 +180,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
             m_aaData[i][j] = ac_raoColumns[j][i];
         }
     }
+    return *this;
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::
@@ -216,6 +219,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
             }
         }
     }
+    return *this;
 }
 
 // Construct/assign from a set of rows
@@ -250,6 +254,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
             m_aaData[i][j] = ac_raoRows[i][j];
         }
     }
+    return *this;
 }
 template< typename T, unsigned int M, unsigned int N >
 inline MatrixBase< T, M, N >::
@@ -288,6 +293,7 @@ inline MatrixBase< T, M, N >& MatrixBase< T, M, N >::
             }
         }
     }
+    return *this;
 }
 
 }   // namespace Math

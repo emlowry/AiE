@@ -11,18 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2ADF0B80-2156-4113-A0E1-BE96CCDE23FC}</ProjectGuid>
+    <ProjectGuid>{CC8B28B8-7907-4C04-9A9A-A246AD6BCA0D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Math</RootNamespace>
+    <RootNamespace>MathTest</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
@@ -38,7 +38,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetExt>.lib</TargetExt>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -46,10 +49,11 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\emlowry\GitHub\AiE\Year 1 Classwork\Math;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -61,60 +65,25 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="Implementations\ColorVector.inl" />
-    <None Include="Implementations\ColorVector_Templates.inl" />
-    <None Include="Implementations\Functions.inl" />
-    <None Include="Implementations\HomogeneousVector.inl" />
-    <None Include="Implementations\HomogeneousVector_Plane.inl" />
-    <None Include="Implementations\HomogeneousVector_Space.inl" />
-    <None Include="Implementations\HomogeneousVector_Templates.inl" />
-    <None Include="Implementations\Matrix.inl" />
-    <None Include="Implementations\MatrixBase.inl" />
-    <None Include="Implementations\MatrixBase_CopyConstructors.inl" />
-    <None Include="Implementations\MatrixBase_FillConstructors.inl" />
-    <None Include="Implementations\Matrix_Constructors.inl" />
-    <None Include="Implementations\Matrix_Operators.inl" />
-    <None Include="Implementations\PointVector.inl" />
-    <None Include="Implementations\PointVector_Templates.inl" />
-    <None Include="Implementations\Transform.inl" />
-    <None Include="Implementations\Transform_Scale.inl" />
-    <None Include="Implementations\Transform_TranslateRotate.inl" />
-    <None Include="Implementations\Vector.inl" />
-    <None Include="Implementations\Vector_Constructors.inl" />
-    <None Include="Implementations\Vector_Operators.inl" />
-    <None Include="ReadMe.txt" />
-    <None Include="Implementations\VectorBase.inl" />
+    <ClInclude Include="UnitTest.h" />
+    <ClInclude Include="UnitTester.h" />
+    <ClInclude Include="UnitTestGroup.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Declarations\ColorConstants.h" />
-    <ClInclude Include="Declarations\Hex.h" />
-    <ClInclude Include="Declarations\ColorVector.h" />
-    <ClInclude Include="Declarations\Functions.h" />
-    <ClInclude Include="Declarations\HomogeneousVector.h" />
-    <ClInclude Include="Declarations\ImExportMacro.h" />
-    <ClInclude Include="Declarations\MostDerivedAddress.h" />
-    <ClInclude Include="Declarations\PointVector.h" />
-    <ClInclude Include="Declarations\Transform.h" />
-    <ClInclude Include="DynamicMath.h" />
-    <ClInclude Include="InlineMath.h" />
-    <ClInclude Include="StaticMath.h" />
-    <ClInclude Include="Declarations\Matrix.h" />
-    <ClInclude Include="Declarations\MatrixBase.h" />
-    <ClInclude Include="Declarations\Vector.h" />
-    <ClInclude Include="Declarations\VectorBase.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Math.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="UnitTest.cpp" />
+    <ClCompile Include="UnitTester.cpp" />
+    <ClCompile Include="UnitTestGroup.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

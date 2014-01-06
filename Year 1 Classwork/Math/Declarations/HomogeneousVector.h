@@ -23,7 +23,7 @@ namespace Plane
 {
 
 // Represent homogeneous coordinates for a point in 2D space
-IMEXPORT_CLASS class HomogeneousVector : public Math::Vector< double, 3 >
+class IMEXPORT_CLASS HomogeneousVector : public Math::Vector< double, 3 >
 {
 public:
 
@@ -155,7 +155,7 @@ namespace Space
 {
 
 // Represent homogenous coordinates for a point in 3D space
-IMEXPORT_CLASS class HomogeneousVector : public Math::Vector< double, 4 >
+class IMEXPORT_CLASS HomogeneousVector : public Math::Vector< double, 4 >
 {
 public:
 
