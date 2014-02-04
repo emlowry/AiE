@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 18, 2013
  * Description:        Function implementations for Matrix template class.
- * Last Modified:      December 10, 2013
+ * Last Modified:      January 5, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -13,13 +13,25 @@
 #include "Declarations/Matrix.h"
 #include "Declarations/Vector.h"
 #include "Declarations/Functions.h"
+#include <stdexcept>    // for out_of_range
 
 // Code separated out into separate files to cut down the size of this one
+#include "Matrix_AssignOperators.inl"
 #include "Matrix_Constructors.inl"
+#include "Matrix_MathFunctions.inl"
 #include "Matrix_Operators.inl"
 
 namespace Math
 {
+    
+// Used whenever values at a given coordinate aren't specified, as in
+// constructing a matrix from another matrix with smaller dimensions.
+template< typename T >
+const T& DefaultFill()
+{
+    static T fill = 0;
+    return fill;
+}
 
 // Zero matrix
 template< typename T, unsigned int M, unsigned int N >
@@ -33,183 +45,57 @@ const Matrix< T, M, N >& Matrix< T, M, N >::Zero()
 template< typename T, unsigned int M, unsigned int N >
 const typename Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::Identity()
 {
-    static IdentityType oIdentity( 1, 0 );
+    static IdentityType oIdentity( 0, 1 );
     return oIdentity;
 }
 
-// Determinant - return 0 if non-square matrix
+// Element access
 template< typename T, unsigned int M, unsigned int N >
-T Matrix< T, M, N >::Determinant() const
+inline T& Matrix< T, M, N >::
+    At( unsigned int a_uiRow, unsigned int a_uiColumn )
 {
-    // Trivial cases
-    if( N != M || N == 0 )
+    if( a_uiRow >= M || a_uiColumn >= N )
     {
-        return 0;
+        throw std::out_of_range( "Cannot access non-existent matrix element" );
     }
-    if( N == 1 )
-    {
-        return m_aaData[0][0];
-    }
-    if( N == 2 )
-    {
-        return ( m_aaData[0][0] * m_aaData[1][1] )
-                - ( m_aaData[0][1] * m_aaData[1][0] );
-    }
-
-    // Recursive case - this gets really inefficient for larger matrices
-    // (complexity is O(!N)) and should be replaced with a more efficient
-    // algorithm if this library is ever used for matrices with larger
-    // dimensions.
-    T determinant = 0;
-    for( unsigned int i = 0; i < N; i++ )
-    {
-        determinant += Minor( 0, i ) * ( (i%2) == 0 ? 1 : -1 );
-    }
-    return determinant;
+    return m_aaData[a_uiRow][a_uiColumn];
 }
 template< typename T, unsigned int M, unsigned int N >
-inline T Matrix< T, M, N >::Minor( unsigned int a_uiRow,
-                                   unsigned int a_uiColumn ) const
+inline const T& Matrix< T, M, N >::
+    At( unsigned int a_uiRow, unsigned int a_uiColumn ) const
 {
-    return MinusRowAndColumn( a_uiRow, a_uiColumn ).Determinant();
+    if( a_uiRow >= M || a_uiColumn >= N )
+    {
+        throw std::out_of_range( "Cannot access non-existent matrix element" );
+    }
+    return m_aaData[a_uiRow][a_uiColumn];
 }
 
-// Inverse
-template< typename T, unsigned int M, unsigned int N >
-inline bool Matrix< T, M, N >::IsInvertable() const
-{
-    if( M > N ) // is the matrix left-invertable?
-    {
-        return ( Transpose() * (*this) ).IsInvertable();
-    }
-    if( M < N ) // is the matrix right-invertable?
-    {
-        return ( (*this) * Transpose() ).IsInvertable();
-    }
-    return ( 0 != Determinant() );  // is the matrix truely invertable?
-}
-template< typename T, unsigned int M, unsigned int N >
-inline bool Matrix< T, M, N >::Invert()
-{
-    InverseType oInverse;
-    bool bInvertable = ( M == N && N > 0 && Inverse( oInverse ) );
-    if( bInvertable )
-    {
-        *this = oInverse;
-    }
-    return bInvertable;
-}
-template< typename T, unsigned int M, unsigned int N >
-inline bool Matrix< T, M, N >::
-    Inverse( InverseType& a_roMatrix ) const    // !invertable = !change
-{
-    if( M > N )
-    {
-        return LeftInverse( a_roMatrix );
-    }
-    if( M < N )
-    {
-        return RightInverse( a_roMatrix );
-    }
-    return TrueInverse( a_roMatrix );
-}
-template< typename T, unsigned int M, unsigned int N >
-inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
-    Inverse() const // if !invertable, return Zero
-{
-    InverseType oInverse;
-    return ( Inverse( oInverse ) ? oInverse : InverseType::Zero() );
-}
-template< typename T, unsigned int M, unsigned int N >
-inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
-    Inverse( bool& a_rbInvertable ) const   // as above
-{
-    InverseType oInverse;
-    a_rbInvertable = Inverse( oInverse );
-    return ( a_rbInvertable ? oInverse : InverseType::Zero() );
-}
-
-// For MxN matrix A where M > N, ( A^T * A )^(-1) * A^T * A
-// So we have a left inverse ( A^T * A )^(-1) * A^T
-template< typename T, unsigned int M, unsigned int N >
-bool Matrix< T, M, N >::
-    LeftInverse( InverseType& a_roMatrix ) const    // !invertable = !change
-{
-    TransposeType oTranspose = Transpose();
-    typename Matrix< T, N >::InverseType oSquare( oTranspose * (*this) );
-    if( !oSquare.Invert() )
-    {
-        return false;
-    }
-    a_roMatrix = oSquare * oTranspose;
-    return true;
-}
-
-// For MxN matrix A where M < N, A * A^T * ( A * A^T )^(-1)
-// So we have a right inverse A^T * ( A * A^T )^(-1)
-template< typename T, unsigned int M, unsigned int N >
-inline bool Matrix< T, M, N >::
-    RightInverse( InverseType& a_roMatrix ) const   // !invertable = !change
-{
-    TransposeType oTranspose = Transpose();
-    typename Matrix< T, M >::InverseType oSquare( (*this) * oTranspose );
-    if( !oSquare.Invert() )
-    {
-        return false;
-    }
-    a_roMatrix = oTranspose * oSquare;
-    return true;
-}
-
-// True inverse = transpose of cofactor matrix divided by determinant
-// cofactor_i,j = minor_i,j * (-1)^(i+j)
-// minor_i,j = determinant of submatrix created by removing row i and column j
-template< typename T, unsigned int M, unsigned int N >
-bool Matrix< T, M, N >::
-    TrueInverse( InverseType& a_roMatrix ) const    // !invertable = !change
-{
-    T determinant = Determinant();
-    if( 0 == determinant )
-    {
-        return false;
-    }
-    for( unsigned int i = 0; i < M*N; ++i )
-    {
-        a_roMatrix[i%N][i/N] = Minor( i/N, i%N );
-        a_roMatrix[i%N][i/N] *= ( ( ( (i/N) + (i%N) ) % 2 ) == 1 ) ? -1 : 1;
-    }
-    a_roMatrix /= determinant;
-    return true;
-}
-
-// Return true if this matrix is an orthogonal matrix
-template< typename T, unsigned int M, unsigned int N >
-inline bool Matrix< T, M, N >::IsOrthogonal() const
-{
-    if( M != N || N == 0 )
-    {
-        return false;
-    }
-    if( N == 1 )
-    {
-        return ( m_aaData[0][0] == (T)1 );
-    }
-    return ( Identity() == ( M < N ? (*this) * Transpose()
-                                   : Transpose() * (*this) ) );
-}
-
-// Get row/column vectors - redefine in child classes to return correct type
+// Get row/column vectors
 template< typename T, unsigned int M, unsigned int N >
 inline typename Matrix< T, M, N >::ColumnVectorType
-    Matrix< T, M, N >::Column( unsigned int ac_uiIndex ) const
+    Matrix< T, M, N >::Column( unsigned int a_uiIndex ) const
 {
-    return ColumnVectorType( BaseType::Column( ac_uiIndex ) );
+    if( a_uiIndex >= N )
+    {
+        throw std::out_of_range( "Cannot access non-existent matrix column" );
+    }
+    ColumnVectorType oColumn;
+    for( unsigned int i = 0; i < M; ++i )
+    {
+        oColumn[i] = m_aaData[i][a_uiIndex];
+    }
+    return oColumn;
 }
 template< typename T, unsigned int M, unsigned int N >
 inline typename Matrix< T, M, N >::RowVectorType
-    Matrix< T, M, N >::Row( unsigned int ac_uiIndex ) const
+    Matrix< T, M, N >::Row( unsigned int a_uiIndex ) const
 {
-    return RowVectorType( BaseType::Row( ac_uiIndex ) );
+    if( a_uiIndex >= M )
+    {
+        throw std::out_of_range( "Cannot access non-existent matrix row" );
+    }
+    return RowVectorType( m_aaData[ a_uiIndex ] );
 }
     
 // Get smaller matrices by removing a row and/or column - redefine in child
@@ -218,28 +104,110 @@ template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, ( M > 1 ? M-1 : 1 ), ( N > 1 ? N-1 : 1 ) > Matrix< T, M, N >::
     MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const
 {
-    return Matrix< T, ( M > 1 ? M-1 : 1 ), ( N > 1 ? N-1 : 1 ) >(
-                           BaseType::MinusRowAndColumn( a_uiRow, a_uiColumn ) );
+    if( N == 1 || M == 1 )
+    {
+        throw( std::out_of_range( "Cannot remove row and column if "
+                                  "there is only one of either" ) );
+    }
+    if( a_uiRow >= M )
+    {
+        throw std::out_of_range( "Cannot remove non-existent matrix row" );
+    }
+    if( a_uiColumn >= N )
+    {
+        throw std::out_of_range( "Cannot remove non-existent matrix column" );
+    }
+    Matrix< T, ( M > 1 ? M-1 : 1 ), ( N > 1 ? N-1 : 1 ) >
+        oResult( Matrix(*this).Shift( -1 - a_uiColumn, -1 - a_uiRow ) );
+    return oResult.Shift( a_uiColumn, a_uiRow );
 }
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, M, ( N > 1 ? N-1 : 1 ) > Matrix< T, M, N >::
     MinusColumn( unsigned int a_uiColumn ) const
 {
-    return Matrix< T, M, ( N > 1 ? N-1 : 1 ) >(
-                                          BaseType::MinusColumn( a_uiColumn ) );
+    if( N == 1 )
+    {
+        throw( std::out_of_range( "Cannot remove column if there is only one" ) );
+    }
+    if( a_uiColumn >= N )
+    {
+        throw std::out_of_range( "Cannot remove non-existent matrix column" );
+    }
+    Matrix< T, M, ( N > 1 ? N-1 : 1 ) >
+        oResult( Matrix(*this).Shift( -1 - a_uiColumn ) );
+    return oResult.Shift( a_uiColumn );
 }
 template< typename T, unsigned int M, unsigned int N >
 inline Matrix< T, ( M > 1 ? M-1 : 1 ), N > Matrix< T, M, N >::
     MinusRow( unsigned int a_uiRow ) const
 {
-    return Matrix< T, ( M > 1 ? M-1 : 1 ), N >( BaseType::MinusRow( a_uiRow ) );
+    if( M == 1 )
+    {
+        throw( std::out_of_range( "Cannot remove row if there is only one" ) );
+    }
+    if( a_uiRow >= M )
+    {
+        throw std::out_of_range( "Cannot remove non-existent matrix row" );
+    }
+    Matrix< T, ( M > 1 ? M-1 : 1 ), N >
+        oResult( Matrix(*this).Shift( 0, -1 - a_uiRow ) );
+    return oResult.Shift( 0, a_uiRow );
 }
-    
-// Transpose - redefine in child classes to return correct type
+
+// Shift elements right/down the given number of spaces, wrapping around the
+// ends of columns and rows
+// Example:
+// Matrix m = { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } };
+// m.Shift( 1, 1 );
+// // m == { { 22, 20, 21 }, { 2, 0, 1 }, { 12, 10, 11 } }
+// m.Shift( -1, -1 );
+// // m == { { 0, 1, 2 }, { 10, 11, 12 }, { 20, 21, 22 } }
 template< typename T, unsigned int M, unsigned int N >
-inline typename Matrix< T, M, N >::TransposeType Matrix< T, M, N >::Transpose() const
+inline Matrix< T, M, N >& Matrix< T, M, N >::Shift( int a_iRight, int a_iDown )
 {
-    return TransposeType( BaseType::Transpose() );
+    Matrix oCopy(*this);
+    for( unsigned int i = 0; i < M*N; ++i )
+    {
+        m_aaData[ Scroll<int>( a_iDown + i/N, M ) ]
+                [ Scroll<int>( a_iRight + i, N ) ] = oCopy[i/N][i%N];
+    }
+    return *this;
+}
+
+// Round all elements to nearest whole number
+// Optionally, divide by the given number first, then multiply by it after
+template< typename T, unsigned int M, unsigned int N >
+inline Matrix< T, M, N >& Matrix< T, M, N >::Round()
+{
+    for( unsigned int i = 0; i < M*N; ++i )
+    {
+        m_aaData[i/N][i%N] = Math::Round( m_aaData[i/N][i%N] );
+    }
+    return *this;
+}
+
+// Return transpose of a matrix
+template< typename T, unsigned int M, unsigned int N >
+inline typename Matrix< T, M, N >::TransposeType
+    Matrix< T, M, N >::Transpose() const
+{
+    TransposeType oTranspose;
+    for(unsigned int i = 0; i < M*N; ++i )
+    {
+        oTranspose[i%N][i/N] = m_aaData[i/N][i%N];
+    }
+    return oTranspose;
+}
+template< typename T, unsigned int M, unsigned int N >
+inline typename Matrix< T, M, N >::TransposeType
+    Matrix< T, M, N >::ConjugateTranspose() const
+{
+    TransposeType oTranspose;
+    for(unsigned int i = 0; i < M*N; ++i )
+    {
+        oTranspose[i%N][i/N] = ComplexConjugate( m_aaData[i/N][i%N] );
+    }
+    return oTranspose;
 }
 
 }   // namespace Math

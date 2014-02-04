@@ -75,14 +75,11 @@
     <None Include="Implementations\ColorVector_Templates.inl" />
     <None Include="Implementations\Functions.inl" />
     <None Include="Implementations\HomogeneousVector.inl" />
-    <None Include="Implementations\HomogeneousVector_Plane.inl" />
-    <None Include="Implementations\HomogeneousVector_Space.inl" />
     <None Include="Implementations\HomogeneousVector_Templates.inl" />
     <None Include="Implementations\Matrix.inl" />
-    <None Include="Implementations\MatrixBase.inl" />
-    <None Include="Implementations\MatrixBase_CopyConstructors.inl" />
-    <None Include="Implementations\MatrixBase_FillConstructors.inl" />
+    <None Include="Implementations\Matrix_AssignOperators.inl" />
     <None Include="Implementations\Matrix_Constructors.inl" />
+    <None Include="Implementations\Matrix_MathFunctions.inl" />
     <None Include="Implementations\Matrix_Operators.inl" />
     <None Include="Implementations\PointVector.inl" />
     <None Include="Implementations\PointVector_Templates.inl" />
@@ -92,8 +89,7 @@
     <None Include="Implementations\Vector.inl" />
     <None Include="Implementations\Vector_Constructors.inl" />
     <None Include="Implementations\Vector_Operators.inl" />
-    <None Include="ReadMe.txt" />
-    <None Include="Implementations\VectorBase.inl" />
+    <None Include="README.pdf" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Declarations\ColorConstants.h" />
@@ -109,9 +105,7 @@
     <ClInclude Include="InlineMath.h" />
     <ClInclude Include="StaticMath.h" />
     <ClInclude Include="Declarations\Matrix.h" />
-    <ClInclude Include="Declarations\MatrixBase.h" />
     <ClInclude Include="Declarations\Vector.h" />
-    <ClInclude Include="Declarations\VectorBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Math.cpp" />

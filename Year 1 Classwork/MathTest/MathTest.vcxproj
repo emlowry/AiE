@@ -75,15 +75,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Matrix3x3TestGroup.h" />
+    <ClInclude Include="Matrix4x4TestGroup.h" />
+    <ClInclude Include="Vector2TestGroup.h" />
+    <ClInclude Include="MathTestGroup.h" />
     <ClInclude Include="UnitTest.h" />
     <ClInclude Include="UnitTester.h" />
     <ClInclude Include="UnitTestGroup.h" />
+    <ClInclude Include="Vector3TestGroup.h" />
+    <ClInclude Include="Vector4TestGroup.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Matrix3x3TestGroup.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MathTestGroup.cpp" />
+    <ClCompile Include="Matrix4x4TestGroup.cpp" />
     <ClCompile Include="UnitTest.cpp" />
     <ClCompile Include="UnitTester.cpp" />
     <ClCompile Include="UnitTestGroup.cpp" />
+    <ClCompile Include="Vector2TestGroup.cpp" />
+    <ClCompile Include="Vector3TestGroup.cpp" />
+    <ClCompile Include="Vector4TestGroup.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

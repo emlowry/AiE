@@ -17,11 +17,9 @@
 #include "Declarations/Hex.h"
 #include "Declarations/HomogeneousVector.h"
 #include "Declarations/Matrix.h"
-#include "Declarations/MatrixBase.h"
 #include "Declarations/MostDerivedAddress.h"
 #include "Declarations/PointVector.h"
 #include "Declarations/Transform.h"
 #include "Declarations/Vector.h"
-#include "Declarations/VectorBase.h"
 
 #endif  // STATIC_MATH__H

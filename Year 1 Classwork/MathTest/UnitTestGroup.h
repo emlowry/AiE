@@ -4,7 +4,7 @@
  * Date Created:       January 5, 2014
  * Description:        Class representing a group of tests.
  * Last Modified:      January 5, 2014
- * Last Modification:  Creation.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef UNIT_TEST_GROUP__H

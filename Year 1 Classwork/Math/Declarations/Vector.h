@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Base class for vectors of numeric type.
- * Last Modified:      December 10, 2013
+ * Last Modified:      January 5, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -11,8 +11,7 @@
 #define VECTOR__H
 
 #include "Matrix.h"
-#include "VectorBase.h"
-// #include <type_traits>   // for common_type
+#include <type_traits>  // for enable_if and is_scalar
 
 namespace Math
 {
@@ -20,130 +19,120 @@ namespace Math
 // A vector handles some things a bit differently than a matrix of the same size
 template< typename T, unsigned int N, bool t_bIsRow = true >
 class Vector
-    : public virtual VectorBase< T, N, t_bIsRow >,
-      public virtual Matrix< T, ( t_bIsRow ? 1 : N ), ( t_bIsRow ? N : 1 ) >
+    : public Matrix< T, ( t_bIsRow ? 1 : N ), ( t_bIsRow ? N : 1 ) >
 {
 public:
 
     // simplify typing
-    typedef MatrixBase< T, ROWS, COLUMNS > RootType;
-    typedef VectorBase< T, N, t_bIsRow > BaseType;
+    typedef Matrix< T, ROWS, COLUMNS > BaseType;
     typedef Vector< T, N, false > ColumnVectorType;
     typedef Vector< T, N > RowVectorType;
-    typedef Matrix< T, ROWS, COLUMNS > MatrixType;
     typedef Vector< T, 1 > IdentityType;
     typedef Vector< typename MatrixInverse< T >::Type, N, !t_bIsRow > InverseType;
     typedef Vector< T, N, !t_bIsRow > TransposeType;
     typedef Vector< typename MatrixInverse< T >::Type, N, t_bIsRow > NormalType;
-
-    // inherit assignment operators
-    using BaseType::operator=;
 
     // destructor
     virtual ~Vector();
 
     // Constructors that forward to base class constructors
     Vector();
-    Vector( const Vector& ac_roVector );
-    Vector( const BaseType& ac_roVector );
-    Vector( const RootType& ac_roMatrix );
-    Vector( Vector&& a_rroVector );
-    Vector( BaseType&& a_rroVector );
-    Vector( RootType&& a_rroMatrix );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill< T >() );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    Vector( Vector< T, Q, t_bOtherIsRow >&& a_rroVector,
-            const T& ac_rFill = DefaultFill< T >() );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    Vector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill< T >() );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    Vector( VectorBase< T, Q, t_bOtherIsRow >&& a_rroVector,
-            const T& ac_rFill = DefaultFill< T >() );
     template< typename U, unsigned int P, unsigned int Q >
-    Vector( const MatrixBase< U, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DefaultFill< T >() );
-    template< unsigned int P, unsigned int Q >
-    Vector( MatrixBase< T, P, Q >&& a_rroMatrix,
+    Vector( const Matrix< U, P, Q >& ac_roMatrix,
             const T& ac_rFill = DefaultFill< T >() );
     Vector( const T& ac_rFill );
     Vector( const T (&ac_raData)[ N ] );
-    Vector( const T* const ac_cpData,
-            const unsigned int ac_uiSize,
-            const T& ac_rFill = DefaultFill< T >() );
+
+    // Assignment operators that pass to base class
+    template< typename U, unsigned int P, unsigned int Q >
+    Vector& operator=( const Matrix< U, P, Q >& ac_roMatrix );
+    Vector& operator=( const T& ac_rFill );
+    Vector& operator=( const T (&ac_raData)[ N ] );
     
-    // Copy assign, move assign, and assign from a different type of vector
-    // These are specified to remove ambiguity between MatrixBase::operator= and
-    // VectorBase::operator=, since both could work - MatrixBase::operator= is
-    // available through inheritance from Matrix, VectorBase::operator= through
-    // inheritance from VectorBase.
+    // Construct from another type of vector
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
+            const T& ac_rFill = DefaultFill< T >() );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     Vector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    Vector& operator=( Vector< T, Q, t_bOtherIsRow >&& a_rroVector );
+    Vector& operator=( const Vector& ac_roMatrix )
+    { return operator=< T, N, t_bIsRow >( ac_roMatrix ); }
     
-    // Element access - hides matrix class row-returning implementation
-    //T& operator[]( unsigned int a_uiIndex );
-    //const T& operator[]( unsigned int a_uiIndex ) const;
-    using BaseType::operator[];
+    // Element access - hides parent class row-returning implementation
+    T& operator[]( unsigned int a_uiIndex );
+    T& At( const unsigned int ac_uiIndex );
+    const T& operator[]( unsigned int a_uiIndex ) const;
+    const T& At( const unsigned int ac_uiIndex ) const;
+
+    // Instead of getting a row or column of a matrix, return this vector in row
+    // or column form.
+    ColumnVectorType Column() const;
+    RowVectorType Row() const;
+
+    // Get a smaller vector by removing an element
+    Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
+        MinusElement( unsigned int a_uiIndex ) const;
+
+    // Shift elements by the given number of places
+    Vector& Shift( int a_iPlaces );
 
     // Non-virtual overrides to return correct type, since return type is
     // concrete and not a pointer or reference.
-    ColumnVectorType Column() const;
-    RowVectorType Row() const;
     InverseType Inverse() const;
     InverseType Inverse( bool& a_rbInvertable ) const;
-    Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
-        MinusElement( unsigned int a_uiIndex ) const;
     TransposeType Transpose() const;
+    TransposeType ConjugateTranspose() const;
 
     // Dot and cross products
     T Dot( const Vector& ac_roVector ) const;
     T Dot( const TransposeType& ac_roVector ) const;
-    Vector Cross( const Vector& ac_roVector
-                        = ( N > 2 ? Unit(1) : Zero() ) ) const;
-    Vector Cross( const TransposeType& ac_roVector
-                        = ( N > 2 ? TransposeType::Unit(1)
-                                  : TransposeType::Zero() ) ) const;
+    Vector Cross( const Vector& ac_roVector = Zero() ) const;
+    Vector Cross( const TransposeType& ac_roVector ) const;
 
     // Normalization
     typename MatrixInverse< T >::Type Magnitude() const;
     T MagnitudeSquared() const; // for efficiency in complex calculations
-    void Normalize();
+    Vector& Normalize();
     NormalType Normal() const;
 
     // Matrix multiplication and division overrides so the operators won't be
     // hidden by the scalar multiplication and division operator overrides
     template< unsigned int P >
-    Matrix< T, ( t_bIsRow ? 1 : N ), P >
+    typename std::conditional< t_bIsRow, Vector< T, P >, Matrix< T, N, P > >::type
         operator*( const Matrix< T, ( t_bIsRow ? N : 1 ), P >& ac_roMatrix ) const;
     template< unsigned int P >
-    Matrix< typename MatrixInverse< T >::Type, ( t_bIsRow ? 1 : N ), P >
+    typename std::conditional< t_bIsRow, Vector< typename MatrixInverse< T >::Type, P >,
+                               Matrix< typename MatrixInverse< T >::Type, N, P > >::type
         operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const;
     Vector& operator*=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
     Vector& operator/=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
 
     // Scalar multiplication/division/modulo overrides to return correct type
+    Vector operator-() const;
     template< typename U >
-    Vector& operator*=( const U& ac_rScalar );
+    typename std::enable_if< std::is_scalar< U >::value, Vector& >::type
+        operator*=( const U& ac_rScalar );
     template< typename U >
-    Vector operator*( const U& ac_rScalar ) const;
+    typename std::enable_if< std::is_scalar< U >::value, Vector >::type
+        operator*( const U& ac_rScalar ) const;
     template< typename U >
-    Vector& operator/=( const U& ac_rScalar );
+    typename std::enable_if< std::is_scalar< U >::value, Vector& >::type
+        operator/=( const U& ac_rScalar );
     template< typename U >
-    Vector operator/( const U& ac_rScalar ) const;
+    typename std::enable_if< std::is_scalar< U >::value, Vector >::type
+        operator/( const U& ac_rScalar ) const;
     template< typename U >
-    Vector& operator%=( const U& ac_rScalar );
+    typename std::enable_if< std::is_scalar< U >::value, Vector& >::type
+        operator%=( const U& ac_rScalar );
     template< typename U >
-    Vector operator%( const U& ac_rScalar ) const;
+    typename std::enable_if< std::is_scalar< U >::value, Vector >::type
+        operator%( const U& ac_rScalar ) const;
 
     // Matrix addition/subtraction overrides to return correct type
-    Vector& operator+=( const MatrixType& ac_roMatrix );
-    Vector operator+( const MatrixType& ac_roMatrix ) const;
-    Vector& operator-=( const MatrixType& ac_roMatrix );
-    Vector operator-( const MatrixType& ac_roMatrix ) const;
+    Vector& operator+=( const BaseType& ac_roMatrix );
+    Vector operator+( const BaseType& ac_roMatrix ) const;
+    Vector& operator-=( const BaseType& ac_roMatrix );
+    Vector operator-( const BaseType& ac_roMatrix ) const;
 
     // Vector addition and subtraction
     // Non-virtual overrides for arithmatic with another vector - vector
@@ -165,6 +154,9 @@ public:
     static const Vector& Zero();
     static const Vector& Unit( unsigned int a_uiAxis );
 
+    static const unsigned int IS_ROW_VECTOR = t_bIsRow;
+    static const unsigned int SIZE = N;
+
 private:
 
     // Hide parent class functions that you shouldn't be using unless you are
@@ -176,9 +168,9 @@ private:
     // Non-virtual override - if explicitly treated as a matrix, then matrix
     // implementation should be available, otherwise no implementation should be
     // available
-    typedef typename MatrixType::ColumnVectorType BaseColumnVectorType;
+    typedef typename BaseType::ColumnVectorType BaseColumnVectorType;
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
-    typedef typename MatrixType::RowVectorType BaseRowVectorType;
+    typedef typename BaseType::RowVectorType BaseRowVectorType;
     BaseRowVectorType Row( unsigned int ac_uiIndex ) const;
     Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
         MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const;
@@ -186,7 +178,7 @@ private:
         MinusColumn( unsigned int a_uiColumn ) const;
     Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow ? N : 1 ) >
         MinusRow( unsigned int a_uiRow ) const;
-    void Shift( int a_iRight, int a_iDown = 0 );
+    void Shift( int a_iRight, int a_iDown );
 
 };
 
@@ -194,11 +186,14 @@ private:
 
 // Vector scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
-Math::Vector< T, N, t_bIsRow >
+typename std::enable_if< std::is_scalar< U >::value,
+                         Math::Vector< T, N, t_bIsRow > >::type
     operator*( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow >& ac_roVector );
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
-typename Math::Vector< T, N, t_bIsRow >::InverseType
+typename std::enable_if< std::is_scalar< U >::value,
+                         typename Math::Vector< T, N, t_bIsRow >
+                                      ::InverseType >::type
     operator/( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow >& ac_roVector );
 

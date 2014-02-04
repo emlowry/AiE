@@ -4,7 +4,7 @@
  * Date Created:       January 5, 2014
  * Description:        Runs a list of unit test groups.
  * Last Modified:      January 5, 2014
- * Last Modification:  Creation.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef UNIT_TESTER__H

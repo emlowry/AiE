@@ -3,121 +3,175 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 17, 2013
  * Description:        Arithmatic operator implementations for Vector.h.
- * Last Modified:      December 17, 2013
- * Last Modification:  Moving code out of Vector.inl.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef VECTOR__OPERATORS__INL
 #define VECTOR__OPERATORS__INL
 
+#include <stdexcept>    // for out_of_range
+#include <type_traits>  // for enable_if and is_scalar
+
 namespace Math
 {
+
+// Vector element access
+template< typename T, unsigned int N, bool t_bIsRow >
+inline T& Vector< T, N, t_bIsRow >::At( unsigned int a_uiIndex )
+{
+    if( a_uiIndex >= N )
+    {
+        throw std::out_of_range( "Cannot access non-existent vector element" );
+    }
+    return ( t_bIsRow ? m_aaData[0][a_uiIndex] : m_aaData[a_uiIndex][0] );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline T& Vector< T, N, t_bIsRow >::operator[]( unsigned int a_uiIndex )
+{
+    return At( a_uiIndex );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline const T& Vector< T, N, t_bIsRow >::At( unsigned int a_uiIndex ) const
+{
+    if( a_uiIndex >= N )
+    {
+        throw std::out_of_range( "Cannot access non-existent vector element" );
+    }
+    return ( t_bIsRow ? m_aaData[0][a_uiIndex] : m_aaData[a_uiIndex][0] );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline const T& Vector< T, N, t_bIsRow >::
+    operator[]( unsigned int a_uiIndex ) const
+{
+    return At( a_uiIndex );
+}
 
 // Matrix multiplication and division overrides so the operators won't be
 // hidden by the scalar multiplication and division operator overrides
 template< typename T, unsigned int N, bool t_bIsRow >
 template< unsigned int P >
-inline Matrix< T, ( t_bIsRow ? 1 : N ), P > Vector< T, N, t_bIsRow >::
+inline typename std::conditional< t_bIsRow, Vector< T, P >,
+                                            Matrix< T, N, P > >::type
+    Vector< T, N, t_bIsRow >::
     operator*( const Matrix< T, ( t_bIsRow ? N : 1 ), P >& ac_roMatrix ) const
 {
-    return MatrixType::operator*( ac_roMatrix );
+    typedef typename std::conditional< t_bIsRow, Vector< T, P >,
+                                                 Matrix< T, N, P > >::type
+            ResultType;
+    return ResultType( BaseType::operator*( ac_roMatrix ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< unsigned int P >
-inline Matrix< typename MatrixInverse< T >::Type, ( t_bIsRow ? 1 : N ), P >
+inline typename std::conditional< t_bIsRow, Vector< typename MatrixInverse< T >::Type, P >,
+                                  Matrix< typename MatrixInverse< T >::Type, N, P > >::type
     Vector< T, N, t_bIsRow >::
     operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const
 {
-    return MatrixType::operator/( ac_roMatrix );
+    typedef typename std::conditional< t_bIsRow, Vector< typename MatrixInverse< T >::Type, P >,
+                                       Matrix< typename MatrixInverse< T >::Type, N, P > >::type
+            ResultType;
+    return ResultType( BaseType::operator/( ac_roMatrix ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::
     operator*=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix )
 {
-    Matrix::operator*=( ac_roMatrix );
+    BaseType::operator*=( ac_roMatrix );
     return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::
     operator/=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix )
 {
-    Matrix::operator/=( ac_roMatrix );
+    BaseType::operator/=( ac_roMatrix );
     return *this;
 }
 
 // Scalar multiplication, division, and modulo overrides to return correct type
 template< typename T, unsigned int N, bool t_bIsRow >
+inline Vector< T, N, t_bIsRow > Vector< T, N, t_bIsRow >::operator-() const
+{
+    return operator*( -1 );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
-inline Vector< T, N, t_bIsRow >&
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Vector< T, N, t_bIsRow >& >::type
     Vector< T, N, t_bIsRow >::operator*=( const U& ac_rScalar )
 {
-    MatrixType::operator*=( ac_rScalar );
+    BaseType::operator*=( ac_rScalar );
     return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
-inline Vector< T, N, t_bIsRow >
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Vector< T, N, t_bIsRow > >::type
     Vector< T, N, t_bIsRow >::operator*( const U& ac_rScalar ) const
 {
-    return Vector( MatrixType::operator*( ac_rScalar ) );
+    return Vector( BaseType::operator*( ac_rScalar ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
-inline Vector< T, N, t_bIsRow >&
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Vector< T, N, t_bIsRow >& >::type
     Vector< T, N, t_bIsRow >::operator/=( const U& ac_rScalar )
 {
-    MatrixType::operator/=( ac_rScalar );
+    BaseType::operator/=( ac_rScalar );
     return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
-inline Vector< T, N, t_bIsRow >
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Vector< T, N, t_bIsRow > >::type
     Vector< T, N, t_bIsRow >::operator/( const U& ac_rScalar ) const
 {
-    return Vector( MatrixType::operator/( ac_rScalar ) );
+    return Vector( BaseType::operator/( ac_rScalar ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
-inline Vector< T, N, t_bIsRow >&
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Vector< T, N, t_bIsRow >& >::type
     Vector< T, N, t_bIsRow >::operator%=( const U& ac_rScalar )
 {
-    MatrixType::operator%=( ac_rScalar );
+    BaseType::operator%=( ac_rScalar );
     return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< typename U >
-inline Vector< T, N, t_bIsRow >
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Vector< T, N, t_bIsRow > >::type
     Vector< T, N, t_bIsRow >::operator%( const U& ac_rScalar ) const
 {
-    return Vector( MatrixType::operator%( ac_rScalar ) );
+    return Vector( BaseType::operator%( ac_rScalar ) );
 }
 
 // Matrix addition/subtraction overrides to return correct type
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >&
-    Vector< T, N, t_bIsRow >::operator+=( const MatrixType& ac_roMatrix )
+    Vector< T, N, t_bIsRow >::operator+=( const BaseType& ac_roMatrix )
 {
-    MatrixType::operator+=( ac_roMatrix );
+    BaseType::operator+=( ac_roMatrix );
     return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >
-    Vector< T, N, t_bIsRow >::operator+( const MatrixType& ac_roMatrix ) const
+    Vector< T, N, t_bIsRow >::operator+( const BaseType& ac_roMatrix ) const
 {
-    return Vector( MatrixType::operator+( ac_roMatrix ) );
+    return Vector( BaseType::operator+( ac_roMatrix ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >&
-    Vector< T, N, t_bIsRow >::operator-=( const MatrixType& ac_roMatrix )
+    Vector< T, N, t_bIsRow >::operator-=( const BaseType& ac_roMatrix )
 {
-    MatrixType::operator-=( ac_roMatrix );
+    BaseType::operator-=( ac_roMatrix );
     return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >
-    Vector< T, N, t_bIsRow >::operator-( const MatrixType& ac_roMatrix ) const
+    Vector< T, N, t_bIsRow >::operator-( const BaseType& ac_roMatrix ) const
 {
-    return Vector( MatrixType::operator-( ac_roMatrix ) );
+    return Vector( BaseType::operator-( ac_roMatrix ) );
 }
 
 // Vector addition
@@ -200,14 +254,17 @@ inline Vector< T, N, t_bIsRow > Vector< T, N, t_bIsRow >::
 
 // Vector scalar multiplication and division in the other direction
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
-inline Math::Vector< T, N, t_bIsRow >
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                Math::Vector< T, N, t_bIsRow > >::type
     operator*( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow >& ac_roVector )
 {
     return ac_roVector.operator*( ac_rScalar );
 }
 template< typename U, typename T, unsigned int N, bool t_bIsRow >
-inline typename Math::Vector< T, N, t_bIsRow >::InverseType
+inline typename std::enable_if< std::is_scalar< U >::value,
+                                typename Math::Vector< T, N, t_bIsRow >
+                                             ::InverseType >::type
     operator/( const U& ac_rScalar,
                const Math::Vector< T, N, t_bIsRow >& ac_roVector )
 {

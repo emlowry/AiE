@@ -4,7 +4,7 @@
  * Date Created:       January 5, 2014
  * Description:        Class representing a single test.
  * Last Modified:      January 5, 2014
- * Last Modification:  Creation.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef UNIT_TEST__H
@@ -33,8 +33,8 @@ public:
 
     bool operator()( std::ostream& a_roOut = std::cout ) const;
 
-    static Result Fail( std::string a_oMessage );
-    static Result Pass( std::string a_oMessage );
+    static Result Fail( std::string a_oMessage = "" );
+    static Result Pass( std::string a_oMessage = "" );
 
     static const Result PASS;
     static const Result FAIL;

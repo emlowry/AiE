@@ -5,7 +5,7 @@
  * Description:        Inline function implementations for making scale
  *                      transformations.
  * Last Modified:      January 5, 2014
- * Last Modification:  Creation.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef TRANSFORM__SCALE__INL
@@ -73,7 +73,7 @@ inline Transform Scaling( double a_dFactor, const PointVector& ac_roOrigin )
 {
     Transform oScale = PointScaling( a_dFactor );
     oScale[3][3] = 1.0;
-    return oScale;
+    return TransformationAbout( oScale, ac_roOrigin );
 }
 
 // Scale by the given factors along each axis

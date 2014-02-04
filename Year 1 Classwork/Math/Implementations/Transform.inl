@@ -5,7 +5,7 @@
  * Description:        Inline function implementations for Transform.h.
  *                      Remember that this library uses row vectors, not column.
  * Last Modified:      January 5, 2014
- * Last Modification:  Creation.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef TRANSFORM__INL
@@ -29,8 +29,7 @@ inline Transform
     {
         return ac_roTransform;
     }
-    return Translation( ac_roOrigin.operator*( -1.0 ) )
-            * ac_roTransform * Translation( ac_roOrigin );
+    return Translation( -ac_roOrigin ) * ac_roTransform * Translation( ac_roOrigin );
 }
 
 }   // namespace Plane
@@ -47,8 +46,7 @@ inline Transform
     {
         return ac_roTransform;
     }
-    return Translation( ac_roOrigin.operator*( -1.0 ) )
-            * ac_roTransform * Translation( ac_roOrigin );
+    return Translation( -ac_roOrigin ) * ac_roTransform * Translation( ac_roOrigin );
 }
 
 // Perspective project onto plane z = -nearDistance.  Remap coordinates from
@@ -60,25 +58,22 @@ inline Transform
                            const Plane::PointVector& ac_roScreenSize,
                            const Plane::PointVector& ac_roScreenCenter)
 {
+    const Point2D& roSize = ac_roScreenSize;
+    const Point2D& roCenter = ac_roScreenCenter;
     // x' = x/sizeX + centerX*z
     // y' = y/sizeY + centerY*z
     // z' = -far*(z + near)/(far - near)
     // w' = -z
     // x'/w' = x/(-z*sizeX) - centerX
     // y'/w' = y/(-z*sizeY) - centerY
-    // z'/w' = far*(1 - near/z)/(far - near)
+    // z'/w' = far*(1 + near/z)/(far - near)
     double dDepth = a_dFarDistance - a_dNearDistance;
     double adProject[4][4] =
-    { { 1.0 / ac_roScreenSize.x, 0.0,                     0.0, 0.0 },
-      { 0.0,                     1.0 / ac_roScreenSize.y, 0.0, 0.0 },
-      { ac_roScreenCenter.x,
-        ac_roScreenCenter.y,
-        -1.0 * a_dFarDistance / dDepth,
-        -1.0 },
-      { 0.0,
-        0.0,
-        -1.0 * a_dFarDistance * a_dNearDistance / dDepth,
-        0.0 } };
+    { { 1.0 / roSize.x, 0.0,            0.0,                        0.0 },
+      { 0.0,            1.0 / roSize.y, 0.0,                        0.0 },
+      { roCenter.x,     roCenter.y,     -a_dFarDistance / dDepth,   -1.0 },
+      { 0.0,            0.0,        -a_dFarDistance * a_dNearDistance / dDepth,
+                                                                    0.0 } };
     return Transform( adProject );
 
 }
@@ -92,18 +87,17 @@ inline Transform
                         const Plane::PointVector& ac_roScreenSize,
                         const Plane::PointVector& ac_roScreenCenter)
 {
+    const Point2D& roSize = ac_roScreenSize;
+    const Point2D& roCenter = ac_roScreenCenter;
     // x' = x'/w' = x/sizeX - centerX
     // y' = y'/w' = y/sizeY - centerY
     // z' = z'/w' = (-z - near)/(far - near)
     double dDepth = a_dFarDistance - a_dNearDistance;
     double adProject[4][4] =
-    { { 1.0 / ac_roScreenSize.x, 0.0,                     0.0,           0.0 },
-      { 0.0,                     1.0 / ac_roScreenSize.y, 0.0,           0.0 },
-      { 0.0,                     0.0,                     -1.0 / dDepth, 0.0 },
-      { -1.0 * ac_roScreenCenter.x,
-        -1.0 * ac_roScreenCenter.y,
-        -a_dNearDistance,
-        1.0 } };
+    { { 1.0 / roSize.x, 0.0,            0.0,                        0.0 },
+      { 0.0,            1.0 / roSize.y, 0.0,                        0.0 },
+      { 0.0,            0.0,            -1.0 / dDepth,              0.0 },
+      { -roCenter.x,    -roCenter.y,    -a_dNearDistance / dDepth,  1.0 } };
     return Transform( adProject );
 }
 

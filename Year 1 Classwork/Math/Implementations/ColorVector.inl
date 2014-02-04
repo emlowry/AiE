@@ -4,8 +4,7 @@
  * Date Created:       December 16, 2013
  * Description:        Inline function implementations for ColorVector class.
  * Last Modified:      January 5, 2014
- * Last Modification:  Redistributed implementations between this file and other
- *                      inl files.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__INL
@@ -25,43 +24,64 @@ inline ColorVector::~ColorVector() {}
 
 // Constructors that forward to base class constructors
 inline ColorVector::ColorVector()
-    : BaseType( 0xFF ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : BaseType( 0xFF ),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] ) {}
 inline ColorVector::ColorVector( const ColorVector& ac_roVector )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const BaseType& ac_roVector )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const VectorBaseType& ac_roVector )
-    : BaseType( ac_roVector ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : BaseType( ac_roVector ),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] ) {}
 inline ColorVector::ColorVector( const RootType& ac_roMatrix )
-    : BaseType( ac_roMatrix ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : BaseType( ac_roMatrix ),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] ) {}
 inline ColorVector::ColorVector( ColorVector&& a_rroVector )
     : BaseType( std::forward< ColorVector >( a_rroVector ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( BaseType&& a_rroVector )
-    : BaseType( std::forward< BaseType >( a_rroVector ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( VectorBaseType&& a_rroVector )
-    : BaseType( std::forward< VectorBaseType >( a_rroVector ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( RootType&& a_rroMatrix )
-    : BaseType( std::forward< RootType >( a_rroMatrix ) ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] ) {}
 inline ColorVector::ColorVector( const Channel& ac_rFill )
-    : BaseType( ac_rFill ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : BaseType( ac_rFill ),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] ) {}
 inline ColorVector::ColorVector( const Channel (&ac_raData)[ 4 ] )
-    : BaseType( ac_raData ), a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
-inline ColorVector::ColorVector( const Channel* const ac_cpData,
-                                 const unsigned int ac_uiSize,
-                                 const Channel& ac_rFill )
-    : BaseType( ac_cpData, ac_uiSize, ac_rFill ),
-      a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) ) {}
+    : BaseType( ac_raData ),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] ) {}
+
+// Assignment operators that pass to base class
+inline ColorVector& ColorVector::operator=( const Channel& ac_rFill )
+{
+    BaseType::operator=( ac_rFill );
+    return *this;
+}
+inline ColorVector& ColorVector::operator=( const Channel (&ac_raData)[ 4 ] )
+{
+    BaseType::operator=( ac_raData );
+    return *this;
+}
 
 // Construct from hex value
 inline ColorVector::ColorVector( Channel a_ucRed,
                                  Channel a_ucGreen,
                                  Channel a_ucBlue,
                                  Channel a_ucAlpha )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+    : BaseType(),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] )
 {
     a = a_ucAlpha;
     r = a_ucRed;
@@ -72,7 +92,11 @@ inline ColorVector::ColorVector( float a_fRed,
                                  float a_fGreen,
                                  float a_fBlue,
                                  float a_fAlpha )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+    : BaseType(),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] )
 {
     a = (Channel)( a_fAlpha * 0xFF );
     r = (Channel)( a_fRed * 0xFF );
@@ -80,7 +104,11 @@ inline ColorVector::ColorVector( float a_fRed,
     b = (Channel)( a_fBlue * 0xFF );
 }
 inline ColorVector::ColorVector( FourChannelInt a_uiHex )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+    : BaseType(),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] )
 {
     a = Hex(a_uiHex).a;
     r = Hex(a_uiHex).r;
@@ -88,7 +116,11 @@ inline ColorVector::ColorVector( FourChannelInt a_uiHex )
     b = Hex(a_uiHex).b;
 }
 inline ColorVector::ColorVector( const Hex& ac_rHex )
-    : a( At(0) ), r( At(1) ), g( At(2) ), b( At(3) )
+    : BaseType(),
+      a( m_aaData[0][0] ),
+      r( m_aaData[0][1] ),
+      g( m_aaData[0][2] ),
+      b( m_aaData[0][3] )
 {
     a = ac_rHex.a;
     r = ac_rHex.r;
@@ -119,135 +151,74 @@ inline ColorVector ColorVector::operator~() const
 {
     return ColorVector( ~( (Hex)(*this) ) );
 }
-inline ColorVector
-    ColorVector::operator&( const ColorVector& ac_roVector ) const
+inline ColorVector ColorVector::operator&( const ColorVector& ac_roVector ) const
 {
-    return operator&( (Hex)(ac_roVector) );
+    return operator&( (Hex)ac_roVector );
+}
+inline ColorVector ColorVector::operator|( const ColorVector& ac_roVector ) const
+{
+    return operator|( (Hex)ac_roVector );
+}
+inline ColorVector ColorVector::operator^( const ColorVector& ac_roVector ) const
+{
+    return operator^( (Hex)ac_roVector );
 }
 inline ColorVector
-    ColorVector::operator|( const ColorVector& ac_roVector ) const
+    ColorVector::operator&( const Hex& ac_roHex ) const
 {
-    return operator|( (Hex)(ac_roVector) );
+    return ColorVector( (Hex)(*this) & ac_roHex );
 }
 inline ColorVector
-    ColorVector::operator^( const ColorVector& ac_roVector ) const
+    ColorVector::operator|( const Hex& ac_roHex ) const
 {
-    return operator^( (Hex)(ac_roVector) );
+    return ColorVector( (Hex)(*this) | ac_roHex );
+}
+inline ColorVector
+    ColorVector::operator^( const Hex& ac_roHex ) const
+{
+    return ColorVector( (Hex)(*this) ^ ac_roHex );
+}
+inline ColorVector
+    ColorVector::operator<<( unsigned char a_ucBits ) const
+{
+    return ColorVector( (Hex)(*this) << a_ucBits );
+}
+inline ColorVector
+    ColorVector::operator>>( unsigned char a_ucBits ) const
+{
+    return ColorVector( (Hex)(*this) << a_ucBits );
 }
 inline ColorVector& ColorVector::operator&=( const ColorVector& ac_roVector )
 {
-    return operator&=( (Hex)(ac_roVector) );
+    return operator&=( (Hex)ac_roVector );
 }
 inline ColorVector& ColorVector::operator|=( const ColorVector& ac_roVector )
 {
-    return operator|=( (Hex)(ac_roVector) );
+    return operator|=( (Hex)ac_roVector );
 }
 inline ColorVector& ColorVector::operator^=( const ColorVector& ac_roVector )
 {
-    return operator^=( (Hex)(ac_roVector) );
+    return operator^=( (Hex)ac_roVector );
 }
-inline ColorVector ColorVector::operator&( const Hex& ac_rHex ) const
+inline ColorVector& ColorVector::operator&=( const Hex& ac_roHex )
 {
-    return ( (Hex)(*this) & ac_rHex );
+    return operator=( (Hex)(*this) & ac_roHex );
 }
-inline ColorVector ColorVector::operator|( const Hex& ac_rHex ) const
+inline ColorVector& ColorVector::operator|=( const Hex& ac_roHex )
 {
-    return ( (Hex)(*this) | ac_rHex );
+    return operator=( (Hex)(*this) | ac_roHex );
 }
-inline ColorVector ColorVector::operator^( const Hex& ac_rHex ) const
+inline ColorVector& ColorVector::operator^=( const Hex& ac_roHex )
 {
-    return ( (Hex)(*this) ^ ac_rHex );
+    return operator=( (Hex)(*this) ^ ac_roHex );
 }
-inline ColorVector& ColorVector::operator&=( const Hex& ac_rHex )
+inline ColorVector& ColorVector::operator<<=( unsigned char a_ucBits )
 {
-    operator=( operator&( ac_rHex ) );
-    return *this;
+    return operator=( (Hex)(*this) << a_ucBits );
 }
-inline ColorVector& ColorVector::operator|=( const Hex& ac_rHex )
+inline ColorVector& ColorVector::operator>>=( unsigned char a_ucBits )
 {
-    operator=( operator|( ac_rHex ) );
-    return *this;
-}
-inline ColorVector& ColorVector::operator^=( const Hex& ac_rHex )
-{
-    operator=( operator^( ac_rHex ) );
-    return *this;
-}
-
-// arithmatic operators for use with other color vectors
-inline ColorVector
-    ColorVector::operator+( const ColorVector& ac_roVector ) const
-{
-    return operator+( (Hex)(ac_roVector) );
-}
-inline ColorVector
-    ColorVector::operator-( const ColorVector& ac_roVector ) const
-{
-    return operator-( (Hex)(ac_roVector) );
-}
-inline ColorVector
-    ColorVector::operator*( const ColorVector& ac_roVector ) const
-{
-    return operator*( (Hex)(ac_roVector) );
-}
-inline ColorVector
-    ColorVector::operator/( const ColorVector& ac_roVector ) const
-{
-    return operator/( (Hex)(ac_roVector) );
-}
-inline ColorVector& ColorVector::operator+=( const ColorVector& ac_roVector )
-{
-    return operator+=( (Hex)(ac_roVector) );
-}
-inline ColorVector& ColorVector::operator-=( const ColorVector& ac_roVector )
-{
-    return operator-=( (Hex)(ac_roVector) );
-}
-inline ColorVector& ColorVector::operator*=( const ColorVector& ac_roVector )
-{
-    return operator*=( (Hex)(ac_roVector) );
-}
-inline ColorVector& ColorVector::operator/=( const ColorVector& ac_roVector )
-{
-    return operator/=( (Hex)(ac_roVector) );
-}
-
-// arithmatic operators for use with color hexes
-inline ColorVector ColorVector::operator+( const Hex& ac_rHex ) const
-{
-    return ColorVector( (Hex)(*this) + ac_rHex );
-}
-inline ColorVector ColorVector::operator-( const Hex& ac_rHex ) const
-{
-    return ColorVector( (Hex)(*this) - ac_rHex );
-}
-inline ColorVector ColorVector::operator*( const Hex& ac_rHex ) const
-{
-    return ColorVector( (Hex)(*this) * ac_rHex );
-}
-inline ColorVector ColorVector::operator/( const Hex& ac_rHex ) const
-{
-    return ColorVector( (Hex)(*this) / ac_rHex );
-}
-inline ColorVector& ColorVector::operator+=( const Hex& ac_rHex )
-{
-    *this = (Hex)(*this) + ac_rHex;
-    return *this;
-}
-inline ColorVector& ColorVector::operator-=( const Hex& ac_rHex )
-{
-    *this = (Hex)(*this) - ac_rHex;
-    return *this;
-}
-inline ColorVector& ColorVector::operator*=( const Hex& ac_rHex )
-{
-    *this = (Hex)(*this) * ac_rHex;
-    return *this;
-}
-inline ColorVector& ColorVector::operator/=( const Hex& ac_rHex )
-{
-    *this = (Hex)(*this) / ac_rHex;
-    return *this;
+    return operator=( (Hex)(*this) >> a_ucBits );
 }
 
 // Return rgb values as floats

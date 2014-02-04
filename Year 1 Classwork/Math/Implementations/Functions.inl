@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 4, 2013
  * Description:        Inline and template function implementations.
- * Last Modified:      December 10, 2013
+ * Last Modified:      January 5, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -11,7 +11,8 @@
 #define FUNCTIONS__INL
 
 #include "Declarations/Functions.h"
-#include <cmath>    // for fmod, log2, ciel, floor, exp2, fdim
+#include <cmath>    // for fmod, log, pow, abs
+#include <type_traits>  // for enable_if, is_same, and is_floating_point
 
 namespace Math
 {
@@ -34,75 +35,118 @@ inline T Interpolate( const T& ac_rPointA,
                       const T& ac_rPointB,
                       float a_fProgress )
 {
-    return ac_roPointA + ( a_fProgress * ( ac_roPointB - ac_roPointA ) );
+    return (T)( ac_rPointA + ( a_fProgress * ( ac_rPointB - ac_rPointA ) ) );
 }
 
 // Call fmod for floating-point types and operator% for everything else
-template< typename T >
-inline T& ModuloAssign( T& a_rDividend, const T& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< !std::is_floating_point< T >::value &&
+                                !std::is_floating_point< U >::value, T >::type
+    Modulo( const T& ac_rDividend, const U& ac_rDivisor )
+{
+    return ac_rDividend % ac_rDivisor;
+}
+template< typename T, typename U >
+inline typename std::enable_if< !std::is_floating_point< T >::value &&
+                                !std::is_floating_point< U >::value, T& >::type
+     ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
 {
     a_rDividend %= ac_rDivisor;
     return a_rDividend;
 }
-template< typename T >
-inline T Modulo( const T& ac_rDividend, const T& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< std::is_same< long double, T >::value ||
+                                std::is_same< long double, U >::value, T >::type
+    Modulo( const T& ac_rDividend, const float& ac_rDivisor )
 {
-    return ac_rDividend % ac_rDivisor;
+    return (T)std::fmod( (long double)a_rDividend, (long double)ac_rDivisor );
 }
-template<>
-inline float& ModuloAssign< float >( float& a_rDividend,
-                                     const float& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< std::is_same< long double, T >::value ||
+                                std::is_same< long double, U >::value, T& >::type
+     ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
 {
-    a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+    a_rDividend = (T)std::fmod( (long double)a_rDividend, (long double)ac_rDivisor );
     return a_rDividend;
 }
-template<>
-inline float Modulo< float >( const float& ac_rDividend,
-                              const float& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< std::is_same< float, T >::value &&
+                                std::is_same< float, U >::value, T >::type
+    Modulo( const T& ac_rDividend, const float& ac_rDivisor )
 {
-    return std::fmod( ac_rDividend, ac_rDivisor );
+    return (T)std::fmod( (float)ac_rDividend, (float)ac_rDivisor );
 }
-template<>
-inline double& ModuloAssign< double >( double& a_rDividend,
-                                       const double& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< std::is_same< float, T >::value &&
+                                std::is_same< float, U >::value, T& >::type
+     ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
 {
-    a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+    a_rDividend = (T)std::fmod( (float)a_rDividend, (float)ac_rDivisor );
     return a_rDividend;
 }
-template<>
-inline double Modulo< double >( const double& ac_rDividend,
-                                const double& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< !std::is_same< long double, T >::value &&
+                                !std::is_same< long double, U >::value &&
+                                ( std::is_floating_point< T >::value ||
+                                  std::is_floating_point< U >::value ) &&
+                                !( std::is_same< float, T >::value &&
+                                   std::is_same< float, U >::value ), T >::type
+    Modulo( const T& ac_rDividend, const float& ac_rDivisor )
 {
-    return std::fmod( ac_rDividend, ac_rDivisor );
+    return (T)std::fmod( (double)ac_rDividend, (double)ac_rDivisor );
 }
-template<>
-inline long double& ModuloAssign< long double >( long double& a_rDividend,
-                                                 const long double& ac_rDivisor )
+template< typename T, typename U >
+inline typename std::enable_if< !std::is_same< long double, T >::value &&
+                                !std::is_same< long double, U >::value &&
+                                ( std::is_floating_point< T >::value ||
+                                  std::is_floating_point< U >::value ) &&
+                                !( std::is_same< float, T >::value &&
+                                   std::is_same< float, U >::value ), T& >::type
+     ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
 {
-    a_rDividend = std::fmod( a_rDividend, ac_rDivisor );
+    a_rDividend = (T)std::fmod( (double)a_rDividend, (double)ac_rDivisor );
     return a_rDividend;
-}
-template<>
-inline long double Modulo< long double >( const long double& ac_rDividend,
-                                          const long double& ac_rDivisor )
-{
-    return std::fmod( ac_rDividend, ac_rDivisor );
 }
 
 // Return the power of two closest to the given value
 template< typename T >
-inline T NearestPowerOfTwo( const T& ac_rValue )
+inline typename std::enable_if< std::is_scalar< T >::value, T >::type
+    NearestPowerOfTwo( const T& ac_rValue )
 {
-    assert( ac_rValue > 0 );
-    T cielPower = (T)std::exp2( std::ciel( std::log2( ac_rValue ) ) );
-    T floorPower = (T)std::exp2( std::floor( std::log2( ac_rValue ) ) );
-    return ( std::fdim( ac_rValue, cielPower ) <
-             std::fdim( ac_rValue, floorPower ) ) ? ceilPower : floorPower;
+    if( ac_rValue <= (T)0 )
+    {
+        return (T)1;
+    }
+    double dLog = std::log( (double)ac_rValue ) / std::log( 2.0 );
+    double dCeilPower = std::pow( 2.0, std::ceil( dLog ) );
+    double dFloorPower = std::pow( 2.0, std::floor( dLog ) );
+    /*
+    double dCeilPower = std::pow( 2.0, (int)( std::log( (double)ac_rValue ) /
+                                                std::log( 2.0 ) ) +
+                                        ( ac_rValue < 1 ? -1 : 1 ) );
+    double dFloorPower = std::pow( 2.0, (int)( std::log( (double)ac_rValue ) /
+                                                std::log( 2.0 ) ) );*/
+    return (T)( ( std::fabs( (double)ac_rValue - dCeilPower ) <
+                  std::fabs( (double)ac_rValue - dFloorPower ) )
+                ? dCeilPower : dFloorPower );
+}
+
+// Round to nearest whole number
+template< typename T >
+inline typename std::enable_if< std::is_scalar< T >::value, T >::type
+    Round( const T& ac_rValue )
+{
+    double dCeil = std::ceil( (double)ac_rValue );
+    double dFloor = std::floor( (double)ac_rValue );
+    return (T)( ( std::fabs( (double)ac_rValue - dCeil ) <
+                  std::fabs( (double)ac_rValue - dFloor ) )
+                ? dCeil : dFloor );
 }
 
 // Scroll a value into the given bounds.
 template< typename T >
-T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
+typename std::enable_if< std::is_scalar< T >::value, T >::type
+    Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
 {
     // If the upper and lower bounds are the same number, than the only result
     // in range is said number.
@@ -146,6 +190,14 @@ T Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
     ModuloAssign( result, interval );
     result += ( result < 0 ? ac_rMax : ac_rMin );
     return result;
+}
+
+// Complex conjugate (if you ever want to use a matrix full of complex numbers,
+// you'll need to define an explicit specialization for this function).
+template< typename T >
+inline T ComplexConjugate( const T& ac_rValue )
+{
+    return ac_rValue;
 }
 
 }   // namespace Math

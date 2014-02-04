@@ -15,7 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
     <None Include="Implementations\Functions.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -26,18 +25,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="Implementations\Matrix_Operators.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\MatrixBase.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\MatrixBase_CopyConstructors.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\MatrixBase_FillConstructors.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\VectorBase.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="Implementations\Vector.inl">
@@ -53,12 +40,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="Implementations\PointVector.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\HomogeneousVector_Plane.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\HomogeneousVector_Space.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="Implementations\HomogeneousVector.inl">
@@ -82,6 +63,13 @@
     <None Include="Implementations\Transform_TranslateRotate.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Implementations\Matrix_MathFunctions.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Matrix_AssignOperators.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="README.pdf" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StaticMath.h">
@@ -94,12 +82,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Declarations\Matrix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations\MatrixBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations\VectorBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Declarations\Vector.h">

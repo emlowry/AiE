@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Inline and other function implementations for Vector.h.
- * Last Modified:      December 10, 2013
+ * Last Modified:      January 5, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -11,6 +11,7 @@
 #define VECTOR__INL
 
 #include "Declarations/Vector.h"
+#include "Declarations/Functions.h"
 #include <cmath>    // for std::sqrt
 
 // separate files to keep file size down
@@ -65,22 +66,39 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline typename Vector< T, N, t_bIsRow >::InverseType
     Vector< T, N, t_bIsRow >::Inverse() const
 {
-    return InverseType( MatrixType::Inverse() );
+    return InverseType( BaseType::Inverse() );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline typename Vector< T, N, t_bIsRow >::InverseType
     Vector< T, N, t_bIsRow >::Inverse( bool& a_rbInvertable ) const
 {
-    return InverseType( MatrixType::Inverse( a_rbInvertable ) );
+    return InverseType( BaseType::Inverse( a_rbInvertable ) );
 }
 
 // Get a smaller vector by removing an element
 template< typename T, unsigned int N, bool t_bIsRow >
-inline Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
-    Vector< T, N, t_bIsRow >::MinusElement( unsigned int a_uiIndex ) const
+inline Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow > Vector< T, N, t_bIsRow >::
+    MinusElement( unsigned int a_uiIndex ) const
 {
-    return Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >(
-                                          BaseType::MinusElement( a_uiIndex ) );
+    if( N == 1 )
+    {
+        throw( std::out_of_range( "Cannot remove element if there are none" ) );
+    }
+    Vector< T, ( N > 1 ? N-1 : 1 ), t_bIsRow >
+        oResult( Vector(*this).Shift( -1 - a_uiIndex ) );
+    return oResult.Shift( a_uiIndex );
+}
+
+// Shift elements by the given number of places
+template< typename T, unsigned int N, bool t_bIsRow >
+inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::Shift( int a_iPlaces )
+{
+    Vector oCopy(*this);
+    for( unsigned int i = 0; i < N; ++i )
+    {
+        At( Scroll<int>( i + a_iPlaces, N ) ) = oCopy[i];
+    }
+    return *this
 }
 
 // Transpose
@@ -89,6 +107,12 @@ inline typename Vector< T, N, t_bIsRow >::TransposeType
     Vector< T, N, t_bIsRow >::Transpose() const
 {
     return TransposeType( *this );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline typename Vector< T, N, t_bIsRow >::TransposeType
+    Vector< T, N, t_bIsRow >::ConjugateTranspose() const
+{
+    return TransposeType( BaseType::ConjugateTranspose() );
 }
 
 // Dot product
@@ -128,17 +152,21 @@ Vector< T, N, t_bIsRow >
     }
     if( N == 2 )
     {
-        T aValues[2] = { At(1), -1 * At(0) };
+        // return this vector rotated 90 degrees clockwise, which is what you'd
+        // get by crossing a 3D version of this vector with the Z-axis.
+        T aValues[N];
+        aValues[0] = At(1);
+        aValues[1] = -1 * At(0);
         return Vector( aValues );
     }
-    RowVectorType aoVectors[ N > 0 ? N - 1 : 0 ];
+    RowVectorType aoVectors[ N - 1 ];
     aoVectors[0] = Row();   // exception if N < 2
-    aoVectors[1] = ac_roVector.Row();
+    aoVectors[1] = ac_roVector.Row();   // exception if N < 3
     for( unsigned int i = 2; i < N - 1; ++i )
     {
         aoVectors[i] = Unit(i).Row();
     }
-    Matrix<T, N, ( N > 0 ? N-1 : 0 ) > oMatrix( aoVectors );
+    Matrix<T, ( N > 0 ? N-1 : 0 ), N > oMatrix( aoVectors );
     Vector oResult;
     for( unsigned int i = 0; i < N; ++i )
     {
@@ -171,13 +199,14 @@ inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
     return result;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
-inline void Vector< T, N, t_bIsRow >::Normalize()
+inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::Normalize()
 {
     typename MatrixInverse< T >::Type magnitude = Magnitude();
     for( unsigned int i = 0; i < N; ++i )
     {
         At(i) /= magnitude;
     }
+    return *this;
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline typename Vector< T, N, t_bIsRow >::NormalType

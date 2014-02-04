@@ -18,11 +18,9 @@
 #include "Declarations/Hex.h"
 #include "Implementations/HomogeneousVector.inl"
 #include "Declarations/Matrix.h"
-#include "Declarations/MatrixBase.h"
 #include "Declarations/MostDerivedAddress.h"
 #include "Implementations/PointVector.inl"
 #include "Implementations/Transform.inl"
 #include "Declarations/Vector.h"
-#include "Declarations/VectorBase.h"
 
 #endif  // MATH__H

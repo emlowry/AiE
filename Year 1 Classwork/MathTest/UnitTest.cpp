@@ -4,7 +4,7 @@
  * Date Created:       January 5, 2014
  * Description:        Class representing a single test.
  * Last Modified:      January 5, 2014
- * Last Modification:  Creation.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "UnitTest.h"
@@ -30,12 +30,28 @@ UnitTest::UnitTest( const std::string& ac_roName,
 bool UnitTest::operator()( std::ostream& a_roOut ) const
 {
     Result oResult;
-    if( nullptr != m_pTest )
+    try
     {
         oResult = m_pTest();
     }
-    a_roOut << "\t" << m_oName << ": "
-            << ( oResult.pass ? "PASS" : "FAIL" ) << std::endl;
+    catch( const std::exception& croError )
+    {
+        oResult = Fail( croError.what() );
+    }
+    catch( const std::string& croString )
+    {
+        oResult = Fail( croString );
+    }
+    catch( const char* const cpccString )
+    {
+        oResult = Fail( cpccString );
+    }
+    catch( ... )
+    {
+        oResult = Fail( "Unidentified error" );
+    }
+    a_roOut << "\t" << ( oResult.pass ? "PASSED" : "FAILED" ) << ": " << m_oName
+            << std::endl;
     if( !oResult.message.empty() )
     {
         a_roOut << "\t\t" << oResult.message << std::endl;

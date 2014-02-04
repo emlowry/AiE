@@ -9,7 +9,7 @@
  *                      instead of transform matrix * original point as it
  *                      would be if column vectors were used.
  * Last Modified:      January 5, 2014
- * Last Modification:  Added import/export macro.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef POINT_VECTOR__H
@@ -31,11 +31,7 @@ class IMEXPORT_CLASS PointVector : public Math::Vector< double, 2 >
 public:
 
     typedef Math::Vector< double, 2 > BaseType;
-    typedef BaseType::BaseType VectorBaseType;
-    typedef BaseType::RootType RootType;
-
-    // inherit assignment operators
-    using BaseType::operator=;
+    typedef BaseType::BaseType RootType;
 
     // destructor
     virtual ~PointVector();
@@ -43,37 +39,25 @@ public:
     // Constructors that forward to base class constructors
     PointVector();
     PointVector( const PointVector& ac_roVector );
-    PointVector( const BaseType& ac_roVector );
-    PointVector( const VectorBaseType& ac_roVector );
-    PointVector( const RootType& ac_roMatrix );
     PointVector( PointVector&& a_rroVector );
-    PointVector( BaseType&& a_rroVector );
-    PointVector( VectorBaseType&& a_rroVector );
-    PointVector( RootType&& a_rroMatrix );
+    PointVector( const RootType& ac_roMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
                  double a_dFill = 0 );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    PointVector( Vector< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill = 0 );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    PointVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill = 0 );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    PointVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill = 0 );
     template< typename U, unsigned int P, unsigned int Q >
-    PointVector( const MatrixBase< U, P, Q >& ac_roMatrix,
-                 double a_dFill = 0 );
-    template< unsigned int P, unsigned int Q >
-    PointVector( MatrixBase< double, P, Q >&& a_rroMatrix,
+    PointVector( const Matrix< U, P, Q >& ac_roMatrix,
                  double a_dFill = 0 );
     PointVector( double a_dFill );
     PointVector( const double (&ac_radData)[ 2 ] );
-    PointVector( const double* const ac_cpdData,
-                 const unsigned int ac_uiSize,
-                 double a_dFill = 0 );
-
+    
+    // Assignment operators that pass to base class
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    PointVector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
+    template< typename U, unsigned int P, unsigned int Q >
+    PointVector& operator=( const Matrix< U, P, Q >& ac_roMatrix );
+    PointVector& operator=( const double& ac_rFill );
+    PointVector& operator=( const double (&ac_raData)[ 2 ] );
+    
     // Construct from the given coordinates
     PointVector( double a_dX, double a_dY );
 
@@ -108,11 +92,7 @@ public:
 
     // simplify typing
     typedef Math::Vector< double, 3 > BaseType;
-    typedef BaseType::BaseType VectorBaseType;
-    typedef BaseType::RootType RootType;
-
-    // inherit assignment operators
-    using BaseType::operator=;
+    typedef BaseType::BaseType RootType;
 
     // destructor
     virtual ~PointVector();
@@ -120,37 +100,25 @@ public:
     // Constructors that forward to base class constructors
     PointVector();
     PointVector( const PointVector& ac_roVector );
-    PointVector( const BaseType& ac_roVector );
-    PointVector( const VectorBaseType& ac_roVector );
-    PointVector( const RootType& ac_roMatrix );
     PointVector( PointVector&& a_rroVector );
-    PointVector( BaseType&& a_rroVector );
-    PointVector( VectorBaseType&& a_rroVector );
-    PointVector( RootType&& a_rroMatrix );
+    PointVector( const RootType& ac_roMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
                  double a_dFill = 0 );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    PointVector( Vector< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill = 0 );
-    template< typename U, unsigned int Q, bool t_bOtherIsRow >
-    PointVector( const VectorBase< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill = 0 );
-    template< unsigned int Q, bool t_bOtherIsRow >
-    PointVector( VectorBase< double, Q, t_bOtherIsRow >&& a_rroVector,
-                 double a_dFill = 0 );
     template< typename U, unsigned int P, unsigned int Q >
-    PointVector( const MatrixBase< U, P, Q >& ac_roMatrix,
-                 double a_dFill = 0 );
-    template< unsigned int P, unsigned int Q >
-    PointVector( MatrixBase< double, P, Q >&& a_rroMatrix,
+    PointVector( const Matrix< U, P, Q >& ac_roMatrix,
                  double a_dFill = 0 );
     PointVector( double a_dFill );
     PointVector( const double (&ac_radData)[ 3 ] );
-    PointVector( const double* const ac_cpdData,
-                 const unsigned int ac_uiSize,
-                 double a_dFill = 0 );
-
+    
+    // Assignment operators that pass to base class
+    template< typename U, unsigned int Q, bool t_bOtherIsRow >
+    PointVector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
+    template< typename U, unsigned int P, unsigned int Q >
+    PointVector& operator=( const Matrix< U, P, Q >& ac_roMatrix );
+    PointVector& operator=( const double& ac_rFill );
+    PointVector& operator=( const double (&ac_raData)[ 3 ] );
+    
     // Construct from the given coordinates
     PointVector( double a_dX, double a_dY, double a_dZ );
 

@@ -4,7 +4,7 @@
  * Date Created:       December 17, 2013
  * Description:        Inline function implementations for PointVector.
  * Last Modified:      January 5, 2014
- * Last Modification:  Moved templated constructors to another file.
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef POINT_VECTOR__INL
@@ -13,9 +13,6 @@
 #include "Declarations/PointVector.h"
 #include "Declarations/HomogeneousVector.h"
 
-// separate file to reduce file size
-#include "PointVector_Templates.inl"
-
 namespace Plane
 {
 
@@ -23,39 +20,35 @@ namespace Plane
 inline PointVector::~PointVector() {}
 
 // Constructors that forward to base class constructors
-inline PointVector::PointVector() : BaseType(), x( At(0) ), y( At(1) ) {}
+inline PointVector::PointVector()
+    : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
 inline PointVector::PointVector( const PointVector& ac_roVector )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( const BaseType& ac_roVector )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( const VectorBaseType& ac_roVector )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( const RootType& ac_roMatrix )
-    : BaseType( ac_roMatrix ), x( At(0) ), y( At(1) ) {}
+    : BaseType( ac_roVector ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
 inline PointVector::PointVector( PointVector&& a_rroVector )
     : BaseType( std::forward< PointVector >( a_rroVector ) ),
-      x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( BaseType&& a_rroVector )
-    : BaseType( std::forward< BaseType >( a_rroVector ) ),
-      x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( VectorBaseType&& a_rroVector )
-    : BaseType( std::forward< VectorBaseType >( a_rroVector ) ),
-      x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( RootType&& a_rroMatrix )
-    : BaseType( std::forward< RootType >( a_rroMatrix ) ),
-      x( At(0) ), y( At(1) ) {}
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
+inline PointVector::PointVector( const RootType& ac_roMatrix )
+    : BaseType( ac_roMatrix ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
 inline PointVector::PointVector( double a_dFill )
-    : BaseType( a_dFill ), x( At(0) ), y( At(1) ) {}
+    : BaseType( a_dFill ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
 inline PointVector::PointVector( const double (&ac_radData)[ 2 ] )
-    : BaseType( ac_radData ), x( At(0) ), y( At(1) ) {}
-inline PointVector::PointVector( const double* const ac_cpdData,
-                                 const unsigned int ac_uiSize,
-                                 double a_dFill )
-    : BaseType( ac_cpdData, ac_uiSize, a_dFill ), x( At(0) ), y( At(1) ) {}
+    : BaseType( ac_radData ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
+
+// Assignment operators that pass to base class
+inline PointVector& PointVector::operator=( const double& ac_rFill )
+{
+    BaseType::operator=( ac_rFill );
+    return *this;
+}
+inline PointVector& PointVector::operator=( const double (&ac_raData)[ 2 ] )
+{
+    BaseType::operator=( ac_raData );
+    return *this;
+}
 
 // Construct from the given coordinates
 inline PointVector::PointVector( double a_dX, double a_dY )
-    : x( At(0) ), y( At(1) )
+    : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] )
 {
     x = a_dX;
     y = a_dY;
@@ -63,7 +56,7 @@ inline PointVector::PointVector( double a_dX, double a_dY )
 
 // Construct from homogenous vector
 inline PointVector::PointVector( const HomogeneousVector& ac_roVector )
-    : x( At(0) ), y( At(1) )
+    : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] )
 {
     operator=( ac_roVector );
 }
@@ -91,40 +84,39 @@ inline PointVector::~PointVector() {}
 
 // Constructors that forward to base class constructors
 inline PointVector::PointVector()
-    : BaseType(), x( At(0) ), y( At(1) ), z( At(2) ) {}
+    : BaseType(),
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
 inline PointVector::PointVector( const PointVector& ac_roVector )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( const BaseType& ac_roVector )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( const VectorBaseType& ac_roVector )
-    : BaseType( ac_roVector ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( const RootType& ac_roMatrix )
-    : BaseType( ac_roMatrix ), x( At(0) ), y( At(1) ), z( At(2) ) {}
+    : BaseType( ac_roVector ),
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
 inline PointVector::PointVector( PointVector&& a_rroVector )
     : BaseType( std::forward< PointVector >( a_rroVector ) ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( BaseType&& a_rroVector )
-    : BaseType( std::forward< BaseType >( a_rroVector ) ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( VectorBaseType&& a_rroVector )
-    : BaseType( std::forward< VectorBaseType >( a_rroVector ) ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( RootType&& a_rroMatrix )
-    : BaseType( std::forward< RootType >( a_rroMatrix ) ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
+inline PointVector::PointVector( const RootType& ac_roMatrix )
+    : BaseType( ac_roMatrix ),
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
 inline PointVector::PointVector( double a_dFill )
-    : BaseType( a_dFill ), x( At(0) ), y( At(1) ), z( At(2) ) {}
+    : BaseType( a_dFill ),
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
 inline PointVector::PointVector( const double (&ac_radData)[ 3 ] )
-    : BaseType( ac_radData ), x( At(0) ), y( At(1) ), z( At(2) ) {}
-inline PointVector::PointVector( const double* const ac_cpdData,
-                                 const unsigned int ac_uiSize,
-                                 double a_dFill )
-    : BaseType( ac_cpdData, ac_uiSize, a_dFill ),
-      x( At(0) ), y( At(1) ), z( At(2) ) {}
+    : BaseType( ac_radData ),
+      x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
+
+// Assignment operators that pass to base class
+inline PointVector& PointVector::operator=( const double& ac_rFill )
+{
+    BaseType::operator=( ac_rFill );
+    return *this;
+}
+inline PointVector& PointVector::operator=( const double (&ac_raData)[ 3 ] )
+{
+    BaseType::operator=( ac_raData );
+    return *this;
+}
 
 // Construct from the given coordinates
 inline PointVector::PointVector( double a_dX, double a_dY, double a_dZ )
-    : x( At(0) ), y( At(1) ), z( At(2) )
+    : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] )
 {
     x = a_dX;
     y = a_dY;
@@ -133,7 +125,7 @@ inline PointVector::PointVector( double a_dX, double a_dY, double a_dZ )
 
 // Construct from homogenous vector
 inline PointVector::PointVector( const HomogeneousVector& ac_roVector )
-    : x( At(0) ), y( At(1) ), z( At(2) )
+    : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] )
 {
     operator=( ac_roVector );
 }

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 16, 2013
  * Description:        Constant Hex values for various colors.
- * Last Modified:      December 16, 2013
- * Last Modification:  Split off from ColorHexValues.h.
+ * Last Modified:      January 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef COLOR_CONSTANTS__H
@@ -140,7 +140,7 @@ namespace Green
 }   // namespace Green
 
 // Hex values for different shades of blue
-const Hex BLUE = 0xFF00FF00;
+const Hex BLUE = 0xFF0000FF;
 namespace Blue
 {
     using Color::BLUE;
