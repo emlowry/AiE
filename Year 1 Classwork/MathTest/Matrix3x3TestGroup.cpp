@@ -3,12 +3,12 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        3x3 Matrix tests.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 5, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "Matrix3x3TestGroup.h"
-#include "InlineMath.h"
+#include "MathLibrary.h"
 
 using namespace Plane;
 using Math::Matrix;

@@ -3,12 +3,12 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Common math functionality tests.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 5, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "MathTestGroup.h"
-#include "InlineMath.h"
+#include "MathLibrary.h"
 
 MathTestGroup::MathTestGroup()
     : UnitTestGroup("Common math functionality tests")

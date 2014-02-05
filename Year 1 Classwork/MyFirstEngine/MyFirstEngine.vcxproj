@@ -75,11 +75,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Math\Math.vcxproj">
-      <Project>{2adf0b80-2156-4113-a0e1-be96ccde23fc}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Declarations\Macros.h" />
     <ClInclude Include="MyFirstEngine.h" />
   </ItemGroup>

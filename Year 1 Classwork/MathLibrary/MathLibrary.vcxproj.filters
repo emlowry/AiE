@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="StaticMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\ColorConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\ColorVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Functions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Hex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\HomogeneousVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\ImExportMacro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\MostDerivedAddress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\PointVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InlineMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathLibrary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Implementations\ColorVector.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\ColorVector_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Functions.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\HomogeneousVector.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\HomogeneousVector_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Matrix.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Matrix_AssignOperators.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Matrix_Constructors.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Matrix_MathFunctions.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Matrix_Operators.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\PointVector.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\PointVector_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Transform.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Transform_Scale.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Transform_TranslateRotate.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Vector.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Vector_Constructors.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Vector_Operators.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="README.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MathLibrary.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

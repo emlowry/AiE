@@ -3,9 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Macros for managing import/export and inline keywords.
- * Last Modified:      February 4, 2014
- * Last Modification:  Added macro for inlining functions unless compiling for
- *                      the library.
+ * Last Modified:      February 5, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 // No include guards for this file - always include it again to override macro
@@ -28,13 +27,20 @@
 #define IMEXPORT_CLASS
 #define IMEXPORT_T_INST
 #define EXTERN_T_INST
+#else
+#error Preprocessor must define _DLL or _LIB to compile library
 #endif
 
 #else
 
 #define INLINE inline
 
-#if defined INCLUDING_STATIC_MY_FIRST_ENGINE_LIBRARY
+#if defined INCLUDING_INLINE_MY_FIRST_ENGINE_LIBRARY
+#define IMEXPORT
+#define IMEXPORT_CLASS
+#define IMEXPORT_T_INST
+#define EXTERN_T_INST
+#elif defined INCLUDING_STATIC_MY_FIRST_ENGINE_LIBRARY
 #define IMEXPORT extern
 #define IMEXPORT_CLASS
 #define IMEXPORT_T_INST
@@ -45,10 +51,10 @@
 #define IMEXPORT_T_INST __declspec( dllimport )
 #define EXTERN_T_INST extern
 #else
-#define IMEXPORT
-#define IMEXPORT_CLASS
-#define IMEXPORT_T_INST
-#define EXTERN_T_INST
+#error Preprocessor must define either \
+INCLUDING_STATIC_MY_FIRST_ENGINE_LIBRARY, \
+INCLUDING_DYNAMIC_MY_FIRST_ENGINE_LIBRARY, \
+or INCLUDING_INLINE_MY_FIRST_ENGINE_LIBRARY
 #endif
 
 #endif

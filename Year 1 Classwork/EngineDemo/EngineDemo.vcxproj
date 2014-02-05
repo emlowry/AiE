@@ -75,9 +75,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Math\Math.vcxproj">
-      <Project>{2adf0b80-2156-4113-a0e1-be96ccde23fc}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\MyFirstEngine\MyFirstEngine.vcxproj">
       <Project>{91868ae9-2027-4bfe-a3d1-a84a843966ee}</Project>
     </ProjectReference>

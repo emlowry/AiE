@@ -3,12 +3,12 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Vector3 tests.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 5, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "Vector3TestGroup.h"
-#include "InlineMath.h"
+#include "MathLibrary.h"
 #include <string>
 #include <sstream>
 

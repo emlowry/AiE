@@ -3,12 +3,12 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Vector4 tests.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 5, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "Vector4TestGroup.h"
-#include "InlineMath.h"
+#include "MathLibrary.h"
 
 Vector4TestGroup::Vector4TestGroup()
     : UnitTestGroup("Vector4 tests")
