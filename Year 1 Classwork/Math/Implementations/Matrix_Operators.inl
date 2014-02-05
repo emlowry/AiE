@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 3, 2013
  * Description:        Operator implementations for Matrix template class.
- * Last Modified:      January 5, 2014
+ * Last Modified:      February 4, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -91,7 +91,8 @@ inline Matrix< typename MatrixInverse< T >::Type, M, P >
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }
-    return operator*( ac_roMatrix.Inverse() );
+    Matrix< typename MatrixInverse< T >::Type, M, N > oCopy( *this );
+    return oCopy * ac_roMatrix.Inverse() ;
 }
 
 // Transform assign

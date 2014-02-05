@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Inline function implementations for HomogeneousVector.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 4, 2014
+ * Last Modification:  Switching from regular inline to macro inline.
  ******************************************************************************/
 
 #ifndef HOMOGENEOUS_VECTOR__INL
@@ -12,52 +12,53 @@
 
 #include "Declarations/HomogeneousVector.h"
 #include "Declarations/PointVector.h"
+#include "Declarations/ImExportMacro.h"
 
 namespace Plane
 {
 
 // destructor
-inline HomogeneousVector::~HomogeneousVector() {}
+INLINE HomogeneousVector::~HomogeneousVector() {}
 
 // Constructors that forward to base class constructors
-inline HomogeneousVector::HomogeneousVector()
+INLINE HomogeneousVector::HomogeneousVector()
     : BaseType(),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] )
 {
     h = 1.0;
 }
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const HomogeneousVector& ac_roVector )
     : BaseType( ac_roVector ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
-inline HomogeneousVector::HomogeneousVector( HomogeneousVector&& a_rroVector )
+INLINE HomogeneousVector::HomogeneousVector( HomogeneousVector&& a_rroVector )
     : BaseType( std::forward< HomogeneousVector >( a_rroVector ) ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const RootType& ac_roMatrix )
     : BaseType( ac_roMatrix ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
-inline HomogeneousVector::HomogeneousVector( double a_dFill )
+INLINE HomogeneousVector::HomogeneousVector( double a_dFill )
     : BaseType( a_dFill ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
-inline HomogeneousVector::HomogeneousVector( const double (&ac_radData)[ 3 ] )
+INLINE HomogeneousVector::HomogeneousVector( const double (&ac_radData)[ 3 ] )
     : BaseType( ac_radData ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
 
 // Assignment operators that pass to base class
-inline HomogeneousVector& HomogeneousVector::operator=( const double& ac_rFill )
+INLINE HomogeneousVector& HomogeneousVector::operator=( const double& ac_rFill )
 {
     BaseType::operator=( ac_rFill );
     return *this;
 }
-inline HomogeneousVector& HomogeneousVector::operator=( const double (&ac_raData)[ 3 ] )
+INLINE HomogeneousVector& HomogeneousVector::operator=( const double (&ac_raData)[ 3 ] )
 {
     BaseType::operator=( ac_raData );
     return *this;
 }
 
 // Construct from the given coordinates
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( double a_dX, double a_dY, double a_dH )
     : BaseType(),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] )
@@ -68,14 +69,14 @@ inline HomogeneousVector::
 }
 
 // Construct from a 2D point
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const PointVector& ac_roPoint, double a_dH )
     : BaseType( ac_roPoint ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] )
 {
     h = a_dH;
 }
-inline HomogeneousVector&
+INLINE HomogeneousVector&
     HomogeneousVector::operator=( const PointVector& ac_roPoint )
 {
     x = ac_roPoint.x * h;
@@ -84,11 +85,11 @@ inline HomogeneousVector&
 }
 
 // Construct from a 3D homogeneous vector
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const Space::HomogeneousVector& ac_roVector )
     : BaseType( Space::PointVector( ac_roVector ) ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
-inline HomogeneousVector&
+INLINE HomogeneousVector&
     HomogeneousVector::operator=( const Space::HomogeneousVector& ac_roVector )
 {
     operator=( Space::PointVector( ac_roVector ) );
@@ -96,36 +97,36 @@ inline HomogeneousVector&
 }
 
 // re-implement equality and inequality checks to account for h
-inline bool HomogeneousVector::operator==( const HomogeneousVector& ac_roVector ) const
+INLINE bool HomogeneousVector::operator==( const HomogeneousVector& ac_roVector ) const
 {
     return ( PointVector( *this ) == PointVector( ac_roVector ) );
 }
-inline bool HomogeneousVector::operator!=( const HomogeneousVector& ac_roVector ) const
+INLINE bool HomogeneousVector::operator!=( const HomogeneousVector& ac_roVector ) const
 {
     return ( PointVector( *this ) != PointVector( ac_roVector ) );
 }
 
 // re-implement normalization to account for h value
-inline double HomogeneousVector::Magnitude() const
+INLINE double HomogeneousVector::Magnitude() const
 {
     return PointVector( *this ).Magnitude();
 }
-inline double HomogeneousVector::MagnitudeSquared() const
+INLINE double HomogeneousVector::MagnitudeSquared() const
 {
     return PointVector( *this ).Magnitude();
 }
-inline HomogeneousVector& HomogeneousVector::Normalize()
+INLINE HomogeneousVector& HomogeneousVector::Normalize()
 {
     operator=( this->Normal() );
     return *this;
 }
-inline HomogeneousVector HomogeneousVector::Normal() const
+INLINE HomogeneousVector HomogeneousVector::Normal() const
 {
     return HomogeneousVector( PointVector( *this ).Normal() );
 }
 
 // Adjust values so that h = 1 or 0
-inline HomogeneousVector& HomogeneousVector::Homogenize()
+INLINE HomogeneousVector& HomogeneousVector::Homogenize()
 {
     if( h != 0.0 )
     {
@@ -135,14 +136,14 @@ inline HomogeneousVector& HomogeneousVector::Homogenize()
 }
 
 // override matrix multiplication to homogenize first
-inline HomogeneousVector& HomogeneousVector::
+INLINE HomogeneousVector& HomogeneousVector::
     operator*=( const Math::Matrix< double, 3 >& ac_roMatrix )
 {
     Homogenize();
     BaseType::operator*=( ac_roMatrix );
     return Homogenize();
 }
-inline HomogeneousVector& HomogeneousVector::
+INLINE HomogeneousVector& HomogeneousVector::
     operator/=( const Math::Matrix< double, 3 >& ac_roMatrix )
 {
     Homogenize();
@@ -151,7 +152,7 @@ inline HomogeneousVector& HomogeneousVector::
 }
 
 // Origin of the coordinate system
-inline const HomogeneousVector& HomogeneousVector::Origin()
+INLINE const HomogeneousVector& HomogeneousVector::Origin()
 {
     static HomogeneousVector oOrigin( 0.0, 0.0, 1.0 );
     return oOrigin;
@@ -163,10 +164,10 @@ namespace Space
 {
 
 // destructor
-inline HomogeneousVector::~HomogeneousVector() {}
+INLINE HomogeneousVector::~HomogeneousVector() {}
 
 // Constructors that forward to base class constructors
-inline HomogeneousVector::HomogeneousVector()
+INLINE HomogeneousVector::HomogeneousVector()
     : BaseType(),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
@@ -175,33 +176,33 @@ inline HomogeneousVector::HomogeneousVector()
 {
     h = 1.0;
 }
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const HomogeneousVector& ac_roVector )
     : BaseType( ac_roVector ),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
       z( m_aaData[0][2] ),
       h( m_aaData[0][3] ) {}
-inline HomogeneousVector::HomogeneousVector( HomogeneousVector&& a_rroVector )
+INLINE HomogeneousVector::HomogeneousVector( HomogeneousVector&& a_rroVector )
     : BaseType( std::forward< HomogeneousVector >( a_rroVector ) ),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
       z( m_aaData[0][2] ),
       h( m_aaData[0][3] ) {}
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const RootType& ac_roMatrix )
     : BaseType( ac_roMatrix ),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
       z( m_aaData[0][2] ),
       h( m_aaData[0][3] ) {}
-inline HomogeneousVector::HomogeneousVector( double a_dFill )
+INLINE HomogeneousVector::HomogeneousVector( double a_dFill )
     : BaseType( a_dFill ),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
       z( m_aaData[0][2] ),
       h( m_aaData[0][3] ) {}
-inline HomogeneousVector::HomogeneousVector( const double (&ac_radData)[ 4 ] )
+INLINE HomogeneousVector::HomogeneousVector( const double (&ac_radData)[ 4 ] )
     : BaseType( ac_radData ),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
@@ -209,19 +210,19 @@ inline HomogeneousVector::HomogeneousVector( const double (&ac_radData)[ 4 ] )
       h( m_aaData[0][3] ) {}
 
 // Assignment operators that pass to base class
-inline HomogeneousVector& HomogeneousVector::operator=( const double& ac_rFill )
+INLINE HomogeneousVector& HomogeneousVector::operator=( const double& ac_rFill )
 {
     BaseType::operator=( ac_rFill );
     return *this;
 }
-inline HomogeneousVector& HomogeneousVector::operator=( const double (&ac_raData)[ 4 ] )
+INLINE HomogeneousVector& HomogeneousVector::operator=( const double (&ac_raData)[ 4 ] )
 {
     BaseType::operator=( ac_raData );
     return *this;
 }
 
 // Construct from the given coordinates
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( double a_dX, double a_dY, double a_dZ, double a_dH )
     : BaseType(),
       x( m_aaData[0][0] ),
@@ -236,7 +237,7 @@ inline HomogeneousVector::
 }
 
 // Construct from a 3D point
-inline HomogeneousVector::
+INLINE HomogeneousVector::
     HomogeneousVector( const PointVector& ac_roPoint, double a_dH )
     : BaseType( ac_roPoint ),
       x( m_aaData[0][0] ),
@@ -247,7 +248,7 @@ inline HomogeneousVector::
     h = a_dH;
     operator=( ac_roPoint );
 }
-inline HomogeneousVector& HomogeneousVector::operator=( const PointVector& ac_roPoint )
+INLINE HomogeneousVector& HomogeneousVector::operator=( const PointVector& ac_roPoint )
 {
     x = ac_roPoint.x * h;
     y = ac_roPoint.y * h;
@@ -256,38 +257,38 @@ inline HomogeneousVector& HomogeneousVector::operator=( const PointVector& ac_ro
 }
 
 // re-implement equality and inequality checks to account for h
-inline bool HomogeneousVector::
+INLINE bool HomogeneousVector::
     operator==( const HomogeneousVector& ac_roVector ) const
 {
     return ( PointVector( *this ) == PointVector( ac_roVector ) );
 }
-inline bool HomogeneousVector::
+INLINE bool HomogeneousVector::
     operator!=( const HomogeneousVector& ac_roVector ) const
 {
     return ( PointVector( *this ) != PointVector( ac_roVector ) );
 }
 
 // re-implement normalization to account for h value
-inline double HomogeneousVector::Magnitude() const
+INLINE double HomogeneousVector::Magnitude() const
 {
     return PointVector( *this ).Magnitude();
 }
-inline double HomogeneousVector::MagnitudeSquared() const
+INLINE double HomogeneousVector::MagnitudeSquared() const
 {
     return PointVector( *this ).Magnitude();
 }
-inline HomogeneousVector& HomogeneousVector::Normalize()
+INLINE HomogeneousVector& HomogeneousVector::Normalize()
 {
     operator=( this->Normal() );
     return *this;
 }
-inline HomogeneousVector HomogeneousVector::Normal() const
+INLINE HomogeneousVector HomogeneousVector::Normal() const
 {
     return HomogeneousVector( PointVector( *this ).Normal() );
 }
 
 // Adjust values so that h = 1 or 0
-inline HomogeneousVector& HomogeneousVector::Homogenize()
+INLINE HomogeneousVector& HomogeneousVector::Homogenize()
 {
     if( h != 0.0 )
     {
@@ -297,14 +298,14 @@ inline HomogeneousVector& HomogeneousVector::Homogenize()
 }
 
 // override matrix multiplication to homogenize first
-inline HomogeneousVector& HomogeneousVector::
+INLINE HomogeneousVector& HomogeneousVector::
     operator*=( const Math::Matrix< double, 4 >& ac_roMatrix )
 {
     Homogenize();
     BaseType::operator*=( ac_roMatrix );
     return Homogenize();
 }
-inline HomogeneousVector& HomogeneousVector::
+INLINE HomogeneousVector& HomogeneousVector::
     operator/=( const Math::Matrix< double, 4 >& ac_roMatrix )
 {
     Homogenize();
@@ -313,7 +314,7 @@ inline HomogeneousVector& HomogeneousVector::
 }
 
 // Origin of the coordinate system
-inline const HomogeneousVector& HomogeneousVector::Origin()
+INLINE const HomogeneousVector& HomogeneousVector::Origin()
 {
     static HomogeneousVector oOrigin( 0.0, 0.0, 0.0, 1.0 );
     return oOrigin;

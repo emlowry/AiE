@@ -4,14 +4,15 @@
  * Date Created:       January 5, 2014
  * Description:        Inline function implementations for Transform.h.
  *                      Remember that this library uses row vectors, not column.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 4, 2014
+ * Last Modification:  Switching from regular inline to macro inline.
  ******************************************************************************/
 
 #ifndef TRANSFORM__INL
 #define TRANSFORM__INL
 
 #include "Declarations/Transform.h"
+#include "Declarations/ImExportMacro.h"
 
 // Separate files to keep file size down
 #include "Transform_Scale.inl"
@@ -21,7 +22,7 @@ namespace Plane
 {
 
 // Make a transformation that performs the given transformation about a point
-inline Transform
+INLINE Transform
    TransformationAbout( const Transform& ac_roTransform,
                         const PointVector& ac_roOrigin )
 {
@@ -38,7 +39,7 @@ namespace Space
 {
 
 // Make a transformation that performs the given transformation about a point
-inline Transform
+INLINE Transform
    TransformationAbout( const Transform& ac_roTransform,
                         const PointVector& ac_roOrigin )
 {
@@ -53,7 +54,7 @@ inline Transform
 //  x = [-screenSizeX/2, screenSizeX/2], y = [-screenSizeY/2, screenSizeY/2],
 //  z = [-near, -far] to x' = [ -screenCenterX - 0.5, -screenCenterX + 0.5],
 //  y' = [ -screenCenterY - 0.5, -screenCenterY + 0.5], z' = [0, 1].
-inline Transform
+INLINE Transform
     PerspectiveProjection( double a_dNearDistance, double a_dFarDistance,
                            const Plane::PointVector& ac_roScreenSize,
                            const Plane::PointVector& ac_roScreenCenter)
@@ -82,7 +83,7 @@ inline Transform
 //  x = [-screenSizeX/2, screenSizeX/2], y = [-screenSizeY/2, screenSizeY/2],
 //  z = [-near, -far] to x' = [ -screenCenterX - 0.5, -screenCenterX + 0.5],
 //  y' = [ -screenCenterY - 0.5, -screenCenterY + 0.5], z' = [0, 1].
-inline Transform
+INLINE Transform
     ParallelProjection( double a_dNearDistance, double a_dFarDistance,
                         const Plane::PointVector& ac_roScreenSize,
                         const Plane::PointVector& ac_roScreenCenter)

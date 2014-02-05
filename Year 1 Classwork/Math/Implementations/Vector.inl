@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Inline and other function implementations for Vector.h.
- * Last Modified:      January 5, 2014
+ * Last Modified:      February 4, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -98,7 +98,7 @@ inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::Shift( int a_iPlaces 
     {
         At( Scroll<int>( i + a_iPlaces, N ) ) = oCopy[i];
     }
-    return *this
+    return *this;
 }
 
 // Transpose
@@ -186,7 +186,13 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline typename MatrixInverse< T >::Type
     Vector< T, N, t_bIsRow >::Magnitude() const
 {
-    return std::sqrt( MagnitudeSquared() );
+    typedef typename
+        std::conditional< std::is_same< long double, T >::value,
+                          long double,
+                          std::conditional< std::is_same< float, T >::value,
+                                            float, double >::type >::type
+            FloatType;
+    return std::sqrt( (FloatType)MagnitudeSquared() );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
@@ -204,7 +210,7 @@ inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::Normalize()
     typename MatrixInverse< T >::Type magnitude = Magnitude();
     for( unsigned int i = 0; i < N; ++i )
     {
-        At(i) /= magnitude;
+        At(i) = (T)( At(i) / magnitude );
     }
     return *this;
 }
@@ -215,6 +221,56 @@ inline typename Vector< T, N, t_bIsRow >::NormalType
     NormalType oNormal(*this);
     oNormal.Normalize();
     return oNormal;
+}
+
+// Hidden parent functionality is defined anyway so the compiler won't complain
+template< typename T, unsigned int N, bool t_bIsRow >
+inline T Vector< T, N, t_bIsRow >::Determinant()
+{
+    return BaseType::Determinant();
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline T Vector< T, N, t_bIsRow >::
+    Minor( unsigned int a_uiRow, unsigned int a_uiColumn )
+{
+    return BaseType::Minor( a_uiRow, a_uiColumn );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline typename Vector< T, N, t_bIsRow >::BaseType::ColumnVectorType
+    Vector< T, N, t_bIsRow >::Column( unsigned int ac_uiIndex ) const
+{
+    return BaseType::Column( ac_uiIndex );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline typename Vector< T, N, t_bIsRow >::BaseType::RowVectorType
+    Vector< T, N, t_bIsRow >::Row( unsigned int ac_uiIndex ) const
+{
+    return BaseType::Row( ac_uiIndex );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
+    Vector< T, N, t_bIsRow >::
+    MinusRowAndColumn( unsigned int a_uiRow, unsigned int a_uiColumn ) const
+{
+    return BaseType::MinusRowAndColumn( a_uiRow, a_uiColumn );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline Matrix< T, ( !t_bIsRow ? N : 1 ), ( t_bIsRow && N > 1 ? N-1 : 1 ) >
+    Vector< T, N, t_bIsRow >::MinusColumn( unsigned int a_uiColumn ) const
+{
+    return BaseType::MinusColumn( a_uiColumn );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow ? N : 1 ) >
+    Vector< T, N, t_bIsRow >::MinusRow( unsigned int a_uiRow ) const
+{
+    return BaseType::MinusRow( a_uiRow );
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+inline typename Vector< T, N, t_bIsRow >::BaseType&
+    Vector< T, N, t_bIsRow >::Shift( int a_iRight, int a_iDown )
+{
+    return BaseType::Shift( a_iRight, a_iDown );
 }
 
 }   // namespace Math

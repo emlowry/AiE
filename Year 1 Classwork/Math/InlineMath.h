@@ -9,8 +9,8 @@
  * Last Modification:  Including inline implementations.
  ******************************************************************************/
 
-#ifndef MATH__H
-#define MATH__H
+#ifndef INLINE_MATH__H
+#define INLINE_MATH__H
 
 #include "Declarations/ColorConstants.h"
 #include "Implementations/ColorVector.inl"
@@ -23,4 +23,4 @@
 #include "Implementations/Transform.inl"
 #include "Declarations/Vector.h"
 
-#endif  // MATH__H
+#endif  // INLINE_MATH__H

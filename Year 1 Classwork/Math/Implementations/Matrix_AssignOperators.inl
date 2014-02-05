@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Operator implementations for Matrix template class.
- * Last Modified:      January 5, 2014
+ * Last Modified:      February 4, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -58,6 +58,7 @@ inline Matrix< T, M, N >& Matrix< T, M, N >::operator=( const T& ac_rFill )
     {
         m_aaData[i/N][i%N] = ac_rFill;
     }
+    return *this;
 }
 
 // Assign parameter data one row at a time until end of parameter data

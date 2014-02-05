@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Base class for vectors of numeric type.
- * Last Modified:      January 5, 2014
+ * Last Modified:      February 4, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -164,10 +164,6 @@ private:
     // a pointer or reference of the parent type
     T Determinant();
     T Minor( unsigned int a_uiRow, unsigned int a_uiColumn );
-
-    // Non-virtual override - if explicitly treated as a matrix, then matrix
-    // implementation should be available, otherwise no implementation should be
-    // available
     typedef typename BaseType::ColumnVectorType BaseColumnVectorType;
     BaseColumnVectorType Column( unsigned int ac_uiIndex ) const;
     typedef typename BaseType::RowVectorType BaseRowVectorType;
@@ -178,7 +174,7 @@ private:
         MinusColumn( unsigned int a_uiColumn ) const;
     Matrix< T, ( !t_bIsRow && N > 1 ? N-1 : 1 ), ( t_bIsRow ? N : 1 ) >
         MinusRow( unsigned int a_uiRow ) const;
-    void Shift( int a_iRight, int a_iDown );
+    BaseType& Shift( int a_iRight, int a_iDown );
 
 };
 

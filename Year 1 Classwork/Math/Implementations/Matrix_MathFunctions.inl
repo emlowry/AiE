@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Function implementations for Matrix template class.
- * Last Modified:      January 5, 2014
+ * Last Modified:      February 4, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -110,11 +110,12 @@ inline typename Matrix< T, M, N >::InverseType Matrix< T, M, N >::
 // For MxN matrix A where M > N, ( A^T * A )^(-1) * A^T * A
 // So we have a left inverse ( A^T * A )^(-1) * A^T
 template< typename T, unsigned int M, unsigned int N >
-bool Matrix< T, M, N >::
+inline bool Matrix< T, M, N >::
     LeftInverse( InverseType& a_roMatrix ) const    // !invertable = !change
 {
-    TransposeType oTranspose = Transpose();
-    typename Matrix< T, N >::InverseType oSquare( oTranspose * (*this) );
+    InverseType oTranspose = Transpose();
+    Matrix< typename MatrixInverse< T >::Type, M, N > oCopy( *this );
+    typename Matrix< T, N >::InverseType oSquare( oTranspose * oCopy );
     if( !oSquare.Invert() )
     {
         return false;
@@ -129,8 +130,9 @@ template< typename T, unsigned int M, unsigned int N >
 inline bool Matrix< T, M, N >::
     RightInverse( InverseType& a_roMatrix ) const   // !invertable = !change
 {
-    TransposeType oTranspose = Transpose();
-    typename Matrix< T, M >::InverseType oSquare( (*this) * oTranspose );
+    InverseType oTranspose = Transpose();
+    Matrix< typename MatrixInverse< T >::Type, M, N > oCopy( *this );
+    typename Matrix< T, M >::InverseType oSquare( oCopy * oTranspose );
     if( !oSquare.Invert() )
     {
         return false;
