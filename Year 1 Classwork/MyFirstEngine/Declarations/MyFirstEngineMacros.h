@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:               Macros.h
+ * File:               MyFirstEngineMacros.h
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Macros for managing import/export and inline keywords.
@@ -10,14 +10,19 @@
 // No include guards for this file - always include it again to override macro
 // definitions from other libraries.  Just make sure to include this file after
 // all other headers.
-// #ifndef MACROS__H
-// #define MACROS__H
+
+#if defined COMPILING_MY_FIRST_ENGINE_LIBRARY || \
+    defined INCLUDING_INLINE_MY_FIRST_ENGINE_LIBRARY
+#define INLINE_IMPLEMENTATION
+#else
+#undef INLINE_IMPLEMENTATION
+#endif
 
 #ifdef COMPILING_MY_FIRST_ENGINE_LIBRARY
 
 #define INLINE
 
-#if defined _DLL
+#if defined _USRDLL
 #define IMEXPORT __declspec( dllexport )
 #define IMEXPORT_CLASS __declspec( dllexport )
 #define IMEXPORT_T_INST __declspec( dllexport )
@@ -58,8 +63,3 @@ or INCLUDING_INLINE_MY_FIRST_ENGINE_LIBRARY
 #endif
 
 #endif
-
-// No include guards for this file - always include it again to override macro
-// definitions from other libraries.  Just make sure to include this file after
-// all other headers.
-// #endif  // MACROS__H

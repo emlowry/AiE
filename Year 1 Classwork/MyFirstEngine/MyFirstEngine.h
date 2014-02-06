@@ -15,6 +15,7 @@
 #define INCLUDING_DYNAMIC_MY_FIRST_ENGINE_LIBRARY
 #endif
 
+#include "Declarations\GameEngine.h"
 //TODO include declaration headers
 
 #endif  // MY_FIRST_ENGINE__H

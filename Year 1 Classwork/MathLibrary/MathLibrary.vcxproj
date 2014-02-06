@@ -22,10 +22,7 @@
     <ClInclude Include="Declarations\PointVector.h" />
     <ClInclude Include="Declarations\Transform.h" />
     <ClInclude Include="Declarations\Vector.h" />
-    <ClInclude Include="DynamicMath.h" />
-    <ClInclude Include="InlineMath.h" />
     <ClInclude Include="MathLibrary.h" />
-    <ClInclude Include="StaticMath.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl" />
@@ -91,6 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MATHLIBRARY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

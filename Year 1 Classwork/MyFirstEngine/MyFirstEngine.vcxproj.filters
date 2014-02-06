@@ -18,7 +18,16 @@
     <ClInclude Include="MyFirstEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Declarations\Macros.h">
+    <ClInclude Include="Declarations\GLFW.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\GameEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\MyFirstEngineMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Singleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,5 +35,10 @@
     <ClCompile Include="MyFirstEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Implementations\GameEngine.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
