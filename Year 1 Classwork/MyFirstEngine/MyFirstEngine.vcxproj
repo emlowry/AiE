@@ -55,7 +55,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\glew\lib;$(SolutionDir)\glfw3\lib-msvc120;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\glew\lib;$(SolutionDir)\glfw3\lib-msvc110;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3dll.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -80,6 +80,7 @@
     <ClInclude Include="Declarations\GameEngine.h" />
     <ClInclude Include="Declarations\GLFW.h" />
     <ClInclude Include="Declarations\MyFirstEngineMacros.h" />
+    <ClInclude Include="Declarations\NotCopyable.h" />
     <ClInclude Include="Declarations\Singleton.h" />
     <ClInclude Include="MyFirstEngine.h" />
   </ItemGroup>

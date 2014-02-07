@@ -13,28 +13,42 @@
 #include "Declarations\GameEngine.h"
 #include "Declarations\GLFW.h"
 #include "Declarations\MyFirstEngineMacros.h"
+#include <iostream>
 
 namespace MyFirstEngine
 {
 
+// Destructor doesn't need to do anything
+INLINE GameEngine::~GameEngine() {}
+
 // Private default constructor called only to initialize singleton
-inline GameEngine::GameEngine() : m_bInitialized( false ) {}
+INLINE GameEngine::GameEngine() : m_bInitialized( false ) {}
+
+//
+// STATIC FUNCTIONS
+//
 
 // Initialize the game engine
-inline bool GameEngine::Initialize()
+INLINE bool GameEngine::Initialize()
 {
-    if( IsInitialized() )
+    if( !IsInitialized() )
     {
-        return true;
+        glfwSetErrorCallback( PrintError );
+        Instance().m_bInitialized = ( GL_TRUE == glfwInit() );
+        // TODO call other initialization/initialization failure functions
     }
-    Instance().m_bInitialized = ( GL_TRUE == glfwInit() );
-    // TODO call other initialization/initialization failure functions
-    return Instance().m_bInitialized;
+    return IsInitialized();
 }
-inline bool GameEngine::IsInitialized() { return Instance().m_bInitialized; }
+INLINE bool GameEngine::IsInitialized() { return Instance().m_bInitialized; }
+
+// Print error messages to standard error stream.
+INLINE void GameEngine::PrintError( int a_iCode, const char* ac_pcDescription )
+{
+    std::cerr << "ERROR " << a_iCode << ": " << ac_pcDescription << std::endl;
+}
 
 // Terminate the game engine
-inline void GameEngine::Terminate()
+INLINE void GameEngine::Terminate()
 {
     if( IsInitialized() )
     {

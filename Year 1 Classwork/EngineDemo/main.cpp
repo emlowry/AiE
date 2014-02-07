@@ -8,9 +8,34 @@
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
+#include <conio.h>
+#include <iostream>
+
+using MyFirstEngine::GameEngine;
 
 int main(int argc, char* argv[])
 {
+    std::cout << "Initializing Game Engine...";
+    bool bSuccess = GameEngine::Initialize();
+    if( !bSuccess )
+    {
+        std::cout << "\tGame Engine initialization failed." << std::endl;
+    }
+    else
+    {
+        std::cout << "\tGame Engine Initialized." << std::endl;
+
+	    std::cout << std::endl << "Press any key to continue..." << std::endl;
+	    _getch();
+
+        std::cout << std::endl << "Terminating Game Engine...";
+        GameEngine::Terminate();
+        std::cout << "\tGame Engine terminated." << std::endl;
+    }
+
+	std::cout << std::endl << "Press any key to exit..." << std::endl;
+	_getch();
+
     //TODO
     return 0;
 }

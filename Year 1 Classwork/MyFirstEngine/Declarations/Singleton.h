@@ -2,13 +2,15 @@
  * File:               Singleton.h
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
- * Description:        Base class for singlton objects.
- * Last Modified:      February 5, 2014
- * Last Modification:  Creation.
+ * Description:        Base class for singleton objects.
+ * Last Modified:      February 6, 2014
+ * Last Modification:  Inheriting from separate NotCopyable class.
  ******************************************************************************/
 
 #ifndef SINGLETON__H
 #define SINGLETON__H
+
+#include "NotCopyable.h"
 
 // To create a singleton class without having to define your own MakeInstance
 // implementation, inherit from this class instead, make this class a friend,
@@ -16,35 +18,39 @@
 //
 //  class MySingleton : public Singleton< MySingleton >
 //  {
+//      friend DefaultSingleton;
+//      
 //      // non-private class stuff goes here
 //  
 //  private:
-//      friend DefaultSingleton;
+//      
 //      MySingleton()
 //      {
 //          // constructor tasks go here
 //      }
-//  };
+//      
+//  };  // MySingleton
 template< typename T >
-class Singleton
+class Singleton : public NotCopyable
 {
 public:
     
+    // You can destroy an object of a type derived from the singleton class
+    // through a pointer or reference of this base type.
     virtual ~Singleton() {}
+
+    // If the singleton instance is only used internally by static member
+    // functions, then making this a protected or private base class instead of
+    // a public one will make this Instance() function protected or private as
+    // well, respectively.
     static T& Instance() { static T instance; return instance; }
 
 protected:
 
+    // You shouldn't ever construct a singleton directly - the constructor is
+    // only called internally by the Instance() function.
     Singleton() {}
 
-private:
-
-    // Don't implement these, since singletons shouldn't be copyable.
-    Singleton( const Singleton& ac_roSingleton );
-    Singleton( Singleton&& a_rroSingleton );
-    Singleton& operator=( const Singleton& ac_roSingleton );
-    Singleton& operator=( Singleton&& a_rrSingleton );
-
-};
+};  // Singleton
 
 #endif  // SINGLETON__H

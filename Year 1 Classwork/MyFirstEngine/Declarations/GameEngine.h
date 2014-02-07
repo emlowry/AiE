@@ -24,6 +24,9 @@ class IMEXPORT_CLASS GameEngine : private Singleton< GameEngine >
 
 public:
 
+    // Destructor is virtual, since inheritance is involved.
+    virtual ~GameEngine();
+
     // Initialization and termination
     static bool Initialize();   // returns true if initialization was successful
     static bool IsInitialized();
@@ -31,9 +34,12 @@ public:
 
 private:
 
+    // Default constructor is only used by the base Singleton class's Instance()
+    // function.  The user never instantiates a GmaeEngine object directly.
     GameEngine();
-    GameEngine( const GameEngine& ac_roToCopy );
-    GameEngine& operator=( const GameEngine& ac_roToCopy );
+
+    // Print error messages to standard error stream.
+    static void PrintError( int a_iCode, const char* ac_pcDescription );
 
     // Is the engine initialized?
     bool m_bInitialized;
