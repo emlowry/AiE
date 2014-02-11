@@ -11,7 +11,6 @@
 #define HOMOGENEOUS_VECTOR__TEMPLATES__INL
 
 #include "Declarations/HomogeneousVector.h"
-#include "Declarations/PointVector.h"
 
 namespace Plane
 {

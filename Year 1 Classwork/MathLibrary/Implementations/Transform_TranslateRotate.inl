@@ -26,7 +26,7 @@ INLINE Transform Translation( double a_dX, double a_dY )
                                  { a_dX, a_dY, 1.0 } };
     return Transform( adTranslate );
 }
-INLINE Transform Translation( const PointVector& ac_roTranslation )
+INLINE Transform Translation( const Point& ac_roTranslation )
 {
     double adTranslate[3][3] =
     { { 1.0,                0.0,                0.0 },
@@ -35,9 +35,9 @@ INLINE Transform Translation( const PointVector& ac_roTranslation )
     return Transform( adTranslate );
 }
 INLINE Transform Translation( double a_dTime,
-                              const PointVector& ac_roVelocity )
+                              const Point& ac_roVelocity )
 {
-    PointVector oDistance = ac_roVelocity * a_dTime;
+    Point oDistance = ac_roVelocity * a_dTime;
     return Translation( oDistance );
 }
 
@@ -53,12 +53,12 @@ INLINE PointTransform
     return PointTransform( adRotate );
 }
 INLINE Transform Rotation( double a_dRadians, bool a_bClockwise,
-                           const PointVector& ac_roOrigin )
+                           const Point& ac_roOrigin )
 {
     return Rotation( a_dRadians, ac_roOrigin, a_bClockwise );
 }
 INLINE Transform Rotation( double a_dRadians,
-                           const PointVector& ac_roOrigin,
+                           const Point& ac_roOrigin,
                            bool a_bClockwise )
 {
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
@@ -73,19 +73,19 @@ INLINE Transform Rotation( double a_dRadians,
 INLINE PointTransform PointDegreeRotation( double a_dDegrees,
                                            bool a_bClockwise )
 {
-    return PointRotation( Math::Radians( a_dDegrees ),
+    return PointRotation( Radians( a_dDegrees ),
                           a_bClockwise );
 }
 INLINE Transform DegreeRotation( double a_dDegrees, bool a_bClockwise,
-                                 const PointVector& ac_roOrigin )
+                                 const Point& ac_roOrigin )
 {
-    return Rotation( Math::Radians( a_dDegrees ), ac_roOrigin, a_bClockwise );
+    return Rotation( Radians( a_dDegrees ), ac_roOrigin, a_bClockwise );
 }
 INLINE Transform DegreeRotation( double a_dDegrees,
-                                 const PointVector& ac_roOrigin,
+                                 const Point& ac_roOrigin,
                                  bool a_bClockwise )
 {
-    return Rotation( Math::Radians( a_dDegrees ), ac_roOrigin, a_bClockwise );
+    return Rotation( Radians( a_dDegrees ), ac_roOrigin, a_bClockwise );
 }
 
 }   // namespace Plane
@@ -102,7 +102,7 @@ INLINE Transform Translation( double a_dX, double a_dY, double a_dZ )
                                  { a_dX, a_dY, a_dZ, 1.0 } };
     return Transform( adTranslate );
 }
-INLINE Transform Translation( const PointVector& ac_roTranslation )
+INLINE Transform Translation( const Point& ac_roTranslation )
 {
     double adTranslate[4][4] =
     { { 1.0,                0.0,                0.0,                0.0 },
@@ -112,26 +112,26 @@ INLINE Transform Translation( const PointVector& ac_roTranslation )
     return Transform( adTranslate );
 }
 INLINE Transform Translation( double a_dTime,
-                              const PointVector& ac_roVelocity )
+                              const Point& ac_roVelocity )
 {
-    PointVector oDistance = ac_roVelocity * a_dTime;
+    Point oDistance = ac_roVelocity * a_dTime;
     return Translation( oDistance );
 }
 
 // Rotate
 INLINE PointTransform
     PointRotation( double a_dRadians, bool a_bClockwise,
-                   const PointVector& ac_roAxis )
+                   const Point& ac_roAxis )
 {
     return PointRotation( a_dRadians, ac_roAxis, a_bClockwise );
 }
 INLINE PointTransform
     PointRotation( double a_dRadians,
-                   const PointVector& ac_roAxis,
+                   const Point& ac_roAxis,
                    bool a_bClockwise )
 {
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
-    PointVector oN = ac_roAxis.Normal();
+    Point oN = ac_roAxis.Normal();
     double dCos = std::cos( a_dRadians );
     double dSin = ( dCos == -1 || dCos == 1 ? 0 : std::sin( a_dRadians ) );
     dCos = ( dSin == -1 || dSin == 1 ? 0 : dCos );
@@ -148,25 +148,25 @@ INLINE PointTransform
     return PointTransform( adRotate );
 }
 INLINE Transform Rotation( double a_dRadians, bool a_bClockwise,
-                           const PointVector& ac_roAxis,
-                           const PointVector& ac_roOrigin )
+                           const Point& ac_roAxis,
+                           const Point& ac_roOrigin )
 {
     return Rotation( a_dRadians, ac_roAxis, ac_roOrigin, a_bClockwise );
 }
 INLINE Transform Rotation( double a_dRadians,
-                           const PointVector& ac_roAxis,
+                           const Point& ac_roAxis,
                            bool a_bClockwise,
-                           const PointVector& ac_roOrigin )
+                           const Point& ac_roOrigin )
 {
     return Rotation( a_dRadians, ac_roAxis, ac_roOrigin, a_bClockwise );
 }
 INLINE Transform Rotation( double a_dRadians,
-                           const PointVector& ac_roAxis,
-                           const PointVector& ac_roOrigin,
+                           const Point& ac_roAxis,
+                           const Point& ac_roOrigin,
                            bool a_bClockwise )
 {
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
-    PointVector oN = ac_roAxis.Normal();
+    Point oN = ac_roAxis.Normal();
     double dCos = std::cos( a_dRadians );
     double dSin = ( dCos == -1 || dCos == 1 ? 0 : std::sin( a_dRadians ) );
     dCos = ( dSin == -1 || dSin == 1 ? 0 : dCos );
@@ -188,37 +188,37 @@ INLINE Transform Rotation( double a_dRadians,
 }
 INLINE PointTransform PointDegreeRotation( double a_dDegrees,
                                            bool a_bClockwise,
-                                           const PointVector& ac_roAxis )
+                                           const Point& ac_roAxis )
 {
-    return PointRotation( Math::Radians( a_dDegrees ), ac_roAxis, a_bClockwise );
+    return PointRotation( Radians( a_dDegrees ), ac_roAxis, a_bClockwise );
 }
 INLINE PointTransform PointDegreeRotation( double a_dDegrees,
-                                           const PointVector& ac_roAxis,
+                                           const Point& ac_roAxis,
                                            bool a_bClockwise )
 {
-    return PointRotation( Math::Radians( a_dDegrees ), ac_roAxis, a_bClockwise );
+    return PointRotation( Radians( a_dDegrees ), ac_roAxis, a_bClockwise );
 }
 INLINE Transform DegreeRotation( double a_dDegrees, bool a_bClockwise,
-                                 const PointVector& ac_roAxis,
-                                 const PointVector& ac_roOrigin )
+                                 const Point& ac_roAxis,
+                                 const Point& ac_roOrigin )
 {
-    return Rotation( Math::Radians( a_dDegrees ),
+    return Rotation( Radians( a_dDegrees ),
                      ac_roAxis, ac_roOrigin, a_bClockwise );
 }
 INLINE Transform DegreeRotation( double a_dDegrees,
-                                 const PointVector& ac_roAxis,
+                                 const Point& ac_roAxis,
                                  bool a_bClockwise,
-                                 const PointVector& ac_roOrigin )
+                                 const Point& ac_roOrigin )
 {
-    return Rotation( Math::Radians( a_dDegrees ),
+    return Rotation( Radians( a_dDegrees ),
                      ac_roAxis, ac_roOrigin, a_bClockwise );
 }
 INLINE Transform DegreeRotation( double a_dDegrees,
-                                 const PointVector& ac_roAxis,
-                                 const PointVector& ac_roOrigin,
+                                 const Point& ac_roAxis,
+                                 const Point& ac_roOrigin,
                                  bool a_bClockwise )
 {
-    return Rotation( Math::Radians( a_dDegrees ),
+    return Rotation( Radians( a_dDegrees ),
                      ac_roAxis, ac_roOrigin, a_bClockwise );
 }
 

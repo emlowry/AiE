@@ -21,6 +21,7 @@
 namespace Space
 {
 
+template< typename T/* = double*/ >
 class PointVector;
 
 // Represent homogenous coordinates for a point in 3D space
@@ -31,6 +32,7 @@ public:
     // simplify typing
     typedef Math::Vector< double, 4 > BaseType;
     typedef BaseType::BaseType RootType;
+    typedef PointVector< double > PointType;
 
     // destructor
     virtual ~HomogeneousVector();
@@ -61,8 +63,8 @@ public:
     HomogeneousVector( double a_dX, double a_dY, double a_dZ, double a_dH = 1.0 );
 
     // Construct from a 3D point
-    HomogeneousVector( const PointVector& ac_roPoint, double a_dH = 1.0 );
-    HomogeneousVector& operator=( const PointVector& ac_roPoint );
+    HomogeneousVector( const PointType& ac_roPoint, double a_dH = 1.0 );
+    HomogeneousVector& operator=( const PointType& ac_roPoint );
 
     // re-implement equality and inequality checks to account for h
     bool operator==( const HomogeneousVector& ac_roVector ) const;
@@ -116,7 +118,8 @@ typedef Space::HomogeneousVector HomogeneousVector3D;
 
 namespace Plane
 {
-
+    
+template< typename T/* = double*/ >
 class PointVector;
 
 // Represent homogeneous coordinates for a point in 2D space
@@ -127,6 +130,7 @@ public:
     // simplify typing
     typedef Math::Vector< double, 3 > BaseType;
     typedef BaseType::BaseType RootType;
+    typedef PointVector< double > PointType;
 
     // destructor
     virtual ~HomogeneousVector();
@@ -157,8 +161,8 @@ public:
     HomogeneousVector( double a_dX, double a_dY, double a_dH = 1.0 );
 
     // Construct from a 2D point
-    HomogeneousVector( const PointVector& ac_roPoint, double a_dH = 1.0 );
-    HomogeneousVector& operator=( const PointVector& ac_roVector );
+    HomogeneousVector( const PointType& ac_roPoint, double a_dH = 1.0 );
+    HomogeneousVector& operator=( const PointType& ac_roVector );
 
     // Construct from a 3D homogeneous vector
     HomogeneousVector( const Space::HomogeneousVector& ac_roVector );

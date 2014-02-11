@@ -16,57 +16,57 @@
 
 namespace Plane
 {
+
+using namespace Math;
     
 // simplify typing
-typedef Math::Matrix< double, 2 > PointTransform;
-typedef Math::Matrix< double, 3 > Transform;
+typedef Matrix< double, 2 > PointTransform;
+typedef Matrix< double, 3 > Transform;
 typedef Transform HomogeneousTransform;
 typedef Transform HVectorTransform;
 
 // Make a transformation that performs the given transformation about a point
 IMEXPORT Transform
    TransformationAbout( const Transform& ac_roTransform,
-                        const PointVector& ac_roOrigin = PointVector::Origin() );
+                        const Point& ac_roOrigin = Point::Origin() );
 
 // Scale
 IMEXPORT PointTransform PointScaling( double a_dFactor );
 IMEXPORT Transform
-    Scaling( double a_dFactor,
-             const PointVector& ac_roOrigin = PointVector::Origin() );
+    Scaling( double a_dFactor, const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT PointTransform PointScaling( double a_dX, double a_dY );
 IMEXPORT Transform
     Scaling( double a_dX, double a_dY,
-             const PointVector& ac_roOrigin = PointVector::Origin() );
-IMEXPORT PointTransform PointScaling( const PointVector& ac_roFactor );
+             const Point& ac_roOrigin = Point::Origin() );
+IMEXPORT PointTransform PointScaling( const Point& ac_roFactor );
 IMEXPORT Transform
-    Scaling( const PointVector& ac_roFactor,
-             const PointVector& ac_roOrigin = PointVector::Origin() );
+    Scaling( const Point& ac_roFactor,
+             const Point& ac_roOrigin = Point::Origin() );
 
 // Translate
 IMEXPORT Transform Translation( double a_dX, double a_dY );
-IMEXPORT Transform Translation( const PointVector& ac_roTranslation );
+IMEXPORT Transform Translation( const Point& ac_roTranslation );
 IMEXPORT Transform
-    Translation( double a_dTime,
-                 const PointVector& ac_roVelocity = PointVector::Unit(0) );
+    Translation( double a_dTime, const Point& ac_roVelocity = Point::Unit(0) );
 
 // Rotate
 IMEXPORT PointTransform PointRotation( double a_dRadians,
                                        bool a_bClockwise = false );
 IMEXPORT Transform
     Rotation( double a_dRadians, bool a_bClockwise,
-              const PointVector& ac_roOrigin = PointVector::Origin() );
+              const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT Transform
     Rotation( double a_dRadians,
-              const PointVector& ac_roOrigin = PointVector::Origin(),
+              const Point& ac_roOrigin = Point::Origin(),
               bool a_bClockwise = false );
 IMEXPORT PointTransform PointDegreeRotation( double a_dDegrees,
                                              bool a_bClockwise = false );
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees, bool a_bClockwise,
-                    const PointVector& ac_roOrigin = PointVector::Origin() );
+                    const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees,
-                    const PointVector& ac_roOrigin = PointVector::Origin(),
+                    const Point& ac_roOrigin = Point::Origin(),
                     bool a_bClockwise = false );
 
 }   // namespace Plane
@@ -78,78 +78,78 @@ typedef Transform2D HVectorTransform2D;
 namespace Space
 {
 
+using namespace Math;
+
 // simplify typing
-typedef Math::Matrix< double, 3 > PointTransform;
-typedef Math::Matrix< double, 4 > Transform;
+typedef Matrix< double, 3 > PointTransform;
+typedef Matrix< double, 4 > Transform;
 typedef Transform HomogeneousTransform;
 typedef Transform HVectorTransform;
 
 // Make a transformation that performs the given transformation about a point
 IMEXPORT Transform
    TransformationAbout( const Transform& ac_roTransform,
-                        const PointVector& ac_roOrigin = PointVector::Origin() );
+                        const Point& ac_roOrigin = Point::Origin() );
 
 // Scale
 IMEXPORT PointTransform PointScaling( double a_dFactor );
 IMEXPORT Transform
-    Scaling( double a_dFactor,
-             const PointVector& ac_roOrigin = PointVector::Origin() );
+    Scaling( double a_dFactor, const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT PointTransform PointScaling( double a_dX, double a_dY, double a_dZ );
 IMEXPORT Transform
     Scaling( double a_dX, double a_dY, double a_dZ,
-             const PointVector& ac_roOrigin = PointVector::Origin() );
-IMEXPORT PointTransform PointScaling( const PointVector& ac_roFactor );
+             const Point& ac_roOrigin = Point::Origin() );
+IMEXPORT PointTransform PointScaling( const Point& ac_roFactor );
 IMEXPORT Transform
-    Scaling( const PointVector& ac_roFactor,
-             const PointVector& ac_roOrigin = PointVector::Origin() );
+    Scaling( const Point& ac_roFactor,
+             const Point& ac_roOrigin = Point::Origin() );
 
 // Translate
 IMEXPORT Transform Translation( double a_dX, double a_dY, double a_dZ );
-IMEXPORT Transform Translation( const PointVector& ac_roTranslation );
+IMEXPORT Transform Translation( const Point& ac_roTranslation );
 IMEXPORT Transform
-    Translation( double a_dTime,
-                 const PointVector& ac_roVelocity = PointVector::Unit(0) );
+    Translation( double a_dTime, const Point& ac_roVelocity = Point::Unit(0) );
 
 // Rotate
 IMEXPORT PointTransform
     PointRotation( double a_dRadians, bool a_bClockwise,
-                   const PointVector& ac_roAxis = PointVector::Unit(2) );
+                   const Point& ac_roAxis = Point::Unit(2) );
 IMEXPORT PointTransform
     PointRotation( double a_dRadians,
-                   const PointVector& ac_roAxis = PointVector::Unit(2),
+                   const Point& ac_roAxis = Point::Unit(2),
                    bool a_bClockwise = false );
 IMEXPORT Transform
     Rotation( double a_dRadians, bool a_bClockwise,
-              const PointVector& ac_roAxis = PointVector::Unit(2),
-              const PointVector& ac_roOrigin = PointVector::Origin() );
+              const Point& ac_roAxis = Point::Unit(2),
+              const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT Transform
     Rotation( double a_dRadians,
-              const PointVector& ac_roAxis, bool a_bClockwise,
-              const PointVector& ac_roOrigin = PointVector::Origin() );
+              const Point& ac_roAxis, bool a_bClockwise,
+              const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT Transform
     Rotation( double a_dRadians,
-              const PointVector& ac_roAxis = PointVector::Unit(2),
-              const PointVector& ac_roOrigin = PointVector::Origin(),
+              const Point& ac_roAxis = Point::Unit(2),
+              const Point& ac_roOrigin = Point::Origin(),
               bool a_bClockwise = false );
 IMEXPORT PointTransform
     PointDegreeRotation( double a_dDegrees, bool a_bClockwise,
-                         const PointVector& ac_roAxis = PointVector::Unit(2) );
+                         const Point& ac_roAxis = Point::Unit(2) );
 IMEXPORT PointTransform
     PointDegreeRotation( double a_dDegrees,
-                         const PointVector& ac_roAxis = PointVector::Unit(2),
+                         const Point& ac_roAxis = Point::Unit(2),
                          bool a_bClockwise = false );
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees, bool a_bClockwise,
-                    const PointVector& ac_roAxis = PointVector::Unit(2),
-                    const PointVector& ac_roOrigin = PointVector::Origin() );
+                    const Point& ac_roAxis = Point::Unit(2),
+                    const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees,
-                    const PointVector& ac_roAxis, bool a_bClockwise,
-                    const PointVector& ac_roOrigin = PointVector::Origin() );
+                    const Point& ac_roAxis, bool a_bClockwise,
+                    const Point& ac_roOrigin = Point::Origin() );
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees,
-                    const PointVector& ac_roAxis = PointVector::Unit(2),
-                    const PointVector& ac_roOrigin = PointVector::Origin(),
+                    const Point& ac_roAxis = Point::Unit(2),
+                    const Point& ac_roOrigin = Point::Origin(),
                     bool a_bClockwise = false );
 
 // Perspective project onto plane z = -nearDistance.  Remap coordinates from
@@ -158,9 +158,9 @@ IMEXPORT Transform
 //  y' = [ -screenCenterY - 0.5, -screenCenterY + 0.5], z' = [0, 1].
 IMEXPORT Transform
     PerspectiveProjection( double a_dNearDistance, double a_dFarDistance,
-                           const Plane::PointVector& ac_roScreenSize,
-                           const Plane::PointVector& ac_roScreenCenter
-                                                      = PointVector::Origin() );
+                           const Plane::Point& ac_roScreenSize,
+                           const Plane::Point& ac_roScreenCenter
+                                                            = Point::Origin() );
 
 // Parallel project onto plane z = -nearDistance.  Remap coordinates from
 //  x = [-screenSizeX/2, screenSizeX/2], y = [-screenSizeY/2, screenSizeY/2],
@@ -168,9 +168,9 @@ IMEXPORT Transform
 //  y' = [ -screenCenterY - 0.5, -screenCenterY + 0.5], z' = [0, 1].
 IMEXPORT Transform
     ParallelProjection( double a_dNearDistance, double a_dFarDistance,
-                        const Plane::PointVector& ac_roScreenSize,
-                        const Plane::PointVector& ac_roScreenCenter
-                                                      = PointVector::Origin() );
+                        const Plane::Point& ac_roScreenSize,
+                        const Plane::Point& ac_roScreenCenter
+                                                            = Point::Origin() );
 
 }   // namespace Space
 typedef Space::PointTransform PointTransform3D;

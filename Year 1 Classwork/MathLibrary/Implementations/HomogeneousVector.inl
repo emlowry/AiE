@@ -70,14 +70,14 @@ INLINE HomogeneousVector::
 
 // Construct from a 2D point
 INLINE HomogeneousVector::
-    HomogeneousVector( const PointVector& ac_roPoint, double a_dH )
+    HomogeneousVector( const PointType& ac_roPoint, double a_dH )
     : BaseType( ac_roPoint ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] )
 {
     h = a_dH;
 }
 INLINE HomogeneousVector&
-    HomogeneousVector::operator=( const PointVector& ac_roPoint )
+    HomogeneousVector::operator=( const PointType& ac_roPoint )
 {
     x = ac_roPoint.x * h;
     y = ac_roPoint.y * h;
@@ -87,33 +87,33 @@ INLINE HomogeneousVector&
 // Construct from a 3D homogeneous vector
 INLINE HomogeneousVector::
     HomogeneousVector( const Space::HomogeneousVector& ac_roVector )
-    : BaseType( Space::PointVector( ac_roVector ) ),
+    : BaseType( Space::Point( ac_roVector ) ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), h( m_aaData[0][2] ) {}
 INLINE HomogeneousVector&
     HomogeneousVector::operator=( const Space::HomogeneousVector& ac_roVector )
 {
-    operator=( Space::PointVector( ac_roVector ) );
+    operator=( Space::Point( ac_roVector ) );
     return *this;
 }
 
 // re-implement equality and inequality checks to account for h
 INLINE bool HomogeneousVector::operator==( const HomogeneousVector& ac_roVector ) const
 {
-    return ( PointVector( *this ) == PointVector( ac_roVector ) );
+    return ( PointType( *this ) == PointType( ac_roVector ) );
 }
 INLINE bool HomogeneousVector::operator!=( const HomogeneousVector& ac_roVector ) const
 {
-    return ( PointVector( *this ) != PointVector( ac_roVector ) );
+    return ( PointType( *this ) != PointType( ac_roVector ) );
 }
 
 // re-implement normalization to account for h value
 INLINE double HomogeneousVector::Magnitude() const
 {
-    return PointVector( *this ).Magnitude();
+    return PointType( *this ).Magnitude();
 }
 INLINE double HomogeneousVector::MagnitudeSquared() const
 {
-    return PointVector( *this ).Magnitude();
+    return PointType( *this ).Magnitude();
 }
 INLINE HomogeneousVector& HomogeneousVector::Normalize()
 {
@@ -122,7 +122,7 @@ INLINE HomogeneousVector& HomogeneousVector::Normalize()
 }
 INLINE HomogeneousVector HomogeneousVector::Normal() const
 {
-    return HomogeneousVector( PointVector( *this ).Normal() );
+    return HomogeneousVector( PointType( *this ).Normal() );
 }
 
 // Adjust values so that h = 1 or 0
@@ -238,7 +238,7 @@ INLINE HomogeneousVector::
 
 // Construct from a 3D point
 INLINE HomogeneousVector::
-    HomogeneousVector( const PointVector& ac_roPoint, double a_dH )
+    HomogeneousVector( const PointType& ac_roPoint, double a_dH )
     : BaseType( ac_roPoint ),
       x( m_aaData[0][0] ),
       y( m_aaData[0][1] ),
@@ -248,7 +248,7 @@ INLINE HomogeneousVector::
     h = a_dH;
     operator=( ac_roPoint );
 }
-INLINE HomogeneousVector& HomogeneousVector::operator=( const PointVector& ac_roPoint )
+INLINE HomogeneousVector& HomogeneousVector::operator=( const PointType& ac_roPoint )
 {
     x = ac_roPoint.x * h;
     y = ac_roPoint.y * h;
@@ -260,22 +260,22 @@ INLINE HomogeneousVector& HomogeneousVector::operator=( const PointVector& ac_ro
 INLINE bool HomogeneousVector::
     operator==( const HomogeneousVector& ac_roVector ) const
 {
-    return ( PointVector( *this ) == PointVector( ac_roVector ) );
+    return ( PointType( *this ) == PointType( ac_roVector ) );
 }
 INLINE bool HomogeneousVector::
     operator!=( const HomogeneousVector& ac_roVector ) const
 {
-    return ( PointVector( *this ) != PointVector( ac_roVector ) );
+    return ( PointType( *this ) != PointType( ac_roVector ) );
 }
 
 // re-implement normalization to account for h value
 INLINE double HomogeneousVector::Magnitude() const
 {
-    return PointVector( *this ).Magnitude();
+    return PointType( *this ).Magnitude();
 }
 INLINE double HomogeneousVector::MagnitudeSquared() const
 {
-    return PointVector( *this ).Magnitude();
+    return PointType( *this ).Magnitude();
 }
 INLINE HomogeneousVector& HomogeneousVector::Normalize()
 {
@@ -284,7 +284,7 @@ INLINE HomogeneousVector& HomogeneousVector::Normalize()
 }
 INLINE HomogeneousVector HomogeneousVector::Normal() const
 {
-    return HomogeneousVector( PointVector( *this ).Normal() );
+    return HomogeneousVector( Point( *this ).Normal() );
 }
 
 // Adjust values so that h = 1 or 0

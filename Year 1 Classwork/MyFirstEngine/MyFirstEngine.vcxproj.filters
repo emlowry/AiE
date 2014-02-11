@@ -33,6 +33,12 @@
     <ClInclude Include="Declarations\NotCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\GameWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\DumbString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyFirstEngine.cpp">
@@ -41,6 +47,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Implementations\GameEngine.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\GameWindow.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\DumbString.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

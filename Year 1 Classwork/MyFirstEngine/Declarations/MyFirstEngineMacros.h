@@ -11,11 +11,16 @@
 // definitions from other libraries.  Just make sure to include this file after
 // all other headers.
 
+#undef INLINE
+#undef INLINE_IMPLEMENTATION
+#undef IMEXPORT
+#undef IMEXPORT_CLASS
+#undef IMEXPORT_T_INST
+#undef EXTERN_T_INST
+
 #if defined COMPILING_MY_FIRST_ENGINE_LIBRARY || \
     defined INCLUDING_INLINE_MY_FIRST_ENGINE_LIBRARY
 #define INLINE_IMPLEMENTATION
-#else
-#undef INLINE_IMPLEMENTATION
 #endif
 
 #ifdef COMPILING_MY_FIRST_ENGINE_LIBRARY

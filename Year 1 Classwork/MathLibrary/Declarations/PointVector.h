@@ -17,20 +17,22 @@
 
 #include "Vector.h"
 #include "Matrix.h"
-#include "ImExportMacro.h"
 
 namespace Plane
 {
+
+using namespace Math;
 
 // forward declare HomogeneousVector
 class HomogeneousVector;
 
 // Represent a point in 2D space
-class IMEXPORT_CLASS PointVector : public Math::Vector< double, 2 >
+template< typename T >
+class PointVector : public Vector< T, 2 >
 {
 public:
 
-    typedef Math::Vector< double, 2 > BaseType;
+    typedef Vector< T, 2 > BaseType;
     typedef BaseType::BaseType RootType;
 
     // destructor
@@ -43,23 +45,23 @@ public:
     PointVector( const RootType& ac_roMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill = 0 );
+                 const T& ac_rFill = DefaultFill< T >() );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector( const Matrix< U, P, Q >& ac_roMatrix,
-                 double a_dFill = 0 );
-    PointVector( double a_dFill );
-    PointVector( const double (&ac_radData)[ 2 ] );
+                 const T& ac_rFill = DefaultFill< T >() );
+    PointVector( const T& a_dFill );
+    PointVector( const T (&ac_radData)[ 2 ] );
     
     // Assignment operators that pass to base class
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector& operator=( const Matrix< U, P, Q >& ac_roMatrix );
-    PointVector& operator=( const double& ac_rFill );
-    PointVector& operator=( const double (&ac_raData)[ 2 ] );
+    PointVector& operator=( const T& ac_rFill );
+    PointVector& operator=( const T (&ac_raData)[ 2 ] );
     
     // Construct from the given coordinates
-    PointVector( double a_dX, double a_dY );
+    PointVector( const T& a_dX, const T& a_dY );
 
     // Construct from homogenous vector
     PointVector( const HomogeneousVector& ac_roVector );
@@ -69,29 +71,35 @@ public:
     static const PointVector& Origin();
 
     // public access to X and Y coordinates
-    double& x;
-    double& y;
+    T& x;
+    T& y;
 
 };   // Plane::PointVector
-typedef PointVector Point;
+typedef PointVector< double > Point;
+typedef PointVector< int > IntPoint;
 
 }   // namespace Plane
-typedef Plane::PointVector PointVector2D;
+typedef Plane::PointVector< double > PointVector2D;
 typedef Plane::Point Point2D;
+typedef Plane::PointVector< int > IntPointVector2D;
+typedef Plane::IntPoint IntPoint2D;
 
 namespace Space
 {
+
+using namespace Math;
 
 // forward declare HomogeneousVector
 class HomogeneousVector;
 
 // Represent a point in 3D space
-class IMEXPORT_CLASS PointVector : public Math::Vector< double, 3 >
+template< typename T >
+class PointVector : public Vector< T, 3 >
 {
 public:
 
     // simplify typing
-    typedef Math::Vector< double, 3 > BaseType;
+    typedef Vector< T, 3 > BaseType;
     typedef BaseType::BaseType RootType;
 
     // destructor
@@ -104,23 +112,23 @@ public:
     PointVector( const RootType& ac_roMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill = 0 );
+                 const T& ac_rFill = DefaultFill< T >() );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector( const Matrix< U, P, Q >& ac_roMatrix,
-                 double a_dFill = 0 );
-    PointVector( double a_dFill );
-    PointVector( const double (&ac_radData)[ 3 ] );
+                 const T& ac_rFill = DefaultFill< T >() );
+    PointVector( const T& a_dFill );
+    PointVector( const T (&ac_radData)[ 3 ] );
     
     // Assignment operators that pass to base class
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector& operator=( const Matrix< U, P, Q >& ac_roMatrix );
-    PointVector& operator=( const double& ac_rFill );
-    PointVector& operator=( const double (&ac_raData)[ 3 ] );
+    PointVector& operator=( const T& ac_rFill );
+    PointVector& operator=( const T (&ac_raData)[ 3 ] );
     
     // Construct from the given coordinates
-    PointVector( double a_dX, double a_dY, double a_dZ );
+    PointVector( const T& a_dX, const T& a_dY, const T& a_dZ );
 
     // Construct from HomogeneousVector
     PointVector( const HomogeneousVector& ac_roVector );
@@ -130,22 +138,21 @@ public:
     static const PointVector& Origin();
 
     // public access to X, Y, and Z coordinates
-    double& x;
-    double& y;
-    double& z;
+    T& x;
+    T& y;
+    T& z;
 
 };   // Space::PointVector
-typedef PointVector Point;
+typedef PointVector< double > Point;
+typedef PointVector< int > IntPoint;
 
 }   // namespace Space
-typedef Space::PointVector PointVector3D;
+typedef Space::PointVector< double > PointVector3D;
 typedef Space::Point Point3D;
+typedef Space::PointVector< int > IntPointVector3D;
+typedef Space::IntPoint IntPoint3D;
 
 #include "Declarations/HomogeneousVector.h"
-// Always include template function implementations with this header
-#include "Implementations/PointVector_Templates.inl"
-#ifdef INLINE_IMPLEMENTATION
 #include "Implementations/PointVector.inl"
-#endif
 
 #endif // POINT_VECTOR__H

@@ -12,68 +12,86 @@
 
 #include "Declarations/HomogeneousVector.h"
 #include "Declarations/PointVector.h"
+#include "PointVector_Templates.inl"
 #include "Declarations/ImExportMacro.h"
 
 namespace Plane
 {
 
 // destructor
-INLINE PointVector::~PointVector() {}
+template< typename T >
+INLINE PointVector< T >::~PointVector() {}
 
 // Constructors that forward to base class constructors
-INLINE PointVector::PointVector()
+template< typename T >
+INLINE PointVector< T >::PointVector()
     : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
-INLINE PointVector::PointVector( const PointVector& ac_roVector )
+template< typename T >
+INLINE PointVector< T >::PointVector( const PointVector& ac_roVector )
     : BaseType( ac_roVector ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
-INLINE PointVector::PointVector( PointVector&& a_rroVector )
+template< typename T >
+INLINE PointVector< T >::PointVector( PointVector&& a_rroVector )
     : BaseType( std::forward< PointVector >( a_rroVector ) ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
-INLINE PointVector::PointVector( const RootType& ac_roMatrix )
+template< typename T >
+INLINE PointVector< T >::PointVector( const RootType& ac_roMatrix )
     : BaseType( ac_roMatrix ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
-INLINE PointVector::PointVector( double a_dFill )
-    : BaseType( a_dFill ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
-INLINE PointVector::PointVector( const double (&ac_radData)[ 2 ] )
-    : BaseType( ac_radData ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
+template< typename T >
+INLINE PointVector< T >::PointVector( const T& ac_rFill )
+    : BaseType( ac_rFill ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
+template< typename T >
+INLINE PointVector< T >::PointVector( const T (&ac_raData)[ 2 ] )
+    : BaseType( ac_raData ), x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
 
 // Assignment operators that pass to base class
-INLINE PointVector& PointVector::operator=( const double& ac_rFill )
+template< typename T >
+INLINE PointVector< T >& PointVector< T >::operator=( const T& ac_rFill )
 {
     BaseType::operator=( ac_rFill );
     return *this;
 }
-INLINE PointVector& PointVector::operator=( const double (&ac_raData)[ 2 ] )
+template< typename T >
+INLINE PointVector< T >& PointVector< T >::operator=( const T (&ac_raData)[ 2 ] )
 {
     BaseType::operator=( ac_raData );
     return *this;
 }
 
 // Construct from the given coordinates
-INLINE PointVector::PointVector( double a_dX, double a_dY )
+template< typename T >
+INLINE PointVector< T >::PointVector( const T& ac_rX, const T& ac_rY )
     : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] )
 {
-    x = a_dX;
-    y = a_dY;
+    x = ac_rX;
+    y = ac_rY;
 }
 
 // Construct from homogenous vector
-INLINE PointVector::PointVector( const HomogeneousVector& ac_roVector )
+template< typename T >
+INLINE PointVector< T >::PointVector( const HomogeneousVector& ac_roVector )
     : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] )
 {
     operator=( ac_roVector );
 }
-INLINE PointVector& PointVector::operator=( const HomogeneousVector& ac_roVector )
+template< typename T >
+INLINE PointVector< T >& PointVector< T >::
+    operator=( const HomogeneousVector& ac_roVector )
 {
-    x = ac_roVector.x / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
-    y = ac_roVector.y / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
+    BaseType::operator=( HomogeneousVector( ac_roVector ).Homogenize() );
     return *this;
 }
 
 // Origin of the coordinate system
-INLINE const PointVector& PointVector::Origin()
+template< typename T >
+INLINE const PointVector< T >& PointVector< T >::Origin()
 {
-    static PointVector oOrigin( 0.0, 0.0 );
+    static PointVector oOrigin = Zero();
     return oOrigin;
 }
+
+// explicit instantiations
+template class IMEXPORT_T_INST PointVector< double >;
+template class IMEXPORT_T_INST PointVector< int >;
 
 }   // namespace Plane
 
@@ -81,69 +99,85 @@ namespace Space
 {
 
 // destructor
-INLINE PointVector::~PointVector() {}
+template< typename T >
+INLINE PointVector< T >::~PointVector() {}
 
 // Constructors that forward to base class constructors
-INLINE PointVector::PointVector()
+template< typename T >
+INLINE PointVector< T >::PointVector()
     : BaseType(),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
-INLINE PointVector::PointVector( const PointVector& ac_roVector )
+template< typename T >
+INLINE PointVector< T >::PointVector( const PointVector& ac_roVector )
     : BaseType( ac_roVector ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
-INLINE PointVector::PointVector( PointVector&& a_rroVector )
+template< typename T >
+INLINE PointVector< T >::PointVector( PointVector&& a_rroVector )
     : BaseType( std::forward< PointVector >( a_rroVector ) ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
-INLINE PointVector::PointVector( const RootType& ac_roMatrix )
+template< typename T >
+INLINE PointVector< T >::PointVector( const RootType& ac_roMatrix )
     : BaseType( ac_roMatrix ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
-INLINE PointVector::PointVector( double a_dFill )
-    : BaseType( a_dFill ),
+template< typename T >
+INLINE PointVector< T >::PointVector( const T& ac_rFill )
+    : BaseType( ac_rFill ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
-INLINE PointVector::PointVector( const double (&ac_radData)[ 3 ] )
-    : BaseType( ac_radData ),
+template< typename T >
+INLINE PointVector< T >::PointVector( const T (&ac_raData)[ 3 ] )
+    : BaseType( ac_raData ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
 
 // Assignment operators that pass to base class
-INLINE PointVector& PointVector::operator=( const double& ac_rFill )
+template< typename T >
+INLINE PointVector< T >& PointVector< T >::operator=( const T& ac_rFill )
 {
     BaseType::operator=( ac_rFill );
     return *this;
 }
-INLINE PointVector& PointVector::operator=( const double (&ac_raData)[ 3 ] )
+template< typename T >
+INLINE PointVector< T >& PointVector< T >::operator=( const T (&ac_raData)[ 3 ] )
 {
     BaseType::operator=( ac_raData );
     return *this;
 }
 
 // Construct from the given coordinates
-INLINE PointVector::PointVector( double a_dX, double a_dY, double a_dZ )
+template< typename T >
+INLINE PointVector< T >::PointVector( const T& ac_rX, const T& ac_rY, const T& ac_rZ )
     : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] )
 {
-    x = a_dX;
-    y = a_dY;
-    z = a_dZ;
+    x = ac_rX;
+    y = ac_rY;
+    z = ac_rZ;
 }
 
 // Construct from homogenous vector
-INLINE PointVector::PointVector( const HomogeneousVector& ac_roVector )
+template< typename T >
+INLINE PointVector< T >::PointVector( const HomogeneousVector& ac_roVector )
     : BaseType(), x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] )
 {
     operator=( ac_roVector );
 }
-INLINE PointVector& PointVector::operator=( const HomogeneousVector& ac_roVector )
+template< typename T >
+INLINE PointVector< T >& PointVector< T >::
+    operator=( const HomogeneousVector& ac_roVector )
 {
-    x = ac_roVector.x / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
-    y = ac_roVector.y / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
-    z = ac_roVector.z / ( ac_roVector.h == 0.0 ? 1.0 : ac_roVector.h );
+    BaseType::operator=( HomogeneousVector( ac_roVector ).Homogenize() );
     return *this;
 }
 
 // Origin of the coordinate system
-INLINE const PointVector& PointVector::Origin()
+template< typename T >
+INLINE const PointVector< T >& PointVector< T >::Origin()
 {
-    static PointVector oOrigin( 0.0, 0.0, 0.0 );
+    static PointVector oOrigin = Zero();
     return oOrigin;
 }
+
+// explicit instantiations
+template class IMEXPORT_T_INST PointVector< double >;
+template class IMEXPORT_T_INST PointVector< int >;
 
 }   // namespace Space
 

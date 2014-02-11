@@ -24,9 +24,9 @@ namespace Plane
 // Make a transformation that performs the given transformation about a point
 INLINE Transform
    TransformationAbout( const Transform& ac_roTransform,
-                        const PointVector& ac_roOrigin )
+                        const Point& ac_roOrigin )
 {
-    if( ac_roOrigin == PointVector::Origin() )
+    if( ac_roOrigin == Point::Origin() )
     {
         return ac_roTransform;
     }
@@ -41,9 +41,9 @@ namespace Space
 // Make a transformation that performs the given transformation about a point
 INLINE Transform
    TransformationAbout( const Transform& ac_roTransform,
-                        const PointVector& ac_roOrigin )
+                        const Point& ac_roOrigin )
 {
-    if( ac_roOrigin == PointVector::Origin() )
+    if( ac_roOrigin == Point::Origin() )
     {
         return ac_roTransform;
     }
@@ -56,8 +56,8 @@ INLINE Transform
 //  y' = [ -screenCenterY - 0.5, -screenCenterY + 0.5], z' = [0, 1].
 INLINE Transform
     PerspectiveProjection( double a_dNearDistance, double a_dFarDistance,
-                           const Plane::PointVector& ac_roScreenSize,
-                           const Plane::PointVector& ac_roScreenCenter)
+                           const Point2D& ac_roScreenSize,
+                           const Point2D& ac_roScreenCenter)
 {
     const Point2D& roSize = ac_roScreenSize;
     const Point2D& roCenter = ac_roScreenCenter;
@@ -85,8 +85,8 @@ INLINE Transform
 //  y' = [ -screenCenterY - 0.5, -screenCenterY + 0.5], z' = [0, 1].
 INLINE Transform
     ParallelProjection( double a_dNearDistance, double a_dFarDistance,
-                        const Plane::PointVector& ac_roScreenSize,
-                        const Plane::PointVector& ac_roScreenCenter)
+                        const Point2D& ac_roScreenSize,
+                        const Point2D& ac_roScreenCenter)
 {
     const Point2D& roSize = ac_roScreenSize;
     const Point2D& roCenter = ac_roScreenCenter;

@@ -12,33 +12,38 @@
 
 #include "Declarations/PointVector.h"
 #include "Declarations/HomogeneousVector.h"
+#include "Declarations/ImExportMacro.h"
 
 namespace Plane
 {
 
 // Constructors that forward to base class constructors
+template< typename T >
 template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
+INLINE PointVector< T >::
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill )
-    : BaseType( ac_roVector, a_dFill ),
+                 const T& ac_rFill )
+    : BaseType( ac_roVector, ac_rFill ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
+template< typename T >
 template< typename U, unsigned int P, unsigned int Q >
-inline PointVector::PointVector( const Matrix< U, P, Q >& ac_roMatrix,
-                                 double a_dFill )
-    : BaseType( ac_roMatrix, a_dFill ),
+INLINE PointVector< T >::PointVector( const Matrix< U, P, Q >& ac_roMatrix,
+                                      const T& ac_rFill )
+    : BaseType( ac_roMatrix, ac_rFill ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ) {}
 
 // Assignment operators that pass to base class
+template< typename T >
 template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector& PointVector::
+INLINE PointVector< T >& PointVector< T >::
     operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector )
 {
     BaseType::operator=( ac_roVector );
     return *this;
 }
+template< typename T >
 template< typename U, unsigned int P, unsigned int Q >
-inline PointVector& PointVector::
+INLINE PointVector< T >& PointVector< T >::
     operator=( const Matrix< U, P, Q >& ac_roMatrix )
 {
     BaseType::operator=( ac_roMatrix );
@@ -51,28 +56,32 @@ namespace Space
 {
 
 // Constructors that forward to base class constructors
+template< typename T >
 template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector::
+INLINE PointVector< T >::
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 double a_dFill )
-    : BaseType( ac_roVector, a_dFill ),
+                 const T& ac_rFill )
+    : BaseType( ac_roVector, ac_rFill ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
+template< typename T >
 template< typename U, unsigned int P, unsigned int Q >
-inline PointVector::PointVector( const Matrix< U, P, Q >& ac_roMatrix,
-                                 double a_dFill )
-    : BaseType( ac_roMatrix, a_dFill ),
+INLINE PointVector< T >::PointVector( const Matrix< U, P, Q >& ac_roMatrix,
+                                      const T& ac_rFill )
+    : BaseType( ac_roMatrix, ac_rFill ),
       x( m_aaData[0][0] ), y( m_aaData[0][1] ), z( m_aaData[0][2] ) {}
 
 // Assignment operators that pass to base class
+template< typename T >
 template< typename U, unsigned int Q, bool t_bOtherIsRow >
-inline PointVector& PointVector::
+INLINE PointVector< T >& PointVector< T >::
     operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector )
 {
     BaseType::operator=( ac_roVector );
     return *this;
 }
+template< typename T >
 template< typename U, unsigned int P, unsigned int Q >
-inline PointVector& PointVector::
+INLINE PointVector< T >& PointVector< T >::
     operator=( const Matrix< U, P, Q >& ac_roMatrix )
 {
     BaseType::operator=( ac_roMatrix );

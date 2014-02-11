@@ -28,6 +28,9 @@ int main(int argc, char* argv[])
 	    std::cout << std::endl << "Press any key to continue..." << std::endl;
 	    _getch();
 
+        GameWindow oWindow;
+        oWindow.Open();
+
         std::cout << std::endl << "Terminating Game Engine...";
         GameEngine::Terminate();
         std::cout << "\tGame Engine terminated." << std::endl;

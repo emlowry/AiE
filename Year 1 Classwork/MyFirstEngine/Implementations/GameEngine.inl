@@ -11,6 +11,7 @@
 #define GAME_ENGINE__INL
 
 #include "Declarations\GameEngine.h"
+#include "Declarations\GameWindow.h"
 #include "Declarations\GLFW.h"
 #include "Declarations\MyFirstEngineMacros.h"
 #include <iostream>
@@ -52,6 +53,7 @@ INLINE void GameEngine::Terminate()
 {
     if( IsInitialized() )
     {
+        GameWindow::DestroyAll();
         glfwTerminate();
         Instance().m_bInitialized = false;
     }

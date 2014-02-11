@@ -51,6 +51,6 @@ protected:
     // only called internally by the Instance() function.
     Singleton() {}
 
-};  // Singleton
+};  // class Singleton
 
 #endif  // SINGLETON__H

@@ -38,6 +38,6 @@ private:
     NotCopyable& operator=( const NotCopyable& ac_roOriginal );
     NotCopyable& operator=( NotCopyable&& a_rroOriginal );
 
-};  // NotCopyable
+};  // class NotCopyable
 
 #endif  // NOT_COPYABLE__H

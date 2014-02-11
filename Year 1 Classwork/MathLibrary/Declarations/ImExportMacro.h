@@ -7,17 +7,22 @@
  * Last Modification:  Refactoring.
  ******************************************************************************/
 
+#undef INLINE
+#undef INLINE_IMPLEMENTATION
+#undef IMEXPORT
+#undef IMEXPORT_CLASS
+#undef IMEXPORT_T_INST
+#undef EXTERN_T_INST
+
 #if defined COMPILING_MATH_LIBRARY || defined INCLUDING_INLINE_MATH_LIBRARY
 #define INLINE_IMPLEMENTATION
-#else
-#undef INLINE_IMPLEMENTATION
 #endif
 
 #ifdef COMPILING_MATH_LIBRARY
 
 #define INLINE
 
-#if defined _DLL
+#if defined _USRDLL
 #define IMEXPORT __declspec( dllexport )
 #define IMEXPORT_CLASS __declspec( dllexport )
 #define IMEXPORT_T_INST __declspec( dllexport )

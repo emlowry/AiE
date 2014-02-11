@@ -22,7 +22,7 @@ INLINE PointTransform PointScaling( double a_dFactor )
 {
     return PointTransform::Identity() * a_dFactor;
 }
-INLINE Transform Scaling( double a_dFactor, const PointVector& ac_roOrigin )
+INLINE Transform Scaling( double a_dFactor, const Point& ac_roOrigin )
 {
     Transform oScale = PointTransform::Identity() * a_dFactor;
     oScale[2][2] = 1.0;
@@ -36,7 +36,7 @@ INLINE PointTransform PointScaling( double a_dX, double a_dY )
     return PointTransform( adScale );
 }
 INLINE Transform Scaling( double a_dX, double a_dY,
-                          const PointVector& ac_roOrigin )
+                          const Point& ac_roOrigin )
 {
     double adScale[3][3] = { { a_dX, 0.0,  0.0 },
                              { 0.0,  a_dY, 0.0 },
@@ -45,14 +45,14 @@ INLINE Transform Scaling( double a_dX, double a_dY,
 }
 
 // Scale by the factors given by a point along each axis
-INLINE PointTransform PointScaling( const PointVector& ac_roFactor )
+INLINE PointTransform PointScaling( const Point& ac_roFactor )
 {
     double adScale[2][2] = { { ac_roFactor[0], 0.0 },
                              { 0.0,            ac_roFactor[1] } };
     return PointTransform( adScale );
 }
-INLINE Transform Scaling( const PointVector& ac_roFactor,
-                          const PointVector& ac_roOrigin )
+INLINE Transform Scaling( const Point& ac_roFactor,
+                          const Point& ac_roOrigin )
 {
     double adScale[3][3] = { { ac_roFactor[0], 0.0,            0.0 },
                              { 0.0,            ac_roFactor[1], 0.0 },
@@ -70,7 +70,7 @@ INLINE PointTransform PointScaling( double a_dFactor )
 {
     return PointTransform::Identity() * a_dFactor;
 }
-INLINE Transform Scaling( double a_dFactor, const PointVector& ac_roOrigin )
+INLINE Transform Scaling( double a_dFactor, const Point& ac_roOrigin )
 {
     Transform oScale = PointScaling( a_dFactor );
     oScale[3][3] = 1.0;
@@ -86,7 +86,7 @@ INLINE PointTransform PointScaling( double a_dX, double a_dY, double a_dZ )
     return PointTransform( adScale );
 }
 INLINE Transform Scaling( double a_dX, double a_dY, double a_dZ,
-                          const PointVector& ac_roOrigin )
+                          const Point& ac_roOrigin )
 {
     double adScale[4][4] = { { a_dX, 0.0,  0.0,  0.0 },
                              { 0.0,  a_dY, 0.0,  0.0 },
@@ -96,7 +96,7 @@ INLINE Transform Scaling( double a_dX, double a_dY, double a_dZ,
 }
 
 // Scale by the factors given by a point along each axis
-INLINE PointTransform PointScaling( const PointVector& ac_roFactor )
+INLINE PointTransform PointScaling( const Point& ac_roFactor )
 {
     double adScale[3][3] =
     { { ac_roFactor[0], 0.0,            0.0 },
@@ -104,8 +104,8 @@ INLINE PointTransform PointScaling( const PointVector& ac_roFactor )
       { 0.0,            0.0,            ac_roFactor[2] } };
     return PointTransform( adScale );
 }
-INLINE Transform Scaling( const PointVector& ac_roFactor,
-                          const PointVector& ac_roOrigin )
+INLINE Transform Scaling( const Point& ac_roFactor,
+                          const Point& ac_roOrigin )
 {
     double adScale[4][4] =
     { { ac_roFactor[0], 0.0,            0.0,            0.0 },
