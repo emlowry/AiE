@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Class representing a window managed by the game engine.
- * Last Modified:      February 10, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 11, 2014
+ * Last Modification:  Adding GameState.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__H
@@ -14,6 +14,7 @@
 #include "GLFW.h"
 #include "MathLibrary.h"
 #include "NotCopyable.h"
+#include <iostream>
 #include <functional>
 #include <vector>
 #include <unordered_map>
@@ -28,7 +29,7 @@ class IMEXPORT_CLASS GameWindow : public NotCopyable
 public:
 
     // prevent typing errors
-    typedef std::vector< GameWindow* >::size_type WindowIndex;
+    typedef std::vector< GameWindow* >::size_type Index;
 
     // Constructors
     GameWindow( const IntPoint2D& ac_roSize = IntPoint2D( 800, 600 ),
@@ -40,12 +41,12 @@ public:
     virtual ~GameWindow();
 
     // Get/Set window properties
-    WindowIndex GetIndex() const { return m_uiIndex; }
+    Index GetIndex() const { return m_uiIndex; }
     const IntPoint2D& GetSize() const { return m_oSize; }
     const char* GetTitle() const { return m_oTitle.CString(); }
-    void SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight );
-    void SetSize( const IntPoint2D& ac_roSize );
-    void SetTitle( const char* ac_pcTitle );
+    GameWindow& SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight );
+    GameWindow& SetSize( const IntPoint2D& ac_roSize );
+    GameWindow& SetTitle( const char* ac_pcTitle );
 
     // Opening/Closing window
     void CancelClose(); // set flag indicating window shouldn't close
@@ -54,13 +55,20 @@ public:
     bool IsOpen() const;    // does a GLFW object exist?
     bool Open();    // actually create the window with GLFW
 
+    // make/check if current context window
+    bool IsCurrent();
+    GameWindow& MakeCurrent();
+
+    // advance by frame
+    void SwapBuffers();
+    static void SwapAllBuffers();
+
     // Destroy all windows
     static void DestroyAll();
 
     // Get a specific window
-    // if window system is not initialized, throw exception
     // if there is no window at the given index, throw exception
-    static GameWindow& Get( WindowIndex a_uiIndex = 0 );
+    static GameWindow& Get( Index a_uiIndex = 0 );
 
 protected:
 
@@ -72,14 +80,18 @@ private:
 
     // prevent typing errors
     typedef std::vector< GameWindow* > WindowSet;
-    typedef std::unordered_map< GLFWwindow*, WindowIndex > WindowLookup;
+    typedef std::unordered_map< GLFWwindow*, Index > WindowLookup;
 
     // Does the work for all the constructors
     void SetUp();
 
+    // the two steps of opening a window
+    void CreateWindow();
+    void AdjustFramePadding();
+
     // close window
     void Destroy(); // destroy the GLFW window object
-    void DoClose(); // called when window closed - if still closing after OnClose, destroy.
+    void DoClose(); // if still closing after OnClose, destroy.
 
     // Get a map for looking up window index based on GLFW window object pointer
     static WindowLookup& Lookup();
@@ -90,10 +102,11 @@ private:
     // Get a vector of pointers to all the managed windows
     static WindowSet& Windows();
 
-    WindowIndex m_uiIndex;
-    IntPoint2D m_oSize;
-    DumbString m_oTitle;
-    GLFWwindow* m_poWindow;
+    Index m_uiIndex;    // identifies the window by its place in the window list
+    IntPoint2D m_oSize; // pixels available to draw on with OpenGL
+    DumbString m_oTitle;    // Window title
+    GLFWwindow* m_poWindow; // pointer to the GLFW window object, if open
+    IntPoint2D m_oFramePadding; // difference in size between buffer and window
 
 };  // class GameWindow
 

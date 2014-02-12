@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the DumbString class.
- * Last Modified:      February 10, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 11, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef DUMB_STRING__INL
@@ -18,29 +18,42 @@
 // Constructors
 INLINE DumbString::DumbString()
     : m_uiSize( 0 ), m_uiCapacity( sizeof( int ) ),
-        m_pcData( new char[ m_uiCapacity ] ) { m_pcData[0] = '\0'; }
+        m_pcData( nullptr )
+{
+    m_pcData = new char[ m_uiCapacity ];
+    m_pcData[0] = '\0';
+}
 INLINE DumbString::DumbString( std::size_t a_uiSize )
     : m_uiSize( 0 ), m_uiCapacity( RequiredCapacity( a_uiSize ) ),
-        m_pcData( new char[ m_uiCapacity ] ) { m_pcData[0] = '\0'; }
+        m_pcData( nullptr )
+{
+    m_pcData = new char[ m_uiCapacity ];
+    m_pcData[0] = '\0';
+}
 INLINE DumbString::DumbString( const DumbString& ac_roString )
     : m_uiSize( ac_roString.m_uiSize ),
         m_uiCapacity( ac_roString.m_uiCapacity ),
-        m_pcData( new char[ m_uiCapacity ] )
+        m_pcData( nullptr )
 {
+    m_pcData = new char[ m_uiCapacity ];
     strcpy_s( m_pcData, m_uiCapacity, ac_roString.m_pcData );
 }
 INLINE DumbString::DumbString( const char* ac_pcData )
     : m_uiSize( strlen( ac_pcData ) ),
         m_uiCapacity( RequiredCapacity( m_uiSize ) ),
-        m_pcData( new char[ m_uiCapacity ] )
+        m_pcData( nullptr )
 {
+    m_pcData = new char[ m_uiCapacity ];
     strcpy_s( m_pcData, m_uiCapacity, ac_pcData );
 }
 
 // Destructor actually does something
 INLINE DumbString::~DumbString()
 {
-    delete[] m_pcData;
+    if( nullptr != m_pcData )
+    {
+        delete[] m_pcData;
+    }
 }
 
 // Assign operators

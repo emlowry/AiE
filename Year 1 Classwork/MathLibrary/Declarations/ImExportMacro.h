@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        A macro for adding the correct import/export keyword(s).
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 10, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #undef INLINE

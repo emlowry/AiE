@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Macros for managing import/export and inline keywords.
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 10, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 // No include guards for this file - always include it again to override macro

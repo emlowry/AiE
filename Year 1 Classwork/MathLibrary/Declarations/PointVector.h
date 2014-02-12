@@ -8,8 +8,8 @@
  *                      transformed point = original point * transform matrix,
  *                      instead of transform matrix * original point as it
  *                      would be if column vectors were used.
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 10, 2014
+ * Last Modification:  Templatizing PointVector.
  ******************************************************************************/
 
 #ifndef POINT_VECTOR__H
@@ -154,5 +154,12 @@ typedef Space::IntPoint IntPoint3D;
 
 #include "Declarations/HomogeneousVector.h"
 #include "Implementations/PointVector.inl"
+
+// explicit instantiations
+EXTERN_T_INST template class IMEXPORT_T_INST Plane::PointVector< double >;
+EXTERN_T_INST template class IMEXPORT_T_INST Plane::PointVector< int >;
+EXTERN_T_INST template class IMEXPORT_T_INST Space::PointVector< double >;
+EXTERN_T_INST template class IMEXPORT_T_INST Space::PointVector< int >;
+
 
 #endif // POINT_VECTOR__H

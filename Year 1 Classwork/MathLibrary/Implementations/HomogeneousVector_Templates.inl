@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Template function implementations for HomogeneousVector.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 10, 2014
+ * Last Modification:  Templatizing PointVector.
  ******************************************************************************/
 
 #ifndef HOMOGENEOUS_VECTOR__TEMPLATES__INL

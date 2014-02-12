@@ -17,6 +17,7 @@
 
 #include "Declarations\DumbString.h"
 #include "Declarations\GameEngine.h"
+#include "Declarations\GameState.h"
 #include "Declarations\GameWindow.h"
 //TODO include declaration headers
 

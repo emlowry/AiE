@@ -8,8 +8,8 @@
  *                      transformed vector = original vector * transform matrix,
  *                      instead of transform matrix * original vector as it
  *                      would be if column vectors were used.
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 10, 2014
+ * Last Modification:  Templatizing PointVector.
  ******************************************************************************/
 
 #ifndef HOMOGENEOUS_VECTOR__H

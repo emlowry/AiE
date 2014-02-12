@@ -4,8 +4,8 @@
  * Date Created:       January 5, 2014
  * Description:        Inline function implementations for making scale
  *                      transformations.
- * Last Modified:      February 4, 2014
- * Last Modification:  Switching from regular inline to macro inline.
+ * Last Modified:      February 10, 2014
+ * Last Modification:  Templatizing PointVector.
  ******************************************************************************/
 
 #ifndef TRANSFORM__SCALE__INL

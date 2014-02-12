@@ -36,7 +36,7 @@
     <None Include="Implementations\Matrix_MathFunctions.inl" />
     <None Include="Implementations\Matrix_Operators.inl" />
     <None Include="Implementations\PointVector.inl" />
-    <None Include="Implementations\PointVector_Templates.inl" />
+    <None Include="Implementations\PointVector_Constructors.inl" />
     <None Include="Implementations\Transform.inl" />
     <None Include="Implementations\Transform_Scale.inl" />
     <None Include="Implementations\Transform_TranslateRotate.inl" />

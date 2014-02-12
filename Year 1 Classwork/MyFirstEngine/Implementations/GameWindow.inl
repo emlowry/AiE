@@ -3,14 +3,16 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the GameWindow class.
- * Last Modified:      February 10, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 11, 2014
+ * Last Modification:  Adding GameState.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__INL
 #define GAME_WINDOW__INL
 
 #include "Declarations\GLFW.h"
+#include "Declarations\GameEngine.h"
+#include "Declarations\GameState.h"
 #include "Declarations\GameWindow.h"
 #include "MathLibrary.h"
 #include <stdexcept>
@@ -23,14 +25,17 @@ namespace MyFirstEngine
 {
 
 // Constructors
-INLINE GameWindow::GameWindow( const IntPoint2D& ac_roSize, const char* ac_pcTitle )
-    : m_oSize( ac_roSize ), m_oTitle( ac_pcTitle )
+INLINE GameWindow::GameWindow( const IntPoint2D& ac_roSize,
+                               const char* ac_pcTitle )
+    : m_oSize( ac_roSize ), m_oFramePadding( 0 ),
+      m_oTitle( ac_pcTitle ), m_poWindow( nullptr )
 {
     SetUp();
 }
 INLINE GameWindow::GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
                                const char* ac_pcTitle )
-    : m_oSize( a_uiWidth, a_uiHeight ), m_oTitle( ac_pcTitle )
+    : m_oSize( a_uiWidth, a_uiHeight ), m_oFramePadding( 0 ),
+      m_oTitle( ac_pcTitle ), m_poWindow( nullptr )
 {
     SetUp();
 }
@@ -48,30 +53,38 @@ INLINE GameWindow::~GameWindow()
 }
 
 // Set window properties
-INLINE void GameWindow::SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight )
+INLINE GameWindow& GameWindow::SetSize( unsigned int a_uiWidth,
+                                        unsigned int a_uiHeight )
 {
     m_oSize.x = a_uiWidth;
     m_oSize.y = a_uiHeight;
     if( IsOpen() )
     {
-        glfwSetWindowSize( m_poWindow, a_uiWidth, a_uiHeight );
+        glfwSetWindowSize( m_poWindow,
+                           a_uiWidth + m_oFramePadding.x,
+                           a_uiHeight + m_oFramePadding.y );
     }
+    return *this;
 }
-INLINE void GameWindow::SetSize( const IntPoint2D& ac_roSize )
+INLINE GameWindow& GameWindow::SetSize( const IntPoint2D& ac_roSize )
 {
     m_oSize = ac_roSize;
     if( IsOpen() )
     {
-        glfwSetWindowSize( m_poWindow, ac_roSize.x, ac_roSize.y );
+        glfwSetWindowSize( m_poWindow,
+                           ac_roSize.x + m_oFramePadding.x,
+                           ac_roSize.y + m_oFramePadding.y );
     }
+    return *this;
 }
-INLINE void GameWindow::SetTitle( const char* ac_pcTitle )
+INLINE GameWindow& GameWindow::SetTitle( const char* ac_pcTitle )
 {
     m_oTitle = ac_pcTitle;
     if( IsOpen() )
     {
         glfwSetWindowTitle( m_poWindow, ac_pcTitle );
     }
+    return *this;
 }
 
 // set flag indicating window shouldn't close
@@ -93,6 +106,7 @@ INLINE void GameWindow::Destroy()
     {
         Lookup().erase( m_poWindow );
         glfwDestroyWindow( m_poWindow );
+        m_poWindow = nullptr;
     }
 }
 
@@ -126,15 +140,54 @@ INLINE bool GameWindow::Open()
 {
     if( !IsOpen() )
     {
-        m_poWindow = glfwCreateWindow( m_oSize.x, m_oSize.y, m_oTitle.CString(),
-                                       nullptr, nullptr );
-        if( nullptr != m_poWindow )
-        {
-            Lookup()[ m_poWindow ] = m_uiIndex;
-            glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
-        }
+        CreateWindow();
+        AdjustFramePadding();
     }
     return IsOpen();
+}
+INLINE void GameWindow::CreateWindow()
+{
+    m_poWindow = glfwCreateWindow( m_oSize.x + m_oFramePadding.x,
+                                    m_oSize.y + m_oFramePadding.y,
+                                    m_oTitle.CString(), nullptr, nullptr );
+    if( nullptr != m_poWindow )
+    {
+        Lookup()[ m_poWindow ] = m_uiIndex;
+        glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
+    }
+}
+INLINE void GameWindow::AdjustFramePadding()
+{
+    IntPoint2D oBufferSize;
+    glfwGetFramebufferSize( m_poWindow, &( oBufferSize.x ), &( oBufferSize.y ) );
+    if( m_oSize != oBufferSize )
+    {
+        m_oFramePadding = m_oSize - oBufferSize;
+        glfwSetWindowSize( m_poWindow,
+                           m_oSize.x + m_oFramePadding.x,
+                           m_oSize.y + m_oFramePadding.y );
+    }
+}
+
+// make/check if current context window
+INLINE bool GameWindow::IsCurrent()
+{
+    return IsOpen() ? glfwGetCurrentContext() == m_poWindow : false;
+}
+INLINE GameWindow& GameWindow::MakeCurrent()
+{
+    Open();
+    glfwMakeContextCurrent( m_poWindow );
+    return *this;
+}
+
+// advance by frame
+INLINE void GameWindow::SwapBuffers()
+{
+    if( IsOpen() )
+    {
+        glfwSwapBuffers( m_poWindow );
+    }
 }
 
 //
@@ -155,7 +208,7 @@ INLINE void GameWindow::DestroyAll()
 
 // Get a specific window
 // if there is no window at the given index, throw exception
-INLINE GameWindow& GameWindow::Get( WindowIndex a_uiIndex )
+INLINE GameWindow& GameWindow::Get( Index a_uiIndex )
 {
     if( a_uiIndex >= Windows().size() || nullptr == Windows()[ a_uiIndex ] )
     {
@@ -174,9 +227,27 @@ INLINE GameWindow::WindowLookup& GameWindow::Lookup()
 // GLFW callback for window close
 INLINE void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 {
-    if( Lookup().count( a_poWindow ) != 0 )
+    if( Lookup().count( a_poWindow ) != 0 &&
+        nullptr != Windows()[ Lookup()[ a_poWindow ] ] )
     {
-        Windows()[ Lookup()[ a_poWindow ] ]->DoClose();
+        GameWindow& roWindow = *( Windows()[ Lookup()[ a_poWindow ] ] );
+        GameEngine::CurrentState().OnCloseWindow( roWindow );
+        if( roWindow.IsClosing() )
+        {
+            roWindow.DoClose();
+        }
+    }
+}
+
+// Swap frame buffers of all open windows
+INLINE void GameWindow::SwapAllBuffers()
+{
+    for each( GameWindow* poWindow in Windows() )
+    {
+        if( nullptr != poWindow )
+        {
+            poWindow->SwapBuffers();
+        }
     }
 }
 
