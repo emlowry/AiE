@@ -107,7 +107,8 @@ INLINE void GameEngine::Run()
     while( GameState::End() != CurrentState() )
     {
         CurrentState().OnUpdate();
-        glfwWaitEvents();
+        glfwPollEvents();
+        CurrentState().Draw();
     }
 }
 

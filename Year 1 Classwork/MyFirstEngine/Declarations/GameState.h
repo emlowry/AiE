@@ -37,6 +37,11 @@ public:
     virtual bool operator==( const GameState& ac_roState ) const;
     virtual bool operator!=( const GameState& ac_roState ) const;
 
+    // Draw to the screen after each update.  Don't update anything - that's for
+    // OnUpdate and other event handlers.  Default behavior is to swap frame
+    // buffers for all windows.
+    virtual void Draw() const;
+
     // Return a reference to the current game state
     bool IsCurrent() const;
 
@@ -66,7 +71,7 @@ protected:
     virtual void OnCloseWindow( GameWindow& a_roWindow );
 
     // Called by GameEngine::Run() before calling on GLFW to update.  Default
-    // behavior is to swap frame buffers of all windows.
+    // behavior is to do nothing.
     virtual void OnUpdate();
 
     // Called by Clear, Pop, Push, and ReplaceCurrent as states are added to,

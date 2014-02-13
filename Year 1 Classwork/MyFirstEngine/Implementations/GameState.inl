@@ -33,6 +33,14 @@ INLINE bool GameState::operator!=( const GameState& ac_roState ) const
     return Address() != ac_roState.Address();
 }
 
+// Draw to the screen after each update.  Don't update anything - that's for
+// OnUpdate and other event handlers.  Default behavior is to swap frame buffers
+// for all windows.
+INLINE void GameState::Draw() const
+{
+    GameWindow::SwapAllBuffers();
+}
+
 // Return a reference to the current game state
 INLINE bool GameState::IsCurrent() const
 {
@@ -56,10 +64,7 @@ INLINE void GameState::OnCloseWindow( GameWindow& a_roWindow )
 {
     GameEngine::ClearStates();
 }
-INLINE void GameState::OnUpdate()
-{
-    GameWindow::SwapAllBuffers();
-}
+INLINE void GameState::OnUpdate() {}
 INLINE void GameState::OnEnter() {}
 INLINE void GameState::OnSuspend() {}
 INLINE void GameState::OnResume() {}
