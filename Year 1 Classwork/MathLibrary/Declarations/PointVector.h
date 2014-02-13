@@ -8,13 +8,14 @@
  *                      transformed point = original point * transform matrix,
  *                      instead of transform matrix * original point as it
  *                      would be if column vectors were used.
- * Last Modified:      February 10, 2014
- * Last Modification:  Templatizing PointVector.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef POINT_VECTOR__H
 #define POINT_VECTOR__H
 
+#include "Functions.h"
 #include "Vector.h"
 #include "Matrix.h"
 
@@ -45,10 +46,10 @@ public:
     PointVector( const RootType& ac_roMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 const T& ac_rFill = DefaultFill< T >() );
+                 const T& ac_rFill = DefaultValue< T >() );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector( const Matrix< U, P, Q >& ac_roMatrix,
-                 const T& ac_rFill = DefaultFill< T >() );
+                 const T& ac_rFill = DefaultValue< T >() );
     PointVector( const T& a_dFill );
     PointVector( const T (&ac_radData)[ 2 ] );
     
@@ -112,10 +113,10 @@ public:
     PointVector( const RootType& ac_roMatrix );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     PointVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 const T& ac_rFill = DefaultFill< T >() );
+                 const T& ac_rFill = DefaultValue< T >() );
     template< typename U, unsigned int P, unsigned int Q >
     PointVector( const Matrix< U, P, Q >& ac_roMatrix,
-                 const T& ac_rFill = DefaultFill< T >() );
+                 const T& ac_rFill = DefaultValue< T >() );
     PointVector( const T& a_dFill );
     PointVector( const T (&ac_radData)[ 3 ] );
     

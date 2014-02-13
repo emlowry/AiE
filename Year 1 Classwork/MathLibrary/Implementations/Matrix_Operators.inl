@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 3, 2013
  * Description:        Operator implementations for Matrix template class.
- * Last Modified:      February 4, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef MATRIX__OPERATORS__INL
@@ -84,14 +84,14 @@ inline Matrix< T, M, P > Matrix< T, M, N >::
 //  ac_roMatrix * ac_roMatrix.Inverse() != Matrix< T, P >::Identity()
 template< typename T, unsigned int M, unsigned int N >
 template< unsigned int P >
-inline Matrix< typename MatrixInverse< T >::Type, M, P >
+inline Matrix< typename InverseOf< T >::Type, M, P >
     Matrix< T, M, N >::operator/( const Matrix< T, P, N >& ac_roMatrix ) const
 {
     if( !ac_roMatrix.IsInvertable() )
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }
-    Matrix< typename MatrixInverse< T >::Type, M, N > oCopy( *this );
+    Matrix< typename InverseOf< T >::Type, M, N > oCopy( *this );
     return oCopy * ac_roMatrix.Inverse() ;
 }
 

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 4, 2013
  * Description:        Inline and template function implementations.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef FUNCTIONS__INL
@@ -16,6 +16,15 @@
 
 namespace Math
 {
+
+// Used whenever values at a given coordinate aren't specified, as in
+// constructing a matrix from another matrix with smaller dimensions.
+template< typename T >
+const T& DefaultValue()
+{
+    static T fill = 0;
+    return fill;
+}
 
 // Convert between degrees and radians
 template< typename T >

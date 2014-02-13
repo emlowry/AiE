@@ -3,41 +3,20 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 18, 2013
  * Description:        Base class for matrices of numeric type.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef MATRIX__H
 #define MATRIX__H
 
+#include "Functions.h"
 #include "MostDerivedAddress.h"
 #include <iostream>
 #include <type_traits>  // for enable_if and is_scalar
 
 namespace Math
 {
-
-// Used whenever values at a given coordinate aren't specified, as in
-// constructing a matrix from another matrix with smaller dimensions.
-template< typename T >
-const T& DefaultFill();
-
-// Used to determine type of matrix inversion operations
-template< typename T >
-struct MatrixInverse
-{
-    typedef double Type;
-};
-template<>
-struct MatrixInverse< float >
-{
-    typedef float Type;
-};
-template<>
-struct MatrixInverse< long double >
-{
-    typedef long double Type;
-};
 
 // Forward declare vector type
 template< typename T, unsigned int N, bool t_bIsRow/* = true*/ >
@@ -53,7 +32,7 @@ public:
     typedef Vector< T, M, false > ColumnVectorType;
     typedef Vector< T, N, true > RowVectorType;
     typedef Matrix< T, ( M < N ? M : N ) > IdentityType;
-    typedef Matrix< typename MatrixInverse< T >::Type, N, M > InverseType;
+    typedef Matrix< typename InverseOf< T >::Type, N, M > InverseType;
     typedef Matrix< T, N, M > TransposeType;
 
     // destructor
@@ -62,14 +41,14 @@ public:
     // Construct/assign from a differently-sized/typed matrix
     template< typename U, unsigned int P, unsigned int Q >
     Matrix( const Matrix< U, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DefaultFill< T >() );
+            const T& ac_rFill = DefaultValue< T >() );
     template< typename U, unsigned int P, unsigned int Q >
     Matrix& operator=( const Matrix< U, P, Q >& ac_roMatrix );
     Matrix& operator=( const Matrix& ac_roMatrix )
     { return operator=< T, M, N >( ac_roMatrix ); }
 
     // Construct/assign all values equal to parameter
-    Matrix( const T& ac_rFill = DefaultFill< T >() );
+    Matrix( const T& ac_rFill = DefaultValue< T >() );
     Matrix& operator=( const T& ac_rFill );
 
     // Fill with one value along the identity diagonal and another elsewhere
@@ -90,6 +69,23 @@ public:
     Matrix& operator=( const RowVectorType (&ac_raoRows)[ M ] );
     Matrix( const RowVectorType* const (&ac_racpoRows)[ M ] );
     Matrix& operator=( const RowVectorType* const (&ac_racpoRows)[ M ] );
+
+    // Assign to arrays
+    template< typename U, unsigned int P >
+    inline typename ArrayReference< U, P >::type
+        AssignTo( U (&a_raData)[ P ], bool a_bTranspose = false ) const;
+    template< typename U, unsigned int P, unsigned int Q >
+    inline typename Array2DReference< U, P, Q >::type
+        AssignTo( U (&a_raaData)[ P ][ Q ], bool a_bTranspose = false ) const;
+    template< typename U >
+    U* AssignTo( U* const a_cpData,
+                 unsigned int a_uiSize = M*N,
+                 bool a_bTranspose = false ) const;
+    template< typename U >
+    U** AssignTo( U* const* const a_cpcpData,
+                  unsigned int a_uiRows = M,
+                  unsigned int a_uiColumns = N,
+                  bool a_bTranspose = false ) const;
 
     // Equality and inequality checks
     bool operator==( const Matrix& ac_roMatrix ) const;
@@ -176,7 +172,7 @@ public:
     //  ac_roMatrix.Inverse() * ac_roMatrix = Identity() but
     //  ac_roMatrix * ac_roMatrix.Inverse() != Matrix< T, P >::Identity()
     template< unsigned int P >
-    Matrix< typename MatrixInverse< T >::Type, M, P >
+    Matrix< typename InverseOf< T >::Type, M, P >
         operator/( const Matrix< T, P, N >& ac_roMatrix ) const;
 
     // transform assign

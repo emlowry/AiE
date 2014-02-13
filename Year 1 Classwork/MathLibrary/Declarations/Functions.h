@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 2, 2013
  * Description:        Various library functions not contained in a class.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef FUNCTIONS__H
@@ -21,6 +21,40 @@ const unsigned short DEGREES_IN_A_CIRCLE = 360;
 const long double PI = 3.14159265358979323846264338327950288419716939937510582L;
 const long double RADIANS_IN_A_CIRCLE = 2 * PI;
 const long double DEGREES_IN_A_RADIAN = 180L / PI;
+
+// simplify typing for array reference parameter/return types
+template< typename T, unsigned int N >
+struct ArrayReference
+{
+    typedef T (&type)[ N ];
+};
+template< typename T, unsigned int M, unsigned int N = M >
+struct Array2DReference
+{
+    typedef T (&type)[ M ][ N ];
+};
+
+// Used to determine type of matrix inversion operations
+template< typename T >
+struct InverseOf
+{
+    typedef double Type;
+};
+template<>
+struct InverseOf< float >
+{
+    typedef float Type;
+};
+template<>
+struct InverseOf< long double >
+{
+    typedef long double Type;
+};
+
+// Used whenever values at a given coordinate aren't specified, as in
+// constructing a matrix from another matrix with smaller dimensions.
+template< typename T >
+const T& DefaultValue();
 
 // Convert between degrees and radians
 template< typename T >

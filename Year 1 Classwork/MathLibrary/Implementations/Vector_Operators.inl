@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 17, 2013
  * Description:        Arithmatic operator implementations for Vector.h.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef VECTOR__OPERATORS__INL
@@ -63,13 +63,13 @@ inline typename std::conditional< t_bIsRow, Vector< T, P >,
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 template< unsigned int P >
-inline typename std::conditional< t_bIsRow, Vector< typename MatrixInverse< T >::Type, P >,
-                                  Matrix< typename MatrixInverse< T >::Type, N, P > >::type
+inline typename std::conditional< t_bIsRow, Vector< typename InverseOf< T >::Type, P >,
+                                  Matrix< typename InverseOf< T >::Type, N, P > >::type
     Vector< T, N, t_bIsRow >::
     operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const
 {
-    typedef typename std::conditional< t_bIsRow, Vector< typename MatrixInverse< T >::Type, P >,
-                                       Matrix< typename MatrixInverse< T >::Type, N, P > >::type
+    typedef typename std::conditional< t_bIsRow, Vector< typename InverseOf< T >::Type, P >,
+                                       Matrix< typename InverseOf< T >::Type, N, P > >::type
             ResultType;
     return ResultType( BaseType::operator/( ac_roMatrix ) );
 }

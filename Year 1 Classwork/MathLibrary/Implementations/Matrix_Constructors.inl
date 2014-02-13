@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 3, 2013
  * Description:        Constructor implementations for Matrix template class.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef MATRIX__CONSTRUCTORS__INL
@@ -136,7 +136,7 @@ inline Matrix< T, M, N >::
         for( unsigned int j = 0; j < N; ++j )
         {
             const ColumnVectorType* const cpcoColumn = ac_racpoColumns[j];
-            m_aaData[i][j] = ( nullptr == cpcoColumn ? DefaultFill< T >()
+            m_aaData[i][j] = ( nullptr == cpcoColumn ? DefaultValue< T >()
                                                   : (*cpcoColumn)[i] );
         }
     }
@@ -171,7 +171,7 @@ inline Matrix< T, M, N >::
         const RowVectorType* const cpcoRow = ac_racpoRows[i];
         for( unsigned int j = 0; j < N; ++j )
         {
-            m_aaData[i][j] = ( nullptr == cpcoRow ? DefaultFill< T >()
+            m_aaData[i][j] = ( nullptr == cpcoRow ? DefaultValue< T >()
                                                   : (*cpcoRow)[j] );
         }
     }

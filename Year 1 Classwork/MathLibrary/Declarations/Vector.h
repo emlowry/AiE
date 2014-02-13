@@ -3,13 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Base class for vectors of numeric type.
- * Last Modified:      February 4, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef VECTOR__H
 #define VECTOR__H
 
+#include "Functions.h"
 #include "Matrix.h"
 #include <type_traits>  // for enable_if and is_scalar
 
@@ -28,9 +29,9 @@ public:
     typedef Vector< T, N, false > ColumnVectorType;
     typedef Vector< T, N > RowVectorType;
     typedef Vector< T, 1 > IdentityType;
-    typedef Vector< typename MatrixInverse< T >::Type, N, !t_bIsRow > InverseType;
+    typedef Vector< typename InverseOf< T >::Type, N, !t_bIsRow > InverseType;
     typedef Vector< T, N, !t_bIsRow > TransposeType;
-    typedef Vector< typename MatrixInverse< T >::Type, N, t_bIsRow > NormalType;
+    typedef Vector< typename InverseOf< T >::Type, N, t_bIsRow > NormalType;
 
     // destructor
     virtual ~Vector();
@@ -39,7 +40,7 @@ public:
     Vector();
     template< typename U, unsigned int P, unsigned int Q >
     Vector( const Matrix< U, P, Q >& ac_roMatrix,
-            const T& ac_rFill = DefaultFill< T >() );
+            const T& ac_rFill = DefaultValue< T >() );
     Vector( const T& ac_rFill );
     Vector( const T (&ac_raData)[ N ] );
 
@@ -52,11 +53,36 @@ public:
     // Construct from another type of vector
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     Vector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-            const T& ac_rFill = DefaultFill< T >() );
+            const T& ac_rFill = DefaultValue< T >() );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     Vector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
     Vector& operator=( const Vector& ac_roMatrix )
     { return operator=< T, N, t_bIsRow >( ac_roMatrix ); }
+
+    // Assign to arrays
+    template< typename U, unsigned int P >
+    typename ArrayReference< U, P >::type
+        AssignToRow( typename ArrayReference< U, P >::type a_raData ) const;
+    template< typename U, unsigned int P >
+    typename ArrayReference< U, P >::type
+        AssignToColumn( typename ArrayReference< U, P >::type a_raData,
+                        unsigned int a_uiColumns,
+                        unsigned int a_uiAssignToColumn = 0 ) const;
+    template< typename U, unsigned int P, unsigned int Q >
+    typename Array2DReference< U, P, Q >::type
+        AssignToColumn( typename Array2DReference< U, P, Q>::type a_raaData,
+                        unsigned int a_uiAssignToColumn = 0 ) const;
+    template< typename U >
+    U* AssignToRow( U* const a_cpData, unsigned int a_uiSize = N ) const;
+    template< typename U >
+    U* AssignToColumn( U* const a_cpData,
+                       unsigned int a_uiColumns,
+                       unsigned int a_uiAssignToColumn = 0,
+                       unsigned int a_uiRows = N ) const;
+    template< typename U >
+    U** AssignToColumn( U* const* const a_cpcpData,
+                        unsigned int a_uiAssignToColumn = 0,
+                        unsigned int a_uiRows = N ) const;
     
     // Element access - hides parent class row-returning implementation
     T& operator[]( unsigned int a_uiIndex );
@@ -90,7 +116,7 @@ public:
     Vector Cross( const TransposeType& ac_roVector ) const;
 
     // Normalization
-    typename MatrixInverse< T >::Type Magnitude() const;
+    typename InverseOf< T >::Type Magnitude() const;
     T MagnitudeSquared() const; // for efficiency in complex calculations
     Vector& Normalize();
     NormalType Normal() const;
@@ -101,8 +127,8 @@ public:
     typename std::conditional< t_bIsRow, Vector< T, P >, Matrix< T, N, P > >::type
         operator*( const Matrix< T, ( t_bIsRow ? N : 1 ), P >& ac_roMatrix ) const;
     template< unsigned int P >
-    typename std::conditional< t_bIsRow, Vector< typename MatrixInverse< T >::Type, P >,
-                               Matrix< typename MatrixInverse< T >::Type, N, P > >::type
+    typename std::conditional< t_bIsRow, Vector< typename InverseOf< T >::Type, P >,
+                               Matrix< typename InverseOf< T >::Type, N, P > >::type
         operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const;
     Vector& operator*=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
     Vector& operator/=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );

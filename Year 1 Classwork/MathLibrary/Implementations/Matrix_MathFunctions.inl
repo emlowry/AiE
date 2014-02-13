@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Function implementations for Matrix template class.
- * Last Modified:      February 4, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef MATRIX__MATH_FUNCTIONS__INL
@@ -114,7 +114,7 @@ inline bool Matrix< T, M, N >::
     LeftInverse( InverseType& a_roMatrix ) const    // !invertable = !change
 {
     InverseType oTranspose = Transpose();
-    Matrix< typename MatrixInverse< T >::Type, M, N > oCopy( *this );
+    Matrix< typename InverseOf< T >::Type, M, N > oCopy( *this );
     typename Matrix< T, N >::InverseType oSquare( oTranspose * oCopy );
     if( !oSquare.Invert() )
     {
@@ -131,7 +131,7 @@ inline bool Matrix< T, M, N >::
     RightInverse( InverseType& a_roMatrix ) const   // !invertable = !change
 {
     InverseType oTranspose = Transpose();
-    Matrix< typename MatrixInverse< T >::Type, M, N > oCopy( *this );
+    Matrix< typename InverseOf< T >::Type, M, N > oCopy( *this );
     typename Matrix< T, M >::InverseType oSquare( oCopy * oTranspose );
     if( !oSquare.Invert() )
     {

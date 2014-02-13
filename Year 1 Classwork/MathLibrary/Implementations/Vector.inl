@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 25, 2013
  * Description:        Inline and other function implementations for Vector.h.
- * Last Modified:      February 4, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef VECTOR__INL
@@ -45,6 +45,128 @@ const Vector< T, N, t_IsRow >&
         abInitialized = true;
     }
     return ( a_uiAxis < N ? aoUnits[a_uiAxis] : Zero() );
+}
+
+// Assign to arrays
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U, unsigned int P >
+typename ArrayReference< U, P >::type Vector< T, N, t_bIsRow >::
+    AssignToRow( typename ArrayReference< U, P >::type a_raData ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < N && i < P; ++i )
+    {
+        a_raData[i] = At(i);
+    }
+    return a_raData;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U, unsigned int P >
+typename ArrayReference< U, P >::type Vector< T, N, t_bIsRow >::
+    AssignToColumn( typename ArrayReference< U, P >::type a_raData,
+                    unsigned int a_uiColumns,
+                    unsigned int a_uiAssignToColumn ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < N && i < P; ++i )
+    {
+        a_raData[ ( i * a_uiColumns ) + a_uiAssignToColumn ] = At(i);
+    }
+    return a_raData;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U, unsigned int P, unsigned int Q >
+typename Array2DReference< U, P, Q >::type Vector< T, N, t_bIsRow >::
+    AssignToColumn( typename Array2DReference< U, P, Q>::type a_raaData,
+                    unsigned int a_uiAssignToColumn ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < N && i < P; ++i )
+    {
+        a_raaData[i][a_uiAssignToColumn] = At(i);
+    }
+    return a_raaData;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U >
+U* Vector< T, N, t_bIsRow >::AssignToRow( U* const a_cpData,
+                                          unsigned int a_uiSize ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < N && i < a_uiSize; ++i )
+    {
+        a_cpData[i] = At(i);
+    }
+    return a_cpData;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U >
+U* Vector< T, N, t_bIsRow >::AssignToColumn( U* const a_cpData,
+                                             unsigned int a_uiColumns,
+                                             unsigned int a_uiAssignToColumn,
+                                             unsigned int a_uiRows ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < N && i < a_uiRows; ++i )
+    {
+        a_cpData[ ( i * a_uiColumns ) + a_uiAssignToColumn ] = At(i);
+    }
+    return a_cpData;
+}
+template< typename T, unsigned int N, bool t_bIsRow >
+template< typename U >
+U** Vector< T, N, t_bIsRow >::AssignToColumn( U* const* const a_cpcpData,
+                                              unsigned int a_uiAssignToColumn,
+                                              unsigned int a_uiRows ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < N && i < a_uiRows; ++i )
+    {
+        a_cpcpData[i][a_uiAssignToColumn] = At(i);
+    }
+    return a_cpcpData;
 }
 
 // Get this vector in row/column form
@@ -183,16 +305,10 @@ inline Vector< T, N, t_bIsRow >
 
 // Normalization
 template< typename T, unsigned int N, bool t_bIsRow >
-inline typename MatrixInverse< T >::Type
+inline typename InverseOf< T >::Type
     Vector< T, N, t_bIsRow >::Magnitude() const
 {
-    typedef typename
-        std::conditional< std::is_same< long double, T >::value,
-                          long double,
-                          std::conditional< std::is_same< float, T >::value,
-                                            float, double >::type >::type
-            FloatType;
-    return std::sqrt( (FloatType)MagnitudeSquared() );
+    return std::sqrt( (typename InverseOf< T >::Type)MagnitudeSquared() );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
@@ -207,7 +323,7 @@ inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::Normalize()
 {
-    typename MatrixInverse< T >::Type magnitude = Magnitude();
+    typename InverseOf< T >::Type magnitude = Magnitude();
     for( unsigned int i = 0; i < N; ++i )
     {
         At(i) = (T)( At(i) / magnitude );

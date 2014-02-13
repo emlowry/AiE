@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 18, 2013
  * Description:        Function implementations for Matrix template class.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 12, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef MATRIX__INL
@@ -23,15 +23,6 @@
 
 namespace Math
 {
-    
-// Used whenever values at a given coordinate aren't specified, as in
-// constructing a matrix from another matrix with smaller dimensions.
-template< typename T >
-const T& DefaultFill()
-{
-    static T fill = 0;
-    return fill;
-}
 
 // Zero matrix
 template< typename T, unsigned int M, unsigned int N >
@@ -47,6 +38,97 @@ const typename Matrix< T, M, N >::IdentityType& Matrix< T, M, N >::Identity()
 {
     static IdentityType oIdentity( 0, 1 );
     return oIdentity;
+}
+
+// Assign to arrays
+template< typename T, unsigned int M, unsigned int N >
+template< typename U, unsigned int P >
+inline typename ArrayReference< U, P >::type
+        Matrix< T, M, N >::AssignTo( U (&a_raData)[ P ],
+                                     bool a_bTranspose ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < M*N && i < P; ++i )
+    {
+        a_raData[i] = a_bTranspose ? m_aaData[i%N][i/N] : m_aaData[i/N][i%N];
+    }
+    return a_raData;
+}
+template< typename T, unsigned int M, unsigned int N >
+template< typename U, unsigned int P, unsigned int Q >
+inline typename Array2DReference< U, P, Q >::type
+    Matrix< T, M, N >::AssignTo( U (&a_raaData)[ P ][ Q ],
+                                 bool a_bTranspose ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < ( a_bTranspose ? N : M ) && i < P; ++i )
+    {
+        for( unsigned int j = 0; j < ( a_bTranspose ? M : N ) && j < Q; ++j )
+        {
+            a_raaData[i][j] = a_bTranspose ? m_aaData[j][i] : m_aaData[i][j];
+        }
+    }
+    return a_raaData;
+}
+template< typename T, unsigned int M, unsigned int N >
+template< typename U >
+U* Matrix< T, M, N >::AssignTo( U* const a_cpData,
+                                unsigned int a_uiSize,
+                                bool a_bTranspose ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < M*N && i < a_uiSize; ++i )
+    {
+        a_raData[i] = a_bTranspose ? m_aaData[i%N][i/N] : m_aaData[i/N][i%N];
+    }
+    return a_cpData;
+}
+template< typename T, unsigned int M, unsigned int N >
+template< typename U >
+U** Matrix< T, M, N >::AssignTo( U* const* const a_cpcpData,
+                                 unsigned int a_uiRows,
+                                 unsigned int a_uiColumns,
+                                 bool a_bTranspose ) const
+{/*
+    if( !std::is_copy_assignable< U >::value )
+    {
+        throw exception("Non-copy-assignable type");
+    }
+    if( !std::is_convertible< T, U >:: value )
+    {
+        throw exception("Non-convertable input type");
+    }  /**/
+    for( unsigned int i = 0; i < ( a_bTranspose ? N : M ) && i < a_uiRows; ++i )
+    {
+        for( unsigned int j = 0;
+             j < ( a_bTranspose ? M : N ) && j < a_uiColumns;
+             ++j )
+        {
+            a_raaData[i][j] = a_bTranspose ? m_aaData[j][i] : m_aaData[i][j];
+        }
+    }
+    return a_cpcpData;
 }
 
 // Element access
