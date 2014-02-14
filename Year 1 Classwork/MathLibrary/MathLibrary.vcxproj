@@ -22,7 +22,7 @@
     <ClInclude Include="Declarations\PointVector.h" />
     <ClInclude Include="Declarations\Transform.h" />
     <ClInclude Include="Declarations\Vector.h" />
-    <ClInclude Include="MathLibrary.h" />
+    <ClInclude Include="include\MathLibrary.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl" />

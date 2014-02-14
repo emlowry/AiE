@@ -101,9 +101,9 @@ public:
 }   // namespace Color
 
 // Always include template function implementations with this header
-#include "Implementations/ColorVector_Templates.inl"
+#include "../Implementations/ColorVector_Templates.inl"
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations/ColorVector.inl"
+#include "../Implementations/ColorVector.inl"
 #endif
 
 #endif  // COLOR_VECTOR__H

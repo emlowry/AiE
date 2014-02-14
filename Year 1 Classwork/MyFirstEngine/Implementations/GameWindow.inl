@@ -18,11 +18,20 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "Declarations\MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
 {
+
+// Store the list of windows and the map of GLFWwindow pointers
+struct WindowStorage : public Singleton< WindowStorage >
+{
+    virtual ~WindowStorage() {}
+    std::unordered_map< GLFWwindow*, unsigned int > lookup;
+    std::vector< GameWindow* > windows;
+};
 
 // Constructors
 INLINE GameWindow::GameWindow( const IntPoint2D& ac_roSize,
@@ -41,15 +50,29 @@ INLINE GameWindow::GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
 }
 INLINE void GameWindow::SetUp()
 {
-    m_uiIndex = Windows().size();
-    Windows().push_back( this );
+    m_uiIndex = WindowStorage::Instance().windows.size();
+    WindowStorage::Instance().windows.push_back( this );
 }
 
 // Destructor actually does something in this class
 INLINE GameWindow::~GameWindow()
 {
     Destroy();
-    Windows()[ m_uiIndex ] = nullptr;
+    WindowStorage::Instance().windows[ m_uiIndex ] = nullptr;
+}
+
+// Get window properties
+INLINE unsigned int GameWindow::GetIndex() const
+{
+    return m_uiIndex;
+}
+INLINE const IntPoint2D& GameWindow::GetSize() const
+{
+    return m_oSize;
+}
+INLINE const char* GameWindow::GetTitle() const
+{
+    return m_oTitle.CString();
 }
 
 // Set window properties
@@ -104,7 +127,7 @@ INLINE void GameWindow::Destroy()
 {
     if( IsOpen() )
     {
-        Lookup().erase( m_poWindow );
+        WindowStorage::Instance().lookup.erase( m_poWindow );
         glfwDestroyWindow( m_poWindow );
         m_poWindow = nullptr;
     }
@@ -152,7 +175,7 @@ INLINE void GameWindow::CreateWindow()
                                     m_oTitle.CString(), nullptr, nullptr );
     if( nullptr != m_poWindow )
     {
-        Lookup()[ m_poWindow ] = m_uiIndex;
+        WindowStorage::Instance().lookup[ m_poWindow ] = m_uiIndex;
         glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
     }
 }
@@ -197,7 +220,7 @@ INLINE void GameWindow::SwapBuffers()
 // Destroy all windows
 INLINE void GameWindow::DestroyAll()
 {
-    for each( GameWindow* poWindow in Windows() )
+    for each( GameWindow* poWindow in WindowStorage::Instance().windows )
     {
         if( nullptr != poWindow )
         {
@@ -208,29 +231,26 @@ INLINE void GameWindow::DestroyAll()
 
 // Get a specific window
 // if there is no window at the given index, throw exception
-INLINE GameWindow& GameWindow::Get( Index a_uiIndex )
+INLINE GameWindow& GameWindow::Get( unsigned int a_uiIndex )
 {
-    if( a_uiIndex >= Windows().size() || nullptr == Windows()[ a_uiIndex ] )
+    if( a_uiIndex >= WindowStorage::Instance().windows.size() ||
+        nullptr == WindowStorage::Instance().windows[ a_uiIndex ] )
     {
         throw std::out_of_range( "No window with that index" );
     }
-    return *( Windows()[ a_uiIndex ] );
-}
-
-// Get a reference to the static map linking GLFWwindow pointers to GameWindows
-INLINE GameWindow::WindowLookup& GameWindow::Lookup()
-{
-    static WindowLookup s_oLookup;
-    return s_oLookup;
+    return *( WindowStorage::Instance().windows[ a_uiIndex ] );
 }
 
 // GLFW callback for window close
 INLINE void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 {
-    if( Lookup().count( a_poWindow ) != 0 &&
-        nullptr != Windows()[ Lookup()[ a_poWindow ] ] )
+    if( WindowStorage::Instance().lookup.count( a_poWindow ) != 0 &&
+        nullptr != WindowStorage::Instance().windows[
+                              WindowStorage::Instance().lookup[ a_poWindow ] ] )
     {
-        GameWindow& roWindow = *( Windows()[ Lookup()[ a_poWindow ] ] );
+        GameWindow& roWindow =
+            *( WindowStorage::Instance().windows[
+                              WindowStorage::Instance().lookup[ a_poWindow ] ] );
         GameEngine::CurrentState().OnCloseWindow( roWindow );
         if( roWindow.IsClosing() )
         {
@@ -242,20 +262,13 @@ INLINE void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 // Swap frame buffers of all open windows
 INLINE void GameWindow::SwapAllBuffers()
 {
-    for each( GameWindow* poWindow in Windows() )
+    for each( GameWindow* poWindow in WindowStorage::Instance().windows )
     {
         if( nullptr != poWindow )
         {
             poWindow->SwapBuffers();
         }
     }
-}
-
-// Get a reference to the static list of windows
-INLINE GameWindow::WindowSet& GameWindow::Windows()
-{
-    static WindowSet s_oWindows;
-    return s_oWindows;
 }
 
 }   // namespace MyFirstEngine

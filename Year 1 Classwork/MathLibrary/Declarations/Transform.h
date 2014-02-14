@@ -179,7 +179,7 @@ typedef Transform2D HomogeneousTransform3D;
 typedef Transform2D HVectorTransform3D;
 
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations/Transform.inl"
+#include "../Implementations/Transform.inl"
 #endif
 
 #endif  // TRANSFORM__H

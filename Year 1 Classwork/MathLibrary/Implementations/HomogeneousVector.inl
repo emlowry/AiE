@@ -10,9 +10,9 @@
 #ifndef HOMOGENEOUS_VECTOR__INL
 #define HOMOGENEOUS_VECTOR__INL
 
-#include "Declarations/HomogeneousVector.h"
-#include "Declarations/PointVector.h"
-#include "Declarations/ImExportMacro.h"
+#include "../Declarations/HomogeneousVector.h"
+#include "../Declarations/PointVector.h"
+#include "../Declarations/ImExportMacro.h"
 
 namespace Plane
 {

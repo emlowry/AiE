@@ -37,22 +37,25 @@ public:
     static bool IsInitialized();
     static void Terminate();
 
-    // Return a reference to the current game state
+    // State management
     static GameState& CurrentState();
-
-    // Remove states
-    static void PopState();  // remove current
-    static void ClearStates();    // remove all
-
-    // Add a state to the stack, above the current stack
+    static void PopState();
+    static void ClearStates();
     static GameState& PushState( GameState& a_roState );
-
-    // Add a state to the stack, replacing the current stack
     static GameState& ReplaceCurrentState( GameState& a_roState );
+
+    // Print error messages to standard error stream.
+    static void PrintError( int a_iCode, const char* ac_pcDescription );
+    static void PrintError( const char* ac_pcDescription );
 
     // Run the game.  This function won't return until the current state is
     // GameState::End().
     static void Run();
+
+    // Time-related functions
+    static double Time();   // time since initialization
+    static double LastDeltaTime() { return Instance().m_dLastDeltaTime; }
+    static double LastTime() { return Instance().m_dLastTime; }
 
 private:
 
@@ -60,11 +63,11 @@ private:
     typedef std::stack< GameState* > StateStack;
 
     // Default constructor is only used by the base Singleton class's Instance()
-    // function.  The user never instantiates a GmaeEngine object directly.
+    // function.  The user never instantiates a GameEngine object directly.
     GameEngine();
 
-    // Print error messages to standard error stream.
-    static void PrintError( int a_iCode, const char* ac_pcDescription );
+    // Returns the time since this function was last called.
+    double DeltaTime();
 
     // get a reference to a static stack object, the top of which contains the
     // current state.
@@ -72,6 +75,19 @@ private:
 
     // Is the engine initialized?
     bool m_bInitialized;
+
+    // result of previous DeltaTime() call
+    double m_dLastDeltaTime;
+
+    // time of previous DeltaTime() call
+    double m_dLastTime;
+
+    // store a stack of state objects, the top of which is the current state
+    // the stack is hidden in a struct to avaoid a compiler warning
+    struct
+    {
+        StateStack stack;
+    } m_oStates;
 
 };  // class GameEngine
 

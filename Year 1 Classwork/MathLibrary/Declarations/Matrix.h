@@ -251,6 +251,6 @@ std::ostream& operator<<( std::ostream& a_roOut,
                           const Math::Matrix< T, M, N >& ac_roMatrix );
 
 // Always include template function implementations with this header
-#include "Implementations/Matrix.inl"
+#include "../Implementations/Matrix.inl"
 
 #endif  // MATRIX__H

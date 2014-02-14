@@ -219,9 +219,9 @@ typedef Plane::HomogeneousVector HomogeneousVector2D;
 
 #include "PointVector.h"
 // Always include template function implementations with this header
-#include "Implementations/HomogeneousVector_Templates.inl"
+#include "../Implementations/HomogeneousVector_Templates.inl"
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations/HomogeneousVector.inl"
+#include "../Implementations/HomogeneousVector.inl"
 #endif
 
 #endif  // HOMOGENEOUS_VECTOR__H

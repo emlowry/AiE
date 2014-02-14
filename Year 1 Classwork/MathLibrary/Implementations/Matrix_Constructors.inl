@@ -10,7 +10,7 @@
 #ifndef MATRIX__CONSTRUCTORS__INL
 #define MATRIX__CONSTRUCTORS__INL
 
-#include "Declarations/Matrix.h"
+#include "../Declarations/Matrix.h"
 // #include <type_traits>  // for is_whateverable checks
 #include <utility>  // for forward
 

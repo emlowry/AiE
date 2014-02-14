@@ -10,7 +10,7 @@
 #ifndef FUNCTIONS__INL
 #define FUNCTIONS__INL
 
-#include "Declarations/Functions.h"
+#include "../Declarations/Functions.h"
 #include <cmath>    // for fmod, log, pow, abs
 #include <type_traits>  // for enable_if, is_same, and is_floating_point
 

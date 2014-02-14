@@ -110,6 +110,56 @@ INLINE DumbString DumbString::operator+( const char* ac_pcData ) const
     return oResult;
 }
 
+// Comparison operators
+INLINE bool DumbString::operator==( const DumbString& ac_roString ) const
+{
+    return ( strcmp( m_pcData, ac_roString.m_pcData ) == 0 );
+}
+INLINE bool DumbString::operator==( const char* ac_pcData ) const
+{
+    return ( strcmp( m_pcData, ac_pcData ) == 0 );
+}
+INLINE bool DumbString::operator!=( const DumbString& ac_roString ) const
+{
+    return ( strcmp( m_pcData, ac_roString.m_pcData ) != 0 );
+}
+INLINE bool DumbString::operator!=( const char* ac_pcData ) const
+{
+    return ( strcmp( m_pcData, ac_pcData ) != 0 );
+}
+INLINE bool DumbString::operator<=( const DumbString& ac_roString ) const
+{
+    return ( strcmp( m_pcData, ac_roString.m_pcData ) <= 0 );
+}
+INLINE bool DumbString::operator<=( const char* ac_pcData ) const
+{
+    return ( strcmp( m_pcData, ac_pcData ) <= 0 );
+}
+INLINE bool DumbString::operator>=( const DumbString& ac_roString ) const
+{
+    return ( strcmp( m_pcData, ac_roString.m_pcData ) >= 0 );
+}
+INLINE bool DumbString::operator>=( const char* ac_pcData ) const
+{
+    return ( strcmp( m_pcData, ac_pcData ) >= 0 );
+}
+INLINE bool DumbString::operator<( const DumbString& ac_roString ) const
+{
+    return ( strcmp( m_pcData, ac_roString.m_pcData ) < 0 );
+}
+INLINE bool DumbString::operator<( const char* ac_pcData ) const
+{
+    return ( strcmp( m_pcData, ac_pcData ) < 0 );
+}
+INLINE bool DumbString::operator>( const DumbString& ac_roString ) const
+{
+    return ( strcmp( m_pcData, ac_roString.m_pcData ) > 0 );
+}
+INLINE bool DumbString::operator>( const char* ac_pcData ) const
+{
+    return ( strcmp( m_pcData, ac_pcData ) > 0 );
+}
+
 // Expand capacity to fit a string of the given size
 INLINE void DumbString::GrowTo( std::size_t a_uiSize )
 {

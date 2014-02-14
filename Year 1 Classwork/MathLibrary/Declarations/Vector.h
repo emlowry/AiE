@@ -220,6 +220,6 @@ typename std::enable_if< std::is_scalar< U >::value,
                const Math::Vector< T, N, t_bIsRow >& ac_roVector );
 
 // Always include template function implementations with this header
-#include "Implementations/Vector.inl"
+#include "../Implementations/Vector.inl"
 
 #endif  // VECTOR__H

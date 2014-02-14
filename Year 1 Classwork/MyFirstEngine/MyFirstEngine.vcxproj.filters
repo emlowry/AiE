@@ -42,6 +42,15 @@
     <ClInclude Include="Declarations\GameState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\Quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyFirstEngine.cpp">
@@ -59,6 +68,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="Implementations\GameState.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Shader.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

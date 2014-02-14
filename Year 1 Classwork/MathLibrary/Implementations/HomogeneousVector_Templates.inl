@@ -10,7 +10,7 @@
 #ifndef HOMOGENEOUS_VECTOR__TEMPLATES__INL
 #define HOMOGENEOUS_VECTOR__TEMPLATES__INL
 
-#include "Declarations/HomogeneousVector.h"
+#include "../Declarations/HomogeneousVector.h"
 
 namespace Plane
 {

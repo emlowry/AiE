@@ -10,9 +10,9 @@
 #ifndef COLOR_VECTOR__INL
 #define COLOR_VECTOR__INL
 
-#include "Declarations/ColorConstants.h"
-#include "Declarations/ColorVector.h"
-#include "Declarations/ImExportMacro.h"
+#include "../Declarations/ColorConstants.h"
+#include "../Declarations/ColorVector.h"
+#include "../Declarations/ImExportMacro.h"
 
 // separate file for template functions to keep filesize down
 #include "ColorVector_Templates.inl"

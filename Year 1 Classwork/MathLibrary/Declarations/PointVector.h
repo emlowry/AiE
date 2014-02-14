@@ -153,8 +153,8 @@ typedef Space::Point Point3D;
 typedef Space::PointVector< int > IntPointVector3D;
 typedef Space::IntPoint IntPoint3D;
 
-#include "Declarations/HomogeneousVector.h"
-#include "Implementations/PointVector.inl"
+#include "HomogeneousVector.h"
+#include "../Implementations/PointVector.inl"
 
 // explicit instantiations
 EXTERN_T_INST template class IMEXPORT_T_INST Plane::PointVector< double >;

@@ -12,8 +12,8 @@
 #ifndef TRANSFORM__TRANSLATE_ROTATE__INL
 #define TRANSFORM__TRANSLATE_ROTATE__INL
 
-#include "Declarations/Transform.h"
-#include "Declarations/ImExportMacro.h"
+#include "../Declarations/Transform.h"
+#include "../Declarations/ImExportMacro.h"
 
 namespace Plane
 {

@@ -11,8 +11,8 @@
 #ifndef TRANSFORM__SCALE__INL
 #define TRANSFORM__SCALE__INL
 
-#include "Declarations/Transform.h"
-#include "Declarations/ImExportMacro.h"
+#include "../Declarations/Transform.h"
+#include "../Declarations/ImExportMacro.h"
 
 namespace Plane
 {

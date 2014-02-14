@@ -12,10 +12,10 @@
 #ifndef POINT_VECTOR__INL
 #define POINT_VECTOR__INL
 
-#include "Declarations/HomogeneousVector.h"
-#include "Declarations/PointVector.h"
+#include "../Declarations/HomogeneousVector.h"
+#include "../Declarations/PointVector.h"
 #include "PointVector_Constructors.inl"
-#include "Declarations/ImExportMacro.h"
+#include "../Declarations/ImExportMacro.h"
 
 namespace Plane
 {

@@ -11,8 +11,8 @@
 #ifndef TRANSFORM__INL
 #define TRANSFORM__INL
 
-#include "Declarations/Transform.h"
-#include "Declarations/ImExportMacro.h"
+#include "../Declarations/Transform.h"
+#include "../Declarations/ImExportMacro.h"
 
 // Separate files to keep file size down
 #include "Transform_Scale.inl"

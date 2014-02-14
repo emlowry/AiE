@@ -36,6 +36,18 @@ public:
     DumbString& operator+=( const char* ac_pcData );
     DumbString operator+( const DumbString& ac_roString ) const;
     DumbString operator+( const char* ac_pcData ) const;
+    bool operator==( const DumbString& ac_roString ) const;
+    bool operator==( const char* ac_pcData ) const;
+    bool operator!=( const DumbString& ac_roString ) const;
+    bool operator!=( const char* ac_pcData ) const;
+    bool operator<=( const DumbString& ac_roString ) const;
+    bool operator<=( const char* ac_pcData ) const;
+    bool operator>=( const DumbString& ac_roString ) const;
+    bool operator>=( const char* ac_pcData ) const;
+    bool operator<( const DumbString& ac_roString ) const;
+    bool operator<( const char* ac_pcData ) const;
+    bool operator>( const DumbString& ac_roString ) const;
+    bool operator>( const char* ac_pcData ) const;
 
     // Get simple properties
     std::size_t Size() const { return m_uiSize; }

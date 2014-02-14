@@ -10,8 +10,8 @@
 #ifndef MATRIX__OPERATORS__INL
 #define MATRIX__OPERATORS__INL
 
-#include "Declarations/Matrix.h"
-#include "Declarations/Functions.h"
+#include "../Declarations/Matrix.h"
+#include "../Declarations/Functions.h"
 #include <iostream>     // for ostream
 #include <stdexcept>    // for invalid_argument and out_of_range
 #include <type_traits>  // for enable_if and is_scalar

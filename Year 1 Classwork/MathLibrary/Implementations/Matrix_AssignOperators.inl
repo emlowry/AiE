@@ -10,8 +10,8 @@
 #ifndef MATRIX__ASSIGN_OPERATORS__INL
 #define MATRIX__ASSIGN_OPERATORS__INL
 
-#include "Declarations/Matrix.h"
-#include "Declarations/Functions.h"
+#include "../Declarations/Matrix.h"
+#include "../Declarations/Functions.h"
 
 // #include <type_traits>  // for is_whateverable checks
 #include <utility>  // for forward

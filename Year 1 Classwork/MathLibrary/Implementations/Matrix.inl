@@ -10,9 +10,9 @@
 #ifndef MATRIX__INL
 #define MATRIX__INL
 
-#include "Declarations/Matrix.h"
-#include "Declarations/Vector.h"
-#include "Declarations/Functions.h"
+#include "../Declarations/Matrix.h"
+#include "../Declarations/Vector.h"
+#include "../Declarations/Functions.h"
 #include <stdexcept>    // for out_of_range
 
 // Code separated out into separate files to cut down the size of this one

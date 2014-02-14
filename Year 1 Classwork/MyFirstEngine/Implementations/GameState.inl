@@ -64,7 +64,7 @@ INLINE void GameState::OnCloseWindow( GameWindow& a_roWindow )
 {
     GameEngine::ClearStates();
 }
-INLINE void GameState::OnUpdate() {}
+INLINE void GameState::OnUpdate( double a_dDeltaTime ) {}
 INLINE void GameState::OnEnter() {}
 INLINE void GameState::OnSuspend() {}
 INLINE void GameState::OnResume() {}

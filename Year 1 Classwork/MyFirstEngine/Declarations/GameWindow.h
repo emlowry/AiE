@@ -15,9 +15,6 @@
 #include "MathLibrary.h"
 #include "NotCopyable.h"
 #include <iostream>
-#include <functional>
-#include <vector>
-#include <unordered_map>
 
 #include "MyFirstEngineMacros.h"
 
@@ -27,9 +24,6 @@ namespace MyFirstEngine
 class IMEXPORT_CLASS GameWindow : public NotCopyable
 {
 public:
-
-    // prevent typing errors
-    typedef std::vector< GameWindow* >::size_type Index;
 
     // Constructors
     GameWindow( const IntPoint2D& ac_roSize = IntPoint2D( 800, 600 ),
@@ -41,9 +35,9 @@ public:
     virtual ~GameWindow();
 
     // Get/Set window properties
-    Index GetIndex() const { return m_uiIndex; }
-    const IntPoint2D& GetSize() const { return m_oSize; }
-    const char* GetTitle() const { return m_oTitle.CString(); }
+    unsigned int GetIndex() const;
+    const IntPoint2D& GetSize() const;
+    const char* GetTitle() const;
     GameWindow& SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight );
     GameWindow& SetSize( const IntPoint2D& ac_roSize );
     GameWindow& SetTitle( const char* ac_pcTitle );
@@ -68,7 +62,7 @@ public:
 
     // Get a specific window
     // if there is no window at the given index, throw exception
-    static GameWindow& Get( Index a_uiIndex = 0 );
+    static GameWindow& Get( unsigned int a_uiIndex = 0 );
 
 protected:
 
@@ -77,10 +71,6 @@ protected:
     virtual void OnClose() {}
 
 private:
-
-    // prevent typing errors
-    typedef std::vector< GameWindow* > WindowSet;
-    typedef std::unordered_map< GLFWwindow*, Index > WindowLookup;
 
     // Does the work for all the constructors
     void SetUp();
@@ -93,16 +83,10 @@ private:
     void Destroy(); // destroy the GLFW window object
     void DoClose(); // if still closing after OnClose, destroy.
 
-    // Get a map for looking up window index based on GLFW window object pointer
-    static WindowLookup& Lookup();
-
     // GLFW callback for window close
     static void OnCloseWindow( GLFWwindow* a_poWindow );
 
-    // Get a vector of pointers to all the managed windows
-    static WindowSet& Windows();
-
-    Index m_uiIndex;    // identifies the window by its place in the window list
+    unsigned int m_uiIndex; // identifies the window by its place in the list
     IntPoint2D m_oSize; // pixels available to draw on with OpenGL
     DumbString m_oTitle;    // Window title
     GLFWwindow* m_poWindow; // pointer to the GLFW window object, if open

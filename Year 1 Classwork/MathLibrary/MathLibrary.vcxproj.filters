@@ -48,7 +48,7 @@
     <ClInclude Include="Declarations\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MathLibrary.h">
+    <ClInclude Include="include\MathLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,15 +15,15 @@
 #define INCLUDING_DYNAMIC_MATH_LIBRARY
 #endif
 
-#include "Declarations/ColorConstants.h"
-#include "Declarations/ColorVector.h"
-#include "Declarations/Functions.h"
-#include "Declarations/Hex.h"
-#include "Declarations/HomogeneousVector.h"
-#include "Declarations/Matrix.h"
-#include "Declarations/MostDerivedAddress.h"
-#include "Declarations/PointVector.h"
-#include "Declarations/Transform.h"
-#include "Declarations/Vector.h"
+#include "../Declarations/ColorConstants.h"
+#include "../Declarations/ColorVector.h"
+#include "../Declarations/Functions.h"
+#include "../Declarations/Hex.h"
+#include "../Declarations/HomogeneousVector.h"
+#include "../Declarations/Matrix.h"
+#include "../Declarations/MostDerivedAddress.h"
+#include "../Declarations/PointVector.h"
+#include "../Declarations/Transform.h"
+#include "../Declarations/Vector.h"
 
 #endif  // MATH__LIBRARY__H

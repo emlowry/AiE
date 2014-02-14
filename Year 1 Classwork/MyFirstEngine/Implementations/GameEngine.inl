@@ -24,7 +24,16 @@ namespace MyFirstEngine
 INLINE GameEngine::~GameEngine() {}
 
 // Private default constructor called only to initialize singleton
-INLINE GameEngine::GameEngine() : m_bInitialized( false ) {}
+INLINE GameEngine::GameEngine() : m_bInitialized( false ), m_dLastTime( 0.0 ) {}
+
+// Returns the time since this function was last called.
+INLINE double GameEngine::DeltaTime()
+{
+    double dThen = m_dLastTime;
+    m_dLastTime = Time();
+    m_dLastDeltaTime = m_dLastTime - dThen;
+    return m_dLastTime - dThen;
+}
 
 //
 // STATIC FUNCTIONS
@@ -47,11 +56,14 @@ INLINE bool GameEngine::Initialize()
     {
         glfwSetErrorCallback( PrintError );
         Instance().m_bInitialized = ( GL_TRUE == glfwInit() );
-        // TODO call other initialization/initialization failure functions
+        Instance().m_dLastTime = Time();
     }
     return IsInitialized();
 }
-INLINE bool GameEngine::IsInitialized() { return Instance().m_bInitialized; }
+INLINE bool GameEngine::IsInitialized()
+{
+    return Instance().m_bInitialized;
+}
 
 // Remove states
 INLINE void GameEngine::PopState()
@@ -77,6 +89,10 @@ INLINE void GameEngine::PrintError( int a_iCode, const char* ac_pcDescription )
 {
     std::cerr << "ERROR " << a_iCode << ": " << ac_pcDescription << std::endl;
 }
+INLINE void GameEngine::PrintError( const char* ac_pcDescription )
+{
+    std::cerr << "ERROR: " << ac_pcDescription << std::endl;
+}
 
 // Add a state to the stack, above the current stack
 INLINE GameState& GameEngine::PushState( GameState& a_roState )
@@ -100,24 +116,23 @@ INLINE GameState& GameEngine::ReplaceCurrentState( GameState& a_roState )
     return CurrentState();
 }
 
+// get a reference to a static stack object, the top of which contains the
+// current state.
+INLINE GameEngine::StateStack& GameEngine::States()
+{
+    return Instance().m_oStates.stack;
+}
+
 // Run the game.  This function won't return until the current state is
 // GameState::End().
 INLINE void GameEngine::Run()
 {
     while( GameState::End() != CurrentState() )
     {
-        CurrentState().OnUpdate();
+        CurrentState().OnUpdate( Instance().DeltaTime() );
         glfwPollEvents();
         CurrentState().Draw();
     }
-}
-
-// get a reference to a static stack object, the top of which contains the
-// current state.
-INLINE GameEngine::StateStack& GameEngine::States()
-{
-    static StateStack s_oStates;
-    return s_oStates;
 }
 
 // Terminate the game engine
@@ -129,6 +144,12 @@ INLINE void GameEngine::Terminate()
         glfwTerminate();
         Instance().m_bInitialized = false;
     }
+}
+
+// Time since initialization
+INLINE double GameEngine::Time()
+{
+    return IsInitialized() ? glfwGetTime() : 0.0;
 }
 
 }   // namespace MyFirstEngine

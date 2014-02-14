@@ -132,6 +132,6 @@ T ComplexConjugate( const T& ac_rValue );
 }   // namespace Math
 
 // Always include template function implementations with this header
-#include "Implementations/Functions.inl"
+#include "../Implementations/Functions.inl"
 
 #endif  // FUNCTIONS__H

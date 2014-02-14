@@ -10,7 +10,7 @@
 #ifndef MATRIX__MATH_FUNCTIONS__INL
 #define MATRIX__MATH_FUNCTIONS__INL
 
-#include "Declarations/Matrix.h"
+#include "../Declarations/Matrix.h"
 
 namespace Math
 {

@@ -10,8 +10,8 @@
 #ifndef COLOR_VECTOR__TEMPLATES__INL
 #define COLOR_VECTOR__TEMPLATES__INL
 
-#include "Declarations/ColorConstants.h"
-#include "Declarations/ColorVector.h"
+#include "../Declarations/ColorConstants.h"
+#include "../Declarations/ColorVector.h"
 
 namespace Color
 {

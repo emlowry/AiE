@@ -50,7 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;MYFIRSTENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\glew\include;$(SolutionDir)\glfw3\include;$(SolutionDir)\MathLibrary;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\glew\include;$(SolutionDir)\glfw3\include;$(SolutionDir)\MathLibrary\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -84,6 +84,9 @@
     <ClInclude Include="Declarations\GLFW.h" />
     <ClInclude Include="Declarations\MyFirstEngineMacros.h" />
     <ClInclude Include="Declarations\NotCopyable.h" />
+    <ClInclude Include="Declarations\Quad.h" />
+    <ClInclude Include="Declarations\Shader.h" />
+    <ClInclude Include="Declarations\ShaderProgram.h" />
     <ClInclude Include="Declarations\Singleton.h" />
     <ClInclude Include="MyFirstEngine.h" />
   </ItemGroup>
@@ -95,6 +98,7 @@
     <None Include="Implementations\GameEngine.inl" />
     <None Include="Implementations\GameState.inl" />
     <None Include="Implementations\GameWindow.inl" />
+    <None Include="Implementations\Shader.inl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MathLibrary\MathLibrary.vcxproj">

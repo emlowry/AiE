@@ -10,8 +10,8 @@
 #ifndef VECTOR__INL
 #define VECTOR__INL
 
-#include "Declarations/Vector.h"
-#include "Declarations/Functions.h"
+#include "../Declarations/Vector.h"
+#include "../Declarations/Functions.h"
 #include <cmath>    // for std::sqrt
 
 // separate files to keep file size down

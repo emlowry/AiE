@@ -72,7 +72,7 @@ protected:
 
     // Called by GameEngine::Run() before calling on GLFW to update.  Default
     // behavior is to do nothing.
-    virtual void OnUpdate();
+    virtual void OnUpdate( double a_dDeltaTime );
 
     // Called by Clear, Pop, Push, and ReplaceCurrent as states are added to,
     // removed from, or covered or uncovered on the stack.  Default behavior is
