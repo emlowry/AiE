@@ -10,7 +10,8 @@
 #ifndef DUMB_STRING__H
 #define DUMB_STRING__H
 
-#include <cstddef>
+#include <cstddef>  // fore size_t
+#include <functional>   // for hash
 
 #include "MyFirstEngineMacros.h"
 
@@ -30,29 +31,42 @@ public:
     ~DumbString();
 
     // Operators
+    char& operator[]( std::size_t a_uiIndex );
+    const char& operator[]( std::size_t a_uiIndex ) const;
     DumbString& operator=( const DumbString& ac_roString );
     DumbString& operator=( const char* ac_pcData );
+    DumbString& operator=( char a_cCharacter );
     DumbString& operator+=( const DumbString& ac_roString );
     DumbString& operator+=( const char* ac_pcData );
+    DumbString& operator+=( char a_cCharacter );
     DumbString operator+( const DumbString& ac_roString ) const;
     DumbString operator+( const char* ac_pcData ) const;
+    DumbString& operator+( char a_cCharacter ) const;
     bool operator==( const DumbString& ac_roString ) const;
     bool operator==( const char* ac_pcData ) const;
+    bool operator==( char a_cCharacter ) const;
     bool operator!=( const DumbString& ac_roString ) const;
     bool operator!=( const char* ac_pcData ) const;
+    bool operator!=( char a_cCharacter ) const;
     bool operator<=( const DumbString& ac_roString ) const;
     bool operator<=( const char* ac_pcData ) const;
+    bool operator<=( char a_cCharacter ) const;
     bool operator>=( const DumbString& ac_roString ) const;
     bool operator>=( const char* ac_pcData ) const;
+    bool operator>=( char a_cCharacter ) const;
     bool operator<( const DumbString& ac_roString ) const;
     bool operator<( const char* ac_pcData ) const;
+    bool operator<( char a_cCharacter ) const;
     bool operator>( const DumbString& ac_roString ) const;
     bool operator>( const char* ac_pcData ) const;
+    bool operator>( char a_cCharacter ) const;
+    operator const char*() const { return m_pcData; }
 
     // Get simple properties
     std::size_t Size() const { return m_uiSize; }
     std::size_t Capacity() const { return m_uiCapacity; }
     const char* CString() const { return m_pcData; }
+    std::size_t Hash() const { return std::hash< DumbString >()( *this ); }
     bool IsEmpty() const { return ( 0 == m_uiSize ); }
 
 private:
@@ -70,8 +84,17 @@ private:
 
 };  // class DumbString
 
+// make sure DumbString objects are hasheable
+template<>
+struct std::hash< DumbString >
+{
+    typedef std::size_t result_type;
+    typedef DumbString argument_type;
+    std::size_t operator()( const DumbString& ac_roString );
+}
+
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations\DumbString.inl"
+#include "..\Implementations\DumbString.inl"
 #endif
 
 #endif  // DUMB_STRING__H

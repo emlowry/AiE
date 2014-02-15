@@ -10,11 +10,14 @@
 #ifndef SHADER__INL
 #define SHADER__INL
 
+#include "../Declarations/DumbString.h"
 #include "../Declarations/GameEngine.h"
 #include "../Declarations/GLFW.h"
 #include "../Declarations/Shader.h"
 #include "../Declarations/Singleton.h"
+#include <stdexcept>
 #include <unordered_map>
+#include <utility>
 #include "../Declarations/MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
@@ -23,6 +26,8 @@ namespace MyFirstEngine
 // store the loaded shaders
 struct ShaderStorage : public Singleton< ShaderStorage >
 {
+    typedef std::unordered_map< DumbString, Shader > SourceLookup;
+    std::unordered_map< GLenum, SourceLookup > lookup;
 }
 
 // Copy constructor
@@ -83,14 +88,67 @@ INLINE GLuint Shader::ID() const
     return m_uiID;
 }
 
+//
+// Static functions
+//
+
 // Get the default shader of the given type
 INLINE Shader Shader::Default( GLenum a_eType )
 {
-    // TODO
+    if( 0 == ShaderStorage::Instance().lookup[ a_eType ].count( "" ) )
+    {
+        switch( a_eType )
+        {
+        case GL_FRAGMENT_SHADER:
+            return Shader( a_eType, "", DefaultFragmentShaderSource() );
+            break;
+        case GL_VERTEX_SHADER:
+            return Shader( a_eType, "", DefaultVertexShaderSource() );
+            break;
+        default:
+            throw std::invalid_argument( "No default shader for this shader type" );
+            break;
+        }
+    }
+    return ShaderStorage::Instance().lookup[ a_eType ][ "" ];
+}
+
+// source code for default shaders
+INLINE const DumbString& Shader::DefaultFragmentShaderSource()
+{
+    static DumbString s_oSource = "varying vec4 v_v4Color; "
+                                  "void main(void) { "
+                                  "    gl_FragColor = v_v4Color; "
+                                  "}";
+    return s_oSource;
+}
+INLINE const DumbString& Shader::DefaultVertexShaderSource()
+{
+    static DumbString s_oSource =
+        "varying vec4 v_v4Color; "
+        "void main(void) { "
+        "    v_v4Color = gl_Color; "
+        "    gl_Position = gl_ModelViewProjectionMatrix * glVertex; "
+        "}";
+    return s_oSource;
 }
 
 // Destroy all shaders
 INLINE void Shader::DestroyAll()
+{
+    typedef std::pair< Glenum, ShaderStorage::SourceLookup > LookupPair
+    for each( LookupPair oPair in ShaderStorage::Instance().lookup )
+    {
+        for each( std::pair< DumbString, Shader > oLookup in oPair.second )
+        {
+            glDeleteShader( Shader.ID() );
+        }
+    }
+    ShaderStorage::Instance().lookup.clear();
+}
+
+// load source code
+INLINE DumbString Shader::LoadSource( const char* ac_pcFileName )
 {
     //TODO
 }

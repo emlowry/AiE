@@ -88,7 +88,7 @@
     <ClInclude Include="Declarations\Shader.h" />
     <ClInclude Include="Declarations\ShaderProgram.h" />
     <ClInclude Include="Declarations\Singleton.h" />
-    <ClInclude Include="MyFirstEngine.h" />
+    <ClInclude Include="include\MyFirstEngine.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyFirstEngine.cpp" />

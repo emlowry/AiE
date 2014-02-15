@@ -95,7 +95,7 @@ private:
 
 #include "Declarations\GameState.h"
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations\GameEngine.inl"
+#include "..\Implementations\GameEngine.inl"
 #endif;
 
 #endif  // GAME_ENGINE__H

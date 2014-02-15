@@ -10,9 +10,9 @@
 #ifndef GAME_STATE__INL
 #define GAME_STATE__INL
 
-#include "Declarations\GameState.h"
-#include "Declarations\GameEngine.h"
-#include "Declarations\MyFirstEngineMacros.h"
+#include "..\Declarations\GameState.h"
+#include "..\Declarations\GameEngine.h"
+#include "..\Declarations\MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
 {

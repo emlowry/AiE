@@ -10,10 +10,12 @@
 #ifndef DUMB_STRING__INL
 #define DUMB_STRING__INL
 
-#include "Declarations\DumbString.h"
+#include "..\Declarations\DumbString.h"
+#include <functional>
+#include <string>
 #include <utility>  // for swap
 
-#include "Declarations\MyFirstEngineMacros.h"
+#include "..\Declarations\MyFirstEngineMacros.h"
 
 // Constructors
 INLINE DumbString::DumbString()
@@ -56,6 +58,16 @@ INLINE DumbString::~DumbString()
     }
 }
 
+// Access operators
+INLINE char& DumbString::operator[]( std::size_t a_uiIndex )
+{
+    return m_pcData[ a_uiIndex ];
+}
+INLINE const char& DumbString::operator[]( std::size_t a_uiIndex ) const
+{
+    return m_pcData[ a_uiIndex ];
+}
+
 // Assign operators
 INLINE DumbString& DumbString::operator=( const DumbString& ac_roString )
 {
@@ -70,6 +82,11 @@ INLINE DumbString& DumbString::operator=( const char* ac_pcData )
     strcpy_s( m_pcData, m_uiCapacity, ac_pcData );
     m_uiSize = strlen( ac_pcData );
     return *this;
+}
+INLINE DumbString& DumbString::operator=( char a_cCharacter )
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator=( acData );
 }
 
 // Concatenation-assign operators
@@ -86,6 +103,11 @@ INLINE DumbString& DumbString::operator+=( const char* ac_pcData )
     strcpy_s( m_pcData + m_uiSize, m_uiCapacity - m_uiSize, ac_pcData );
     m_uiSize += strlen( ac_pcData );
     return *this;
+}
+INLINE DumbString& DumbString::operator+=( char a_cCharacter )
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator+=( acData );
 }
 
 // Concatenation operators
@@ -109,6 +131,11 @@ INLINE DumbString DumbString::operator+( const char* ac_pcData ) const
     oResult.m_uiSize = m_uiSize + strlen( ac_pcData );
     return oResult;
 }
+INLINE DumbString& DumbString::operator+( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator+( acData );
+}
 
 // Comparison operators
 INLINE bool DumbString::operator==( const DumbString& ac_roString ) const
@@ -119,6 +146,11 @@ INLINE bool DumbString::operator==( const char* ac_pcData ) const
 {
     return ( strcmp( m_pcData, ac_pcData ) == 0 );
 }
+INLINE bool DumbString::operator==( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator==( acData );
+}
 INLINE bool DumbString::operator!=( const DumbString& ac_roString ) const
 {
     return ( strcmp( m_pcData, ac_roString.m_pcData ) != 0 );
@@ -126,6 +158,11 @@ INLINE bool DumbString::operator!=( const DumbString& ac_roString ) const
 INLINE bool DumbString::operator!=( const char* ac_pcData ) const
 {
     return ( strcmp( m_pcData, ac_pcData ) != 0 );
+}
+INLINE bool DumbString::operator!=( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator!=( acData );
 }
 INLINE bool DumbString::operator<=( const DumbString& ac_roString ) const
 {
@@ -135,6 +172,11 @@ INLINE bool DumbString::operator<=( const char* ac_pcData ) const
 {
     return ( strcmp( m_pcData, ac_pcData ) <= 0 );
 }
+INLINE bool DumbString::operator<=( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator<=( acData );
+}
 INLINE bool DumbString::operator>=( const DumbString& ac_roString ) const
 {
     return ( strcmp( m_pcData, ac_roString.m_pcData ) >= 0 );
@@ -142,6 +184,11 @@ INLINE bool DumbString::operator>=( const DumbString& ac_roString ) const
 INLINE bool DumbString::operator>=( const char* ac_pcData ) const
 {
     return ( strcmp( m_pcData, ac_pcData ) >= 0 );
+}
+INLINE bool DumbString::operator>=( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator>=( acData );
 }
 INLINE bool DumbString::operator<( const DumbString& ac_roString ) const
 {
@@ -151,6 +198,11 @@ INLINE bool DumbString::operator<( const char* ac_pcData ) const
 {
     return ( strcmp( m_pcData, ac_pcData ) < 0 );
 }
+INLINE bool DumbString::operator<( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator<( acData );
+}
 INLINE bool DumbString::operator>( const DumbString& ac_roString ) const
 {
     return ( strcmp( m_pcData, ac_roString.m_pcData ) > 0 );
@@ -158,6 +210,11 @@ INLINE bool DumbString::operator>( const DumbString& ac_roString ) const
 INLINE bool DumbString::operator>( const char* ac_pcData ) const
 {
     return ( strcmp( m_pcData, ac_pcData ) > 0 );
+}
+INLINE bool DumbString::operator>( char a_cCharacter ) const
+{
+    char acData[] = { ac_Character, '\0' };
+    return operator>( acData );
 }
 
 // Expand capacity to fit a string of the given size
@@ -169,6 +226,14 @@ INLINE void DumbString::GrowTo( std::size_t a_uiSize )
         std::swap( m_pcData, pcNewData );
         delete[] pcNewData;
     }
+}
+
+// Hash
+template<>
+INLINE std::size_t std::hash< DumbString >::
+    operator()( const DumbString& ac_roString ) const
+{
+    return std::hash< std::string >()( std::string( ac_roString.CString() ) );
 }
 
 // Calculate the int-aligned capacity needed for a string of the given size

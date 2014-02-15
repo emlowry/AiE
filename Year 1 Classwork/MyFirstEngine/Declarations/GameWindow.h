@@ -97,7 +97,7 @@ private:
 }   // namespace GameEngine
 
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations\GameWindow.inl"
+#include "..\Implementations\GameWindow.inl"
 #endif
 
 #endif  // GAME_WINDOW__H

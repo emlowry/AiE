@@ -10,17 +10,17 @@
 #ifndef GAME_WINDOW__INL
 #define GAME_WINDOW__INL
 
-#include "Declarations\GLFW.h"
-#include "Declarations\GameEngine.h"
-#include "Declarations\GameState.h"
-#include "Declarations\GameWindow.h"
+#include "..\Declarations\GLFW.h"
+#include "..\Declarations\GameEngine.h"
+#include "..\Declarations\GameState.h"
+#include "..\Declarations\GameWindow.h"
 #include "MathLibrary.h"
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-#include "Declarations\MyFirstEngineMacros.h"
+#include "..\Declarations\MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
 {

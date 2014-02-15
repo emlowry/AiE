@@ -89,7 +89,7 @@ protected:
 #include "GameEngine.h"
 #include "GameWindow.h"
 #ifdef INLINE_IMPLEMENTATION
-#include "Implementations\GameState.inl"
+#include "..\Implementations\GameState.inl"
 #endif
 
 #endif  // GAME_STATE__H

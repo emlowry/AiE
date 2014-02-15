@@ -10,11 +10,11 @@
 #ifndef GAME_ENGINE__INL
 #define GAME_ENGINE__INL
 
-#include "Declarations\GameEngine.h"
-#include "Declarations\GameState.h"
-#include "Declarations\GameWindow.h"
-#include "Declarations\GLFW.h"
-#include "Declarations\MyFirstEngineMacros.h"
+#include "..\Declarations\GameEngine.h"
+#include "..\Declarations\GameState.h"
+#include "..\Declarations\GameWindow.h"
+#include "..\Declarations\GLFW.h"
+#include "..\Declarations\MyFirstEngineMacros.h"
 #include <iostream>
 
 namespace MyFirstEngine

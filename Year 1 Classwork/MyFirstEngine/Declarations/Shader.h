@@ -26,6 +26,7 @@ public:
 
     // Copy constructor
     Shader( const Shader& ac_roShader );
+    Shader& operator=( const Shader& ac_roShader );
 
     // If source name is null or empty, use default shader
     // If source name hasn't been loaded yet, do so and compile a new shader
@@ -56,6 +57,13 @@ public:
     static void DestroyAll();
 
 private:
+
+    // source code for default shaders
+    static const DumbString& DefaultFragmentShaderSource();
+    static const DumbString& DefaultVertexShaderSource();
+
+    // load source code
+    static DumbString LoadSource( const char* ac_pcFileName );
 
     // Shader type
     GLenum m_eType;
