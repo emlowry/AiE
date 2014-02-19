@@ -89,6 +89,10 @@ private:
 };  // class DumbString
 DumbString operator+( const char* ac_pcData, const DumbString& ac_roString );
 DumbString operator+( const char a_cCharacter, const DumbString& ac_roString );
+namespace std
+{
+template<> struct hash< DumbString > : public hash< Hashable > {};
+}   // namespace std
 
 #include "..\Implementations\DumbString.inl"
 

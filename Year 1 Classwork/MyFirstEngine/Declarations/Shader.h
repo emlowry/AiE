@@ -25,17 +25,17 @@ namespace MyFirstEngine
 class IMEXPORT_CLASS Shader : public Hashable
 {
 public:
-
+    
     // Copy constructor
     Shader( const Shader& ac_roShader )
         : m_uiID( ac_roShader.m_uiID ), m_eType( ac_roShader.m_eType ) {}
 
-    // just use the ID of an existing shader
+    // Just use the ID of an existing shader
     Shader( GLuint a_eID );
 
     // If source name is null or empty, use default shader
     // If source name hasn't been loaded yet, do so and compile a new shader
-    Shader( GLenum a_eType, const char* ac_pcSourceName = nullptr,
+    Shader( GLenum a_eType, const char* ac_pcSourceName,
             bool a_bRecompile = false );
 
     // If source text is null or empty, behave like the previous constructor
@@ -81,9 +81,17 @@ private:
     // an stl container won't result in warnings.
     class ShaderLookup;
 
+    // construct using the gived combination of type and ID instead of looking
+    // up type from ID
+    Shader( GLenum a_eType, GLuint a_uiID )
+        : m_eType( a_eType ), m_uiID( a_uiID ) {}
+
     // Compile a shader from the given source code
     static GLuint CompileShader( GLenum a_eType, const char* ac_pcSourceText );
     static GLuint CompileShader( const char* ac_pcSourceText, GLuint a_uiID );
+
+    // Get a reference to the lookup map
+    static ShaderLookup& Lookup() { return *sm_poLookup; }
 
     // Shader type
     GLenum m_eType;

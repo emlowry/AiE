@@ -90,6 +90,10 @@ private:
     // GLFW callback for window close
     static void OnCloseWindow( GLFWwindow* a_poWindow );
 
+    // get references to the lists
+    static WindowLookup& Lookup() { return *sm_poLookup; }
+    static WindowList& List() { return *sm_poList; }
+
     unsigned int m_uiIndex; // identifies the window by its place in the list
     IntPoint2D m_oSize; // pixels available to draw on with OpenGL
     DumbString m_oTitle;    // Window title

@@ -19,13 +19,16 @@ public:
     virtual ~Hashable() {}
     virtual std::size_t Hash() const = 0;
 };
-template<>
-struct std::hash< Hashable >
+namespace std
 {
-    typedef std::size_t result_type;
+template<>
+struct hash< Hashable >
+{
+    typedef size_t result_type;
     typedef const Hashable& argument_type;
-    std::size_t operator()( const Hashable& ac_roHashable ) const
+    size_t operator()( const Hashable& ac_roHashable ) const
     { return ac_roHashable.Hash(); }
 };
+}   // namespace std
 
 #endif  // HASHABLE__H

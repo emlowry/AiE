@@ -28,7 +28,7 @@ public:
     virtual ~WindowList() {}
 };
 class GameWindow::WindowLookup
-    : std::unordered_map< GLFWwindow*, unsigned int >
+    : public std::unordered_map< GLFWwindow*, unsigned int >
 {
 public:
     virtual ~WindowLookup() {}
@@ -42,28 +42,28 @@ GameWindow::WindowLookup* GameWindow::sm_poLookup = new GameWindow::WindowLookup
 GameWindow::GameWindow( const IntPoint2D& ac_roSize, const char* ac_pcTitle )
     : m_oSize( ac_roSize ), m_oFramePadding( 0 ),
       m_oTitle( ac_pcTitle ), m_poWindow( nullptr ),
-      m_uiIndex( sm_poList->size() )
+      m_uiIndex( List().size() )
 {
-    sm_poList->push_back( this );
+    List().push_back( this );
 }
 GameWindow::GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
                         const char* ac_pcTitle )
     : m_oSize( a_uiWidth, a_uiHeight ), m_oFramePadding( 0 ),
       m_oTitle( ac_pcTitle ), m_poWindow( nullptr ),
-      m_uiIndex( sm_poList->size() )
+      m_uiIndex( List().size() )
 {
-    sm_poList->push_back( this );
+    List().push_back( this );
 }
 // Destructor actually does something in this class
 GameWindow::~GameWindow()
 {
     Destroy();
-    (*sm_poList)[ m_uiIndex ] = nullptr;
+    List()[ m_uiIndex ] = nullptr;
 }
 
 // Set window properties
 GameWindow& GameWindow::SetSize( unsigned int a_uiWidth,
-                                        unsigned int a_uiHeight )
+                                 unsigned int a_uiHeight )
 {
     m_oSize.x = a_uiWidth;
     m_oSize.y = a_uiHeight;
@@ -111,7 +111,7 @@ void GameWindow::Close()
 // Is this window object flagged for closing?
 bool GameWindow::IsClosing() const
 {
-    IsOpen() ? ( GL_TRUE == glfwWindowShouldClose( m_poWindow ) ) : false;
+    return IsOpen() ? ( GL_TRUE == glfwWindowShouldClose( m_poWindow ) ) : false;
 }
 
 // destroy the GLFW window object
@@ -119,7 +119,7 @@ void GameWindow::Destroy()
 {
     if( IsOpen() )
     {
-        sm_poLookup->erase( m_poWindow );
+        Lookup().erase( m_poWindow );
         glfwDestroyWindow( m_poWindow );
         m_poWindow = nullptr;
     }
@@ -155,7 +155,7 @@ void GameWindow::CreateWindow()
                                     m_oTitle.CString(), nullptr, nullptr );
     if( nullptr != m_poWindow )
     {
-        (*sm_poLookup)[ m_poWindow ] = m_uiIndex;
+        Lookup()[ m_poWindow ] = m_uiIndex;
         glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
     }
 }
@@ -200,7 +200,7 @@ void GameWindow::SwapBuffers()
 // Destroy all windows
 void GameWindow::DestroyAll()
 {
-    for each( GameWindow* poWindow in sm_oList )
+    for each( GameWindow* poWindow in List() )
     {
         if( nullptr != poWindow )
         {
@@ -213,20 +213,20 @@ void GameWindow::DestroyAll()
 // if there is no window at the given index, throw exception
 GameWindow& GameWindow::Get( unsigned int a_uiIndex )
 {
-    if( a_uiIndex >= sm_poList->size() || nullptr == (*sm_poList)[ a_uiIndex ] )
+    if( a_uiIndex >= List().size() || nullptr == List()[ a_uiIndex ] )
     {
         throw std::out_of_range( "No window with that index" );
     }
-    return *( (*sm_poList)[ a_uiIndex ] );
+    return *( List()[ a_uiIndex ] );
 }
 
 // GLFW callback for window close
 void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 {
-    if( sm_poLookup->count( a_poWindow ) != 0 &&
-        nullptr != (*sm_poList)[ (*sm_poLookup)[ a_poWindow ] ] )
+    if( Lookup().count( a_poWindow ) != 0 &&
+        nullptr != List()[ Lookup()[ a_poWindow ] ] )
     {
-        GameWindow& roWindow = *( (*sm_poList)[ (*sm_poLookup)[ a_poWindow ] ] );
+        GameWindow& roWindow = *( List()[ Lookup()[ a_poWindow ] ] );
         GameEngine::CurrentState().OnCloseWindow( roWindow );
         if( roWindow.IsClosing() )
         {
@@ -238,7 +238,7 @@ void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 // Swap frame buffers of all open windows
 void GameWindow::SwapAllBuffers()
 {
-    for each( GameWindow* poWindow in sm_oList )
+    for each( GameWindow* poWindow in List() )
     {
         if( nullptr != poWindow )
         {

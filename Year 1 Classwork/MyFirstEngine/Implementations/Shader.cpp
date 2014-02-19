@@ -36,9 +36,13 @@ const char* const Shader::DEFAULT_VERTEX_SHADER_SOURCE_CODE =
 // declare classes instead of typedefs to avoid compiler warnings
 // definition is only in cpp
 class Shader::ShaderLookup
-    : public std::unordered_map< GLenum, std::unordered_map< DumbString, Shader > >
+    : public std::unordered_map< GLenum, std::unordered_map< DumbString, GLuint > >
 {
 public:
+    typedef std::unordered_map< DumbString, GLuint > InnerType;
+    typedef InnerType::value_type InnerValueType;
+    typedef std::unordered_map< GLenum, InnerType > BaseType;
+    typedef BaseType::value_type ValueType;
     virtual ~ShaderLookup() {}
 };
     
@@ -56,7 +60,7 @@ Shader::Shader( GLuint a_uiID ) : m_uiID( a_uiID )
 // If source name is null or empty, use default shader
 // If source name hasn't been loaded yet, do so and compile a new shader
 Shader::Shader( GLenum a_eType, const char* ac_pcSourceName, bool a_bRecompile )
-    : m_eType( ac_roShader.m_eType )
+    : m_eType( m_eType )
 {
     DumbString oSourceName( ac_pcSourceName );
     
@@ -69,14 +73,14 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName, bool a_bRecompile )
 
     // If a shader has already been compiled from source code with the given
     // name, reuse its ID.
-    else if( 0 < sm_oLookup[ m_eType ].count( oSourceName ) )
+    else if( 0 < Lookup()[ m_eType ].count( oSourceName ) )
     {
-        m_uiID = (*sm_poLookup)[ m_eType ][ oSourceName ].m_uiID;
+        m_uiID = Lookup()[ m_eType ][ oSourceName ];
 
         // If the recompile flag is set to true, reload and recompile the shader
         if( a_bRecompile )
         {
-            CompileShader( LoadSource( oSourceName ), m_uiID );
+            CompileShader( DumbString::LoadFrom( oSourceName ), m_uiID );
         }
     }
 
@@ -84,8 +88,8 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName, bool a_bRecompile )
     // map.
     else
     {
-        m_uiID = CompileShader( LoadSource( oSourceName ) );
-        (*sm_poLookup)[ m_eType ][ oSourceName ] = *this;
+        m_uiID = CompileShader( m_eType, DumbString::LoadFrom( oSourceName ) );
+        Lookup()[ m_eType ][ oSourceName ] = m_uiID;
     }
 }
 
@@ -95,25 +99,25 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName, bool a_bRecompile )
 // shader, while if flag is true, replace stored source and recompile shader
 Shader::Shader( GLenum a_eType, const char* ac_pcSourceName,
                 const char* ac_pcSourceText, bool a_bRecompile )
-    : m_eType( ac_roShader.m_eType )
+    : m_eType( m_eType )
 {
     DumbString oSourceName( ac_pcSourceName );
     DumbString oSourceText( ac_pcSourceText );
 
     // If requesting the default shader or an already-compiled shader, reuse the
     // existing ID.
-    if( "" == oSourceName || 0 < (*sm_poLookup)[ m_eType ].count( oSourceName ) )
+    if( "" == oSourceName || 0 < Lookup()[ m_eType ].count( oSourceName ) )
     {
         m_uiID = ( "" == oSourceName
                    ? Default( m_eType ).m_uiID
-                   : (*sm_poLookup)[ m_eType ][ oSourceName ].m_uiID );
+                   : Lookup()[ m_eType ][ oSourceName ] );
 
         // If the recompile flag is set to true and either a file name or source
         // code is passed in, reload and recompile.
         if( a_bRecompile && ( "" != oSourceName || "" != oSourceText ) )
         {
-            CompileShader( "" == oSourceText ? LoadSource( oSourceName )
-                                             : oSourceText,
+            CompileShader( "" == oSourceText
+                           ? DumbString::LoadFrom( oSourceName ) : oSourceText,
                            m_uiID );
         }
     }
@@ -121,9 +125,10 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName,
     // If there is no already-compiled shader, load and compile.
     else
     {
-        m_uiID = CompileShader( "" == oSourceText ? LoadSource( oSourceName )
-                                                  : oSourceText );
-        (*sm_poLookup)[ m_eType ][ oSourceName ] = *this;
+        m_uiID = CompileShader( m_eType, "" == oSourceText
+                                         ? DumbString::LoadFrom( oSourceName )
+                                         : oSourceText );
+        Lookup()[ m_eType ][ oSourceName ] = m_uiID;
     }
 }
 
@@ -178,7 +183,7 @@ GLuint Shader::CompileShader( const char* ac_pcSourceText, GLuint a_uiID )
 // Get the default shader of the given type
 Shader Shader::Default( GLenum a_eType )
 {
-    if( 0 == (*sm_poLookup)[ a_eType ].count( "" ) )
+    if( 0 == Lookup()[ a_eType ].count( "" ) )
     {
         switch( a_eType )
         {
@@ -193,20 +198,20 @@ Shader Shader::Default( GLenum a_eType )
             break;
         }
     }
-    return (*sm_poLookup)[ a_eType ][ "" ];
+    return Shader( a_eType, Lookup()[ a_eType ][ "" ] );
 }
 
 // Destroy all shaders
 void Shader::DestroyAll()
 {
-    for each( (*sm_poLookup)::value_type oPair in *sm_oLookup )
+    for each( ShaderLookup::ValueType oPair in Lookup() )
     {
-        for each( std::pair< DumbString, Shader > oLookup in oPair.second )
+        for each( ShaderLookup::InnerValueType oInnerPair in oPair.second )
         {
-            glDeleteShader( Shader.ID() );
+            glDeleteShader( oInnerPair.second );
         }
     }
-    sm_poLookup->clear();
+    Lookup().clear();
 }
 
 }   // namespace MyFirstEngine
