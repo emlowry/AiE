@@ -51,27 +51,27 @@
     <ClInclude Include="include\MyFirstEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\Hashable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Comparable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MyFirstEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Implementations\GameEngine.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\GameWindow.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="Implementations\DumbString.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Implementations\GameState.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="Implementations\Shader.inl">
-      <Filter>Header Files</Filter>
-    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Implementations\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Implementations\GameEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Implementations\GameWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -10,10 +10,10 @@
 #ifndef GAME_ENGINE__H
 #define GAME_ENGINE__H
 
-#include "Declarations\Singleton.h"
+#include "Singleton.h"
 #include <stack>
 
-#include "Declarations\MyFirstEngineMacros.h"
+#include "MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
 {
@@ -34,7 +34,7 @@ public:
 
     // Initialization and termination
     static bool Initialize();   // returns true if initialization was successful
-    static bool IsInitialized();
+    static bool IsInitialized() { return Instance().m_bInitialized; }
     static void Terminate();
 
     // State management
@@ -59,8 +59,9 @@ public:
 
 private:
 
-    // prevent typing errors
-    typedef std::stack< GameState* > StateStack;
+    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
+    // an stl container won't result in warnings.
+    class StateStack;
 
     // Default constructor is only used by the base Singleton class's Instance()
     // function.  The user never instantiates a GameEngine object directly.
@@ -71,7 +72,7 @@ private:
 
     // get a reference to a static stack object, the top of which contains the
     // current state.
-    static StateStack& States();
+    static StateStack& States() { return *( Instance().m_poStates ); }
 
     // Is the engine initialized?
     bool m_bInitialized;
@@ -84,18 +85,12 @@ private:
 
     // store a stack of state objects, the top of which is the current state
     // the stack is hidden in a struct to avaoid a compiler warning
-    struct
-    {
-        StateStack stack;
-    } m_oStates;
+    StateStack* m_poStates;
 
 };  // class GameEngine
 
 }   // namespace MyFirstEngine
 
-#include "Declarations\GameState.h"
-#ifdef INLINE_IMPLEMENTATION
-#include "..\Implementations\GameEngine.inl"
-#endif;
+#include "GameState.h"
 
 #endif  // GAME_ENGINE__H

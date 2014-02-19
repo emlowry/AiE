@@ -77,11 +77,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Declarations\Comparable.h" />
     <ClInclude Include="Declarations\DumbString.h" />
     <ClInclude Include="Declarations\GameEngine.h" />
     <ClInclude Include="Declarations\GameState.h" />
     <ClInclude Include="Declarations\GameWindow.h" />
     <ClInclude Include="Declarations\GLFW.h" />
+    <ClInclude Include="Declarations\Hashable.h" />
     <ClInclude Include="Declarations\MyFirstEngineMacros.h" />
     <ClInclude Include="Declarations\NotCopyable.h" />
     <ClInclude Include="Declarations\Quad.h" />
@@ -91,19 +93,17 @@
     <ClInclude Include="include\MyFirstEngine.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MyFirstEngine.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Implementations\DumbString.inl" />
-    <None Include="Implementations\GameEngine.inl" />
-    <None Include="Implementations\GameState.inl" />
-    <None Include="Implementations\GameWindow.inl" />
-    <None Include="Implementations\Shader.inl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MathLibrary\MathLibrary.vcxproj">
       <Project>{760cfe98-f0a1-42cf-b14c-9a601c462c5b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Implementations\GameEngine.cpp" />
+    <ClCompile Include="Implementations\GameWindow.cpp" />
+    <ClCompile Include="Implementations\Shader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

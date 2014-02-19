@@ -15,6 +15,8 @@
 #include "MathLibrary.h"
 #include "NotCopyable.h"
 #include <iostream>
+#include <vector>
+#include <unordered_map>
 
 #include "MyFirstEngineMacros.h"
 
@@ -35,18 +37,18 @@ public:
     virtual ~GameWindow();
 
     // Get/Set window properties
-    unsigned int GetIndex() const;
-    const IntPoint2D& GetSize() const;
-    const char* GetTitle() const;
+    unsigned int GetIndex() const { return m_uiIndex; }
+    const IntPoint2D& GetSize() const { return m_oSize; }
+    const char* GetTitle() const { return m_oTitle.CString(); }
     GameWindow& SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight );
     GameWindow& SetSize( const IntPoint2D& ac_roSize );
     GameWindow& SetTitle( const char* ac_pcTitle );
 
     // Opening/Closing window
-    void CancelClose(); // set flag indicating window shouldn't close
-    void Close();   // set flag indicating window should close
-    bool IsClosing() const; // does GLFW flag indicate window should be closed?
-    bool IsOpen() const;    // does a GLFW object exist?
+    void CancelClose(); // set the close flag for this window to false
+    void Close();   // set the close flag for this window to true
+    bool IsClosing() const; // is this window object flagged for closing?
+    bool IsOpen() const { return ( nullptr != m_poWindow ); }
     bool Open();    // actually create the window with GLFW
 
     // make/check if current context window
@@ -72,8 +74,10 @@ protected:
 
 private:
 
-    // Does the work for all the constructors
-    void SetUp();
+    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
+    // an stl container won't result in warnings.
+    class WindowList;
+    class WindowLookup;
 
     // the two steps of opening a window
     void CreateWindow();
@@ -92,12 +96,11 @@ private:
     GLFWwindow* m_poWindow; // pointer to the GLFW window object, if open
     IntPoint2D m_oFramePadding; // difference in size between buffer and window
 
+    static WindowLookup* sm_poLookup;
+    static WindowList* sm_poList;
+
 };  // class GameWindow
 
 }   // namespace GameEngine
-
-#ifdef INLINE_IMPLEMENTATION
-#include "..\Implementations\GameWindow.inl"
-#endif
 
 #endif  // GAME_WINDOW__H

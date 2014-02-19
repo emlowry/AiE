@@ -19,6 +19,9 @@
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
+#include "..\Declarations\Hashable.h"
+#include "..\Declarations\NotCopyable.h"
+#include "..\Declarations\Singleton.h"
 //TODO include declaration headers
 
 #endif  // MY_FIRST_ENGINE__H
