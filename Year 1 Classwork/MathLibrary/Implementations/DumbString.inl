@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the DumbString class.
- * Last Modified:      February 11, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved into Utility namespace from MyFirstEngine project.
  ******************************************************************************/
 
 #ifndef DUMB_STRING__INL
@@ -17,21 +17,26 @@
 #include <string>
 #include <utility>  // for swap
 
+#include "..\Declarations\ImExportMacro.h"
+
+namespace Utility
+{
+
 // Constructors
-inline DumbString::DumbString()
+INLINE DumbString::DumbString()
     : m_uiSize( 0 ), m_uiCapacity( sizeof( int ) ), m_pcData( nullptr )
 {
     m_pcData = new char[ m_uiCapacity ];
     m_pcData[0] = '\0';
 }
-inline DumbString::DumbString( std::size_t a_uiSize )
+INLINE DumbString::DumbString( std::size_t a_uiSize )
     : m_uiSize( 0 ), m_uiCapacity( RequiredCapacity( a_uiSize ) ),
       m_pcData( nullptr )
 {
     m_pcData = new char[ m_uiCapacity ];
     m_pcData[0] = '\0';
 }
-inline DumbString::DumbString( const DumbString& ac_roString )
+INLINE DumbString::DumbString( const DumbString& ac_roString )
     : m_uiSize( ac_roString.m_uiSize ),
         m_uiCapacity( ac_roString.m_uiCapacity ),
         m_pcData( nullptr )
@@ -39,7 +44,7 @@ inline DumbString::DumbString( const DumbString& ac_roString )
     m_pcData = new char[ m_uiCapacity ];
     strcpy_s( m_pcData, m_uiCapacity, ac_roString.m_pcData );
 }
-inline DumbString::DumbString( const char* ac_pcData )
+INLINE DumbString::DumbString( const char* ac_pcData )
     : m_uiSize( strlen( ac_pcData ) ),
         m_uiCapacity( RequiredCapacity( m_uiSize ) ),
         m_pcData( nullptr )
@@ -54,7 +59,7 @@ inline DumbString::DumbString( const char* ac_pcData )
         strcpy_s( m_pcData, m_uiCapacity, ac_pcData );
     }
 }
-inline DumbString::DumbString( char a_cCharacter )
+INLINE DumbString::DumbString( char a_cCharacter )
     : m_uiSize( '\0' == a_cCharacter ? 0 : 1 ),
       m_uiCapacity( RequiredCapacity( 1 ) ),
       m_pcData( nullptr )
@@ -63,7 +68,7 @@ inline DumbString::DumbString( char a_cCharacter )
     m_pcData[0] = a_cCharacter;
     m_pcData[1] = '\0';
 }
-inline DumbString::DumbString( std::istream& a_roInput )
+INLINE DumbString::DumbString( std::istream& a_roInput )
     : m_uiSize( 0 ), m_uiCapacity( sizeof( int ) ), m_pcData( nullptr )
 {
     m_pcData = new char[ m_uiCapacity ];
@@ -72,7 +77,7 @@ inline DumbString::DumbString( std::istream& a_roInput )
 }
 
 // Destructor actually does something
-inline DumbString::~DumbString()
+INLINE DumbString::~DumbString()
 {
     if( nullptr != m_pcData )
     {
@@ -81,14 +86,14 @@ inline DumbString::~DumbString()
 }
 
 // Assign operators
-inline DumbString& DumbString::operator=( const DumbString& ac_roString )
+INLINE DumbString& DumbString::operator=( const DumbString& ac_roString )
 {
     GrowTo( ac_roString.m_uiSize );
     strcpy_s( m_pcData, m_uiCapacity, ac_roString.m_pcData );
     m_uiSize = ac_roString.m_uiSize;
     return *this;
 }
-inline DumbString& DumbString::operator=( const char* ac_pcData )
+INLINE DumbString& DumbString::operator=( const char* ac_pcData )
 {
     if( nullptr == ac_pcData )
     {
@@ -102,21 +107,21 @@ inline DumbString& DumbString::operator=( const char* ac_pcData )
     }
     return *this;
 }
-inline DumbString& DumbString::operator=( char a_cCharacter )
+INLINE DumbString& DumbString::operator=( char a_cCharacter )
 {
     char acData[] = { a_cCharacter, '\0' };
     return operator=( acData );
 }
 
 // Concatenation-assign operators
-inline DumbString& DumbString::operator+=( const DumbString& ac_roString )
+INLINE DumbString& DumbString::operator+=( const DumbString& ac_roString )
 {
     GrowTo( m_uiSize + ac_roString.m_uiSize );
     strcpy_s( m_pcData + m_uiSize, m_uiCapacity - m_uiSize, ac_roString.m_pcData );
     m_uiSize += ac_roString.m_uiSize;
     return *this;
 }
-inline DumbString& DumbString::operator+=( const char* ac_pcData )
+INLINE DumbString& DumbString::operator+=( const char* ac_pcData )
 {
     if( nullptr != ac_pcData )
     {
@@ -126,14 +131,14 @@ inline DumbString& DumbString::operator+=( const char* ac_pcData )
     }
     return *this;
 }
-inline DumbString& DumbString::operator+=( char a_cCharacter )
+INLINE DumbString& DumbString::operator+=( char a_cCharacter )
 {
     char acData[] = { a_cCharacter, '\0' };
     return operator+=( acData );
 }
 
 // Concatenation operators
-inline DumbString DumbString::operator+( const DumbString& ac_roString ) const
+INLINE DumbString DumbString::operator+( const DumbString& ac_roString ) const
 {
     DumbString oResult( m_uiSize + ac_roString.m_uiSize );
     strcpy_s( oResult.m_pcData, oResult.m_uiCapacity, m_pcData );
@@ -143,7 +148,7 @@ inline DumbString DumbString::operator+( const DumbString& ac_roString ) const
     oResult.m_uiSize = m_uiSize + ac_roString.m_uiSize;
     return oResult;
 }
-inline DumbString DumbString::operator+( const char* ac_pcData ) const
+INLINE DumbString DumbString::operator+( const char* ac_pcData ) const
 {
     if( nullptr == ac_pcData )
     {
@@ -157,23 +162,23 @@ inline DumbString DumbString::operator+( const char* ac_pcData ) const
     oResult.m_uiSize = m_uiSize + strlen( ac_pcData );
     return oResult;
 }
-inline DumbString DumbString::operator+( char a_cCharacter ) const
+INLINE DumbString DumbString::operator+( char a_cCharacter ) const
 {
     char acData[] = { a_cCharacter, '\0' };
     return operator+( acData );
 }
-inline DumbString operator+( const char* ac_pcData,
+INLINE DumbString operator+( const char* ac_pcData,
                              const DumbString& ac_roString )
 {
     return DumbString( ac_pcData ).operator+( ac_roString );
 }
-inline DumbString operator+( char a_cCharacter, const DumbString& ac_roString )
+INLINE DumbString operator+( char a_cCharacter, const DumbString& ac_roString )
 {
     return DumbString( a_cCharacter ).operator+( ac_roString );
 }
 
 // Expand capacity to fit a string of the given size
-inline void DumbString::GrowTo( std::size_t a_uiSize )
+INLINE void DumbString::GrowTo( std::size_t a_uiSize )
 {
     if( a_uiSize >= m_uiCapacity )
     {
@@ -184,33 +189,33 @@ inline void DumbString::GrowTo( std::size_t a_uiSize )
 }
 
 // Implement abstract functions from parent classes
-inline std::size_t DumbString::Hash() const
+INLINE std::size_t DumbString::Hash() const
 {
     return std::hash< std::string >()( std::string( m_pcData ) );
 }
-inline int DumbString::Compare( const DumbString& ac_roString ) const
+INLINE int DumbString::Compare( const DumbString& ac_roString ) const
 {
     return strcmp( m_pcData, ac_roString.m_pcData );
 }
-inline int DumbString::Compare( const char* ac_pcData ) const
+INLINE int DumbString::Compare( const char* ac_pcData ) const
 {
     return strcmp( m_pcData, ac_pcData );
 }
-inline int DumbString::Compare( char a_cCharacter ) const
+INLINE int DumbString::Compare( char a_cCharacter ) const
 {
     char acData[] = { a_cCharacter, '\0' };
     return strcmp( m_pcData, acData );
 }
 
 // Calculate the int-aligned capacity needed for a string of the given size
-inline std::size_t DumbString::RequiredCapacity( std::size_t a_uiSize )
+INLINE std::size_t DumbString::RequiredCapacity( std::size_t a_uiSize )
 {
     return ( ( ( a_uiSize * sizeof( char ) ) + sizeof( int ) )
                 / sizeof( int ) ) * sizeof( int );
 }
 
 // read from or write to stream
-inline void DumbString::ReadFrom( std::istream& a_roInput )
+INLINE void DumbString::ReadFrom( std::istream& a_roInput )
 {
     if( a_roInput )
     {
@@ -224,7 +229,7 @@ inline void DumbString::ReadFrom( std::istream& a_roInput )
         }
     }
 }
-inline void DumbString::ReadFrom( std::istream& a_roInput,
+INLINE void DumbString::ReadFrom( std::istream& a_roInput,
                                   std::size_t a_uiSize )
 {
     if( a_roInput )
@@ -235,11 +240,11 @@ inline void DumbString::ReadFrom( std::istream& a_roInput,
         m_pcData[ m_uiSize ] = '\0';
     }
 }
-inline void DumbString::WriteTo( std::ostream& a_roOutput ) const
+INLINE void DumbString::WriteTo( std::ostream& a_roOutput ) const
 {
     WriteTo( a_roOutput, m_uiSize );
 }
-inline void DumbString::WriteTo( std::ostream& a_roOutput,
+INLINE void DumbString::WriteTo( std::ostream& a_roOutput,
                                  std::size_t a_uiSize ) const
 {
     if( a_roOutput )
@@ -253,7 +258,7 @@ inline void DumbString::WriteTo( std::ostream& a_roOutput,
 //
 
 // load string from file contents
-inline DumbString DumbString::LoadFrom( const char* ac_pcFileName,
+INLINE DumbString DumbString::LoadFrom( const char* ac_pcFileName,
                                  const char* ac_pcErrorMessage )
 {
     std::ifstream file( ac_pcFileName );
@@ -265,5 +270,7 @@ inline DumbString DumbString::LoadFrom( const char* ac_pcFileName,
     }
     return DumbString( file );
 }
+
+}   // namespace Utility
 
 #endif  // DUMB_STRING__INL

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       November 18, 2013
  * Description:        Base class for matrices of numeric type.
- * Last Modified:      February 12, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  MostDerivedAddress moved to Utility namespace.
  ******************************************************************************/
 
 #ifndef MATRIX__H
@@ -24,7 +24,7 @@ class Vector;
 
 // Represents a matrix of values of a set type with set dimensions.
 template< typename T, unsigned int M, unsigned int N = M >
-class Matrix : public MostDerivedAddress
+class Matrix : public Utility::MostDerivedAddress
 {
 public:
 

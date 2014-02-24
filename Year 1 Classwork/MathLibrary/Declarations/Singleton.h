@@ -3,14 +3,17 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Base class for singleton objects.
- * Last Modified:      February 6, 2014
- * Last Modification:  Inheriting from separate NotCopyable class.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved into Utility namespace from MyFirstEngine project.
  ******************************************************************************/
 
 #ifndef SINGLETON__H
 #define SINGLETON__H
 
 #include "NotCopyable.h"
+
+namespace Utility
+{
 
 // To create a singleton class without having to define your own MakeInstance
 // implementation, inherit from this class instead, make this class a friend,
@@ -52,5 +55,7 @@ protected:
     Singleton() {}
 
 };  // class Singleton
+
+}   // namespace Utility
 
 #endif  // SINGLETON__H

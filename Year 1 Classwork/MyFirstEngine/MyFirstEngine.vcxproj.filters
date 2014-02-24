@@ -24,16 +24,7 @@
     <ClInclude Include="Declarations\MyFirstEngineMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Declarations\Singleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations\NotCopyable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Declarations\GameWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations\DumbString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Declarations\GameState.h">
@@ -51,17 +42,6 @@
     <ClInclude Include="include\MyFirstEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Declarations\Hashable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations\Comparable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Implementations\DumbString.inl">
-      <Filter>Header Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\Shader.cpp">
@@ -71,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Implementations\GameWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Implementations\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,17 +3,15 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Class representing a window managed by the game engine.
- * Last Modified:      February 11, 2014
- * Last Modification:  Adding GameState.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved base class to Utility namespace in MathLibrary.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__H
 #define GAME_WINDOW__H
 
-#include "DumbString.h"
 #include "GLFW.h"
 #include "MathLibrary.h"
-#include "NotCopyable.h"
 #include <iostream>
 #include <vector>
 #include <unordered_map>
@@ -22,6 +20,8 @@
 
 namespace MyFirstEngine
 {
+
+using namespace Utility;
 
 class IMEXPORT_CLASS GameWindow : public NotCopyable
 {

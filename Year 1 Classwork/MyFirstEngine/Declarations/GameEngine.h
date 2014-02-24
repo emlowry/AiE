@@ -3,20 +3,22 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Singleton class representing the game engine as a whole.
- * Last Modified:      February 11, 2014
- * Last Modification:  Adding GameState.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved base class to Utility namespace in MathLibrary.
  ******************************************************************************/
 
 #ifndef GAME_ENGINE__H
 #define GAME_ENGINE__H
 
-#include "Singleton.h"
+#include "MathLibrary.h"
 #include <stack>
 
 #include "MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
 {
+
+using namespace Utility;
 
 // forward declare GameState
 class GameState;

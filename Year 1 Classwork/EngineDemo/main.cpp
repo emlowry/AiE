@@ -3,17 +3,16 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Runs a simple game to demonstrate MyFirstEngine.
- * Last Modified:      February 4, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Using namespaces instead of individual classes.
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
 #include <conio.h>
 #include <iostream>
 
-using MyFirstEngine::GameEngine;
-using MyFirstEngine::GameState;
-using MyFirstEngine::GameWindow;
+using namespace MyFirstEngine;
+using namespace Utility;
 
 class SimpleState : public GameState, public Singleton< SimpleState >
 {

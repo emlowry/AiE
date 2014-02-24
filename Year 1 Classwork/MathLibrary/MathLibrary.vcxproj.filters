@@ -51,6 +51,21 @@
     <ClInclude Include="include\MathLibrary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\Comparable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\DumbString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Hashable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\NotCopyable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Declarations\Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl">
@@ -106,6 +121,9 @@
     </None>
     <None Include="README.pdf" />
     <None Include="Implementations\PointVector_Constructors.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\DumbString.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

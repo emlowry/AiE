@@ -3,14 +3,17 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 18, 2014
  * Description:        Abstract parent class for objects that can be compared.
- * Last Modified:      February 18, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved into Utility namespace from MyFirstEngine project.
  ******************************************************************************/
 
 #ifndef COMPARABLE__H
 #define COMPARABLE__H
 
 #include <type_traits>  // for conditional and is_fundamental
+
+namespace Utility
+{
 
 // Has a member function, Compare, which must be defined to return 0 if the
 // object is equal to the parameter, -1 if the object is less than the
@@ -48,6 +51,18 @@ public:
     bool operator<=( CompareType a_Val ) const { return Compare( a_Val ) <= 0; }
     bool operator>( CompareType a_Val ) const { return Compare( a_Val ) > 0; }
     bool operator<( CompareType a_Val ) const { return Compare( a_Val ) < 0; }
-};
+
+};  // class Comparable
+
+// default comparison function
+template< typename T >
+inline int SimpleCompare( const T& ac_roFirst, const T& ac_roSecond )
+{
+    return ( ac_roFirst == ac_roSecond
+             ? 0
+             : ( ac_roFirst > ac_roSecond ? 1 : -1 ) );
+}
+
+}   // namespace Utility
 
 #endif  // COMPARABLE__H

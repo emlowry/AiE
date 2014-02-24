@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Simple non-template string to avoid DLL-compile warnings.
- * Last Modified:      February 10, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved into Utility namespace from MyFirstEngine project.
  ******************************************************************************/
 
 #ifndef DUMB_STRING__H
@@ -16,7 +16,10 @@
 #include <functional>   // for hash
 #include <iostream>
 
-#include "MyFirstEngineMacros.h"
+#include "ImExportMacro.h"
+
+namespace Utility
+{
 
 // A simple String structure.  This doesn't implement everything std::string
 // does, but it won't result in warnings when compiling a DLL
@@ -89,11 +92,19 @@ private:
 };  // class DumbString
 DumbString operator+( const char* ac_pcData, const DumbString& ac_roString );
 DumbString operator+( const char a_cCharacter, const DumbString& ac_roString );
+
+}   // namespace Utility
+
 namespace std
 {
-template<> struct hash< DumbString > : public hash< Hashable > {};
+
+template<>
+struct hash< Utility::DumbString > : public hash< Utility::Hashable > {};
+
 }   // namespace std
 
+#ifdef INLINE_IMPLEMENTATION
 #include "..\Implementations\DumbString.inl"
+#endif
 
 #endif  // DUMB_STRING__H

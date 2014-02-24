@@ -14,11 +14,16 @@
 
 #include "ImExportMacro.h"
 
+namespace Utility
+{
+
 class IMEXPORT_CLASS MostDerivedAddress
 {
 public:
     virtual ~MostDerivedAddress() {}
     const void* Address() const { return dynamic_cast< const void* >( this ); }
 };
+
+}   // namespace Utility
 
 #endif  // MOST_DERIVED_ADDRESS__H

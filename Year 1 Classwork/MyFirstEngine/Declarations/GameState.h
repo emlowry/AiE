@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 11, 2014
  * Description:        Class representing a game state (load, menu, play, etc).
- * Last Modified:      February 18, 2014
- * Last Modification:  Condensed into a pure inline class.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Moved base classes to Utility namespace in MathLibrary.
  ******************************************************************************/
 
 #ifndef GAME_STATE__H
@@ -13,13 +13,13 @@
 #include "GameEngine.h"
 #include "GameWindow.h"
 #include "MathLibrary.h"
-#include "NotCopyable.h"
-#include "Singleton.h"
 
 #include "MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
 {
+
+using namespace Utility;
 
 // Represents a state in the game, such as showing the splash screen or the menu
 // or actually playing the game.

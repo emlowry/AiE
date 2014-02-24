@@ -15,15 +15,11 @@
 #define INCLUDING_DYNAMIC_MY_FIRST_ENGINE_LIBRARY
 #endif
 
-#include "..\Declarations\Comparable.h"
-#include "..\Declarations\DumbString.h"
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
-#include "..\Declarations\Hashable.h"
-#include "..\Declarations\NotCopyable.h"
 #include "..\Declarations\Shader.h"
-#include "..\Declarations\Singleton.h"
+#include "..\Declarations\ShaderProgram.h"
 //TODO include declaration headers
 
 #endif  // MY_FIRST_ENGINE__H

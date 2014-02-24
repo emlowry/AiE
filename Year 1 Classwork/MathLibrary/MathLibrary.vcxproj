@@ -13,13 +13,18 @@
   <ItemGroup>
     <ClInclude Include="Declarations\ColorConstants.h" />
     <ClInclude Include="Declarations\ColorVector.h" />
+    <ClInclude Include="Declarations\Comparable.h" />
+    <ClInclude Include="Declarations\DumbString.h" />
     <ClInclude Include="Declarations\Functions.h" />
+    <ClInclude Include="Declarations\Hashable.h" />
     <ClInclude Include="Declarations\Hex.h" />
     <ClInclude Include="Declarations\HomogeneousVector.h" />
     <ClInclude Include="Declarations\ImExportMacro.h" />
     <ClInclude Include="Declarations\Matrix.h" />
     <ClInclude Include="Declarations\MostDerivedAddress.h" />
+    <ClInclude Include="Declarations\NotCopyable.h" />
     <ClInclude Include="Declarations\PointVector.h" />
+    <ClInclude Include="Declarations\Singleton.h" />
     <ClInclude Include="Declarations\Transform.h" />
     <ClInclude Include="Declarations\Vector.h" />
     <ClInclude Include="include\MathLibrary.h" />
@@ -27,6 +32,7 @@
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl" />
     <None Include="Implementations\ColorVector_Templates.inl" />
+    <None Include="Implementations\DumbString.inl" />
     <None Include="Implementations\Functions.inl" />
     <None Include="Implementations\HomogeneousVector.inl" />
     <None Include="Implementations\HomogeneousVector_Templates.inl" />
