@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 16, 2013
  * Description:        A union for representing color hex values.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 24, 2014
+ * Last Modification:  Added functions for getting channels as floats.
  ******************************************************************************/
 
 #ifndef HEX__H
@@ -276,6 +276,12 @@ union Hex
         result /= ac_rScalar;
         return result;
     }
+
+    // get channels as floats
+    float fA() const { return (float)a / 0xFF; }
+    float fR() const { return (float)r / 0xFF; }
+    float fG() const { return (float)g / 0xFF; }
+    float fB() const { return (float)b / 0xFF; }
 
 };  // union Hex
 

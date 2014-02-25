@@ -64,7 +64,6 @@ ShaderProgram::ShaderProgram( const char* ac_pcProgramName,
 // Start using this shader program
 void ShaderProgram::Use()
 {
-    Setup();
     glUseProgram( m_uiID );
 }
 
@@ -102,6 +101,23 @@ Shader ShaderProgram::GetShader( GLenum a_eType ) const
     return Shader::Null();
 }
 
+// Get the info log
+DumbString ShaderProgram::GetLog() const
+{
+    // get the size of the log
+    GLint uiSize = 0;
+    glGetProgramiv( m_uiID, GL_INFO_LOG_LENGTH, &uiSize );
+
+    // get the log data
+    char* pcData = new char[ uiSize + 1 ];
+    glGetProgramInfoLog( m_uiID, uiSize + 1, nullptr, pcData );
+
+    // return the log data
+    DumbString oString( pcData );
+    delete[] pcData;
+    return oString;
+}
+
 //
 // Static functions
 //
@@ -136,6 +152,19 @@ void ShaderProgram::DestroyAll()
         glDeleteProgram( oPair.second );
     }
     List().clear();
+}
+
+// Is the program linked and not flagged for deletion?
+static bool ShaderProgram::IsValid( GLuint a_uiID )
+{
+    if( GL_FALSE == glIsProgram( a_uiID ) )
+    {
+        return false;
+    }
+    GLint iLinked, iDeleted;
+    glGetProgramiv( a_uiID, GL_LINK_STATUS, &iLinked );
+    glGetProgramiv( a_uiID, GL_DELETE_STATUS, &iDeleted );
+    return ( GL_TRUE == iLinked && GL_FALSE == iDeleted );
 }
     
 // Link the fragment shader and vertex shader into a program

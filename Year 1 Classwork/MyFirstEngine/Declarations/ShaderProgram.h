@@ -50,14 +50,9 @@ public:
     virtual ~ShaderProgram() {}
 
     // Start or stop using a given (or the current) shader program
-    void Use();
+    void Use() const;
     static void Use( ShaderProgram& a_roProgram ) { a_roProgram.Use(); }
-    static void StopUsing() { ShaderProgram( Null() ).Use(); }
-
-    // Perform sany neccesary setup tasks before starting to use this program.
-    // Default behavior is to do nothing - redefine in child classes to set
-    // uniform variables and such.
-    virtual void Setup() {}
+    static void Stop() { Null().Use(); }
 
     // Get shader program properties
     int Compare( const ShaderProgram& ac_roProgram ) const
@@ -66,6 +61,13 @@ public:
     GLuint ID() const { return m_uiID; }
     Shader VertexShader() const { return GetShader( GL_VERTEX_SHADER ); }
     Shader FragmentShader() const { return GetShader( GL_FRAGMENT_SHADER ); }
+
+    // Get the info log
+    DumbString GetLog() const;
+
+    // Is the program linked and not flagged for deletion?
+    static bool IsValid( GLuint a_uiID );
+    bool IsValid() const { return IsValid( m_uiID ); }
 
     // get the shader program currently in use
     static ShaderProgram Current();

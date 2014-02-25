@@ -39,7 +39,8 @@ public:
 
     // Draw to the screen after each update.  Don't update anything - that's for
     // OnUpdate and other event handlers.  Default behavior is to swap frame
-    // buffers for all windows.
+    // buffers for all windows.  If you actually draw things, remember to call
+    // ShaderProgram::Stop() when finished.
     virtual void Draw() const { GameWindow::SwapAllBuffers(); }
 
     // Return a reference to the current game state

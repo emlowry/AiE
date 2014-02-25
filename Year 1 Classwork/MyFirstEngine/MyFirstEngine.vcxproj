@@ -85,6 +85,7 @@
     <ClInclude Include="Declarations\Quad.h" />
     <ClInclude Include="Declarations\Shader.h" />
     <ClInclude Include="Declarations\ShaderProgram.h" />
+    <ClInclude Include="Declarations\Drawable.h" />
     <ClInclude Include="include\MyFirstEngine.h" />
   </ItemGroup>
   <ItemGroup>
@@ -93,8 +94,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Implementations\Drawable.cpp" />
     <ClCompile Include="Implementations\GameEngine.cpp" />
     <ClCompile Include="Implementations\GameWindow.cpp" />
+    <ClCompile Include="Implementations\Quad.cpp" />
     <ClCompile Include="Implementations\Shader.cpp" />
     <ClCompile Include="Implementations\ShaderProgram.cpp" />
   </ItemGroup>

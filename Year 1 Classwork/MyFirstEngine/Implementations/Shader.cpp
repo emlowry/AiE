@@ -123,19 +123,6 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName,
     }
 }
 
-// Is this shader compiled and not marked for deletion?
-bool Shader::IsValid( GLuint a_uiID )
-{
-    if( GL_FALSE == glIsShader( a_uiID ) )
-    {
-        return false;
-    }
-    GLint iCompiled, iDeleted;
-    glGetShaderiv( a_uiID, GL_COMPILE_STATUS, &iCompiled );
-    glGetShaderiv( a_uiID, GL_DELETE_STATUS, &iDeleted );
-    return ( GL_TRUE == iCompiled && GL_FALSE == iDeleted );
-}
-
 // Get the info log
 DumbString Shader::GetLog() const
 {
@@ -211,6 +198,19 @@ void Shader::DestroyAll()
         }
     }
     Lookup().clear();
+}
+
+// Is this shader compiled and not marked for deletion?
+bool Shader::IsValid( GLuint a_uiID )
+{
+    if( GL_FALSE == glIsShader( a_uiID ) )
+    {
+        return false;
+    }
+    GLint iCompiled, iDeleted;
+    glGetShaderiv( a_uiID, GL_COMPILE_STATUS, &iCompiled );
+    glGetShaderiv( a_uiID, GL_DELETE_STATUS, &iDeleted );
+    return ( GL_TRUE == iCompiled && GL_FALSE == iDeleted );
 }
 
 // Shader meaning no shader
