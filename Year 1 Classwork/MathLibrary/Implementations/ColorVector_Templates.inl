@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Template function implementations for ColorVector class.
- * Last Modified:      January 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Changed from 8-bit channel to float.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__TEMPLATES__INL
@@ -20,34 +20,20 @@ namespace Color
 template< typename U, unsigned int Q, bool t_bOtherIsRow >
 inline ColorVector::
     ColorVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill )
-    : BaseType( ac_roVector, ac_rFill ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] )
-{
-    if( Q < SIZE )
-    {
-        Shift( 1 );
-        *this |= OPAQUE;
-    }
-}
+                 float a_fFill )
+    : BaseType( ac_roVector, a_fFill ),
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
 template< typename U, unsigned int P, unsigned int Q >
 inline ColorVector::ColorVector( const Matrix< U, P, Q >& ac_roMatrix,
-                                 const Channel& ac_rFill )
-    : BaseType( ac_roMatrix, ac_rFill ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] )
-{
-    if( Q < SIZE )
-    {
-        Shift( 1 );
-        *this |= OPAQUE;
-    }
-}
+                                 float a_fFill )
+    : BaseType( ac_roMatrix, a_fFill ),
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
 
 // Assignment operators that pass to base class
 template< typename U, unsigned int Q, bool t_bOtherIsRow >

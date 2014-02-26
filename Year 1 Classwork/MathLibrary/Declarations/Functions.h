@@ -3,14 +3,13 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 2, 2013
  * Description:        Various library functions not contained in a class.
- * Last Modified:      February 12, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Simplified the InverseOf struct typedef.
  ******************************************************************************/
 
 #ifndef FUNCTIONS__H
 #define FUNCTIONS__H
 
-#include "Vector.h"
 #include <type_traits>  // for enable_if, is_same, and is_floating_point
 
 namespace Math
@@ -38,17 +37,13 @@ struct Array2DReference
 template< typename T >
 struct InverseOf
 {
-    typedef double Type;
-};
-template<>
-struct InverseOf< float >
-{
-    typedef float Type;
-};
-template<>
-struct InverseOf< long double >
-{
-    typedef long double Type;
+    typedef
+        typename std::conditional<
+            std::is_same< long double, T >::value, long double,
+            typename std::conditional<
+                std::is_same< float, T >::value, float, double
+            >::type
+        >::type Type;
 };
 
 // Used whenever values at a given coordinate aren't specified, as in

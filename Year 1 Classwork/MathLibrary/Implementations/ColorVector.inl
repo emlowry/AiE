@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 16, 2013
  * Description:        Inline function implementations for ColorVector class.
- * Last Modified:      February 4, 2014
- * Last Modification:  Switching from regular inline to macro inline.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Changed from 8-bit channel to float.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__INL
@@ -12,6 +12,7 @@
 
 #include "../Declarations/ColorConstants.h"
 #include "../Declarations/ColorVector.h"
+#include "../Declarations/Functions.h"
 #include "../Declarations/ImExportMacro.h"
 
 // separate file for template functions to keep filesize down
@@ -25,51 +26,51 @@ INLINE ColorVector::~ColorVector() {}
 
 // Constructors that forward to base class constructors
 INLINE ColorVector::ColorVector()
-    : BaseType( 0xFF ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] ) {}
+    : BaseType( 1.0f ),
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
 INLINE ColorVector::ColorVector( const ColorVector& ac_roVector )
     : BaseType( ac_roVector ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] ) {}
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
 INLINE ColorVector::ColorVector( const RootType& ac_roMatrix )
     : BaseType( ac_roMatrix ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] ) {}
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
 INLINE ColorVector::ColorVector( ColorVector&& a_rroVector )
     : BaseType( std::forward< ColorVector >( a_rroVector ) ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] ) {}
-INLINE ColorVector::ColorVector( const Channel& ac_rFill )
-    : BaseType( ac_rFill ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] ) {}
-INLINE ColorVector::ColorVector( const Channel (&ac_raData)[ 4 ] )
-    : BaseType( ac_raData ),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] ) {}
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
+INLINE ColorVector::ColorVector( float a_fFill )
+    : BaseType( a_fFill ),
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
+INLINE ColorVector::ColorVector( const float (&ac_rafData)[ 4 ] )
+    : BaseType( ac_rafData ),
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] ) {}
 
 // Assignment operators that pass to base class
-INLINE ColorVector& ColorVector::operator=( const Channel& ac_rFill )
+INLINE ColorVector& ColorVector::operator=( float a_fFill )
 {
-    BaseType::operator=( ac_rFill );
+    BaseType::operator=( a_fFill );
     return *this;
 }
-INLINE ColorVector& ColorVector::operator=( const Channel (&ac_raData)[ 4 ] )
+INLINE ColorVector& ColorVector::operator=( const float (&ac_rafData)[ 4 ] )
 {
-    BaseType::operator=( ac_raData );
+    BaseType::operator=( ac_rafData );
     return *this;
 }
 
@@ -79,54 +80,54 @@ INLINE ColorVector::ColorVector( Channel a_ucRed,
                                  Channel a_ucBlue,
                                  Channel a_ucAlpha )
     : BaseType(),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] )
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] )
 {
-    a = a_ucAlpha;
-    r = a_ucRed;
-    g = a_ucGreen;
-    b = a_ucBlue;
+    r = (float)a_ucRed / 0xFF;
+    g = (float)a_ucGreen / 0xFF;
+    b = (float)a_ucBlue / 0xFF;
+    a = (float)a_ucAlpha / 0xFF;
 }
 INLINE ColorVector::ColorVector( float a_fRed,
                                  float a_fGreen,
                                  float a_fBlue,
                                  float a_fAlpha )
     : BaseType(),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] )
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] )
 {
-    a = (Channel)( a_fAlpha * 0xFF );
-    r = (Channel)( a_fRed * 0xFF );
-    g = (Channel)( a_fGreen * 0xFF );
-    b = (Channel)( a_fBlue * 0xFF );
+    r = a_fRed;
+    g = a_fGreen;
+    b = a_fBlue;
+    a = a_fAlpha;
 }
 INLINE ColorVector::ColorVector( FourChannelInt a_uiHex )
     : BaseType(),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] )
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] )
 {
-    a = Hex(a_uiHex).a;
-    r = Hex(a_uiHex).r;
-    g = Hex(a_uiHex).g;
-    b = Hex(a_uiHex).b;
+    r = (float)( Hex(a_uiHex).r ) / 0xFF;
+    g = (float)( Hex(a_uiHex).g ) / 0xFF;
+    b = (float)( Hex(a_uiHex).b ) / 0xFF;
+    a = (float)( Hex(a_uiHex).a ) / 0xFF;
 }
 INLINE ColorVector::ColorVector( const Hex& ac_rHex )
     : BaseType(),
-      a( m_aaData[0][0] ),
-      r( m_aaData[0][1] ),
-      g( m_aaData[0][2] ),
-      b( m_aaData[0][3] )
+      r( m_aaData[0][0] ),
+      g( m_aaData[0][1] ),
+      b( m_aaData[0][2] ),
+      a( m_aaData[0][3] )
 {
-    a = ac_rHex.a;
-    r = ac_rHex.r;
-    g = ac_rHex.g;
-    b = ac_rHex.b;
+    r = (float)( ac_rHex.r ) / 0xFF;
+    g = (float)( ac_rHex.g ) / 0xFF;
+    b = (float)( ac_rHex.b ) / 0xFF;
+    a = (float)( ac_rHex.a ) / 0xFF;
 }
 
 // Assign from or convert to color Hex value
@@ -136,10 +137,10 @@ INLINE ColorVector& ColorVector::operator=( FourChannelInt a_uiHex )
 }
 INLINE ColorVector& ColorVector::operator=( const Hex& ac_rHex )
 {
-    a = ac_rHex.a;
-    r = ac_rHex.r;
-    g = ac_rHex.g;
-    b = ac_rHex.b;
+    r = (float)( ac_rHex.r ) / 0xFF;
+    g = (float)( ac_rHex.g ) / 0xFF;
+    b = (float)( ac_rHex.b ) / 0xFF;
+    a = (float)( ac_rHex.a ) / 0xFF;
     return *this;
 }
 INLINE ColorVector::operator Hex() const
@@ -223,21 +224,29 @@ INLINE ColorVector& ColorVector::operator>>=( unsigned char a_ucBits )
 }
 
 // Return rgb values as floats
-INLINE float ColorVector::fAlpha() const
+INLINE Channel ColorVector::AlphaChannel() const
 {
-    return (float)(a) / 0xFF;
+    return 0.0f > a ? 0x00
+        : 1.0f < a ? 0xFF
+        : (Channel)Math::Round( a * 0xFF );
 }
-INLINE float ColorVector::fRed() const
+INLINE Channel ColorVector::RedChannel() const
 {
-    return (float)(r) / 0xFF;
+    return 0.0f > r ? 0x00
+        : 1.0f < r ? 0xFF
+        : (Channel)Math::Round( r * 0xFF );
 }
-INLINE float ColorVector::fGreen() const
+INLINE Channel ColorVector::GreenChannel() const
 {
-    return (float)(g) / 0xFF;
+    return 0.0f > g ? 0x00
+        : 1.0f < g ? 0xFF
+        : (Channel)Math::Round( g * 0xFF );
 }
-INLINE float ColorVector::fBlue() const
+INLINE Channel ColorVector::BlueChannel() const
 {
-    return (float)(b) / 0xFF;
+    return 0.0f > b ? 0x00
+        : 1.0f < b ? 0xFF
+        : (Channel)Math::Round( b * 0xFF );
 }
 
 }   // namespace Color

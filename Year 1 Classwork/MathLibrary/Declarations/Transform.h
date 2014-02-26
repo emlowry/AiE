@@ -14,6 +14,11 @@
 #include "Matrix.h"
 #include "ImExportMacro.h"
 
+// explicit instantiations
+EXTERN_T_INST template class IMEXPORT_T_INST Math::Matrix< double, 2 >;
+EXTERN_T_INST template class IMEXPORT_T_INST Math::Matrix< double, 3 >;
+EXTERN_T_INST template class IMEXPORT_T_INST Math::Matrix< double, 4 >;
+
 namespace Plane
 {
 

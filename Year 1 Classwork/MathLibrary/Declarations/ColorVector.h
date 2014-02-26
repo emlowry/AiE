@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 11, 2013
  * Description:        Vector for representing RGBA colors.
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Changed from 8-bit channel to float.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__H
@@ -17,12 +17,12 @@
 namespace Color
 {
 // Handles RGBA colors
-class IMEXPORT_CLASS ColorVector : public Math::Vector< Channel, 4 >
+class IMEXPORT_CLASS ColorVector : public Math::Vector< float, 4 >
 {
 public:
 
     // simplify typing
-    typedef Vector< Channel, SIZE, IS_ROW_VECTOR > BaseType;
+    typedef Vector< float, SIZE, IS_ROW_VECTOR > BaseType;
     typedef BaseType::BaseType RootType;
 
     // destructor
@@ -35,20 +35,20 @@ public:
     ColorVector( ColorVector&& a_rroVector );
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     ColorVector( const Vector< U, Q, t_bOtherIsRow >& ac_roVector,
-                 const Channel& ac_rFill = 0 );
+                 float a_fFill = 1.0f );
     template< typename U, unsigned int P, unsigned int Q >
     ColorVector( const Matrix< U, P, Q >& ac_roMatrix,
-                 const Channel& ac_rFill = 0 );
-    ColorVector( const Channel& ac_rFill );
-    ColorVector( const Channel (&ac_raData)[ 4 ] );
+                 float a_fFill = 1.0f );
+    ColorVector( float a_fFill );
+    ColorVector( const float (&ac_rafData)[ 4 ] );
     
     // Assignment operators that pass to base class
     template< typename U, unsigned int Q, bool t_bOtherIsRow >
     ColorVector& operator=( const Vector< U, Q, t_bOtherIsRow >& ac_roVector );
     template< typename U, unsigned int P, unsigned int Q >
     ColorVector& operator=( const Matrix< U, P, Q >& ac_roMatrix );
-    ColorVector& operator=( const Channel& ac_rFill );
-    ColorVector& operator=( const Channel (&ac_raData)[ 4 ] );
+    ColorVector& operator=( float a_fFill );
+    ColorVector& operator=( const float (&ac_rafData)[ 4 ] );
     
     // Construct/assign from or convert to hex value
     ColorVector( Channel a_ucRed,
@@ -84,17 +84,17 @@ public:
     ColorVector& operator<<=( unsigned char a_ucBits );
     ColorVector& operator>>=( unsigned char a_ucBits );
 
-    // Return rgb values as floats
-    float fAlpha() const;
-    float fRed() const;
-    float fGreen() const;
-    float fBlue() const;
+    // Return rgba values as hexidecimal channel values
+    Channel AlphaChannel() const;
+    Channel RedChannel() const;
+    Channel GreenChannel() const;
+    Channel BlueChannel() const;
 
-    // rgb value access
-    Channel& a; // m_aaData[0][0]
-    Channel& r; // m_aaData[0][1]
-    Channel& g; // m_aaData[0][2]
-    Channel& b; // m_aaData[0][3]
+    // rgba value access
+    float& r; // m_aaData[0][0]
+    float& g; // m_aaData[0][1]
+    float& b; // m_aaData[0][2]
+    float& a; // m_aaData[0][3]
 
 };
 

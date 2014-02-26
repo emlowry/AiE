@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        Vector4 tests.
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Changed ColorVector from 8-bit Channel to float.
  ******************************************************************************/
 
 #include "Vector4TestGroup.h"
@@ -22,19 +22,19 @@ Vector4TestGroup::Vector4TestGroup()
 UnitTest::Result Vector4TestGroup::ColorConstInit()
 {
     Color::ColorVector oColor( Color::VGA::GREEN );
-    if( oColor.fAlpha() != 1.0f )
+    if( oColor.a != 1.0f )
     {
         return UnitTest::Fail( "Wrong alpha value" );
     }
-    if( oColor.fRed() != 0.0f )
+    if( oColor.r != 0.0f )
     {
         return UnitTest::Fail( "Wrong red value" );
     }
-    if( oColor.g != 0x7F )
+    if( oColor.GreenChannel() != 0x7F )
     {
         return UnitTest::Fail( "Wrong green value" );
     }
-    if( oColor.b != 0x00 )
+    if( oColor.BlueChannel() != 0x00 )
     {
         return UnitTest::Fail( "Wrong blue value" );
     }
@@ -44,19 +44,19 @@ UnitTest::Result Vector4TestGroup::ColorConstInit()
 UnitTest::Result Vector4TestGroup::ColorHexInit()
 {
     Color::ColorVector oColor( 0xFF007F00 );
-    if( oColor.fAlpha() != 1.0f )
+    if( oColor.a != 1.0f )
     {
         return UnitTest::Fail( "Wrong alpha value" );
     }
-    if( oColor.fRed() != 0.0f )
+    if( oColor.r != 0.0f )
     {
         return UnitTest::Fail( "Wrong red value" );
     }
-    if( oColor.g != 0x7F )
+    if( oColor.GreenChannel() != 0x7F )
     {
         return UnitTest::Fail( "Wrong green value" );
     }
-    if( oColor.b != 0x00 )
+    if( oColor.BlueChannel() != 0x00 )
     {
         return UnitTest::Fail( "Wrong blue value" );
     }
@@ -67,19 +67,19 @@ UnitTest::Result Vector4TestGroup::ColorBitwiseOp()
 {
     Color::ColorVector oColor( 0xFF000000 );
     oColor |= 0x00007F00;
-    if( oColor.fAlpha() != 1.0f )
+    if( oColor.a != 1.0f )
     {
         return UnitTest::Fail( "Wrong alpha value" );
     }
-    if( oColor.fRed() != 0.0f )
+    if( oColor.r != 0.0f )
     {
         return UnitTest::Fail( "Wrong red value" );
     }
-    if( oColor.g != 0x7F )
+    if( oColor.GreenChannel() != 0x7F )
     {
         return UnitTest::Fail( "Wrong green value" );
     }
-    if( oColor.b != 0x00 )
+    if( oColor.BlueChannel() != 0x00 )
     {
         return UnitTest::Fail( "Wrong blue value" );
     }

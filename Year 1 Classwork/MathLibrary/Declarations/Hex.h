@@ -3,13 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 16, 2013
  * Description:        A union for representing color hex values.
- * Last Modified:      February 24, 2014
- * Last Modification:  Added functions for getting channels as floats.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Changed how constructor handles float parameters.
  ******************************************************************************/
 
 #ifndef HEX__H
 #define HEX__H
 
+#include "Functions.h"
 #include <algorithm>
 #include <cstdint>
 
@@ -65,10 +66,18 @@ union Hex
     Hex( Channel a_r, Channel a_g, Channel a_b, Channel a_a = 0xFF )
         : a( a_a ), r( a_r ), g( a_g ), b( a_b ) {}
     Hex( float a_r, float a_g, float a_b, float a_a = 1.0 )
-        : a( a_a < 0.0 ? 0 : a_a > 1.0 ? 0xFF : (Channel)( a_a * 0xFF ) ),
-          r( a_r < 0.0 ? 0 : a_r > 1.0 ? 0xFF : (Channel)( a_r * 0xFF ) ),
-          g( a_g < 0.0 ? 0 : a_g > 1.0 ? 0xFF : (Channel)( a_g * 0xFF ) ),
-          b( a_b < 0.0 ? 0 : a_b > 1.0 ? 0xFF : (Channel)( a_b * 0xFF ) ) {}
+        : a( a_a < 0.0 ? 0
+            : a_a > 1.0 ? 0xFF
+            : (Channel)Math::Round( a_a * 0xFF ) ),
+          r( a_r < 0.0 ? 0
+            : a_r > 1.0 ? 0xFF
+            : (Channel)Math::Round( a_r * 0xFF ) ),
+          g( a_g < 0.0 ? 0
+            : a_g > 1.0 ? 0xFF
+            : (Channel)Math::Round( a_g * 0xFF ) ),
+          b( a_b < 0.0 ? 0
+            : a_b > 1.0 ? 0xFF
+            : (Channel)Math::Round( a_b * 0xFF ) ) {}
     Hex( FourChannelInt a_i ) : i( a_i ) {}
     Hex& operator=( FourChannelInt a_i )
     {
