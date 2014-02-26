@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved base classes to Utility namespace in MathLibrary.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added deletion and reverse lookup.
  ******************************************************************************/
 
 #ifndef SHADER__H
@@ -48,6 +48,9 @@ public:
     Shader( GLenum a_eType, const char* ac_pcSourceName,
             const char* ac_pcSourceText, bool a_bRecompile = false );
 
+    // Delete the shader
+    void Delete();
+
     // Is this shader compiled and not marked for deletion?
     static bool IsValid( GLuint a_uiID );
     bool IsValid() const { return IsValid( m_uiID ); }
@@ -88,6 +91,7 @@ private:
     // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
     // an stl container won't result in warnings.
     class ShaderLookup;
+    class SourceNameLookup;
 
     // Compile a shader from the given source code
     static GLuint CompileShader( GLenum a_eType, const char* ac_pcSourceText );
@@ -95,12 +99,14 @@ private:
 
     // Get a reference to the lookup map
     static ShaderLookup& Lookup() { return *sm_poLookup; }
+    static SourceNameLookup& SourceLookup() { return *sm_poSourceLookup; }
 
     // ID associated with the GLSL shader object
     GLuint m_uiID;
     
     // store all the compiled shaders
     static ShaderLookup* sm_poLookup;
+    static SourceNameLookup* sm_poSourceLookup;
 
 };  // class Shader
 

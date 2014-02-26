@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the DumbString class.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved into Utility namespace from MyFirstEngine project.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef DUMB_STRING__INL
@@ -182,8 +182,10 @@ INLINE void DumbString::GrowTo( std::size_t a_uiSize )
 {
     if( a_uiSize >= m_uiCapacity )
     {
-        char* pcNewData = new char[ RequiredCapacity( a_uiSize ) ];
+        unsigned int uiCapacity = RequiredCapacity( a_uiSize );
+        char* pcNewData = new char[ uiCapacity ];
         std::swap( m_pcData, pcNewData );
+        m_uiCapacity = uiCapacity;
         delete[] pcNewData;
     }
 }
@@ -220,7 +222,7 @@ INLINE void DumbString::ReadFrom( std::istream& a_roInput )
     if( a_roInput )
     {
         long long llStart = a_roInput.tellg();
-        a_roInput.seekg( std::ios::end );
+        a_roInput.seekg( 0, std::ios::end );
         long long llEnd = a_roInput.tellg();
         a_roInput.seekg( llStart );
         if( llStart >= 0 && llEnd > 0 && llEnd > llStart )
@@ -268,7 +270,9 @@ INLINE DumbString DumbString::LoadFrom( const char* ac_pcFileName,
                                  ? "Unable to open text file"
                                  : ac_pcErrorMessage );
     }
-    return DumbString( file );
+    DumbString oString( file );
+    file.close();
+    return oString;
 }
 
 }   // namespace Utility

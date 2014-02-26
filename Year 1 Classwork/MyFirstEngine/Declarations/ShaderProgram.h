@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader program.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved base classes to Utility namespace in MathLibrary.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added deletion and reverse lookup.
  ******************************************************************************/
 
 #ifndef SHADER_PROGRAM__H
@@ -44,10 +44,8 @@ public:
                    const Shader& ac_roFragmentShader = Shader::Null(),
                    bool a_bRelink = false );
 
-    // Destructor is virtual - this should be used as a base class, with derived
-    // classes passing specific shaders back to the base constructor and
-    // providing their own functions for setting uniform variables
-    virtual ~ShaderProgram() {}
+    // Delete this shader program
+    void Delete();
 
     // Start or stop using a given (or the current) shader program
     void Use() const;
@@ -86,6 +84,7 @@ private:
     // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
     // an stl container won't result in warnings.
     class ProgramList;
+    class ProgramNameList;
 
     // Get a list of all attached shaders
     std::list< GLuint > ShaderIDs() const { return ShaderIDs( m_uiID ); }
@@ -103,6 +102,7 @@ private:
 
     // Get a reference to the map of already-linked programs
     static ProgramList& List() { return *sm_poList; }
+    static ProgramNameList& NameList() { return *sm_poNameList; }
 
     GLuint m_uiID;  // ID of the GL shader program
     Shader m_oFragmentShader;
@@ -110,6 +110,7 @@ private:
 
     // store all the programs that have been linked already
     static ProgramList* sm_poList;
+    static ProgramNameList* sm_poNameList;
 
 };  // class ShaderProgram
 

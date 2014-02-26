@@ -3,15 +3,17 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Implementations of GameEngine functions.
- * Last Modified:      February 18, 2014
- * Last Modification:  Changed from inl to cpp.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added main window and quad data initialization.
  ******************************************************************************/
 
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
 #include "..\Declarations\GLFW.h"
+#include "..\Declarations\Quad.h"
 #include "..\Declarations\Shader.h"
+#include "..\Declarations\ShaderProgram.h"
 #include <iostream>
 
 namespace MyFirstEngine
@@ -22,7 +24,7 @@ namespace MyFirstEngine
 class GameEngine::StateStack : public std::stack< GameState* >
 {
 public:
-    ~StateStack() {}
+    virtual ~StateStack() {}
 };
 
 // Default constructor is only used by the base Singleton class's Instance()
@@ -63,15 +65,52 @@ GameState& GameEngine::CurrentState()
 }
 
 // Initialize the game engine
-bool GameEngine::Initialize()
+bool GameEngine::Initialize( const IntPoint2D& ac_roSize,
+                             const char* ac_pcTitle,
+                             const ColorVector& ac_roColor )
 {
     if( !IsInitialized() )
     {
+        // Initialize GLFW
         glfwSetErrorCallback( PrintError );
         Instance().m_bInitialized = ( GL_TRUE == glfwInit() );
-        Instance().m_dLastTime = Time();
-    }
+        
+        // If GLFW failed to initialize, just return false
+        if( !IsInitialized() )
+        {
+            return false;
+        }
+
+        // Otherwise, attempt to create an OpenGL context and call glewInit()
+        MainWindow().SetClearColor( ac_roColor );
+        MainWindow().SetSize( ac_roSize );
+        MainWindow().SetTitle( ac_pcTitle );
+        MainWindow().MakeCurrent();
+        glewExperimental = GL_TRUE;
+        Instance().m_bInitialized = ( MainWindow().IsCurrent() &&
+                                      GLEW_OK == glewInit() );
+
+        // If context and GLEW initialization succeeded, initialize the rest
+        if( IsInitialized() )
+        {
+            Quad::Initialize();
+            Instance().m_dLastTime = Time();
+        }
+        else    // otherwise, terminate GLFW
+        {
+            GameWindow::DestroyAll();
+            glfwTerminate();
+        }
+
+    }   // if( !IsInitialized() )
     return IsInitialized();
+}
+bool GameEngine::Initialize( unsigned int a_uiWidth, unsigned int a_uiHeight,
+                             const char* ac_pcTitle,
+                             const ColorVector& ac_roColor )
+{
+    return Initialize( IntPoint2D( a_uiWidth, a_uiHeight ),
+                       ac_pcTitle, ac_roColor );
 }
 
 // Remove states
@@ -142,8 +181,10 @@ void GameEngine::Terminate()
 {
     if( IsInitialized() )
     {
-        GameWindow::DestroyAll();
+        Quad::Terminate();
+        ShaderProgram::DestroyAll();
         Shader::DestroyAll();
+        GameWindow::DestroyAll();
         glfwTerminate();
         Instance().m_bInitialized = false;
     }

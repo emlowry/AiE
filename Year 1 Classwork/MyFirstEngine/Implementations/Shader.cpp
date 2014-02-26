@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Function implementations for the Shader class.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved base classes to Utility namespace in MathLibrary.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added deletion and reverse lookup.
  ******************************************************************************/
 
 #include "../Declarations/GameEngine.h"
@@ -46,9 +46,18 @@ public:
     typedef BaseType::value_type ValueType;
     virtual ~ShaderLookup() {}
 };
+class Shader::SourceNameLookup : public std::unordered_map< GLuint, DumbString >
+{
+public:
+    typedef std::unordered_map< GLuint, DumbString > BaseType;
+    typedef BaseType::value_type ValueType;
+    virtual ~SourceNameLookup() {}
+};
     
 // store all the compiled shaders
 Shader::ShaderLookup* Shader::sm_poLookup = new Shader::ShaderLookup();
+Shader::SourceNameLookup*
+    Shader::sm_poSourceLookup = new Shader::SourceNameLookup();
 
 // If source name is null or empty, use default shader
 // If source name hasn't been loaded yet, do so and compile a new shader
@@ -82,6 +91,7 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName, bool a_bRecompile )
     {
         m_uiID = CompileShader( a_eType, DumbString::LoadFrom( oSourceName ) );
         Lookup()[ a_eType ][ oSourceName ] = m_uiID;
+        SourceLookup()[ m_uiID ] = oSourceName;
     }
 }
 
@@ -120,6 +130,18 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName,
                                          ? DumbString::LoadFrom( oSourceName )
                                          : oSourceText );
         Lookup()[ a_eType ][ oSourceName ] = m_uiID;
+        SourceLookup()[ m_uiID ] = oSourceName;
+    }
+}
+
+// Delete the shader
+void Shader::Delete()
+{
+    if( 0 != m_uiID )
+    {
+        glDeleteShader( m_uiID );
+        Lookup()[ Type() ].erase( SourceLookup()[ m_uiID ] );
+        SourceLookup().erase( m_uiID );
     }
 }
 
@@ -173,16 +195,32 @@ Shader Shader::Default( GLenum a_eType )
     {
         switch( a_eType )
         {
+
         case GL_FRAGMENT_SHADER:
-            return Shader( a_eType, "", DEFAULT_FRAGMENT_SHADER_SOURCE_CODE );
+        {
+            GLuint uiID =
+                CompileShader( a_eType, DEFAULT_FRAGMENT_SHADER_SOURCE_CODE );
+            Lookup()[ a_eType ][ "" ] = uiID;
+            SourceLookup()[ uiID ] = "";
             break;
+        }
+
         case GL_VERTEX_SHADER:
-            return Shader( a_eType, "", DEFAULT_VERTEX_SHADER_SOURCE_CODE );
+        {
+            GLuint uiID =
+                CompileShader( a_eType, DEFAULT_VERTEX_SHADER_SOURCE_CODE );
+            Lookup()[ a_eType ][ "" ] = uiID;
+            SourceLookup()[ uiID ] = "";
             break;
+        }
+
         default:
+        {
             throw std::invalid_argument( "No default shader for this shader type" );
             break;
         }
+
+        }   // switch( a_eType )
     }
     return Shader( Lookup()[ a_eType ][ "" ] );
 }
@@ -198,6 +236,7 @@ void Shader::DestroyAll()
         }
     }
     Lookup().clear();
+    SourceLookup().clear();
 }
 
 // Is this shader compiled and not marked for deletion?

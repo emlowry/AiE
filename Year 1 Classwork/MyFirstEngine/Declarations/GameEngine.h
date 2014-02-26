@@ -3,13 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Singleton class representing the game engine as a whole.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved base class to Utility namespace in MathLibrary.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Adding a main window for the game engine.
  ******************************************************************************/
 
 #ifndef GAME_ENGINE__H
 #define GAME_ENGINE__H
 
+#include "GameWindow.h"
 #include "MathLibrary.h"
 #include <stack>
 
@@ -35,7 +36,12 @@ public:
     virtual ~GameEngine();
 
     // Initialization and termination
-    static bool Initialize();   // returns true if initialization was successful
+    static bool Initialize( const IntPoint2D& ac_roSize = IntPoint2D( 800, 600 ),
+                            const char* ac_pcTitle = "",
+                            const ColorVector& ac_roColor = Color::BLACK );
+    static bool Initialize( unsigned int a_uiWidth, unsigned int a_uiHeight,
+                            const char* ac_pcTitle = "",
+                            const ColorVector& ac_roColor = Color::BLACK );
     static bool IsInitialized() { return Instance().m_bInitialized; }
     static void Terminate();
 
@@ -58,6 +64,9 @@ public:
     static double Time();   // time since initialization
     static double LastDeltaTime() { return Instance().m_dLastDeltaTime; }
     static double LastTime() { return Instance().m_dLastTime; }
+
+    // Get the main game window
+    static GameWindow& MainWindow() { return Instance().m_oMainWindow; }
 
 private:
 
@@ -88,6 +97,9 @@ private:
     // store a stack of state objects, the top of which is the current state
     // the stack is hidden in a struct to avaoid a compiler warning
     StateStack* m_poStates;
+
+    // Main game window
+    GameWindow m_oMainWindow;
 
 };  // class GameEngine
 

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Class representing a window managed by the game engine.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved base class to Utility namespace in MathLibrary.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added functions for clearing the screen.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__H
@@ -22,6 +22,7 @@ namespace MyFirstEngine
 {
 
 using namespace Utility;
+using Color::ColorVector;
 
 class IMEXPORT_CLASS GameWindow : public NotCopyable
 {
@@ -29,17 +30,21 @@ public:
 
     // Constructors
     GameWindow( const IntPoint2D& ac_roSize = IntPoint2D( 800, 600 ),
-                const char* ac_pcTitle = "" );
+                const char* ac_pcTitle = "",
+                const ColorVector& ac_roColor = Color::BLACK );
     GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
-                const char* ac_pcTitle = "" );
+                const char* ac_pcTitle = "",
+                const ColorVector& ac_roColor = Color::BLACK );
 
     // Destructor - actually does work!
     virtual ~GameWindow();
 
     // Get/Set window properties
+    const ColorVector& GetClearColor() const { return m_oColor; }
     unsigned int GetIndex() const { return m_uiIndex; }
     const IntPoint2D& GetSize() const { return m_oSize; }
     const char* GetTitle() const { return m_oTitle.CString(); }
+    GameWindow& SetClearColor( const ColorVector& ac_roColor );
     GameWindow& SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight );
     GameWindow& SetSize( const IntPoint2D& ac_roSize );
     GameWindow& SetTitle( const char* ac_pcTitle );
@@ -58,6 +63,10 @@ public:
     // advance by frame
     void SwapBuffers();
     static void SwapAllBuffers();
+
+    // Clear frame buffer of current window
+    void Clear() { MakeCurrent(); ClearCurrent(); }
+    static void ClearCurrent();
 
     // Destroy all windows
     static void DestroyAll();
@@ -99,6 +108,7 @@ private:
     DumbString m_oTitle;    // Window title
     GLFWwindow* m_poWindow; // pointer to the GLFW window object, if open
     IntPoint2D m_oFramePadding; // difference in size between buffer and window
+    ColorVector m_oColor;   // Color after clearing frame buffer
 
     static WindowLookup* sm_poLookup;
     static WindowList* sm_poList;

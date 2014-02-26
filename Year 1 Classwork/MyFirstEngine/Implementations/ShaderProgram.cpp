@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Function implementations for the ShaderProgram class.
- * Last Modified:      February 24, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added deletion and reverse lookup.
  ******************************************************************************/
 
 #include "../Declarations/GLFW.h"
@@ -27,11 +27,21 @@ class ShaderProgram::ProgramList
 public:
     typedef std::unordered_map< DumbString, GLuint > BaseType;
     typedef BaseType::value_type ValueType;
+    virtual ~ProgramList() {}
+};
+class ShaderProgram::ProgramNameList : public std::unordered_map< GLuint, DumbString >
+{
+public:
+    typedef std::unordered_map< GLuint, DumbString > BaseType;
+    typedef BaseType::value_type ValueType;
+    virtual ~ProgramNameList() {}
 };
 
 // store all the programs that have been linked already
 ShaderProgram::ProgramList*
     ShaderProgram::sm_poList = new ShaderProgram::ProgramList();
+ShaderProgram::ProgramNameList*
+    ShaderProgram::sm_poNameList = new ShaderProgram::ProgramNameList();
 
 // Constructor
 ShaderProgram::ShaderProgram( const char* ac_pcProgramName,
@@ -58,11 +68,23 @@ ShaderProgram::ShaderProgram( const char* ac_pcProgramName,
     {
         m_uiID = Link( ac_roVertexShader, ac_roFragmentShader );
         List()[ oProgramName ] = m_uiID;
+        NameList()[ m_uiID ] = oProgramName;
+    }
+}
+
+// Delete this shader program
+void ShaderProgram::Delete()
+{
+    if( 0 != m_uiID )
+    {
+        glDeleteProgram( m_uiID );
+        List().erase( NameList()[ m_uiID ] );
+        NameList().erase( m_uiID );
     }
 }
 
 // Start using this shader program
-void ShaderProgram::Use()
+void ShaderProgram::Use() const
 {
     glUseProgram( m_uiID );
 }
@@ -73,6 +95,10 @@ std::list< GLuint > ShaderProgram::ShaderIDs( GLuint a_uiID )
     // Get the number of attached shaders
     GLint iMaxCount;
     glGetProgramiv( a_uiID, GL_ATTACHED_SHADERS, &iMaxCount );
+    if( 0 >= iMaxCount )
+    {
+        return std::list< GLuint >();
+    }
 
     // Get the IDs of the attached shaders
     GLsizei iCount;
@@ -133,14 +159,14 @@ ShaderProgram ShaderProgram::Current()
 // get the default shader program
 ShaderProgram ShaderProgram::Default()
 {
-    // if the default program has already been compiled, return it
-    if( List().count( "" ) > 0 )
+    // if the default program hasn't been linked yet, do so
+    if( 0 == List().count( "" ) )
     {
-        return ShaderProgram( List()[ "" ] );
+        GLuint uiID = Link( Shader::Null(), Shader::Null() );
+        List()[ "" ] = uiID;
+        NameList()[ uiID ] = "";
     }
 
-    // otherwise, link a program with no attached shaders
-    List()[ "" ] = Link( Shader::Null(), Shader::Null() );
     return List()[ "" ];
 }
 
@@ -152,10 +178,11 @@ void ShaderProgram::DestroyAll()
         glDeleteProgram( oPair.second );
     }
     List().clear();
+    NameList().clear();
 }
 
 // Is the program linked and not flagged for deletion?
-static bool ShaderProgram::IsValid( GLuint a_uiID )
+bool ShaderProgram::IsValid( GLuint a_uiID )
 {
     if( GL_FALSE == glIsProgram( a_uiID ) )
     {

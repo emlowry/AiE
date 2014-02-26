@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the GameWindow class.
- * Last Modified:      February 18, 2014
- * Last Modification:  Changing from inl to cpp.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Added functions for clearing the screen.
  ******************************************************************************/
 
 #include "..\Declarations\GLFW.h"
@@ -39,17 +39,18 @@ GameWindow::WindowList* GameWindow::sm_poList = new GameWindow::WindowList();
 GameWindow::WindowLookup* GameWindow::sm_poLookup = new GameWindow::WindowLookup();
 
 // Constructors
-GameWindow::GameWindow( const IntPoint2D& ac_roSize, const char* ac_pcTitle )
+GameWindow::GameWindow( const IntPoint2D& ac_roSize,
+                        const char* ac_pcTitle, const ColorVector& ac_roColor )
     : m_oSize( ac_roSize ), m_oFramePadding( 0 ),
-      m_oTitle( ac_pcTitle ), m_poWindow( nullptr ),
+      m_oTitle( ac_pcTitle ), m_poWindow( nullptr ), m_oColor( ac_roColor ),
       m_uiIndex( List().size() )
 {
     List().push_back( this );
 }
 GameWindow::GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
-                        const char* ac_pcTitle )
+                        const char* ac_pcTitle, const ColorVector& ac_roColor )
     : m_oSize( a_uiWidth, a_uiHeight ), m_oFramePadding( 0 ),
-      m_oTitle( ac_pcTitle ), m_poWindow( nullptr ),
+      m_oTitle( ac_pcTitle ), m_poWindow( nullptr ), m_oColor( ac_roColor ),
       m_uiIndex( List().size() )
 {
     List().push_back( this );
@@ -62,6 +63,15 @@ GameWindow::~GameWindow()
 }
 
 // Set window properties
+GameWindow& GameWindow::SetClearColor( const ColorVector& ac_roColor )
+{
+    m_oColor = ac_roColor;
+    if( IsCurrent() )
+    {
+        glClearColor( m_oColor.r, m_oColor.g, m_oColor.b, m_oColor.a );
+    }
+    return *this;
+}
 GameWindow& GameWindow::SetSize( unsigned int a_uiWidth,
                                  unsigned int a_uiHeight )
 {
@@ -72,6 +82,10 @@ GameWindow& GameWindow::SetSize( unsigned int a_uiWidth,
         glfwSetWindowSize( m_poWindow,
                            a_uiWidth + m_oFramePadding.x,
                            a_uiHeight + m_oFramePadding.y );
+        if( IsCurrent() )
+        {
+            glViewport( 0, 0, m_oSize.x, m_oSize.y );
+        }
     }
     return *this;
 }
@@ -83,6 +97,10 @@ GameWindow& GameWindow::SetSize( const IntPoint2D& ac_roSize )
         glfwSetWindowSize( m_poWindow,
                            ac_roSize.x + m_oFramePadding.x,
                            ac_roSize.y + m_oFramePadding.y );
+        if( IsCurrent() )
+        {
+            glViewport( 0, 0, m_oSize.x, m_oSize.y );
+        }
     }
     return *this;
 }
@@ -179,8 +197,13 @@ bool GameWindow::IsCurrent()
 }
 GameWindow& GameWindow::MakeCurrent()
 {
-    Open();
-    glfwMakeContextCurrent( m_poWindow );
+    if( !IsCurrent() )
+    {
+        Open();
+        glfwMakeContextCurrent( m_poWindow );
+        glViewport( 0, 0, m_oSize.x, m_oSize.y );
+        glClearColor( m_oColor.r, m_oColor.g, m_oColor.b, m_oColor.a );
+    }
     return *this;
 }
 
@@ -196,6 +219,12 @@ void GameWindow::SwapBuffers()
 //
 // Static functions
 //
+
+// Clear frame buffer of current window
+void GameWindow::ClearCurrent()
+{
+    glClear( GL_COLOR_BUFFER_BIT );
+}
 
 // Destroy all windows
 void GameWindow::DestroyAll()

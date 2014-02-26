@@ -15,36 +15,39 @@ namespace MyFirstEngine
 // Constructor
 Drawable::Drawable( ShaderProgram* a_poProgram )
     : m_oColor( Color::WHITE ), m_dYaw( 0.0 ), m_dPitch( 0.0 ), m_dRoll( 0.0 ),
-      m_oPosition( Point3D::Origin ), m_oScale( Point3D( 1.0 ) ),
-      m_oTransform( Transform3D::Identity() ), m_poProgram( a_poProgram ),
+      m_oPosition( Point3D::Origin() ), m_oScale( Point3D( 1.0 ) ),
+      m_oExtraTransform( Transform3D::Identity() ), m_poProgram( a_poProgram ),
       m_bVisible( true ) {}
-Drawable::Drawable( Color::Hex a_oColor, ShaderProgram* a_poProgram )
-    : m_oColor( a_oColor ), m_dYaw( 0.0 ), m_dPitch( 0.0 ), m_dRoll( 0.0 ),
-      m_oPosition( Point3D::Origin ), m_oScale( Point3D( 1.0 ) ),
-      m_oTransform( Transform3D::Identity() ), m_poProgram( a_poProgram ),
+Drawable::Drawable( const Color::ColorVector& ac_roColor,
+                    ShaderProgram* a_poProgram )
+    : m_oColor( ac_roColor ), m_dYaw( 0.0 ), m_dPitch( 0.0 ), m_dRoll( 0.0 ),
+      m_oPosition( Point3D::Origin() ), m_oScale( Point3D( 1.0 ) ),
+      m_oExtraTransform( Transform3D::Identity() ), m_poProgram( a_poProgram ),
       m_bVisible( true ) {}
 
 // Create a full transformation matrix based on the scale, rotations,
 // positions, and additional transform
-void Drawable::AssembleTransform()
+void Drawable::AssembleTransform( Transform3D& a_roTransform ) const
 {
-    m_oTransform = Space::Scaling( m_oScale );
-    m_oTransform *= Space::Rotation( m_dRoll, Point3D::Unit( 0 ) );
-    m_oTransform *= Space::Rotation( m_dPitch, Point3D::Unit( 1 ) );
-    m_oTransform *= Space::Rotation( m_dYaw, Point3D::Unit( 2 ) );
-    m_oTransform *= Space::Translation( m_oPosition );
-    m_oTransform *= m_oExtraTransform;
+    a_roTransform = Space::Scaling( m_oScale );
+    a_roTransform *= Space::Rotation( m_dRoll, Point3D::Unit( 0 ) );
+    a_roTransform *= Space::Rotation( m_dPitch, Point3D::Unit( 1 ) );
+    a_roTransform *= Space::Rotation( m_dYaw, Point3D::Unit( 2 ) );
+    a_roTransform *= Space::Translation( m_oPosition );
+    a_roTransform *= m_oExtraTransform;
 }
 
 // Draw the object to the screen
 void Drawable::Draw() const
 {
+    // Don't bother if the object isn't visible
+    if( !m_bVisible )
+    {
+        return;
+    }
+
     // In case there is already an active shader program
     ShaderProgram oPreviousProgram = ShaderProgram::Current();
-
-    // Perform setup tasks, such as showing a custom shader program where to
-    // look for uniform variable values
-    Setup();
 
     // start using the shader program
     if( nullptr != m_poProgram )
@@ -53,10 +56,11 @@ void Drawable::Draw() const
     }
 
     // set modelview matrix
-    AssembleTransform();
+    Transform3D oTransform;
+    AssembleTransform( oTransform );
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
-    glMultTransposeMatrixd( &(m_oTransform[0][0]) );
+    glMultTransposeMatrixd( &( oTransform[0][0] ) );
 
     // Draw the components of this drawable object - points, lines, other
     // drawable objects, etc.

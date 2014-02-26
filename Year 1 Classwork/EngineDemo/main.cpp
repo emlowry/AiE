@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Runs a simple game to demonstrate MyFirstEngine.
- * Last Modified:      February 24, 2014
- * Last Modification:  Using namespaces instead of individual classes.
+ * Last Modified:      February 25, 2014
+ * Last Modification:  Testing quads.
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
@@ -19,32 +19,49 @@ class SimpleState : public GameState, public Singleton< SimpleState >
     friend class Singleton< SimpleState >;
 public:
     virtual ~SimpleState() {}
+    virtual void Draw() const override
+    {
+        GameEngine::MainWindow().Clear();
+        m_oQuad1.Draw();
+        m_oQuad2.Draw();
+        GameEngine::MainWindow().SwapBuffers();
+    }
 protected:
-    virtual void OnEnter() { m_oWindow.Open(); }
+    virtual void OnEnter() override
+    {
+        GameEngine::MainWindow().MakeCurrent();
+    }
+    virtual void OnUpdate( double a_dDeltaTime )
+    {
+        m_oQuad1.AddYaw( a_dDeltaTime );
+        m_oQuad1.AddPitch( a_dDeltaTime );
+        m_oQuad1.AddRoll( a_dDeltaTime );
+        m_oQuad2.AddYaw( -a_dDeltaTime );
+        m_oQuad2.AddPitch( -a_dDeltaTime );
+        m_oQuad2.AddRoll( -a_dDeltaTime );
+    }
 private:
-    SimpleState() : m_oWindow( 800, 600, "Simple Test Program" ) {}
-    GameWindow m_oWindow;
+    SimpleState()
+        : m_oQuad2( Point2D( 0.5, 0.5 ),
+                    Point3D::Origin(),
+                    Color::ColorWheel::ROSE ) {}
+    Quad m_oQuad1;
+    Quad m_oQuad2;
 };
 
 int main(int argc, char* argv[])
 {
     std::cout << "Initializing Game Engine...";
-    bool bSuccess = GameEngine::Initialize();
+    bool bSuccess = GameEngine::Initialize( 800, 600, "Simple Test Program" );
     if( !bSuccess )
     {
         std::cout << "\tGame Engine initialization failed." << std::endl;
     }
     else
     {
-        std::cout << "\tGame Engine Initialized." << std::endl;
-
-	    std::cout << std::endl << "Press any key to continue...";
-	    _getch();
-
-        std::cout << "\tLaunching game window." << std::endl;
+        std::cout << "\tGame Engine Initialized." << std::endl
+                  << std::endl << "Close game window to continue...";
         SimpleState::Instance().Push();
-
-	    std::cout << std::endl << "Close game window to continue...";
         GameEngine::Run();
 
         std::cout << "\tWindow closed." << std::endl
