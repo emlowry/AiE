@@ -45,6 +45,9 @@
     <ClInclude Include="Declarations\Drawable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\QuadShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\Shader.cpp">
@@ -62,7 +65,7 @@
     <ClCompile Include="Implementations\Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Implementations\Quad.cpp">
+    <ClCompile Include="Implementations\QuadShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

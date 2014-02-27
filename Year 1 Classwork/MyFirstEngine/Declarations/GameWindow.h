@@ -24,7 +24,7 @@ namespace MyFirstEngine
 using namespace Utility;
 using Color::ColorVector;
 
-class IMEXPORT_CLASS GameWindow : public NotCopyable
+class IMEXPORT_CLASS GameWindow : public NotCopyable, public MostDerivedAddress
 {
 public:
 
@@ -39,9 +39,14 @@ public:
     // Destructor - actually does work!
     virtual ~GameWindow();
 
+    // (In)Equality operators
+    bool operator==( const GameWindow& ac_roWindow ) const
+    { return ThisIs( ac_roWindow ); }
+    bool operator!=( const GameWindow& ac_roWindow ) const
+    { return ThisIsNot( ac_roWindow ); }
+
     // Get/Set window properties
     const ColorVector& GetClearColor() const { return m_oColor; }
-    unsigned int GetIndex() const { return m_uiIndex; }
     const IntPoint2D& GetSize() const { return m_oSize; }
     const char* GetTitle() const { return m_oTitle.CString(); }
     GameWindow& SetClearColor( const ColorVector& ac_roColor );
@@ -70,10 +75,6 @@ public:
 
     // Destroy all windows
     static void DestroyAll();
-
-    // Get a specific window
-    // if there is no window at the given index, throw exception
-    static GameWindow& Get( unsigned int a_uiIndex = 0 );
 
 protected:
 

@@ -33,7 +33,7 @@ inline Matrix< T, M, N >& Matrix< T, M, N >::
     {
         throw exception("Non-convertable input type");
     }  /**/
-    if( Address() != ac_roMatrix.Address() )
+    if( ThisIsNot( ac_roMatrix ) )
     {
         for( unsigned int i = 0; i < M && i < P; ++i )
         {

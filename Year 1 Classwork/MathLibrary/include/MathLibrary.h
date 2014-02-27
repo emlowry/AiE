@@ -23,6 +23,7 @@
 #include "../Declarations/Hashable.h"
 #include "../Declarations/Hex.h"
 #include "../Declarations/HomogeneousVector.h"
+#include "../Declarations/InitializeableSingleton.h"
 #include "../Declarations/Matrix.h"
 #include "../Declarations/MostDerivedAddress.h"
 #include "../Declarations/NotCopyable.h"

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader.
- * Last Modified:      February 25, 2014
- * Last Modification:  Added deletion and reverse lookup.
+ * Last Modified:      February 26, 2014
+ * Last Modification:  Got rid of hardcoded default shaders.
  ******************************************************************************/
 
 #ifndef SHADER__H
@@ -73,18 +73,11 @@ public:
     { return m_uiID != ac_roShader.m_uiID; }
     bool operator!=( GLuint a_uiID ) const { return m_uiID != a_uiID; }
 
-    // Get the default shader of the given type
-    static Shader Default( GLenum a_eType );
-
     // Destroy all shaders
     static void DestroyAll();
 
     // Shader meaning no shader
     static const Shader& Null();
-
-    // Source code for default shaders
-    static const char* const DEFAULT_FRAGMENT_SHADER_SOURCE_CODE;
-    static const char* const DEFAULT_VERTEX_SHADER_SOURCE_CODE;
 
 private:
 

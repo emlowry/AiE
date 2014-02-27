@@ -22,6 +22,30 @@ class IMEXPORT_CLASS MostDerivedAddress
 public:
     virtual ~MostDerivedAddress() {}
     const void* Address() const { return dynamic_cast< const void* >( this ); }
+    bool IsThis( const MostDerivedAddress& ac_roObject ) const
+    {
+        return Address() == ac_roObject.Address();
+    }
+    bool IsThis( const MostDerivedAddress* ac_poObject ) const
+    {
+        return nullptr == ac_poObject ? false : Address() == ac_poObject->Address();
+    }
+    bool ThisIs( const MostDerivedAddress& ac_roObject ) const
+    {
+        return Address() == ac_roObject.Address();
+    }
+    bool ThisIs( const MostDerivedAddress* ac_poObject ) const
+    {
+        return nullptr == ac_poObject ? false : Address() == ac_poObject->Address();
+    }
+    bool ThisIsNot( const MostDerivedAddress& ac_roObject ) const
+    {
+        return Address() != ac_roObject.Address();
+    }
+    bool ThisIsNot( const MostDerivedAddress* ac_poObject ) const
+    {
+        return nullptr == ac_poObject ? true : Address() != ac_poObject->Address();
+    }
 };
 
 }   // namespace Utility

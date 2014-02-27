@@ -83,6 +83,7 @@
     <ClInclude Include="Declarations\GLFW.h" />
     <ClInclude Include="Declarations\MyFirstEngineMacros.h" />
     <ClInclude Include="Declarations\Quad.h" />
+    <ClInclude Include="Declarations\QuadShaderProgram.h" />
     <ClInclude Include="Declarations\Shader.h" />
     <ClInclude Include="Declarations\ShaderProgram.h" />
     <ClInclude Include="Declarations\Drawable.h" />
@@ -97,7 +98,7 @@
     <ClCompile Include="Implementations\Drawable.cpp" />
     <ClCompile Include="Implementations\GameEngine.cpp" />
     <ClCompile Include="Implementations\GameWindow.cpp" />
-    <ClCompile Include="Implementations\Quad.cpp" />
+    <ClCompile Include="Implementations\QuadShaderProgram.cpp" />
     <ClCompile Include="Implementations\Shader.cpp" />
     <ClCompile Include="Implementations\ShaderProgram.cpp" />
   </ItemGroup>

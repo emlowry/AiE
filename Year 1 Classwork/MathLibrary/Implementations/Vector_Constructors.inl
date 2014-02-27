@@ -92,7 +92,7 @@ inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::
     {
         throw exception("Non-convertable input type");
     } /**/
-    if( Address() != ac_roVector.Address() )
+    if( ThisIsNot( ac_roVector ) )
     {
         for( unsigned int i = 0; i < N && i < Q; ++i )
         {

@@ -238,17 +238,6 @@ void GameWindow::DestroyAll()
     }
 }
 
-// Get a specific window
-// if there is no window at the given index, throw exception
-GameWindow& GameWindow::Get( unsigned int a_uiIndex )
-{
-    if( a_uiIndex >= List().size() || nullptr == List()[ a_uiIndex ] )
-    {
-        throw std::out_of_range( "No window with that index" );
-    }
-    return *( List()[ a_uiIndex ] );
-}
-
 // GLFW callback for window close
 void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 {

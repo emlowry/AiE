@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader program.
- * Last Modified:      February 25, 2014
- * Last Modification:  Added deletion and reverse lookup.
+ * Last Modified:      February 26, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef SHADER_PROGRAM__H
@@ -24,54 +24,50 @@ using namespace Utility;
 
 // Loads, compiles, and links a GLSL shader program and provides functions for
 // calling upon the resulting shader program
-class IMEXPORT_CLASS ShaderProgram : public Hashable, public Comparable< ShaderProgram >
+class IMEXPORT_CLASS ShaderProgram
+    : public NotCopyable, public MostDerivedAddress
 {
 public:
 
-    // Default constructor
-    ShaderProgram() : m_uiID( 0 ) {}
-
-    // Copy constructor
-    ShaderProgram( const ShaderProgram& ac_roProgram )
-         : m_uiID( ac_roProgram.m_uiID ) {}
-
-    // Just use the ID of an existing program
-    ShaderProgram( GLuint a_uiID ) : m_uiID( a_uiID ) {}
-
     // Constructor
-    ShaderProgram( const char* ac_pcProgramName,
-                   const Shader& ac_roVertexShader = Shader::Null(),
+    ShaderProgram( const Shader& ac_roVertexShader,
                    const Shader& ac_roFragmentShader = Shader::Null(),
-                   bool a_bRelink = false );
+                   const Shader& ac_roGeometryShader = Shader::Null() );
+    ShaderProgram( const Shader* ac_paoShaders, unsigned int a_uiCount );
 
-    // Delete this shader program
-    void Delete();
+    // Destructor actually does something
+    virtual ~ShaderProgram();
+
+    // (In)Equality operators
+    bool operator==( const ShaderProgram& ac_roProgram ) const
+    { return ThisIs( ac_roProgram ); }
+    bool operator!=( const ShaderProgram& ac_roProgram ) const
+    { return ThisIsNot( ac_roProgram ); }
 
     // Start or stop using a given (or the current) shader program
-    void Use() const;
+    virtual void Use() const;
     static void Use( ShaderProgram& a_roProgram ) { a_roProgram.Use(); }
     static void Stop() { Null().Use(); }
 
     // Get shader program properties
-    int Compare( const ShaderProgram& ac_roProgram ) const
-    { return SimpleCompare( m_uiID, ac_roProgram.m_uiID ); }
-    std::size_t Hash() const { return std::hash< GLuint >()( m_uiID ); }
     GLuint ID() const { return m_uiID; }
+
+    // Get the first attached shader of a given type
+    Shader GetShader( GLenum a_eType ) const;
     Shader VertexShader() const { return GetShader( GL_VERTEX_SHADER ); }
+    Shader GeometryShader() const { return GetShader( GL_GEOMETRY_SHADER ); }
     Shader FragmentShader() const { return GetShader( GL_FRAGMENT_SHADER ); }
 
     // Get the info log
     DumbString GetLog() const;
 
     // Is the program linked and not flagged for deletion?
-    static bool IsValid( GLuint a_uiID );
-    bool IsValid() const { return IsValid( m_uiID ); }
+    static bool IsValid( const ShaderProgram& ac_roProgram )
+    { return ac_roProgram.IsValid(); }
+    bool IsValid() const;
 
     // get the shader program currently in use
-    static ShaderProgram Current();
-
-    // get the default shader program
-    static ShaderProgram Default();
+    static const ShaderProgram& Current();
 
     // destroy all shader programs
     static void DestroyAll();
@@ -79,38 +75,51 @@ public:
     // get a shader program representing no shader program
     static const ShaderProgram& Null();
 
+protected:
+
+    // Destroy vertex arrays, zero out IDs, etc.
+    virtual void DestroyData() {}
+
+    // Set up vertex arrays, get uniform variable locations, etc.
+    virtual void SetupData() {}
+
+    // Bind vertex arrays, etc.
+    virtual void UseData() const {}
+
+    // ID of the GL shader program
+    GLuint m_uiID;
+
 private:
 
-    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
-    // an stl container won't result in warnings.
+    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
+    // from an stl container won't result in warnings.
     class ProgramList;
-    class ProgramNameList;
+    class ProgramLookup;
+    class ShaderList;
 
-    // Get a list of all attached shaders
-    std::list< GLuint > ShaderIDs() const { return ShaderIDs( m_uiID ); }
-    static std::list< GLuint > ShaderIDs( GLuint a_uiID );
+    // Default constructor used only by Null()
+    ShaderProgram();
 
-    // Get the first attached shader of a given type
-    Shader GetShader( GLenum a_eType ) const;
+    // Delete this shader program
+    void Destroy();
 
-    // Link the fragment shader and vertex shader into a program
-    static GLuint Link( const Shader& ac_roVertexShader,
-                        const Shader& ac_roFragmentShader );
-    static GLuint Link( GLuint a_uiID,
-                        const Shader& ac_roVertexShader,
-                        const Shader& ac_roFragmentShader );
+    // Link, set up vertex arrays, etc.
+    void Setup();
+
+    // Get a reference to the list of shaders
+    ShaderList& Shaders() { return *m_poShaders; }
+    const ShaderList& Shaders() const { return *m_poShaders; }
 
     // Get a reference to the map of already-linked programs
     static ProgramList& List() { return *sm_poList; }
-    static ProgramNameList& NameList() { return *sm_poNameList; }
+    static ProgramLookup& Lookup() { return *sm_poLookup; }
 
-    GLuint m_uiID;  // ID of the GL shader program
-    Shader m_oFragmentShader;
-    Shader m_oVertexShader;
+    unsigned int m_uiIndex; // location of shader program in list
+    ShaderList* m_poShaders; // owned by this object
 
-    // store all the programs that have been linked already
+    // store all the programs
     static ProgramList* sm_poList;
-    static ProgramNameList* sm_poNameList;
+    static ProgramLookup* sm_poLookup;
 
 };  // class ShaderProgram
 

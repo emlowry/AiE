@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Implementations for Drawable member functions.
- * Last Modified:      February 24, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 26, 2014
+ * Last Modification:  Changed how transforms are assembled.
  ******************************************************************************/
 
 #include "../Declarations/Drawable.h"
@@ -13,28 +13,31 @@ namespace MyFirstEngine
 {
 
 // Constructor
-Drawable::Drawable( ShaderProgram* a_poProgram )
-    : m_oColor( Color::WHITE ), m_dYaw( 0.0 ), m_dPitch( 0.0 ), m_dRoll( 0.0 ),
-      m_oPosition( Point3D::Origin() ), m_oScale( Point3D( 1.0 ) ),
-      m_oExtraTransform( Transform3D::Identity() ), m_poProgram( a_poProgram ),
-      m_bVisible( true ) {}
-Drawable::Drawable( const Color::ColorVector& ac_roColor,
-                    ShaderProgram* a_poProgram )
-    : m_oColor( ac_roColor ), m_dYaw( 0.0 ), m_dPitch( 0.0 ), m_dRoll( 0.0 ),
-      m_oPosition( Point3D::Origin() ), m_oScale( Point3D( 1.0 ) ),
-      m_oExtraTransform( Transform3D::Identity() ), m_poProgram( a_poProgram ),
-      m_bVisible( true ) {}
+Drawable::Drawable( ShaderProgram* a_poProgram,
+                    const Color::ColorVector& ac_roColor,
+                    const Point2D& ac_roSize,
+                    const Point3D& ac_roPosition,
+                    double a_dYaw, double a_dPitch, double a_dRoll )
+    : m_oColor( ac_roColor ), m_oScale( ac_roSize ), m_oPosition( ac_roPosition ),
+      m_dYaw( a_dYaw ), m_dPitch( a_dPitch ), m_dRoll( a_dRoll ),
+      m_poProgram( a_poProgram ), m_oAfterTransform( Transform3D::Identity() ),
+      m_oBeforeTransform( Transform3D::Identity() ), m_bVisible( true ) {}
 
-// Create a full transformation matrix based on the scale, rotations,
-// positions, and additional transform
-void Drawable::AssembleTransform( Transform3D& a_roTransform ) const
+// Apply transformations to the current matrix
+void Drawable::ApplyTransforms() const
 {
-    a_roTransform = Space::Scaling( m_oScale );
-    a_roTransform *= Space::Rotation( m_dRoll, Point3D::Unit( 0 ) );
-    a_roTransform *= Space::Rotation( m_dPitch, Point3D::Unit( 1 ) );
-    a_roTransform *= Space::Rotation( m_dYaw, Point3D::Unit( 2 ) );
-    a_roTransform *= Space::Translation( m_oPosition );
-    a_roTransform *= m_oExtraTransform;
+    glMultTransposeMatrixd( &( m_oBeforeTransform[0][0] ) );
+    Transform3D oTransform = Space::Scaling( m_oScale );
+    glMultTransposeMatrixd( &( oTransform[0][0] ) );
+    oTransform = Space::Rotation( m_dRoll, Point3D::Unit( 0 ) );
+    glMultTransposeMatrixd( &( oTransform[0][0] ) );
+    oTransform = Space::Rotation( m_dPitch, Point3D::Unit( 1 ) );
+    glMultTransposeMatrixd( &( oTransform[0][0] ) );
+    oTransform = Space::Rotation( m_dYaw, Point3D::Unit( 2 ) );
+    glMultTransposeMatrixd( &( oTransform[0][0] ) );
+    oTransform = Space::Translation( m_oPosition );
+    glMultTransposeMatrixd( &( oTransform[0][0] ) );
+    glMultTransposeMatrixd( &( m_oAfterTransform[0][0] ) );
 }
 
 // Draw the object to the screen
@@ -47,7 +50,7 @@ void Drawable::Draw() const
     }
 
     // In case there is already an active shader program
-    ShaderProgram oPreviousProgram = ShaderProgram::Current();
+    const ShaderProgram& roPreviousProgram = ShaderProgram::Current();
 
     // start using the shader program
     if( nullptr != m_poProgram )
@@ -56,11 +59,9 @@ void Drawable::Draw() const
     }
 
     // set modelview matrix
-    Transform3D oTransform;
-    AssembleTransform( oTransform );
     glMatrixMode( GL_MODELVIEW );
     glPushMatrix();
-    glMultTransposeMatrixd( &( oTransform[0][0] ) );
+    ApplyTransforms();
 
     // Draw the components of this drawable object - points, lines, other
     // drawable objects, etc.
@@ -70,11 +71,8 @@ void Drawable::Draw() const
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
 
-    // If neccessary, restore previous shader program
-    if( nullptr != m_poProgram && *m_poProgram != oPreviousProgram )
-    {
-        oPreviousProgram.Use();
-    }
+    // Restore previous shader program
+    roPreviousProgram.Use();
 }
 
 }   // namespace MyFirstEngine

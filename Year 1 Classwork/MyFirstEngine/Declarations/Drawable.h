@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Base class for drawable objects.
- * Last Modified:      February 25, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      February 26, 2014
+ * Last Modification:  Changed how transforms are assembled.
  ******************************************************************************/
 
 #ifndef DRAWABLE__H
@@ -26,9 +26,11 @@ public:
     // is passed in to distinguish between using whatever shader program is
     // current (indicated by a null pointer) or using no shader program
     // (indicated by a pointer to a program equal to ShaderProgram::Null() )
-    Drawable( ShaderProgram* a_poProgram = nullptr );
-    Drawable( const Color::ColorVector& ac_roColor,
-              ShaderProgram* a_poProgram = nullptr );
+    Drawable( ShaderProgram* a_poProgram = nullptr,
+              const Color::ColorVector& ac_roColor = Color::WHITE,
+              const Point2D& ac_roSize = Point2D( 1.0 ),
+              const Point3D& ac_roPosition = Point3D::Origin(),
+              double a_dYaw = 0.0, double a_dPitch = 0.0, double a_dRoll = 0.0 );
     virtual ~Drawable() {}
 
     // Draw the object to the screen
@@ -66,13 +68,20 @@ public:
     { m_oScale = ac_roScale; return *this; }
 
     // Apply/Get/Set additional transformation
-    Drawable& ApplyExtraTransformation( const Transform3D& ac_roTransform )
-    { m_oExtraTransform *= ac_roTransform; return *this; }
-    const Transform3D& GetExtraTransformation() const
-    { return m_oExtraTransform; }
-    Drawable& SetExtraTransformation(
+    Drawable& ApplyAfterTransformation( const Transform3D& ac_roTransform )
+    { m_oAfterTransform *= ac_roTransform; return *this; }
+    const Transform3D& GetAfterTransformation() const
+    { return m_oAfterTransform; }
+    Drawable& SetAfterTransformation(
         const Transform3D& ac_roTransform = Transform3D::Identity() )
-    { m_oExtraTransform = ac_roTransform; return *this; }
+    { m_oAfterTransform = ac_roTransform; return *this; }
+    Drawable& ApplyBeforeTransformation( const Transform3D& ac_roTransform )
+    { m_oBeforeTransform *= ac_roTransform; return *this; }
+    const Transform3D& GetBeforeTransformation() const
+    { return m_oBeforeTransform; }
+    Drawable& SetBeforeTransformation(
+        const Transform3D& ac_roTransform = Transform3D::Identity() )
+    { m_oBeforeTransform = ac_roTransform; return *this; }
 
     // Show/Hide
     bool IsVisible() const { return m_bVisible; }
@@ -82,10 +91,10 @@ public:
 
 protected:
 
-    // Create a full transformation matrix based on the scale, rotations,
-    // positions, and additional transform.  Assumes points are row vectors, so
-    // make sure to transpose if the points to transform are column vectors.
-    void AssembleTransform( Transform3D& a_roTransform ) const;
+    // Apply transformations for this object to the current matrix.  Assumes
+    // points are row vectors, so make sure to transpose if the points to
+    // transform are column vectors.
+    void ApplyTransforms() const;
 
     // This is where the actual work of drawing the object, whatever it is,
     // takes place.
@@ -103,7 +112,11 @@ protected:
 
     // Additional transformations applied to vertices after the transformations
     // due to the above properties
-    Transform3D m_oExtraTransform;
+    Transform3D m_oAfterTransform;
+
+    // Additional transformations applied to vertices before the transformations
+    // due to the above properties
+    Transform3D m_oBeforeTransform;
 
     // Shader program to use - if null, use whatever program is current
     ShaderProgram* m_poProgram;

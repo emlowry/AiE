@@ -15,13 +15,16 @@
 namespace Utility
 {
 
-// To create a singleton class without having to define your own MakeInstance
-// implementation, inherit from this class instead, make this class a friend,
-// and implement a private default constructor:
+// To create a singleton class, inherit from this class, make this class a
+// friend, and implement a private default constructor:
 //
 //  class MySingleton : public Singleton< MySingleton >
 //  {
-//      friend DefaultSingleton;
+//      friend Singleton;
+//
+//  public:
+//
+//
 //      
 //      // non-private class stuff goes here
 //  

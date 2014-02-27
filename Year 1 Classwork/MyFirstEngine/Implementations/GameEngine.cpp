@@ -93,7 +93,7 @@ bool GameEngine::Initialize( const IntPoint2D& ac_roSize,
         // If context and GLEW initialization succeeded, initialize the rest
         if( IsInitialized() )
         {
-            Quad::Initialize();
+            QuadShaderProgram::Initialize();
             Instance().m_dLastTime = Time();
         }
         else    // otherwise, terminate GLFW
@@ -181,7 +181,7 @@ void GameEngine::Terminate()
 {
     if( IsInitialized() )
     {
-        Quad::Terminate();
+        QuadShaderProgram::Terminate();
         ShaderProgram::DestroyAll();
         Shader::DestroyAll();
         GameWindow::DestroyAll();

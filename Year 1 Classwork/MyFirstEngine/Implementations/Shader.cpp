@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Function implementations for the Shader class.
- * Last Modified:      February 25, 2014
- * Last Modification:  Added deletion and reverse lookup.
+ * Last Modified:      February 26, 2014
+ * Last Modification:  Got rid of hardcoded default shaders.
  ******************************************************************************/
 
 #include "../Declarations/GameEngine.h"
@@ -20,19 +20,6 @@ namespace MyFirstEngine
 {
 
 using namespace Utility;
-
-// Source code for default shaders
-const char* const Shader::DEFAULT_FRAGMENT_SHADER_SOURCE_CODE =
-    "varying vec4 v_v4Color; "
-    "void main(void) { "
-    "    gl_FragColor = v_v4Color; "
-    "}";
-const char* const Shader::DEFAULT_VERTEX_SHADER_SOURCE_CODE =
-    "varying vec4 v_v4Color; "
-    "void main(void) { "
-    "    v_v4Color = gl_Color; "
-    "    gl_Position = gl_ModelViewProjectionMatrix * glVertex; "
-    "}";
 
 // declare classes instead of typedefs to avoid compiler warnings
 // definition is only in cpp
@@ -69,7 +56,7 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName, bool a_bRecompile )
     // Default function to make sure the default shader is loaded and compiled.
     if( "" == oSourceName )
     {
-        m_uiID = Default( a_eType ).m_uiID;
+        m_uiID = Null().m_uiID;
     }
 
     // If a shader has already been compiled from source code with the given
@@ -110,15 +97,14 @@ Shader::Shader( GLenum a_eType, const char* ac_pcSourceName,
     if( "" == oSourceName || 0 < Lookup()[ a_eType ].count( oSourceName ) )
     {
         m_uiID = ( "" == oSourceName
-                   ? Default( a_eType ).m_uiID
-                   : Lookup()[ a_eType ][ oSourceName ] );
+                    ? Null().m_uiID : Lookup()[ a_eType ][ oSourceName ] );
 
         // If the recompile flag is set to true and either a file name or source
         // code is passed in, reload and recompile.
         if( a_bRecompile && ( "" != oSourceName || "" != oSourceText ) )
         {
             CompileShader( "" == oSourceText
-                           ? DumbString::LoadFrom( oSourceName ) : oSourceText,
+                            ? DumbString::LoadFrom( oSourceName ) : oSourceText,
                            m_uiID );
         }
     }
@@ -186,43 +172,6 @@ GLuint Shader::CompileShader( const char* ac_pcSourceText, GLuint a_uiID )
     glShaderSource( a_uiID, 1, &ac_pcSourceText, nullptr );
     glCompileShader( a_uiID );
     return a_uiID;
-}
-
-// Get the default shader of the given type
-Shader Shader::Default( GLenum a_eType )
-{
-    if( 0 == Lookup()[ a_eType ].count( "" ) )
-    {
-        switch( a_eType )
-        {
-
-        case GL_FRAGMENT_SHADER:
-        {
-            GLuint uiID =
-                CompileShader( a_eType, DEFAULT_FRAGMENT_SHADER_SOURCE_CODE );
-            Lookup()[ a_eType ][ "" ] = uiID;
-            SourceLookup()[ uiID ] = "";
-            break;
-        }
-
-        case GL_VERTEX_SHADER:
-        {
-            GLuint uiID =
-                CompileShader( a_eType, DEFAULT_VERTEX_SHADER_SOURCE_CODE );
-            Lookup()[ a_eType ][ "" ] = uiID;
-            SourceLookup()[ uiID ] = "";
-            break;
-        }
-
-        default:
-        {
-            throw std::invalid_argument( "No default shader for this shader type" );
-            break;
-        }
-
-        }   // switch( a_eType )
-    }
-    return Shader( Lookup()[ a_eType ][ "" ] );
 }
 
 // Destroy all shaders

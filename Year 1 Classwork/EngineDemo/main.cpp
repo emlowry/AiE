@@ -42,9 +42,8 @@ protected:
     }
 private:
     SimpleState()
-        : m_oQuad2( Point2D( 0.5, 0.5 ),
-                    Point3D::Origin(),
-                    Color::ColorWheel::ROSE ) {}
+        : m_oQuad2( Color::ColorWheel::ROSE,
+                    Point2D( 0.5, 0.5 ) ) {}
     Quad m_oQuad1;
     Quad m_oQuad2;
 };
