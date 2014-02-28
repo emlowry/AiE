@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 16, 2013
  * Description:        Inline function implementations for ColorVector class.
- * Last Modified:      February 25, 2014
- * Last Modification:  Changed from 8-bit channel to float.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Adding functions.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__INL
@@ -223,7 +223,7 @@ INLINE ColorVector& ColorVector::operator>>=( unsigned char a_ucBits )
     return operator=( (Hex)(*this) >> a_ucBits );
 }
 
-// Return rgb values as floats
+// Return rgb values as 8-bit channel values
 INLINE Channel ColorVector::AlphaChannel() const
 {
     return 0.0f > a ? 0x00
@@ -247,6 +247,28 @@ INLINE Channel ColorVector::BlueChannel() const
     return 0.0f > b ? 0x00
         : 1.0f < b ? 0xFF
         : (Channel)Math::Round( b * 0xFF );
+}
+
+// Set individual rgba values using 8-bit channel values
+INLINE ColorVector& ColorVector::AlphaChannel( Channel a_ucAlpha )
+{
+    a = (float)a_ucAlpha / 255.0f;
+    return *this;
+}
+INLINE ColorVector& ColorVector::RedChannel( Channel a_ucRed )
+{
+    r = (float)a_ucRed / 255.0f;
+    return *this;
+}
+INLINE ColorVector& ColorVector::GreenChannel( Channel a_ucGreen )
+{
+    g = (float)a_ucGreen / 255.0f;
+    return *this;
+}
+INLINE ColorVector& ColorVector::BlueChannel( Channel a_ucBlue )
+{
+    b = (float)a_ucBlue / 255.0f;
+    return *this;
 }
 
 }   // namespace Color

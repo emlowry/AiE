@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Class representing a window managed by the game engine.
- * Last Modified:      February 25, 2014
- * Last Modification:  Added functions for clearing the screen.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Adding functions.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__H
@@ -23,6 +23,7 @@ namespace MyFirstEngine
 
 using namespace Utility;
 using Color::ColorVector;
+using Color::Channel;
 
 class IMEXPORT_CLASS GameWindow : public NotCopyable, public MostDerivedAddress
 {
@@ -50,6 +51,10 @@ public:
     const IntPoint2D& GetSize() const { return m_oSize; }
     const char* GetTitle() const { return m_oTitle.CString(); }
     GameWindow& SetClearColor( const ColorVector& ac_roColor );
+    GameWindow& SetClearColor( float a_fRed, float a_fGreen, float a_fBlue,
+                               float a_fAlpha = 1.0f );
+    GameWindow& SetClearColor( Channel a_ucRed, Channel a_ucGreen,
+                               Channel a_ucBlue, Channel a_ucAlpha = 0xFF );
     GameWindow& SetSize( unsigned int a_uiWidth, unsigned int a_uiHeight );
     GameWindow& SetSize( const IntPoint2D& ac_roSize );
     GameWindow& SetTitle( const char* ac_pcTitle );

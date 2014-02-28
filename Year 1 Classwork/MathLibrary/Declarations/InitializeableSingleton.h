@@ -4,8 +4,8 @@
  * Date Created:       February 26, 2014
  * Description:        Base class for singleton objects that can be initialized
  *                      and destroyed.
- * Last Modified:      February 26, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Adding virtual functions.
  ******************************************************************************/
 
 #ifndef INITIALIZEABLE_SINGLETON__H
@@ -18,11 +18,19 @@ namespace Utility
 {
 
 // To create a singleton class, inherit from this class, make this class a
-// friend, and implement a private default constructor:
+// friend, and implement a private default constructor and, if neccessary,
+// InitializeInstance and TerminateInstance functions:
 //
 //  class MySingleton : public InitializeableSingleton< MySingleton >
 //  {
 //      friend InitializeableSingleton;
+//
+//  public:
+//
+//      virtual ~MySingleton()
+//      {
+//          // destructor tasks go here
+//      }
 //      
 //      // non-private class stuff goes here
 //  
@@ -31,6 +39,18 @@ namespace Utility
 //      MySingleton()
 //      {
 //          // constructor tasks go here
+//      }
+//
+//      // this can be left out if there's nothing for it to do
+//      virtual void InitializeInstance() override
+//      {
+//          // setup tasks go here
+//      }
+//
+//      // this can be left out if there's nothing for it to do
+//      virtual void TerminateInstance() override
+//      {
+//          // tear down tasks go here
 //      }
 //      
 //  };  // MySingleton
@@ -49,6 +69,7 @@ public:
         if( nullptr == sm_poInstance )
         {
             sm_poInstance = new T();
+            Instance().InitializeInstance();
         }
     }
 
@@ -76,6 +97,7 @@ public:
     {
         if( nullptr != sm_poInstance )
         {
+            Instance().TerminateInstance();
             T* poInstance = sm_poInstance;
             sm_poInstance = nullptr;
             delete poInstance;
@@ -87,6 +109,12 @@ protected:
     // You shouldn't ever construct a singleton directly - the constructor is
     // only called internally by the Instance() function.
     InitializeableSingleton() {}
+
+    // Virtual function lookup is disabled in constructors and destructors, so
+    // any child-class-specific initialization tasks should be specified here so
+    // they can be called after/before the constructor/destructor
+    virtual void InitializeInstance() {};
+    virtual void TerminateInstance() {};
 
     static T* sm_poInstance;
 

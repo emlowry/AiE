@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Implementations of GameEngine functions.
- * Last Modified:      February 25, 2014
- * Last Modification:  Added main window and quad data initialization.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "..\Declarations\GameEngine.h"
@@ -30,10 +30,8 @@ public:
 // Default constructor is only used by the base Singleton class's Instance()
 // function.  The user never instantiates a GameEngine object directly.
 GameEngine::GameEngine()
-    : m_bInitialized( false ), m_dLastTime( 0.0 ), m_poStates( nullptr )
-{
-    m_poStates = new StateStack();
-}
+    : m_bInitialized( false ), m_dLastTime( 0.0 ),
+      m_poStates( new StateStack ) {}
 
 // Destructor is virtual, since inheritance is involved.
 GameEngine::~GameEngine()

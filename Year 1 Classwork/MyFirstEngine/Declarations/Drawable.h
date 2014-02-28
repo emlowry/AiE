@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Base class for drawable objects.
- * Last Modified:      February 26, 2014
- * Last Modification:  Changed how transforms are assembled.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Refactoring and debugging.
  ******************************************************************************/
 
 #ifndef DRAWABLE__H
@@ -28,73 +28,94 @@ public:
     // (indicated by a pointer to a program equal to ShaderProgram::Null() )
     Drawable( ShaderProgram* a_poProgram = nullptr,
               const Color::ColorVector& ac_roColor = Color::WHITE,
-              const Point2D& ac_roSize = Point2D( 1.0 ),
+              const Point3D& ac_roScale = Point3D( 1.0 ),
               const Point3D& ac_roPosition = Point3D::Origin(),
               double a_dYaw = 0.0, double a_dPitch = 0.0, double a_dRoll = 0.0 );
-    virtual ~Drawable() {}
+    Drawable( const Drawable& ac_roObject );
+    Drawable& operator=( const Drawable& ac_roObject );
+
+    // Destructor deallocates the dynamically stored modelview transform cache
+    // and flag.
+    virtual ~Drawable();
 
     // Draw the object to the screen
     void Draw() const;
 
-    // Add/Get/Set color
+    // Get properties
     const Color::ColorVector& GetColor() const { return m_oColor; }
-    Drawable& SetColor( const Color::ColorVector& ac_roColor )
-    { m_oColor = ac_roColor; return *this; }
-
-    // Add/Get/Set rotation properties
-    Drawable& AddPitch( double a_dPitch )
-    { m_dPitch += a_dPitch; return *this; }
     double GetPitch() const { return m_dPitch; }
-    Drawable& SetPitch( double a_dPitch = 0.0 )
-    { m_dPitch = a_dPitch; return *this; }
-    Drawable& AddRoll( double a_dRoll ) { m_dRoll += a_dRoll; return *this; }
     double GetRoll() const { return m_dRoll; }
-    Drawable& SetRoll( double a_dRoll = 0.0 )
-    { m_dRoll = a_dRoll; return *this; }
-    Drawable& AddYaw( double a_dYaw ) { m_dYaw += a_dYaw; return *this; }
     double GetYaw() const { return m_dYaw; }
-    Drawable& SetYaw( double a_dYaw = 0.0 ) { m_dYaw = a_dYaw; return *this; }
-
-    // Add/Get/Set Position and Scale
-    Drawable& AddPosition( const Point3D& ac_roPosition )
-    { m_oPosition += ac_roPosition; return *this; }
     const Point3D& GetPosition() const { return m_oPosition; }
-    Drawable& SetPosition( const Point3D& ac_roPosition = Point3D::Origin() )
-    { m_oPosition = ac_roPosition; return *this; }
-    Drawable& AddScale( const Point3D& ac_roScale )
-    { m_oScale += ac_roScale; return *this; }
     const Point3D& GetScale() const { return m_oScale; }
-    Drawable& SetScale( const Point3D& ac_roScale = Point3D( 1.0 ) )
-    { m_oScale = ac_roScale; return *this; }
-
-    // Apply/Get/Set additional transformation
-    Drawable& ApplyAfterTransformation( const Transform3D& ac_roTransform )
-    { m_oAfterTransform *= ac_roTransform; return *this; }
-    const Transform3D& GetAfterTransformation() const
+    const Transform3D& GetAfterTransform() const
     { return m_oAfterTransform; }
-    Drawable& SetAfterTransformation(
-        const Transform3D& ac_roTransform = Transform3D::Identity() )
-    { m_oAfterTransform = ac_roTransform; return *this; }
-    Drawable& ApplyBeforeTransformation( const Transform3D& ac_roTransform )
-    { m_oBeforeTransform *= ac_roTransform; return *this; }
-    const Transform3D& GetBeforeTransformation() const
+    const Transform3D& GetBeforeTransform() const
     { return m_oBeforeTransform; }
-    Drawable& SetBeforeTransformation(
-        const Transform3D& ac_roTransform = Transform3D::Identity() )
-    { m_oBeforeTransform = ac_roTransform; return *this; }
+    bool IsVisible() const { return m_bVisible; }
+
+    // Get the cached model view transformation resulting from this object's
+    // scale/rotation/position/etc.  If any of those properties have changed
+    // since the last time said transformation was calculated, recalculate it.
+    const Transform3D& ModelView() const;
+
+    // Set color
+    Drawable& SetColor( const Color::ColorVector& ac_roColor );
+    Drawable& SetColor( float a_fRed, float a_fGreen, float a_fBlue,
+                        float a_fAlpha = 1.0f );
+    Drawable& SetColor( Color::Channel a_ucRed,
+                        Color::Channel a_ucGreen,
+                        Color::Channel a_ucBlue,
+                        Color::Channel a_ucAlpha = 0xFF );
+
+    // Add rotation
+    Drawable& AddPitch( double a_dPitch );
+    Drawable& AddRoll( double a_dRoll );
+    Drawable& AddYaw( double a_dYaw );
+    Drawable& AddRotation( double a_dYaw,
+                           double a_dPitch = 0.0,
+                           double a_dRoll = 0.0 );
+
+    // Set rotation
+    Drawable& SetPitch( double a_dPitch = 0.0 );
+    Drawable& SetRoll( double a_dRoll = 0.0 );
+    Drawable& SetYaw( double a_dYaw = 0.0 );
+    Drawable& SetRotation( double a_dYaw = 0.0,
+                           double a_dPitch = 0.0,
+                           double a_dRoll = 0.0 );
+
+    // Add position and scale
+    Drawable& AddPosition( const Point3D& ac_roPosition );
+    Drawable& AddPosition( double a_dX, double a_dY = 0.0, double a_dZ = 0.0 );
+    Drawable& AddScale( const Point3D& ac_roScale );
+    Drawable& AddScale( double a_dFactor );
+    Drawable& AddScale( double a_dX, double a_dY, double a_dZ = 0.0 );
+
+    // Set position and scale
+    Drawable& SetPosition( const Point3D& ac_roPosition = Point3D::Origin() );
+    Drawable& SetPosition( double a_dX, double a_dY = 0.0, double a_dZ = 0.0 );
+    Drawable& SetScale( const Point3D& ac_roScale = Point3D( 1.0 ) );
+    Drawable& SetScale( double a_dFactor );
+    Drawable& SetScale( double a_dX, double a_dY, double a_dZ = 0.0 );
+
+    // Apply/Set additional transformation
+    Drawable& ApplyAfterTransform( const Transform3D& ac_roTransform );
+    Drawable& SetAfterTransform(
+        const Transform3D& ac_roTransform = Transform3D::Identity() );
+    Drawable& ApplyBeforeTransform( const Transform3D& ac_roTransform );
+    Drawable& SetBeforeTransform(
+        const Transform3D& ac_roTransform = Transform3D::Identity() );
 
     // Show/Hide
-    bool IsVisible() const { return m_bVisible; }
-    Drawable& Show() { m_bVisible = true; return *this; }
-    Drawable& Hide() { m_bVisible = false; return *this; }
-    Drawable& SetVisible( bool a_bVisible ) { m_bVisible = a_bVisible; return *this; }
+    Drawable& Show();
+    Drawable& Hide();
+    Drawable& SetVisible( bool a_bVisible );
+
+    // set a flag indicating that the cached modelview matrix for this object
+    // should be recalculated
+    void UpdateModelView() { *m_pbUpdateModelView = true; }
 
 protected:
-
-    // Apply transformations for this object to the current matrix.  Assumes
-    // points are row vectors, so make sure to transpose if the points to
-    // transform are column vectors.
-    void ApplyTransforms() const;
 
     // This is where the actual work of drawing the object, whatever it is,
     // takes place.
@@ -123,6 +144,13 @@ protected:
 
     // Is this object even visible?
     bool m_bVisible;
+
+    // Cache the complete transformation for cases when it doesn't change.
+    // When it does change, set a flag indicating that the cached matrix should
+    // be recalculated.  These are pointers to values instead of actual values
+    // as a cheat that lets them be updated even in const functions.
+    bool* m_pbUpdateModelView;
+    Transform3D* m_poModelView;
 
 };  // class Drawable
 

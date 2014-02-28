@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 11, 2013
  * Description:        Vector for representing RGBA colors.
- * Last Modified:      February 25, 2014
- * Last Modification:  Changed from 8-bit channel to float.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Adding functions.
  ******************************************************************************/
 
 #ifndef COLOR_VECTOR__H
@@ -84,11 +84,17 @@ public:
     ColorVector& operator<<=( unsigned char a_ucBits );
     ColorVector& operator>>=( unsigned char a_ucBits );
 
-    // Return rgba values as hexidecimal channel values
+    // Return rgba values as 8-bit channel values
     Channel AlphaChannel() const;
     Channel RedChannel() const;
     Channel GreenChannel() const;
     Channel BlueChannel() const;
+
+    // Set individual rgba values using 8-bit channel values
+    ColorVector& AlphaChannel( Channel a_ucAlpha );
+    ColorVector& RedChannel( Channel a_ucRed );
+    ColorVector& GreenChannel( Channel a_ucGreen );
+    ColorVector& BlueChannel( Channel a_ucBlue );
 
     // rgba value access
     float& r; // m_aaData[0][0]

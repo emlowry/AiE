@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Class representing an untextured rectangle.
- * Last Modified:      February 26, 2014
- * Last Modification:  Separating out shader code.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Adding copy constructor/operator.
  ******************************************************************************/
 
 #ifndef QUAD__H
@@ -31,6 +31,12 @@ public:
         : Drawable( &( QuadShaderProgram::Instance() ),
                     ac_roColor, ac_roSize, ac_roPosition,
                     a_dYaw, a_dPitch, a_dRoll ) {}
+    Quad( const Quad& ac_roQuad ) : Drawable( ac_roQuad ) {}
+    Quad& operator=( const Quad& ac_roQuad )
+    {
+        Drawable::operator=( ac_roQuad );
+        return *this;
+    }
 
     // destructor is virtual, since Sprite inherits from Quad
     virtual ~Quad() {}

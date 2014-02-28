@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the GameWindow class.
- * Last Modified:      February 25, 2014
- * Last Modification:  Added functions for clearing the screen.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Adding functions.
  ******************************************************************************/
 
 #include "..\Declarations\GLFW.h"
@@ -66,6 +66,32 @@ GameWindow::~GameWindow()
 GameWindow& GameWindow::SetClearColor( const ColorVector& ac_roColor )
 {
     m_oColor = ac_roColor;
+    if( IsCurrent() )
+    {
+        glClearColor( m_oColor.r, m_oColor.g, m_oColor.b, m_oColor.a );
+    }
+    return *this;
+}
+GameWindow& GameWindow::SetClearColor( float a_fRed, float a_fGreen,
+                                       float a_fBlue, float a_fAlpha )
+{
+    m_oColor.r = a_fRed;
+    m_oColor.g = a_fGreen;
+    m_oColor.b = a_fBlue;
+    m_oColor.a = a_fAlpha;
+    if( IsCurrent() )
+    {
+        glClearColor( m_oColor.r, m_oColor.g, m_oColor.b, m_oColor.a );
+    }
+    return *this;
+}
+GameWindow& GameWindow::SetClearColor( Channel a_ucRed, Channel a_ucGreen,
+                                       Channel a_ucBlue, Channel a_ucAlpha )
+{
+    m_oColor.RedChannel( a_ucRed );
+    m_oColor.GreenChannel( a_ucGreen );
+    m_oColor.BlueChannel( a_ucBlue );
+    m_oColor.AlphaChannel( a_ucAlpha );
     if( IsCurrent() )
     {
         glClearColor( m_oColor.r, m_oColor.g, m_oColor.b, m_oColor.a );

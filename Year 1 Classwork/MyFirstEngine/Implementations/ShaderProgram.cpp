@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Function implementations for the ShaderProgram class.
- * Last Modified:      February 26, 2014
+ * Last Modified:      February 27, 2014
  * Last Modification:  Refactoring.
  ******************************************************************************/
 
@@ -53,7 +53,7 @@ ShaderProgram::ShaderProgram()
     List().push_back( this );
 }
 
-// Constructor
+// Constructor - you should call Setup() after calling these
 ShaderProgram::ShaderProgram( const Shader& ac_roVertexShader,
                               const Shader& ac_roFragmentShader,
                               const Shader& ac_roGeometryShader )
@@ -72,7 +72,6 @@ ShaderProgram::ShaderProgram( const Shader& ac_roVertexShader,
     {
         Shaders().push_back( ac_roGeometryShader );
     }
-    Setup();
 }
 ShaderProgram::ShaderProgram( const Shader* ac_paoShaders,
                               unsigned int a_uiCount )
@@ -89,13 +88,11 @@ ShaderProgram::ShaderProgram( const Shader* ac_paoShaders,
             }
         }
     }
-    Setup();
 }
 
-// Destructor
+// Destructor - you should call Destroy() before calling this.
 ShaderProgram::~ShaderProgram()
 {
-    Destroy();
     List()[ m_uiIndex ] = nullptr;
     delete m_poShaders;
 }

@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader program.
- * Last Modified:      February 26, 2014
+ * Last Modified:      February 27, 2014
  * Last Modification:  Refactoring.
  ******************************************************************************/
 
@@ -77,8 +77,14 @@ public:
 
 protected:
 
+    // Delete this shader program
+    void Destroy();
+
     // Destroy vertex arrays, zero out IDs, etc.
     virtual void DestroyData() {}
+
+    // Link, set up vertex arrays, etc.
+    void Setup();
 
     // Set up vertex arrays, get uniform variable locations, etc.
     virtual void SetupData() {}
@@ -99,12 +105,6 @@ private:
 
     // Default constructor used only by Null()
     ShaderProgram();
-
-    // Delete this shader program
-    void Destroy();
-
-    // Link, set up vertex arrays, etc.
-    void Setup();
 
     // Get a reference to the list of shaders
     ShaderList& Shaders() { return *m_poShaders; }

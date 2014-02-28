@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 26, 2014
  * Description:        Shader program for Quad objects.
- * Last Modified:      February 26, 2014
- * Last Modification:  Creation.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Overriding virtual functions added to parent class.
  ******************************************************************************/
 
 #ifndef QUAD_SHADER_PROGRAM__H
@@ -59,6 +59,11 @@ protected:
     // only the Quad class or a class derived from this one can call the
     // constructors
     QuadShaderProgram();
+
+    // Instance initialization/termination calls Setup()/Destroy() before
+    // constructor/destructor
+    virtual void InitializeInstance() override { Setup(); }
+    virtual void TerminateInstance() override { Destroy(); }
 
     // manage the buffers, vertex array, and color uniform variable
     virtual void DestroyData() override;

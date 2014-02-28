@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Base class for singleton objects.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved into Utility namespace from MyFirstEngine project.
+ * Last Modified:      February 27, 2014
+ * Last Modification:  Updating comment.
  ******************************************************************************/
 
 #ifndef SINGLETON__H
@@ -24,7 +24,10 @@ namespace Utility
 //
 //  public:
 //
-//
+//      virtual ~MySingleton()
+//      {
+//          // destructor tasks go here
+//      }
 //      
 //      // non-private class stuff goes here
 //  
