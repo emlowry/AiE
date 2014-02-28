@@ -87,6 +87,7 @@
     <ClInclude Include="Declarations\Shader.h" />
     <ClInclude Include="Declarations\ShaderProgram.h" />
     <ClInclude Include="Declarations\Drawable.h" />
+    <ClInclude Include="Declarations\Sprite.h" />
     <ClInclude Include="include\MyFirstEngine.h" />
   </ItemGroup>
   <ItemGroup>

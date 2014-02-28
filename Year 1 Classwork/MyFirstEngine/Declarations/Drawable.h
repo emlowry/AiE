@@ -57,7 +57,7 @@ public:
     // Get the cached model view transformation resulting from this object's
     // scale/rotation/position/etc.  If any of those properties have changed
     // since the last time said transformation was calculated, recalculate it.
-    const Transform3D& ModelView() const;
+    virtual const Transform3D& ModelView() const;
 
     // Set color
     Drawable& SetColor( const Color::ColorVector& ac_roColor );

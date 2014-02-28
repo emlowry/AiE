@@ -147,94 +147,135 @@ Drawable& Drawable::SetColor( Color::Channel a_ucRed,
 // Add rotation properties
 Drawable& Drawable::AddPitch( double a_dPitch )
 {
-    m_dPitch += a_dPitch;
-    UpdateModelView();
+    if( a_dPitch != 0.0 )
+    {
+        m_dPitch += a_dPitch;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddRoll( double a_dRoll )
 {
-    m_dRoll += a_dRoll;
-    UpdateModelView();
+    if( a_dRoll != 0.0 )
+    {
+        m_dRoll += a_dRoll;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddYaw( double a_dYaw )
 {
-    m_dYaw += a_dYaw;
-    UpdateModelView();
+    if( a_dYaw != 0.0 )
+    {
+        m_dYaw += a_dYaw;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddRotation( double a_dYaw, double a_dPitch, double a_dRoll )
 {
-    m_dYaw += a_dYaw;
-    m_dPitch += a_dPitch;
-    m_dRoll += a_dRoll;
-    UpdateModelView();
+    if( a_dYaw != 0.0 || a_dPitch != 0.0 || a_dRoll != 0.0 )
+    {
+        m_dYaw += a_dYaw;
+        m_dPitch += a_dPitch;
+        m_dRoll += a_dRoll;
+        UpdateModelView();
+    }
     return *this;
 }
 
 // Set rotation properties
 Drawable& Drawable::SetPitch( double a_dPitch )
 {
-    m_dPitch = a_dPitch;
-    UpdateModelView();
+    if( a_dPitch != m_dPitch )
+    {
+        m_dPitch = a_dPitch;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetRoll( double a_dRoll )
 {
-    m_dRoll = a_dRoll;
-    UpdateModelView();
+    if( a_dRoll != m_dRoll )
+    {
+        m_dRoll = a_dRoll;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetYaw( double a_dYaw )
 {
-    m_dYaw = a_dYaw;
-    UpdateModelView();
+    if( a_dYaw != m_dYaw )
+    {
+        m_dYaw = a_dYaw;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetRotation( double a_dYaw, double a_dPitch, double a_dRoll )
 {
-    m_dYaw = a_dYaw;
-    m_dPitch = a_dPitch;
-    m_dRoll = a_dRoll;
-    UpdateModelView();
+    if( a_dYaw != m_dYaw || a_dPitch != m_dPitch || a_dRoll != m_dRoll )
+    {
+        m_dYaw = a_dYaw;
+        m_dPitch = a_dPitch;
+        m_dRoll = a_dRoll;
+        UpdateModelView();
+    }
     return *this;
 }
 
 // Add position and scale
 Drawable& Drawable::AddPosition( const Point3D& ac_roPosition )
 {
-    m_oPosition += ac_roPosition;
-    UpdateModelView();
+    if( ac_roPosition != m_oPosition )
+    {
+        m_oPosition += ac_roPosition;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddPosition( double a_dX, double a_dY, double a_dZ )
 {
-    m_oPosition.x += a_dX;
-    m_oPosition.y += a_dY;
-    m_oPosition.z += a_dZ;
-    UpdateModelView();
+    if( a_dX != m_oPosition.x || a_dY != m_oPosition.y || a_dZ != m_oPosition.z )
+    {
+        m_oPosition.x += a_dX;
+        m_oPosition.y += a_dY;
+        m_oPosition.z += a_dZ;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddScale( const Point3D& ac_roScale )
 {
-    m_oScale += ac_roScale;
-    UpdateModelView();
+    if( ac_roScale != m_oScale )
+    {
+        m_oScale += ac_roScale;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddScale( double a_dX, double a_dY, double a_dZ )
 {
-    m_oScale.x += a_dX;
-    m_oScale.y += a_dY;
-    m_oScale.z += a_dZ;
-    UpdateModelView();
+    if( a_dX != m_oScale.x || a_dY != m_oScale.y || a_dZ != m_oScale.z )
+    {
+        m_oScale.x += a_dX;
+        m_oScale.y += a_dY;
+        m_oScale.z += a_dZ;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::AddScale( double a_dFactor )
 {
-    m_oScale.x += a_dFactor;
-    m_oScale.y += a_dFactor;
-    m_oScale.z += a_dFactor;
-    UpdateModelView();
+    if( a_dFactor != m_oScale.x ||
+        a_dFactor != m_oScale.y ||
+        a_dFactor != m_oScale.z )
+    {
+        m_oScale.x += a_dFactor;
+        m_oScale.y += a_dFactor;
+        m_oScale.z += a_dFactor;
+        UpdateModelView();
+    }
     return *this;
 }
 
@@ -242,64 +283,93 @@ Drawable& Drawable::AddScale( double a_dFactor )
 Drawable& Drawable::
     SetPosition( const Point3D& ac_roPosition )
 {
-    m_oPosition = ac_roPosition;
-    UpdateModelView();
+    if( ac_roPosition != m_oPosition )
+    {
+        m_oPosition = ac_roPosition;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetPosition( double a_dX, double a_dY, double a_dZ )
 {
-    m_oPosition.x = a_dX;
-    m_oPosition.y = a_dY;
-    m_oPosition.z = a_dZ;
-    UpdateModelView();
+    if( a_dX != m_oPosition.x || a_dY != m_oPosition.y || a_dZ != m_oPosition.z )
+    {
+        m_oPosition.x = a_dX;
+        m_oPosition.y = a_dY;
+        m_oPosition.z = a_dZ;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetScale( const Point3D& ac_roScale )
 {
-    m_oScale = ac_roScale;
-    UpdateModelView();
+    if( ac_roScale != m_oScale )
+    {
+        m_oScale = ac_roScale;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetScale( double a_dX, double a_dY, double a_dZ )
 {
-    m_oScale.x = a_dX;
-    m_oScale.y = a_dY;
-    m_oScale.z = a_dZ;
-    UpdateModelView();
+    if( a_dX != m_oScale.x || a_dY != m_oScale.y || a_dZ != m_oScale.z )
+    {
+        m_oScale.x = a_dX;
+        m_oScale.y = a_dY;
+        m_oScale.z = a_dZ;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetScale( double a_dFactor )
 {
-    m_oScale.x = a_dFactor;
-    m_oScale.y = a_dFactor;
-    m_oScale.z = a_dFactor;
-    UpdateModelView();
+    if( a_dFactor != m_oScale.x ||
+        a_dFactor != m_oScale.y ||
+        a_dFactor != m_oScale.z )
+    {
+        m_oScale.x = a_dFactor;
+        m_oScale.y = a_dFactor;
+        m_oScale.z = a_dFactor;
+        UpdateModelView();
+    }
     return *this;
 }
 
 // Apply/Set additional transformation
 Drawable& Drawable::ApplyAfterTransform( const Transform3D& ac_roTransform )
 {
-    m_oAfterTransform *= ac_roTransform;
-    UpdateModelView();
+    if( ac_roTransform != Transform3D::Identity() )
+    {
+        m_oAfterTransform *= ac_roTransform;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetAfterTransform( const Transform3D& ac_roTransform )
 {
-    m_oAfterTransform = ac_roTransform;
-    UpdateModelView();
+    if( ac_roTransform != m_oAfterTransform )
+    {
+        m_oAfterTransform = ac_roTransform;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::ApplyBeforeTransform( const Transform3D& ac_roTransform )
 {
-    m_oBeforeTransform *= ac_roTransform;
-    UpdateModelView();
+    if( ac_roTransform != Transform3D::Identity() )
+    {
+        m_oBeforeTransform *= ac_roTransform;
+        UpdateModelView();
+    }
     return *this;
 }
 Drawable& Drawable::SetBeforeTransform( const Transform3D& ac_roTransform )
 {
-    m_oBeforeTransform = ac_roTransform;
-    UpdateModelView();
+    if( ac_roTransform != m_oBeforeTransform )
+    {
+        m_oBeforeTransform = ac_roTransform;
+        UpdateModelView();
+    }
     return *this;
 }
 
