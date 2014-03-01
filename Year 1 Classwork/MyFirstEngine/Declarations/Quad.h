@@ -37,6 +37,14 @@ public:
         Drawable::operator=( ac_roQuad );
         return *this;
     }
+    Quad( const Color::ColorVector& ac_roColor,
+          const Point3D& ac_roLowerLeftCorner,
+          const Point3D& ac_roUpperRightCorner,
+          const Point3D& ac_roUpDirection = Point3D::Unit(1) )
+        : Drawable( &( QuadShaderProgram::Instance() ), ac_roColor )
+    {
+        m_oPosition = ( ( ac_roUpperRightCorner - ac_roLowerLeftCorner ) / 2 ) + ac_roLowerLeftCorner;
+    }
 
     // destructor is virtual, since Sprite inherits from Quad
     virtual ~Quad() {}

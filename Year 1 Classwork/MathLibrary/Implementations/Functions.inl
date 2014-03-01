@@ -152,11 +152,17 @@ inline typename std::enable_if< std::is_scalar< T >::value, T >::type
                 ? dCeil : dFloor );
 }
 
-// Scroll a value into the given bounds.
+// Scroll a value into the given bounds, [ ac_rMin, ac_rMax ).
 template< typename T >
 typename std::enable_if< std::is_scalar< T >::value, T >::type
     Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
 {
+    // If the value is already on a boundary, return the max
+    if( ac_rValue == ac_rMax || ac_rValue == ac_rMin )
+    {
+        return ac_rMax;
+    }
+
     // If the upper and lower bounds are the same number, than the only result
     // in range is said number.
     if( ac_rMax == ac_rMin )
@@ -199,6 +205,14 @@ typename std::enable_if< std::is_scalar< T >::value, T >::type
     ModuloAssign( result, interval );
     result += ( result < 0 ? ac_rMax : ac_rMin );
     return result;
+}
+
+// Scroll a value into the the bounds ( -PI, PI ].
+template< typename T >
+typename std::enable_if< std::is_scalar< T >::value, T >::type
+    ScrollRadians( const T& ac_rValue )
+{
+    T result = Scroll( -ac_rValue, -(T)PI, (T)PI );
 }
 
 // Complex conjugate (if you ever want to use a matrix full of complex numbers,

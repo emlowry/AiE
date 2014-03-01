@@ -57,7 +57,7 @@ public:
     // Get the cached model view transformation resulting from this object's
     // scale/rotation/position/etc.  If any of those properties have changed
     // since the last time said transformation was calculated, recalculate it.
-    virtual const Transform3D& ModelView() const;
+    virtual const Transform3D& GetModelMatrix() const;
 
     // Set color
     Drawable& SetColor( const Color::ColorVector& ac_roColor );
@@ -75,6 +75,52 @@ public:
     Drawable& AddRotation( double a_dYaw,
                            double a_dPitch = 0.0,
                            double a_dRoll = 0.0 );
+
+    // Rotate toward something (for unrotated objects, the x-axis is "forward"
+    // and the z-axis is "up")
+    Drawable& RotateTowardDirection( const Point3D& ac_roForward,
+                                     const Point3D& ac_roUp,
+                                     double a_dAmount = 1.0 );
+    Drawable& RotateTowardDirection( const Point3D& ac_roForward,
+                                     double a_dAmount = 1.0 );
+    Drawable& RotateTowardPoint( const Point3D& ac_roTarget,
+                                 const Point3D& ac_roUp,
+                                 double a_dAmount = 1.0 );
+    Drawable& RotateTowardPoint( const Point3D& ac_roTarget,
+                                 double a_dAmount = 1.0 );
+    Drawable& RotateToward( const HVector3D& ac_roHVector,
+                            const Point3D& ac_roUp,
+                            double a_dAmount = 1.0 );
+    Drawable& RotateToward( const HVector3D& ac_roHVector,
+                            double a_dAmount = 1.0 );
+    Drawable& RotateTowardDirection( const Point3D& ac_roForward,
+                                     const Point3D& ac_roUp,
+                                     double a_dRadiansPerSecond,
+                                     double a_dSeconds,
+                                     double a_dRollSpeed = 0.0 );
+    Drawable& RotateTowardDirection( const Point3D& ac_roForward,
+                                     double a_dRadiansPerSecond,
+                                     double a_dSeconds,
+                                     double a_dRollSpeed = 0.0 );
+    Drawable& RotateTowardPoint( const Point3D& ac_roTarget,
+                                 const Point3D& ac_roUp,
+                                 double a_dRadiansPerSecond,
+                                 double a_dSeconds,
+                                 double a_dRollSpeed = 0.0 );
+    Drawable& RotateTowardPoint( const Point3D& ac_roTarget,
+                                 double a_dRadiansPerSecond,
+                                 double a_dSeconds,
+                                 double a_dRollSpeed = 0.0 );
+    Drawable& RotateToward( const HVector3D& ac_roHVector,
+                            const Point3D& ac_roUp,
+                            double a_dRadiansPerSecond,
+                            double a_dSeconds,
+                            double a_dRollSpeed = 0.0 );
+    Drawable& RotateToward( const HVector3D& ac_roHVector,
+                            double a_dRadiansPerSecond,
+                            double a_dSeconds,
+                            double a_dRollSpeed = 0.0 );
+
 
     // Set rotation
     Drawable& SetPitch( double a_dPitch = 0.0 );
@@ -113,9 +159,18 @@ public:
 
     // set a flag indicating that the cached modelview matrix for this object
     // should be recalculated
-    void UpdateModelView() { *m_pbUpdateModelView = true; }
+    void UpdateModelMatrix() { *m_pbUpdateModelMatrix = true; }
 
 protected:
+
+    // Given vectors for a desired forward (x-axis) and up (z-axis) direction,
+    // calculate yaw, pitch, and roll.  If a zero vector is given as up, use the
+    // z-axis rotated by this object's current rotation.  If the forward vector
+    // and the up vector are the same, then the calculated roll will be the
+    // current roll.  If the given forward vector is zero, then return false.
+    bool CalculateTaitBryanAngles( double& a_rdYaw, double& a_rdPitch,
+                                   double a_rdRoll, const Point3D& ac_roForward,
+                                   const Point3D& ac_roUp = Point3D::Zero() ) const;
 
     // This is where the actual work of drawing the object, whatever it is,
     // takes place.
@@ -149,8 +204,8 @@ protected:
     // When it does change, set a flag indicating that the cached matrix should
     // be recalculated.  These are pointers to values instead of actual values
     // as a cheat that lets them be updated even in const functions.
-    bool* m_pbUpdateModelView;
-    Transform3D* m_poModelView;
+    bool* m_pbUpdateModelMatrix;
+    Transform3D* m_poModelMatrix;
 
 };  // class Drawable
 

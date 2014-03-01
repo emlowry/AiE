@@ -47,9 +47,9 @@ INLINE PointTransform
 {
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
     double dCos = std::cos( a_dRadians );
-    double dSin = ( dCos == -1 || dCos == 1 ? 0 : std::sin( a_dRadians ) );
-    dCos = ( dSin == -1 || dSin == 1 ? 0 : dCos );
-    double adRotate[2][2] = { { dCos, dSin }, { dSin * -1, dCos } };
+    double dSin = ( -1 == dCos || 1 == dCos ? 0 : std::sin( a_dRadians ) );
+    dCos = ( -1 == dSin || 1 == dSin ? 0 : dCos );
+    double adRotate[2][2] = { { dCos, dSin }, { -dSin, dCos } };
     return PointTransform( adRotate );
 }
 INLINE Transform Rotation( double a_dRadians, bool a_bClockwise,
@@ -63,11 +63,11 @@ INLINE Transform Rotation( double a_dRadians,
 {
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
     double dCos = std::cos( a_dRadians );
-    double dSin = ( dCos == -1 || dCos == 1 ? 0 : std::sin( a_dRadians ) );
-    dCos = ( dSin == -1 || dSin == 1 ? 0 : dCos );
-    double adRotate[3][3] = { { dCos,      dSin, 0.0 },
-                              { dSin * -1, dCos, 0.0 },
-                              { 0.0,       0.0,  1.0 } };
+    double dSin = ( -1 == dCos || 1 == dCos ? 0 : std::sin( a_dRadians ) );
+    dCos = ( -1 == dSin || 1 == dSin ? 0 : dCos );
+    double adRotate[3][3] = { { dCos,   dSin,   0.0 },
+                              { -dSin,  dCos,   0.0 },
+                              { 0.0,    0.0,    1.0 } };
     return TransformationAbout( Transform( adRotate ), ac_roOrigin );
 }
 INLINE PointTransform PointDegreeRotation( double a_dDegrees,
@@ -133,8 +133,8 @@ INLINE PointTransform
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
     Point oN = ac_roAxis.Normal();
     double dCos = std::cos( a_dRadians );
-    double dSin = ( dCos == -1 || dCos == 1 ? 0 : std::sin( a_dRadians ) );
-    dCos = ( dSin == -1 || dSin == 1 ? 0 : dCos );
+    double dSin = ( -1 == dCos || 1 == dCos ? 0 : std::sin( a_dRadians ) );
+    dCos = ( -1 == dSin || 1 == dSin ? 0 : dCos );
     double adRotate[3][3] =
     { { dCos + ( oN.x * oN.x * ( 1.0 - dCos ) ),
         ( oN.y * oN.x * ( 1.0 - dCos ) ) + ( oN.z * dSin ),
@@ -145,6 +145,38 @@ INLINE PointTransform
       { ( oN.x * oN.z * ( 1.0 - dCos ) ) + ( oN.y * dSin ),
         ( oN.y * oN.z * ( 1.0 - dCos ) ) - ( oN.x * dSin ),
         dCos + ( oN.z * oN.z * ( 1.0 - dCos ) ) } };
+    return PointTransform( adRotate );
+}
+INLINE PointTransform
+    PointRotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                   bool a_bClockwise )
+{
+    // correct for clockwise-ness
+    int iMult = ( a_bClockwise ? -1 : 1 );
+    a_dYaw *= iMult;
+    a_dPitch *= iMult;
+    a_dRoll *= iMult;
+
+    // get the sines and cosines
+    double dCosY = std::cos( a_dYaw );
+    double dSinY = ( -1 == dCosY || 1 == dCosY ? 0 : std::sin( a_dYaw ) );
+    dCosY = ( -1 == dSinY || 1 == dSinY ? 0 : dCosY );
+    double dCosP = std::cos( a_dPitch );
+    double dSinP = ( -1 == dCosP || 1 == dCosP ? 0 : std::sin( a_dPitch ) );
+    dCosP = ( -1 == dSinP || 1 == dSinP ? 0 : dCosP );
+    double dCosR = std::cos( a_dRoll );
+    double dSinR = ( -1 == dCosR || 1 == dCosR ? 0 : std::sin( a_dRoll ) );
+    dCosR = ( -1 == dSinR || 1 == dSinR ? 0 : dCosR );
+
+    // assemble the matrix
+    double adRotate[3][3] = 
+    { { dCosP * dCosY, dCosP * dSinY, -dSinP },
+      { ( dSinR * dSinP * dCosY ) - ( dCosR * dSinY ),
+        ( dSinR * dSinP * dSinY ) + ( dCosR * dCosY ),
+        dSinR * dCosP },
+      { ( dCosR * dSinP * dCosY ) + ( dSinR * dSinY ),
+        ( dCosR * dSinP * dSinY ) - ( dSinR * dCosY ),
+        dCosR * dCosP } };
     return PointTransform( adRotate );
 }
 INLINE Transform Rotation( double a_dRadians, bool a_bClockwise,
@@ -168,8 +200,8 @@ INLINE Transform Rotation( double a_dRadians,
     a_dRadians *= ( a_bClockwise ? -1 : 1 );
     Point oN = ac_roAxis.Normal();
     double dCos = std::cos( a_dRadians );
-    double dSin = ( dCos == -1 || dCos == 1 ? 0 : std::sin( a_dRadians ) );
-    dCos = ( dSin == -1 || dSin == 1 ? 0 : dCos );
+    double dSin = ( -1 == dCos || 1 == dCos ? 0 : std::sin( a_dRadians ) );
+    dCos = ( -1 == dSin || 1 == dSin ? 0 : dCos );
     double adRotate[4][4] =
     { { dCos + ( oN.x * oN.x * ( 1.0 - dCos ) ),
         ( oN.y * oN.x * ( 1.0 - dCos ) ) + ( oN.z * dSin ),
@@ -186,6 +218,43 @@ INLINE Transform Rotation( double a_dRadians,
       { 0.0, 0.0, 0.0, 1.0 } };
     return TransformationAbout( Transform( adRotate ), ac_roOrigin );
 }
+INLINE Transform Rotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                           bool a_bClockwise, const Point& ac_roOrigin )
+{
+    return Rotation( a_dYaw, a_dPitch, a_dRoll, ac_roOrigin, a_bClockwise );
+}
+INLINE Transform Rotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                           const Point& ac_roOrigin, bool a_bClockwise )
+{
+    // correct for clockwise-ness
+    int iMult = ( a_bClockwise ? -1 : 1 );
+    a_dYaw *= iMult;
+    a_dPitch *= iMult;
+    a_dRoll *= iMult;
+
+    // get the sines and cosines
+    double dCosY = std::cos( a_dYaw );
+    double dSinY = ( -1 == dCosY || 1 == dCosY ? 0 : std::sin( a_dYaw ) );
+    dCosY = ( -1 == dSinY || 1 == dSinY ? 0 : dCosY );
+    double dCosP = std::cos( a_dPitch );
+    double dSinP = ( -1 == dCosP || 1 == dCosP ? 0 : std::sin( a_dPitch ) );
+    dCosP = ( -1 == dSinP || 1 == dSinP ? 0 : dCosP );
+    double dCosR = std::cos( a_dRoll );
+    double dSinR = ( -1 == dCosR || 1 == dCosR ? 0 : std::sin( a_dRoll ) );
+    dCosR = ( -1 == dSinR || 1 == dSinR ? 0 : dCosR );
+
+    // assemble the matrix
+    double adRotate[4][4] = 
+    { { dCosP * dCosY, dCosP * dSinY, -dSinP, 0.0 },
+      { ( dSinR * dSinP * dCosY ) - ( dCosR * dSinY ),
+        ( dSinR * dSinP * dSinY ) + ( dCosR * dCosY ),
+        dSinR * dCosP, 0.0 },
+      { ( dCosR * dSinP * dCosY ) + ( dSinR * dSinY ),
+        ( dCosR * dSinP * dSinY ) - ( dSinR * dCosY ),
+        dCosR * dCosP, 0.0 },
+      { 0.0, 0.0, 0.0, 1.0 } };
+    return TransformationAbout( Transform( adRotate ), ac_roOrigin );
+}
 INLINE PointTransform PointDegreeRotation( double a_dDegrees,
                                            bool a_bClockwise,
                                            const Point& ac_roAxis )
@@ -197,6 +266,13 @@ INLINE PointTransform PointDegreeRotation( double a_dDegrees,
                                            bool a_bClockwise )
 {
     return PointRotation( Radians( a_dDegrees ), ac_roAxis, a_bClockwise );
+}
+INLINE PointTransform
+    PointDegreeRotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                         bool a_bClockwise )
+{
+    return PointRotation( Radians( a_dYaw ), Radians( a_dPitch ),
+                          Radians( a_dRoll ), a_bClockwise );
 }
 INLINE Transform DegreeRotation( double a_dDegrees, bool a_bClockwise,
                                  const Point& ac_roAxis,
@@ -220,6 +296,18 @@ INLINE Transform DegreeRotation( double a_dDegrees,
 {
     return Rotation( Radians( a_dDegrees ),
                      ac_roAxis, ac_roOrigin, a_bClockwise );
+}
+INLINE Transform DegreeRotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                                 bool a_bClockwise, const Point& ac_roOrigin )
+{
+    return Rotation( Radians( a_dYaw ), Radians( a_dPitch ), Radians( a_dRoll ),
+                     ac_roOrigin, a_bClockwise );
+}
+INLINE Transform DegreeRotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                                 const Point& ac_roOrigin, bool a_bClockwise )
+{
+    return Rotation( Radians( a_dYaw ), Radians( a_dPitch ), Radians( a_dRoll ),
+                     ac_roOrigin, a_bClockwise );
 }
 
 }   // namespace Space

@@ -18,6 +18,7 @@ namespace Math
 // Degrees/Radians in a circle
 const unsigned short DEGREES_IN_A_CIRCLE = 360;
 const long double PI = 3.14159265358979323846264338327950288419716939937510582L;
+const long double HALF_PI = PI / 2;
 const long double RADIANS_IN_A_CIRCLE = 2 * PI;
 const long double DEGREES_IN_A_RADIAN = 180L / PI;
 
@@ -114,10 +115,15 @@ template< typename T >
 typename std::enable_if< std::is_scalar< T >::value, T >::type
     Round( const T& ac_rValue );
 
-// Scroll a value into the given bounds.
+// Scroll a value into the given bounds, [ ac_rMin, ac_rMax ).
 template< typename T >
 typename std::enable_if< std::is_scalar< T >::value, T >::type
     Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin = (T)0 );
+
+// Scroll a value into the the bounds ( -PI, PI ].
+template< typename T >
+typename std::enable_if< std::is_scalar< T >::value, T >::type
+    ScrollRadians( const T& ac_rValue );
 
 // Complex conjugate (if you ever want to use a matrix full of complex numbers,
 // you'll need to define an explicit specialization for this function).

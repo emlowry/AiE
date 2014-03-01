@@ -38,21 +38,49 @@ public:
     virtual ~Sprite() {}
 
     // Get properties
-    const Point2D& GetPixels() const { return m_oPixels; }
-    const Point2D& GetSlicePixels() const { return m_oSlicePixels; }
-    const Point2D& GetPixelLocation() const { return m_oPixelLocation; }
-    const Point2D& GetPixelOffset() const { return m_oPixelOffset; }
+    const IntPoint2D& GetPixels() const { return m_oPixels; }
+    const IntPoint2D& GetCenterOffset() const { return m_oCenterOffset; }
+    const IntPoint2D& GetSlicePixels() const { return m_oSlicePixels; }
+    const IntPoint2D& GetSliceLocation() const { return m_oSliceLocation; }
+    const IntPoint2D& GetSliceOffset() const { return m_oSliceOffset; }
     Cropping GetCropping() const { return m_eCropping; }
     // TODO get texture
 
+    // Get the cached model view transformation resulting from this object's
+    // scale/rotation/position/pixel dimensions/etc.  If any of those properties
+    // have changed since the last time said transformation was calculated,
+    // recalculate it.
+    virtual const Transform3D& GetModelMatrix() const override;
+
+    // Add to pixel dimensions
+    const Sprite& AddPixels( const IntPoint2D& ac_roPixels );
+    const Sprite& AddPixels( int a_iX, int a_iY );
+    const Sprite& AddCenterOffset( const IntPoint2D& ac_roPixels );
+    const Sprite& AddCenterOffset( int a_iX, int a_iY );
+    const Sprite& AddSlicePixels( const IntPoint2D& ac_roPixels );
+    const Sprite& AddSlicePixels( int a_iX, int a_iY );
+    const Sprite& AddSliceLocation( const IntPoint2D& ac_roPixels );
+    const Sprite& AddSliceLocation( int a_iX, int a_iY );
+    const Sprite& AddSliceOffset( const IntPoint2D& ac_roPixels );
+    const Sprite& AddSliceOffset( int a_iX, int a_iY );
+    const Sprite& AddSliceDimensions( const IntPoint2D& ac_roPixels,
+        const IntPoint2D& ac_roCenterOffset = IntPoint2D::Zero(),
+        const IntPoint2D& ac_roSlicePixels = IntPoint2D::Zero(),
+        const IntPoint2D& ac_roSliceLocation = IntPoint2D::Zero(),
+        const IntPoint2D& ac_roSliceOffset = IntPoint2D::Zero() );
+
     // TODO set properties
 
-private:
+protected:
 
-    Point2D m_oPixels;          // size of the sprite in texture pixels
-    Point2D m_oSlicePixels;     // size of the slice in texture pixels
-    Point2D m_oPixelLocation;   // pixel location of the top-left pixel in slice
-    Point2D m_oPixelOffset;     // pixel location of the top-left pixel in slice
+    IntPoint2D m_oPixels;       // size of the sprite in texture pixels
+    IntPoint2D m_oCenterOffset; // pixel location of the center of the sprite
+                                // relative to m_oPixels / 2
+    IntPoint2D m_oSlicePixels;  // size of the slice in texture pixels
+    IntPoint2D m_oSliceLocation;// pixel location of the top-left pixel in slice
+                                // relative to the top-left corner of the
+                                // texture ( +x = down, +y = right )
+    IntPoint2D m_oSliceOffset;  // pixel location of the top-left pixel in slice
                                 // relative to the top-left corner of the sprite
                                 // ( +x = down, +y = right )
     Cropping m_eCropping;

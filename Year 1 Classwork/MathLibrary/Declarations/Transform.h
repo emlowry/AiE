@@ -123,6 +123,9 @@ IMEXPORT PointTransform
     PointRotation( double a_dRadians,
                    const Point& ac_roAxis = Point::Unit(2),
                    bool a_bClockwise = false );
+IMEXPORT PointTransform
+    PointRotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                   bool a_bClockwise = false );
 IMEXPORT Transform
     Rotation( double a_dRadians, bool a_bClockwise,
               const Point& ac_roAxis = Point::Unit(2),
@@ -136,12 +139,22 @@ IMEXPORT Transform
               const Point& ac_roAxis = Point::Unit(2),
               const Point& ac_roOrigin = Point::Origin(),
               bool a_bClockwise = false );
+IMEXPORT Transform
+    Rotation( double a_dYaw, double a_dPitch, double a_dRoll, bool a_bClockwise,
+              const Point& ac_roOrigin = Point::Origin() );
+IMEXPORT Transform
+    Rotation( double a_dYaw, double a_dPitch, double a_dRoll,
+              const Point& ac_roOrigin = Point::Origin(),
+              bool a_bClockwise = false );
 IMEXPORT PointTransform
     PointDegreeRotation( double a_dDegrees, bool a_bClockwise,
                          const Point& ac_roAxis = Point::Unit(2) );
 IMEXPORT PointTransform
     PointDegreeRotation( double a_dDegrees,
                          const Point& ac_roAxis = Point::Unit(2),
+                         bool a_bClockwise = false );
+IMEXPORT PointTransform
+    PointDegreeRotation( double a_dYaw, double a_dPitch, double a_dRoll,
                          bool a_bClockwise = false );
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees, bool a_bClockwise,
@@ -154,6 +167,14 @@ IMEXPORT Transform
 IMEXPORT Transform
     DegreeRotation( double a_dDegrees,
                     const Point& ac_roAxis = Point::Unit(2),
+                    const Point& ac_roOrigin = Point::Origin(),
+                    bool a_bClockwise = false );
+IMEXPORT Transform
+    DegreeRotation( double a_dYaw, double a_dPitch, double a_dRoll,
+                    bool a_bClockwise,
+                    const Point& ac_roOrigin = Point::Origin() );
+IMEXPORT Transform
+    DegreeRotation( double a_dYaw, double a_dPitch, double a_dRoll,
                     const Point& ac_roOrigin = Point::Origin(),
                     bool a_bClockwise = false );
 
