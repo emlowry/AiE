@@ -25,10 +25,10 @@ public:
     // on the current OpenGL clamping options.
     enum Cropping
     {
-        CROP_TO_SLICE = 0,          // draw pixels if and only if inside slice area
-        CROP_TO_SPRITE = 1,         // draw pixels if and only if inside sprite area
+        CROP_TO_SLICE = 0,      // draw pixels if and only if inside slice area
+        CROP_TO_SPRITE = 1,     // draw pixels if and only if inside sprite area
         CROP_TO_INTERSECTION = 2,   // draw only where sprite and slice overlap
-        CROP_TO_UNION = 3,          // draw area that contains both sprite and slice
+        CROP_TO_UNION = 3,      // draw area that contains both sprite and slice
 
         CROP_OPTION_COUNT = 4
     };

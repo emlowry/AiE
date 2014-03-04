@@ -69,6 +69,9 @@
     <ClInclude Include="Declarations\InitializeableSingleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\Quaternion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl">
@@ -127,6 +130,12 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="Implementations\DumbString.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Quaternion_Templates.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Implementations\Quaternion.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

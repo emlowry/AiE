@@ -25,6 +25,7 @@
     <ClInclude Include="Declarations\MostDerivedAddress.h" />
     <ClInclude Include="Declarations\NotCopyable.h" />
     <ClInclude Include="Declarations\PointVector.h" />
+    <ClInclude Include="Declarations\Quaternion.h" />
     <ClInclude Include="Declarations\Singleton.h" />
     <ClInclude Include="Declarations\Transform.h" />
     <ClInclude Include="Declarations\Vector.h" />
@@ -44,6 +45,8 @@
     <None Include="Implementations\Matrix_Operators.inl" />
     <None Include="Implementations\PointVector.inl" />
     <None Include="Implementations\PointVector_Constructors.inl" />
+    <None Include="Implementations\Quaternion.inl" />
+    <None Include="Implementations\Quaternion_Templates.inl" />
     <None Include="Implementations\Transform.inl" />
     <None Include="Implementations\Transform_Scale.inl" />
     <None Include="Implementations\Transform_TranslateRotate.inl" />

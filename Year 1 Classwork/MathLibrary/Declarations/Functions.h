@@ -18,6 +18,7 @@ namespace Math
 // Degrees/Radians in a circle
 const unsigned short DEGREES_IN_A_CIRCLE = 360;
 const long double PI = 3.14159265358979323846264338327950288419716939937510582L;
+const long double EULERS_NUMBER = 2.718281828459045235360287471352662497757247L;
 const long double HALF_PI = PI / 2;
 const long double RADIANS_IN_A_CIRCLE = 2 * PI;
 const long double DEGREES_IN_A_RADIAN = 180L / PI;

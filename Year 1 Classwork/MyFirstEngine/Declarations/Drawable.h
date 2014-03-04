@@ -172,6 +172,10 @@ protected:
                                    double a_rdRoll, const Point3D& ac_roForward,
                                    const Point3D& ac_roUp = Point3D::Zero() ) const;
 
+    // If pitch is outside the range [-PI/2, PI/2], add or subtract PI from yaw
+    // and put pitch on the other side of the +/-PI/2 boundary.
+    void ScrollPitch
+
     // This is where the actual work of drawing the object, whatever it is,
     // takes place.
     virtual void DrawComponents() const = 0;

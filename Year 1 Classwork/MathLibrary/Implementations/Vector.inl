@@ -308,7 +308,10 @@ template< typename T, unsigned int N, bool t_bIsRow >
 inline typename InverseOf< T >::Type
     Vector< T, N, t_bIsRow >::Magnitude() const
 {
-    return std::sqrt( (typename InverseOf< T >::Type)MagnitudeSquared() );
+    (typename InverseOf< T >::Type) magnitudeSquared = MagnitudeSquared();
+    return ( (InverseOf< T >::Type)1.0 == magnitudeSquared
+                                            ? (typename InverseOf< T >::Type)1.0
+                                            : std::sqrt( magnitudeSquared ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const

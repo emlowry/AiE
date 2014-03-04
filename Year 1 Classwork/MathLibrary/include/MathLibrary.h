@@ -28,6 +28,7 @@
 #include "../Declarations/MostDerivedAddress.h"
 #include "../Declarations/NotCopyable.h"
 #include "../Declarations/PointVector.h"
+#include "../Declarations/Quaternion.h"
 #include "../Declarations/Singleton.h"
 #include "../Declarations/Transform.h"
 #include "../Declarations/Vector.h"
