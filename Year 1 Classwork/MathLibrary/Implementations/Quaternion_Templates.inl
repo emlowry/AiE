@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 3, 2014
  * Description:        Implementations for templated Quaternion functions.
- * Last Modified:      March 3, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef QUATERNION__TEMPLATES__INL

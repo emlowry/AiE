@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 2, 2013
  * Description:        Various library functions not contained in a class.
- * Last Modified:      February 25, 2014
- * Last Modification:  Simplified the InverseOf struct typedef.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef FUNCTIONS__H
@@ -18,10 +18,14 @@ namespace Math
 // Degrees/Radians in a circle
 const unsigned short DEGREES_IN_A_CIRCLE = 360;
 const long double PI = 3.14159265358979323846264338327950288419716939937510582L;
-const long double EULERS_NUMBER = 2.718281828459045235360287471352662497757247L;
 const long double HALF_PI = PI / 2;
 const long double RADIANS_IN_A_CIRCLE = 2 * PI;
 const long double DEGREES_IN_A_RADIAN = 180L / PI;
+
+// other useful constants
+const float FLOAT_ERROR = 1.0f / ( 1 << ( 8*sizeof( float ) -1 ) );
+const double DOUBLE_ERROR = 1.0 / ( (long long)1 << ( 8*sizeof( double ) -1 ) );
+const long double EULERS_NUMBER = 2.718281828459045235360287471352662497757247L;
 
 // simplify typing for array reference parameter/return types
 template< typename T, unsigned int N >
@@ -68,43 +72,21 @@ T Interpolate( const T& ac_rPointA,
 // Call fmod for floating-point types and operator% for everything else
 template< typename T, typename U >
 typename std::enable_if< !std::is_floating_point< T >::value &&
-                         !std::is_floating_point< U >::value, T >::type
+                         !std::is_floating_point< U >::value,
+                         typename std::common_type< T, U >::type >::type
     Modulo( const T& ac_rDividend, const U& ac_rDivisor );
 template< typename T, typename U >
 typename std::enable_if< !std::is_floating_point< T >::value &&
                          !std::is_floating_point< U >::value, T& >::type
     ModuloAssign( T& a_rDividend, const U& ac_rDivisor );
 template< typename T, typename U >
-typename std::enable_if< std::is_same< long double, T >::value ||
-                         std::is_same< long double, U >::value, T >::type
+typename std::enable_if< std::is_floating_point< T >::value ||
+                         std::is_floating_point< U >::value,
+                         typename std::common_type< T, U >::type >::type
     Modulo( const T& ac_rDividend, const U& ac_rDivisor );
 template< typename T, typename U >
-typename std::enable_if< std::is_same< long double, T >::value ||
-                         std::is_same< long double, U >::value, T& >::type
-    ModuloAssign( T& a_rDividend, const U& ac_rDivisor );
-template< typename T, typename U >
-typename std::enable_if< std::is_same< float, T >::value &&
-                         std::is_same< float, U >::value, T >::type
-    Modulo( const T& ac_rDividend, const U& ac_rDivisor );
-template< typename T, typename U >
-typename std::enable_if< std::is_same< float, T >::value &&
-                         std::is_same< float, U >::value, T& >::type
-    ModuloAssign( T& a_rDividend, const U& ac_rDivisor );
-template< typename T, typename U >
-typename std::enable_if< !std::is_same< long double, T >::value &&
-                         !std::is_same< long double, U >::value &&
-                         ( std::is_floating_point< T >::value ||
-                           std::is_floating_point< U >::value ) &&
-                         !( std::is_same< float, T >::value &&
-                            std::is_same< float, U >::value ), T >::type
-    Modulo( const T& ac_rDividend, const U& ac_rDivisor );
-template< typename T, typename U >
-typename std::enable_if< !std::is_same< long double, T >::value &&
-                         !std::is_same< long double, U >::value &&
-                         ( std::is_floating_point< T >::value ||
-                           std::is_floating_point< U >::value ) &&
-                         !( std::is_same< float, T >::value &&
-                            std::is_same< float, U >::value ), T& >::type
+typename std::enable_if< std::is_floating_point< T >::value ||
+                         std::is_floating_point< U >::value, T& >::type
     ModuloAssign( T& a_rDividend, const U& ac_rDivisor );
 
 // Return the power of two closest to the given value
@@ -119,7 +101,8 @@ typename std::enable_if< std::is_scalar< T >::value, T >::type
 // Scroll a value into the given bounds, [ ac_rMin, ac_rMax ).
 template< typename T >
 typename std::enable_if< std::is_scalar< T >::value, T >::type
-    Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin = (T)0 );
+    Scroll( const T& ac_rValue, const T& ac_rMax,
+            const T& ac_rMin = DefaultValue< T >() );
 
 // Scroll a value into the the bounds ( -PI, PI ].
 template< typename T >
@@ -135,5 +118,6 @@ T ComplexConjugate( const T& ac_rValue );
 
 // Always include template function implementations with this header
 #include "../Implementations/Functions.inl"
+#include "../Implementations/Functions_Instantiations.inl"
 
 #endif  // FUNCTIONS__H

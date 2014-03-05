@@ -36,6 +36,7 @@
     <None Include="Implementations\ColorVector_Templates.inl" />
     <None Include="Implementations\DumbString.inl" />
     <None Include="Implementations\Functions.inl" />
+    <None Include="Implementations\Functions_Instantiations.inl" />
     <None Include="Implementations\HomogeneousVector.inl" />
     <None Include="Implementations\HomogeneousVector_Templates.inl" />
     <None Include="Implementations\Matrix.inl" />

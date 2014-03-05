@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Base class for drawable objects.
- * Last Modified:      February 27, 2014
- * Last Modification:  Refactoring and debugging.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef DRAWABLE__H
@@ -76,16 +76,6 @@ public:
                         Color::Channel a_ucBlue,
                         Color::Channel a_ucAlpha = 0xFF );
 
-    // Add rotation
-    Drawable& AddPitch( double a_dPitch );
-    Drawable& AddRoll( double a_dRoll );
-    Drawable& AddYaw( double a_dYaw );
-    Drawable& AddRotationAngle( double a_dAngle );
-    Drawable& AddTaitBryanAngles( double a_dYaw,
-                                  double a_dPitch,
-                                  double a_dRoll = 0.0 );
-    Drawable& ApplyRotation( const Rotation3D& ac_roRotation );
-
     // Rotate toward something (for unrotated objects, the x-axis is "forward"
     // and the z-axis is "up")
     Drawable& RotateTowardDirection( const Point3D& ac_roForward,
@@ -144,13 +134,6 @@ public:
     Drawable& SetTaitBryanAngles( double a_dYaw = 0.0, double a_dPitch = 0.0,
                                   double a_dRoll = 0.0 );
 
-    // Add position and scale
-    Drawable& AddPosition( const Point3D& ac_roPosition );
-    Drawable& AddPosition( double a_dX, double a_dY = 0.0, double a_dZ = 0.0 );
-    Drawable& AddScale( const Point3D& ac_roScale );
-    Drawable& AddScale( double a_dFactor );
-    Drawable& AddScale( double a_dX, double a_dY, double a_dZ = 0.0 );
-
     // Set position and scale
     Drawable& SetPosition( const Point3D& ac_roPosition = Point3D::Origin() );
     Drawable& SetPosition( double a_dX, double a_dY = 0.0, double a_dZ = 0.0 );
@@ -159,10 +142,8 @@ public:
     Drawable& SetScale( double a_dX, double a_dY, double a_dZ = 0.0 );
 
     // Apply/Set additional transformation
-    Drawable& ApplyAfterTransform( const Transform3D& ac_roTransform );
     Drawable& SetAfterTransform(
         const Transform3D& ac_roTransform = Transform3D::Identity() );
-    Drawable& ApplyBeforeTransform( const Transform3D& ac_roTransform );
     Drawable& SetBeforeTransform(
         const Transform3D& ac_roTransform = Transform3D::Identity() );
 

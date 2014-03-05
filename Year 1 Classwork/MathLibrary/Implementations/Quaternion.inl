@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 3, 2014
  * Description:        Inline implementations for Quaternion functions.
- * Last Modified:      March 3, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef QUATERNION__INL
@@ -156,7 +156,7 @@ INLINE Quaternion& Quaternion::operator/=( const Quaternion& ac_roQuaternion )
 // Get properties
 INLINE double Quaternion::GetAngle() const
 {
-    return 2 * std::acos( 1.0 == MagnitudeSquared() ? w : w / Magnitude() );
+    return 2 * std::acos( w );
 }
 INLINE Point3D Quaternion::GetAxis() const
 {
@@ -168,18 +168,18 @@ INLINE Point3D Quaternion::GetAxis() const
 INLINE double Quaternion::GetYaw() const
 {
     // calculate sine of pitch
-    double dSinP = 2 * ( w*z - x*y );
+    double dSinP = -2 * ( x*z - w*y );
 
     // singularity at pitch = PI/2
     if( 1.0 <= dSinP )
     {
-        return -std::atan2( x*y - w*z, x*z + w*x );
+        return -std::atan2( x*y - w*z, x*z + w*y );
     }
 
     // singularity at pitch = -PI/2
     if( -1.0 >= dSinP )
     {
-        return std::atan2( x*y - w*z, x*z + w*x );
+        return std::atan2( x*y - w*z, x*z + w*y );
     }
 
     // non-singularity case
@@ -191,7 +191,7 @@ INLINE double Quaternion::GetYaw() const
 INLINE double Quaternion::GetPitch() const
 {
     // calculate sine of pitch
-    double dSinP = 2 * ( w*z - x*y );
+    double dSinP = -2 * ( x*z - w*y );
 
     // singularity at pitch = PI/2
     if( 1.0 <= dSinP )
@@ -215,7 +215,7 @@ INLINE double Quaternion::GetRoll() const
 {
     // calculate sine of pitch
     Quaternion oUnit = Normal();
-    double dSinP = 2 * ( w*z - x*y );
+    double dSinP = -2 * ( x*z - w*y );
 
     // singularity at pitch = +/-PI/2
     if( 1.0 <= dSinP || -1.0 >= dSinP )
@@ -234,14 +234,14 @@ INLINE void Quaternion::GetTaitBryanAngles( double& a_rdYaw,
                                             double& a_rdRoll ) const
 {
     // calculate sine of pitch
-    double dSinP = 2 * ( w*z - x*y );
+    long double dSinP = -2 * ( x*z - w*y );
 
     // singularity at pitch = PI/2
     if( 1.0 <= dSinP )
     {
         a_rdRoll = 0.0;
         a_rdPitch = Math::HALF_PI;
-        a_rdYaw = -std::atan2( x*y - w*z, x*z + w*x );
+        a_rdYaw = -std::atan2( x*y - w*z, x*z + w*y );
         return;
     }
 
@@ -250,7 +250,7 @@ INLINE void Quaternion::GetTaitBryanAngles( double& a_rdYaw,
     {
         a_rdRoll = 0.0;
         a_rdPitch = -Math::HALF_PI;
-        a_rdYaw = std::atan2( x*y - w*z, x*z + w*x );
+        a_rdYaw = std::atan2( x*y - w*z, x*z + w*y );
         return;
     }
 
@@ -293,7 +293,8 @@ INLINE Quaternion& Quaternion::Set( double a_dAngle, const Point3D& ac_roAxis )
 {
     double dSin = std::sin( a_dAngle / 2 );
     Point3D oAxis = ac_roAxis.Normal();
-    w = std::cos( a_dAngle / 2 );
+    w = ( 1 == dSin || -1 == dSin ? 0 : std::cos( a_dAngle / 2 ) );
+    dSin = ( 1 == w || -1 == w ? 0 : dSin );
     x = dSin * oAxis.x;
     y = dSin * oAxis.y;
     z = dSin * oAxis.z;
@@ -360,53 +361,21 @@ INLINE Quaternion&
 {
     // calculate sines and cosines
     double dCosY = std::cos( a_dYaw / 2 );
-    double dSinY = std::sin( a_dYaw / 2 );
+    double dSinY = ( 1 == dCosY || -1 == dCosY ? 0 : std::sin( a_dYaw / 2 ) );
+    dCosY = ( 1 == dSinY || -1 == dSinY ? 0 : dCosY );
     double dCosP = std::cos( a_dPitch / 2 );
-    double dSinP = std::sin( a_dPitch / 2 );
+    double dSinP = ( 1 == dCosP || -1 == dCosP ? 0 : std::sin( a_dPitch / 2 ) );
+    dCosP = ( 1 == dSinP || -1 == dSinP ? 0 : dCosP );
     double dCosR = std::cos( a_dRoll / 2 );
-    double dSinR = std::sin( a_dRoll / 2 );
+    double dSinR = ( 1 == dCosR || -1 == dCosR ? 0 : std::sin( a_dRoll / 2 ) );
+    dCosR = ( 1 == dSinR || -1 == dSinR ? 0 : dCosR );
 
     // set elements
-    w = ( dCosR * dCosP * dCosY ) -
-        ( Math::EULERS_NUMBER * dSinR * dSinP * dSinY );
-    x = ( dSinR * dCosP * dCosY ) +
-        ( Math::EULERS_NUMBER * dCosR * dSinP * dSinY );
-    y = ( dCosR * dSinP * dCosY ) -
-        ( Math::EULERS_NUMBER * dSinR * dCosP * dSinY );
-    z = ( dCosR * dCosP * dSinY ) +
-        ( Math::EULERS_NUMBER * dSinR * dSinP * dCosY );
+    w = dCosR*dCosP*dCosY - dSinR*dSinP*dSinY;
+    x = dSinR*dCosP*dCosY + dCosR*dSinP*dSinY;
+    y = dCosR*dSinP*dCosY - dSinR*dCosP*dSinY;
+    z = dCosR*dCosP*dSinY + dSinR*dSinP*dCosY;
     return *this;
-}
-
-// Add angles
-INLINE Quaternion& Quaternion::AddAngle( double a_dAngle )
-{
-    return Set( GetAngle() + a_dAngle, GetAxis() );
-}
-INLINE Quaternion& Quaternion::AddYaw( double a_dYaw )
-{
-    double dYaw, dPitch, dRoll;
-    GetTaitBryanAngles( dYaw, dPitch, dRoll );
-    return Set( dYaw + a_dYaw, dPitch, dRoll );
-}
-INLINE Quaternion& Quaternion::AddPitch( double a_dPitch )
-{
-    double dYaw, dPitch, dRoll;
-    GetTaitBryanAngles( dYaw, dPitch, dRoll );
-    return Set( dYaw, dPitch + a_dPitch, dRoll );
-}
-INLINE Quaternion& Quaternion::AddRoll( double a_dRoll )
-{
-    double dYaw, dPitch, dRoll;
-    GetTaitBryanAngles( dYaw, dPitch, dRoll );
-    return Set( dYaw, dPitch, dRoll + a_dRoll );
-}
-INLINE Quaternion&
-    Quaternion::Add( double a_dYaw, double a_dPitch, double a_dRoll )
-{
-    double dYaw, dPitch, dRoll;
-    GetTaitBryanAngles( dYaw, dPitch, dRoll );
-    return Set( dYaw + a_dYaw, dPitch + a_dPitch, dRoll + a_dRoll );
 }
 
 // Apply this rotation to the given point

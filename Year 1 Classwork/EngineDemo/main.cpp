@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Runs a simple game to demonstrate MyFirstEngine.
- * Last Modified:      February 27, 2014
- * Last Modification:  More quad testing.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
@@ -36,11 +36,15 @@ protected:
     }
     virtual void OnUpdate( double a_dDeltaTime )
     {
-        m_aoQuads[0].AddYaw( a_dDeltaTime );
-        m_aoQuads[1].AddPitch( a_dDeltaTime );
-        m_aoQuads[2].AddRoll( a_dDeltaTime );
-        m_aoQuads[3].AddRotation( a_dDeltaTime, a_dDeltaTime, a_dDeltaTime );
-        m_aoQuads[4].AddRotation( -a_dDeltaTime, -a_dDeltaTime, -a_dDeltaTime );
+        m_aoQuads[0].SetYaw( GameEngine::LastTime() );
+        m_aoQuads[1].SetPitch( GameEngine::LastTime() );
+        m_aoQuads[2].SetRoll( GameEngine::LastTime() );
+        m_aoQuads[3].SetTaitBryanAngles( GameEngine::LastTime(),
+                                         GameEngine::LastTime(),
+                                         GameEngine::LastTime() );
+        m_aoQuads[4].SetTaitBryanAngles( -GameEngine::LastTime(),
+                                         -GameEngine::LastTime(),
+                                         -GameEngine::LastTime() );
         m_aoQuads[5].SetScale( 0.625 + ( 0.125 * std::sin( 2 * GameEngine::LastTime() ) ) );
         m_aoQuads[6].SetScale( 0.25 + ( 0.25 * std::sin( GameEngine::LastTime() / 2 ) ),
                                0.25 + ( 0.25 * std::cos( GameEngine::LastTime() / 2 ) ) );

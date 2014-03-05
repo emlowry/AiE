@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 4, 2013
  * Description:        Inline and template function implementations.
- * Last Modified:      February 12, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef FUNCTIONS__INL
@@ -50,7 +50,8 @@ inline T Interpolate( const T& ac_rPointA,
 // Call fmod for floating-point types and operator% for everything else
 template< typename T, typename U >
 inline typename std::enable_if< !std::is_floating_point< T >::value &&
-                                !std::is_floating_point< U >::value, T >::type
+                                !std::is_floating_point< U >::value,
+                                typename std::common_type< T, U >::type >::type
     Modulo( const T& ac_rDividend, const U& ac_rDivisor )
 {
     return ac_rDividend % ac_rDivisor;
@@ -64,56 +65,21 @@ inline typename std::enable_if< !std::is_floating_point< T >::value &&
     return a_rDividend;
 }
 template< typename T, typename U >
-inline typename std::enable_if< std::is_same< long double, T >::value ||
-                                std::is_same< long double, U >::value, T >::type
-    Modulo( const T& ac_rDividend, const float& ac_rDivisor )
+inline typename std::enable_if< std::is_floating_point< T >::value ||
+                                std::is_floating_point< U >::value,
+                                typename std::common_type< T, U >::type >::type
+    Modulo( const T& ac_rDividend, const U& ac_rDivisor )
 {
-    return (T)std::fmod( (long double)a_rDividend, (long double)ac_rDivisor );
+    typedef typename std::common_type< T, U >::type CommonType;
+    return (CommonType)std::fmod( (CommonType)ac_rDividend, (CommonType)ac_rDivisor );
 }
 template< typename T, typename U >
-inline typename std::enable_if< std::is_same< long double, T >::value ||
-                                std::is_same< long double, U >::value, T& >::type
+inline typename std::enable_if< std::is_floating_point< T >::value ||
+                                std::is_floating_point< U >::value, T& >::type
      ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
 {
-    a_rDividend = (T)std::fmod( (long double)a_rDividend, (long double)ac_rDivisor );
-    return a_rDividend;
-}
-template< typename T, typename U >
-inline typename std::enable_if< std::is_same< float, T >::value &&
-                                std::is_same< float, U >::value, T >::type
-    Modulo( const T& ac_rDividend, const float& ac_rDivisor )
-{
-    return (T)std::fmod( (float)ac_rDividend, (float)ac_rDivisor );
-}
-template< typename T, typename U >
-inline typename std::enable_if< std::is_same< float, T >::value &&
-                                std::is_same< float, U >::value, T& >::type
-     ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
-{
-    a_rDividend = (T)std::fmod( (float)a_rDividend, (float)ac_rDivisor );
-    return a_rDividend;
-}
-template< typename T, typename U >
-inline typename std::enable_if< !std::is_same< long double, T >::value &&
-                                !std::is_same< long double, U >::value &&
-                                ( std::is_floating_point< T >::value ||
-                                  std::is_floating_point< U >::value ) &&
-                                !( std::is_same< float, T >::value &&
-                                   std::is_same< float, U >::value ), T >::type
-    Modulo( const T& ac_rDividend, const float& ac_rDivisor )
-{
-    return (T)std::fmod( (double)ac_rDividend, (double)ac_rDivisor );
-}
-template< typename T, typename U >
-inline typename std::enable_if< !std::is_same< long double, T >::value &&
-                                !std::is_same< long double, U >::value &&
-                                ( std::is_floating_point< T >::value ||
-                                  std::is_floating_point< U >::value ) &&
-                                !( std::is_same< float, T >::value &&
-                                   std::is_same< float, U >::value ), T& >::type
-     ModuloAssign( T& a_rDividend, const U& ac_rDivisor )
-{
-    a_rDividend = (T)std::fmod( (double)a_rDividend, (double)ac_rDivisor );
+    typedef typename std::common_type< T, U >::type CommonType;
+    a_rDividend = (T)std::fmod( (CommonType)a_rDividend, (CommonType)ac_rDivisor );
     return a_rDividend;
 }
 
@@ -151,10 +117,10 @@ template< typename T >
 typename std::enable_if< std::is_scalar< T >::value, T >::type
     Scroll( const T& ac_rValue, const T& ac_rMax, const T& ac_rMin )
 {
-    // If the value is already on a boundary, return the max
+    // If the value is already on a boundary, return the min
     if( ac_rValue == ac_rMax || ac_rValue == ac_rMin )
     {
-        return ac_rMax;
+        return ac_rMin;
     }
 
     // If the upper and lower bounds are the same number, than the only result

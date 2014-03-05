@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Implementations for Drawable member functions.
- * Last Modified:      February 27, 2014
- * Last Modification:  Refactoring and debugging.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "../Declarations/Drawable.h"
@@ -20,7 +20,7 @@ Drawable::Drawable( ShaderProgram* a_poProgram,
                     const Point3D& ac_roPosition,
                     const Rotation3D& ac_roRotation )
     : m_oColor( ac_roColor ), m_oScale( ac_roScale ),
-      m_oPosition( ac_roPosition ), m_oRotation( ac_roRotation.Normal() ),
+      m_oPosition( ac_roPosition ), m_oRotation( ac_roRotation ),
       m_poProgram( a_poProgram ), m_oAfterTransform( Transform3D::Identity() ),
       m_oBeforeTransform( Transform3D::Identity() ), m_bVisible( true ),
       m_pbUpdateModelMatrix( new bool ), m_poModelMatrix( new Transform3D )
@@ -140,63 +140,6 @@ Drawable& Drawable::SetColor( Color::Channel a_ucRed,
     return *this;
 }
 
-// Add rotation properties
-Drawable& Drawable::AddPitch( double a_dPitch )
-{
-    if( 0.0 != a_dPitch )
-    {
-        m_oRotation.AddPitch( a_dPitch );
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddRoll( double a_dRoll )
-{
-    if( 0.0 != a_dRoll )
-    {
-        m_oRotation.AddRoll( a_dRoll );
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddYaw( double a_dYaw )
-{
-    if( 0.0 != a_dYaw )
-    {
-        m_oRotation.AddYaw( a_dYaw );
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddRotationAngle( double a_dAngle )
-{
-    if( 0.0 != a_dAngle )
-    {
-        m_oRotation.AddAngle( a_dAngle );
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddTaitBryanAngles( double a_dYaw, double a_dPitch, double a_dRoll )
-{
-    if( 0.0 != a_dYaw || 0.0 != a_dPitch || 0.0 != a_dRoll )
-    {
-        m_oRotation.Add( a_dYaw, a_dPitch, a_dRoll );
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::ApplyRotation( const Rotation3D& ac_roRotation )
-{
-    Rotation3D oRotation = ac_roRotation.Normal();
-    if( Rotation3D::None() != oRotation )
-    {
-        m_oRotation = oRotation * m_oRotation;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-
 // Set rotation properties
 Drawable& Drawable::SetPitch( double a_dPitch )
 {
@@ -218,10 +161,9 @@ Drawable& Drawable::SetYaw( double a_dYaw )
 }
 Drawable& Drawable::SetRotation( const Rotation3D& ac_roRotation )
 {
-    Rotation3D oRotation = ac_roRotation.Normal();
-    if( m_oRotation != oRotation )
+    if( m_oRotation != ac_roRotation )
     {
-        m_oRotation = oRotation;
+        m_oRotation = ac_roRotation;
         UpdateModelMatrix();
     }
     return *this;
@@ -365,61 +307,6 @@ Drawable& Drawable::RotateToward( const HVector3D& ac_roHVector,
                              a_dRadiansPerSecond, a_dSeconds, a_bClamp );
 }
 
-// Add position and scale
-Drawable& Drawable::AddPosition( const Point3D& ac_roPosition )
-{
-    if( ac_roPosition != m_oPosition )
-    {
-        m_oPosition += ac_roPosition;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddPosition( double a_dX, double a_dY, double a_dZ )
-{
-    if( a_dX != m_oPosition.x || a_dY != m_oPosition.y || a_dZ != m_oPosition.z )
-    {
-        m_oPosition.x += a_dX;
-        m_oPosition.y += a_dY;
-        m_oPosition.z += a_dZ;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddScale( const Point3D& ac_roScale )
-{
-    if( ac_roScale != m_oScale )
-    {
-        m_oScale += ac_roScale;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddScale( double a_dX, double a_dY, double a_dZ )
-{
-    if( a_dX != m_oScale.x || a_dY != m_oScale.y || a_dZ != m_oScale.z )
-    {
-        m_oScale.x += a_dX;
-        m_oScale.y += a_dY;
-        m_oScale.z += a_dZ;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::AddScale( double a_dFactor )
-{
-    if( a_dFactor != m_oScale.x ||
-        a_dFactor != m_oScale.y ||
-        a_dFactor != m_oScale.z )
-    {
-        m_oScale.x += a_dFactor;
-        m_oScale.y += a_dFactor;
-        m_oScale.z += a_dFactor;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-
 // Set position and scale
 Drawable& Drawable::
     SetPosition( const Point3D& ac_roPosition )
@@ -477,29 +364,11 @@ Drawable& Drawable::SetScale( double a_dFactor )
 }
 
 // Apply/Set additional transformation
-Drawable& Drawable::ApplyAfterTransform( const Transform3D& ac_roTransform )
-{
-    if( ac_roTransform != Transform3D::Identity() )
-    {
-        m_oAfterTransform *= ac_roTransform;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
 Drawable& Drawable::SetAfterTransform( const Transform3D& ac_roTransform )
 {
     if( ac_roTransform != m_oAfterTransform )
     {
         m_oAfterTransform = ac_roTransform;
-        UpdateModelMatrix();
-    }
-    return *this;
-}
-Drawable& Drawable::ApplyBeforeTransform( const Transform3D& ac_roTransform )
-{
-    if( ac_roTransform != Transform3D::Identity() )
-    {
-        m_oBeforeTransform *= ac_roTransform;
         UpdateModelMatrix();
     }
     return *this;

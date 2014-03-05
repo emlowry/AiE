@@ -6,8 +6,8 @@
  *                      For a rotation of A radians about a normalized axis
  *                      {{Bx,By,Bz}}, the resulting quaternion {{w,x,y,z}} would
  *                      be {{cos(A/2),sin(A/2)Bx,sin(A/2)By,sin(A/2)Bz}}.
- * Last Modified:      March 3, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef QUATERNION__H
@@ -90,13 +90,6 @@ public:
     Quaternion& Set( const Point3D& ac_roForward,
                      const Point3D& ac_roUp = Point3D::Zero() );
     Quaternion& Set( double a_dYaw, double a_dPitch, double a_dRoll = 0.0 );
-
-    // Add angles
-    Quaternion& AddAngle( double a_dAngle );
-    Quaternion& AddYaw( double a_dYaw );
-    Quaternion& AddPitch( double a_dPitch );
-    Quaternion& AddRoll( double a_dRoll );
-    Quaternion& Add( double a_dYaw, double a_dPitch, double a_dRoll = 0.0 );
 
     // Apply this rotation to the given point
     Point3D AppliedTo( const Point3D& ac_roPoint ) const;

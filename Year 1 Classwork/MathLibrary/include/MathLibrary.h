@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        All-inclusive header file for the Math library.
- * Last Modified:      February 24, 2014
- * Last Modification:  Moved utility classes in from MyFirstEngine project.
+ * Last Modified:      March 5, 2014
+ * Last Modification:  Disabled warning about extern template instantiation.
  ******************************************************************************/
 
 #ifndef MATH__LIBRARY__H
@@ -14,6 +14,10 @@
     !(defined INCLUDING_INLINE_MATH_LIBRARY)
 #define INCLUDING_DYNAMIC_MATH_LIBRARY
 #endif
+
+//disable warnings on extern before template instantiation
+#pragma warning(push)
+#pragma warning (disable : 4231)
 
 #include "../Declarations/ColorConstants.h"
 #include "../Declarations/ColorVector.h"
@@ -32,5 +36,8 @@
 #include "../Declarations/Singleton.h"
 #include "../Declarations/Transform.h"
 #include "../Declarations/Vector.h"
+
+// reenable warnings
+#pragma warning(pop)
 
 #endif  // MATH__LIBRARY__H
