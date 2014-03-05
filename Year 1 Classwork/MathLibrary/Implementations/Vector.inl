@@ -305,13 +305,11 @@ inline Vector< T, N, t_bIsRow >
 
 // Normalization
 template< typename T, unsigned int N, bool t_bIsRow >
-inline typename InverseOf< T >::Type
-    Vector< T, N, t_bIsRow >::Magnitude() const
+inline typename InverseOf< T >::Type Vector< T, N, t_bIsRow >::Magnitude() const
 {
-    (typename InverseOf< T >::Type) magnitudeSquared = MagnitudeSquared();
-    return ( (InverseOf< T >::Type)1.0 == magnitudeSquared
-                                            ? (typename InverseOf< T >::Type)1.0
-                                            : std::sqrt( magnitudeSquared ) );
+    InverseT magnitudeSquared = MagnitudeSquared();
+    return ( (InverseT)1.0 == magnitudeSquared
+                ? (InverseT)1.0 : std::sqrt( magnitudeSquared ) );
 }
 template< typename T, unsigned int N, bool t_bIsRow >
 inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
@@ -326,7 +324,7 @@ inline T Vector< T, N, t_bIsRow >::MagnitudeSquared() const
 template< typename T, unsigned int N, bool t_bIsRow >
 inline Vector< T, N, t_bIsRow >& Vector< T, N, t_bIsRow >::Normalize()
 {
-    typename InverseOf< T >::Type magnitude = Magnitude();
+    InverseT magnitude = Magnitude();
     for( unsigned int i = 0; i < N; ++i )
     {
         At(i) = (T)( At(i) / magnitude );

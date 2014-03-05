@@ -68,8 +68,8 @@ inline typename std::conditional< t_bIsRow, Vector< typename InverseOf< T >::Typ
     Vector< T, N, t_bIsRow >::
     operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const
 {
-    typedef typename std::conditional< t_bIsRow, Vector< typename InverseOf< T >::Type, P >,
-                                       Matrix< typename InverseOf< T >::Type, N, P > >::type
+    typedef typename std::conditional< t_bIsRow, Vector< InverseT, P >,
+                                       Matrix< InverseT, N, P > >::type
             ResultType;
     return ResultType( BaseType::operator/( ac_roMatrix ) );
 }

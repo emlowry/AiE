@@ -30,7 +30,7 @@ public:
               const Color::ColorVector& ac_roColor = Color::WHITE,
               const Point3D& ac_roScale = Point3D( 1.0 ),
               const Point3D& ac_roPosition = Point3D::Origin(),
-              double a_dYaw = 0.0, double a_dPitch = 0.0, double a_dRoll = 0.0 );
+              const Rotation3D& ac_roRotation = Rotation3D::None() );
     Drawable( const Drawable& ac_roObject );
     Drawable& operator=( const Drawable& ac_roObject );
 
@@ -43,9 +43,6 @@ public:
 
     // Get properties
     const Color::ColorVector& GetColor() const { return m_oColor; }
-    double GetPitch() const { return m_dPitch; }
-    double GetRoll() const { return m_dRoll; }
-    double GetYaw() const { return m_dYaw; }
     const Point3D& GetPosition() const { return m_oPosition; }
     const Point3D& GetScale() const { return m_oScale; }
     const Transform3D& GetAfterTransform() const
@@ -53,6 +50,17 @@ public:
     const Transform3D& GetBeforeTransform() const
     { return m_oBeforeTransform; }
     bool IsVisible() const { return m_bVisible; }
+
+    // Get rotation properties
+    double GetPitch() const { return m_oRotation.GetPitch(); }
+    double GetRoll() const { return m_oRotation.GetRoll(); }
+    double GetYaw() const { return m_oRotation.GetYaw(); }
+    double GetRotationAngle() const { return m_oRotation.GetAngle(); }
+    Point3D GetRotationAxis() const { return m_oRotation.GetAxis(); }
+    const Rotation3D& GetRotation() const { return m_oRotation; }
+    void GetTaitBryanAngles( double& a_rdYaw, double& a_rdPitch,
+                             double& a_rdRoll ) const
+    { m_oRotation.GetTaitBryanAngles( a_rdYaw, a_rdPitch, a_rdRoll ); }
 
     // Get the cached model view transformation resulting from this object's
     // scale/rotation/position/etc.  If any of those properties have changed
@@ -72,9 +80,11 @@ public:
     Drawable& AddPitch( double a_dPitch );
     Drawable& AddRoll( double a_dRoll );
     Drawable& AddYaw( double a_dYaw );
-    Drawable& AddRotation( double a_dYaw,
-                           double a_dPitch = 0.0,
-                           double a_dRoll = 0.0 );
+    Drawable& AddRotationAngle( double a_dAngle );
+    Drawable& AddTaitBryanAngles( double a_dYaw,
+                                  double a_dPitch,
+                                  double a_dRoll = 0.0 );
+    Drawable& ApplyRotation( const Rotation3D& ac_roRotation );
 
     // Rotate toward something (for unrotated objects, the x-axis is "forward"
     // and the z-axis is "up")
@@ -97,38 +107,42 @@ public:
                                      const Point3D& ac_roUp,
                                      double a_dRadiansPerSecond,
                                      double a_dSeconds,
-                                     double a_dRollSpeed = 0.0 );
+                                     bool a_bClamp = true );
     Drawable& RotateTowardDirection( const Point3D& ac_roForward,
                                      double a_dRadiansPerSecond,
                                      double a_dSeconds,
-                                     double a_dRollSpeed = 0.0 );
+                                     bool a_bClamp = true );
     Drawable& RotateTowardPoint( const Point3D& ac_roTarget,
                                  const Point3D& ac_roUp,
                                  double a_dRadiansPerSecond,
                                  double a_dSeconds,
-                                 double a_dRollSpeed = 0.0 );
+                                 bool a_bClamp = true );
     Drawable& RotateTowardPoint( const Point3D& ac_roTarget,
                                  double a_dRadiansPerSecond,
                                  double a_dSeconds,
-                                 double a_dRollSpeed = 0.0 );
+                                 bool a_bClamp = true );
     Drawable& RotateToward( const HVector3D& ac_roHVector,
                             const Point3D& ac_roUp,
                             double a_dRadiansPerSecond,
                             double a_dSeconds,
-                            double a_dRollSpeed = 0.0 );
+                            bool a_bClamp = true );
     Drawable& RotateToward( const HVector3D& ac_roHVector,
                             double a_dRadiansPerSecond,
                             double a_dSeconds,
-                            double a_dRollSpeed = 0.0 );
+                            bool a_bClamp = true );
 
 
     // Set rotation
     Drawable& SetPitch( double a_dPitch = 0.0 );
     Drawable& SetRoll( double a_dRoll = 0.0 );
     Drawable& SetYaw( double a_dYaw = 0.0 );
-    Drawable& SetRotation( double a_dYaw = 0.0,
-                           double a_dPitch = 0.0,
-                           double a_dRoll = 0.0 );
+    Drawable& SetRotation( const Rotation3D& ac_roRotation = Rotation3D::None() );
+    Drawable& SetRotation( double a_dAngle,
+                           const Point3D& ac_roAxis = Point3D::Unit(2) );
+    Drawable& SetRotationAngle( double a_dAngle = 0.0 );
+    Drawable& SetRotationAxis( const Point3D& ac_roAxis = Point3D::Unit(2) );
+    Drawable& SetTaitBryanAngles( double a_dYaw = 0.0, double a_dPitch = 0.0,
+                                  double a_dRoll = 0.0 );
 
     // Add position and scale
     Drawable& AddPosition( const Point3D& ac_roPosition );
@@ -163,19 +177,6 @@ public:
 
 protected:
 
-    // Given vectors for a desired forward (x-axis) and up (z-axis) direction,
-    // calculate yaw, pitch, and roll.  If a zero vector is given as up, use the
-    // z-axis rotated by this object's current rotation.  If the forward vector
-    // and the up vector are the same, then the calculated roll will be the
-    // current roll.  If the given forward vector is zero, then return false.
-    bool CalculateTaitBryanAngles( double& a_rdYaw, double& a_rdPitch,
-                                   double a_rdRoll, const Point3D& ac_roForward,
-                                   const Point3D& ac_roUp = Point3D::Zero() ) const;
-
-    // If pitch is outside the range [-PI/2, PI/2], add or subtract PI from yaw
-    // and put pitch on the other side of the +/-PI/2 boundary.
-    void ScrollPitch
-
     // This is where the actual work of drawing the object, whatever it is,
     // takes place.
     virtual void DrawComponents() const = 0;
@@ -184,10 +185,8 @@ protected:
     Color::ColorVector m_oColor;
 
     // Basic scale/position/rotation
-    double m_dYaw;  // first rotation, about world z-axis
-    double m_dPitch;    // second rotation, about model y-axis
-    double m_dRoll; // third rotation, about model x-axis
     Point3D m_oPosition;    // applied after rotation
+    Rotation3D m_oRotation;
     Point3D m_oScale;   // applied before rotation
 
     // Additional transformations applied to vertices after the transformations

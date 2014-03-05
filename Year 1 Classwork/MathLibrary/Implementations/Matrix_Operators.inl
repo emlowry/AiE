@@ -91,7 +91,7 @@ inline Matrix< typename InverseOf< T >::Type, M, P >
     {
         throw std::invalid_argument( "Cannot divide by a non-invertable matrix" );
     }
-    Matrix< typename InverseOf< T >::Type, M, N > oCopy( *this );
+    Matrix< InverseT, M, N > oCopy( *this );
     return oCopy * ac_roMatrix.Inverse() ;
 }
 

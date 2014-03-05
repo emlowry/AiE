@@ -32,7 +32,8 @@ public:
     typedef Vector< T, M, false > ColumnVectorType;
     typedef Vector< T, N, true > RowVectorType;
     typedef Matrix< T, ( M < N ? M : N ) > IdentityType;
-    typedef Matrix< typename InverseOf< T >::Type, N, M > InverseType;
+    typedef typename InverseOf< T >::Type InverseT;
+    typedef Matrix< InverseT, N, M > InverseType;
     typedef Matrix< T, N, M > TransposeType;
 
     // destructor
@@ -172,7 +173,7 @@ public:
     //  ac_roMatrix.Inverse() * ac_roMatrix = Identity() but
     //  ac_roMatrix * ac_roMatrix.Inverse() != Matrix< T, P >::Identity()
     template< unsigned int P >
-    Matrix< typename InverseOf< T >::Type, M, P >
+    Matrix< InverseT, M, P >
         operator/( const Matrix< T, P, N >& ac_roMatrix ) const;
 
     // transform assign

@@ -129,12 +129,6 @@ inline typename std::enable_if< std::is_scalar< T >::value, T >::type
     double dLog = std::log( (double)ac_rValue ) / std::log( 2.0 );
     double dCeilPower = std::pow( 2.0, std::ceil( dLog ) );
     double dFloorPower = std::pow( 2.0, std::floor( dLog ) );
-    /*
-    double dCeilPower = std::pow( 2.0, (int)( std::log( (double)ac_rValue ) /
-                                                std::log( 2.0 ) ) +
-                                        ( ac_rValue < 1 ? -1 : 1 ) );
-    double dFloorPower = std::pow( 2.0, (int)( std::log( (double)ac_rValue ) /
-                                                std::log( 2.0 ) ) );*/
     return (T)( ( std::fabs( (double)ac_rValue - dCeilPower ) <
                   std::fabs( (double)ac_rValue - dFloorPower ) )
                 ? dCeilPower : dFloorPower );
@@ -209,10 +203,10 @@ typename std::enable_if< std::is_scalar< T >::value, T >::type
 
 // Scroll a value into the the bounds ( -PI, PI ].
 template< typename T >
-typename std::enable_if< std::is_scalar< T >::value, T >::type
+inline typename std::enable_if< std::is_scalar< T >::value, T >::type
     ScrollRadians( const T& ac_rValue )
 {
-    T result = Scroll( -ac_rValue, -(T)PI, (T)PI );
+    return Scroll( -ac_rValue, -(T)PI, (T)PI );
 }
 
 // Complex conjugate (if you ever want to use a matrix full of complex numbers,

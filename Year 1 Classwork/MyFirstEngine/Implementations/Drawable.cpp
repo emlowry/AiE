@@ -18,9 +18,9 @@ Drawable::Drawable( ShaderProgram* a_poProgram,
                     const Color::ColorVector& ac_roColor,
                     const Point3D& ac_roScale,
                     const Point3D& ac_roPosition,
-                    double a_dYaw, double a_dPitch, double a_dRoll )
-    : m_oColor( ac_roColor ), m_oScale( ac_roScale ), m_oPosition( ac_roPosition ),
-      m_dYaw( a_dYaw ), m_dPitch( a_dPitch ), m_dRoll( a_dRoll ),
+                    const Rotation3D& ac_roRotation )
+    : m_oColor( ac_roColor ), m_oScale( ac_roScale ),
+      m_oPosition( ac_roPosition ), m_oRotation( ac_roRotation.Normal() ),
       m_poProgram( a_poProgram ), m_oAfterTransform( Transform3D::Identity() ),
       m_oBeforeTransform( Transform3D::Identity() ), m_bVisible( true ),
       m_pbUpdateModelMatrix( new bool ), m_poModelMatrix( new Transform3D )
@@ -29,8 +29,7 @@ Drawable::Drawable( ShaderProgram* a_poProgram,
 }
 Drawable::Drawable( const Drawable& ac_roObject )
     : m_oColor( ac_roObject.m_oColor ), m_oScale( ac_roObject.m_oScale ),
-      m_oPosition( ac_roObject.m_oPosition ), m_dYaw( ac_roObject.m_dYaw ),
-      m_dPitch( ac_roObject.m_dPitch ), m_dRoll( ac_roObject.m_dRoll ),
+      m_oPosition( ac_roObject.m_oPosition ), m_oRotation( ac_roObject.m_oRotation ),
       m_poProgram( ac_roObject.m_poProgram ), m_bVisible( ac_roObject.m_bVisible ),
       m_oAfterTransform( ac_roObject.m_oAfterTransform ),
       m_oBeforeTransform( ac_roObject.m_oBeforeTransform ),
@@ -43,9 +42,7 @@ Drawable& Drawable::operator=( const Drawable& ac_roObject )
     m_oColor = ac_roObject.m_oColor;
     m_oScale = ac_roObject.m_oScale;
     m_oPosition = ac_roObject.m_oPosition;
-    m_dYaw = ac_roObject.m_dYaw;
-    m_dPitch = ac_roObject.m_dPitch;
-    m_dRoll = ac_roObject.m_dRoll;
+    m_oRotation = ac_roObject.m_oRotation;
     m_poProgram = ac_roObject.m_poProgram;
     m_bVisible = ac_roObject.m_bVisible;
     m_oAfterTransform = ac_roObject.m_oAfterTransform;
@@ -109,8 +106,8 @@ const Transform3D& Drawable::GetModelMatrix() const
     {
         // Recompute the modelview matrix
         *m_poModelMatrix = m_oBeforeTransform * Space::Scaling( m_oScale ) *
-                         Space::Rotation( m_dYaw, m_dPitch, m_dRoll ) *
-                         Space::Translation( m_oPosition ) * m_oAfterTransform;
+                           m_oRotation.MakeTransform() *
+                           Space::Translation( m_oPosition ) * m_oAfterTransform;
         *m_pbUpdateModelMatrix = false;
     }
     return *m_poModelMatrix;
@@ -146,45 +143,55 @@ Drawable& Drawable::SetColor( Color::Channel a_ucRed,
 // Add rotation properties
 Drawable& Drawable::AddPitch( double a_dPitch )
 {
-    if( a_dPitch != 0.0 )
+    if( 0.0 != a_dPitch )
     {
-        m_dPitch = Math::ScrollRadians( m_dPitch + a_dPitch );
-        if( -Math::HALF_PI > m_dPitch || Math::HALF_PI < m_dPitch )
-        {
-            m_dYaw = Math::ScrollRadians( m_dYaw + Math::PI );
-            m_dPitch = ( 0 < m_dPitch
-                         ? Math::HALF_PI - ( m_dPitch - Math::HALF_PI )
-                         : -Math::HALF_PI - ( m_dPitch + Math::HALF_PI ) );
-        }
+        m_oRotation.AddPitch( a_dPitch );
         UpdateModelMatrix();
     }
     return *this;
 }
 Drawable& Drawable::AddRoll( double a_dRoll )
 {
-    if( a_dRoll != 0.0 )
+    if( 0.0 != a_dRoll )
     {
-        m_dRoll += a_dRoll;
+        m_oRotation.AddRoll( a_dRoll );
         UpdateModelMatrix();
     }
     return *this;
 }
 Drawable& Drawable::AddYaw( double a_dYaw )
 {
-    if( a_dYaw != 0.0 )
+    if( 0.0 != a_dYaw )
     {
-        m_dYaw += a_dYaw;
+        m_oRotation.AddYaw( a_dYaw );
         UpdateModelMatrix();
     }
     return *this;
 }
-Drawable& Drawable::AddRotation( double a_dYaw, double a_dPitch, double a_dRoll )
+Drawable& Drawable::AddRotationAngle( double a_dAngle )
 {
-    if( a_dYaw != 0.0 || a_dPitch != 0.0 || a_dRoll != 0.0 )
+    if( 0.0 != a_dAngle )
     {
-        m_dYaw += a_dYaw;
-        m_dPitch += a_dPitch;
-        m_dRoll += a_dRoll;
+        m_oRotation.AddAngle( a_dAngle );
+        UpdateModelMatrix();
+    }
+    return *this;
+}
+Drawable& Drawable::AddTaitBryanAngles( double a_dYaw, double a_dPitch, double a_dRoll )
+{
+    if( 0.0 != a_dYaw || 0.0 != a_dPitch || 0.0 != a_dRoll )
+    {
+        m_oRotation.Add( a_dYaw, a_dPitch, a_dRoll );
+        UpdateModelMatrix();
+    }
+    return *this;
+}
+Drawable& Drawable::ApplyRotation( const Rotation3D& ac_roRotation )
+{
+    Rotation3D oRotation = ac_roRotation.Normal();
+    if( Rotation3D::None() != oRotation )
+    {
+        m_oRotation = oRotation * m_oRotation;
         UpdateModelMatrix();
     }
     return *this;
@@ -193,84 +200,55 @@ Drawable& Drawable::AddRotation( double a_dYaw, double a_dPitch, double a_dRoll 
 // Set rotation properties
 Drawable& Drawable::SetPitch( double a_dPitch )
 {
-    if( a_dPitch != m_dPitch )
-    {
-        m_dPitch = a_dPitch;
-        UpdateModelMatrix();
-    }
+    m_oRotation.SetPitch( a_dPitch );
+    UpdateModelMatrix();
     return *this;
 }
 Drawable& Drawable::SetRoll( double a_dRoll )
 {
-    if( a_dRoll != m_dRoll )
-    {
-        m_dRoll = a_dRoll;
-        UpdateModelMatrix();
-    }
+    m_oRotation.SetRoll( a_dRoll );
+    UpdateModelMatrix();
     return *this;
 }
 Drawable& Drawable::SetYaw( double a_dYaw )
 {
-    if( a_dYaw != m_dYaw )
+    m_oRotation.SetYaw( a_dYaw );
+    UpdateModelMatrix();
+    return *this;
+}
+Drawable& Drawable::SetRotation( const Rotation3D& ac_roRotation )
+{
+    Rotation3D oRotation = ac_roRotation.Normal();
+    if( m_oRotation != oRotation )
     {
-        m_dYaw = a_dYaw;
+        m_oRotation = oRotation;
         UpdateModelMatrix();
     }
     return *this;
 }
-Drawable& Drawable::SetRotation( double a_dYaw, double a_dPitch, double a_dRoll )
+Drawable& Drawable::SetRotation( double a_dAngle, const Point3D& ac_roAxis )
 {
-    if( a_dYaw != m_dYaw || a_dPitch != m_dPitch || a_dRoll != m_dRoll )
-    {
-        m_dYaw = a_dYaw;
-        m_dPitch = a_dPitch;
-        m_dRoll = a_dRoll;
-        UpdateModelMatrix();
-    }
+    m_oRotation.Set( a_dAngle, ac_roAxis );
+    UpdateModelMatrix();
     return *this;
 }
-
-// Given vectors for a desired forward (x-axis) and up (z-axis) direction,
-// calculate yaw, pitch, and roll.  If a zero vector is given as up, use the
-// z-axis rotated by this object's current rotation.  If the forward vector
-// and the up vector are the same, then the calculated roll will be the
-// current roll.  If the given forward vector is zero, then return false.
-bool Drawable::
-    CalculateTaitBryanAngles( double& a_rdYaw, double& a_rdPitch,
-                              double a_rdRoll, const Point3D& ac_roForward,
-                              const Point3D& ac_roUp ) const
+Drawable& Drawable::SetRotationAngle( double a_dAngle )
 {
-    // If no forward direction is given, return false
-    if( Point3D::Zero() == ac_roForward )
-    {
-        return false;
-    }
-
-    // Calculate desired Yaw and pitch
-    Point3D oForward = ac_roForward.Normal();
-    Point2D oForwardXY( ac_roForward );
-    a_rdYaw = ( oForwardXY.y < 0 ? -1 : 1 ) *
-        std::acos( Point2D::Unit(0).Dot( oForwardXY.Normalize() ) );
-    a_rdPitch = std::asin( oForward.z );
-
-    // If an up vector was provided, use its normalized value as the desired
-    // post-rotation z-axis.  Otherwise, use the z-axis transformed by the
-    // current yaw, pitch, and roll
-    Point3D oUp = ( Point3D::Zero() != ac_roUp ? ac_roUp.Normal()
-                    : Point3D::Unit(2) *
-                        Space::PointRotation( m_dYaw, m_dPitch, m_dRoll ) );
-
-    // Calculate target roll
-    a_rdRoll = m_dRoll;
-    if( oUp != oForward )
-    {
-        oUp *= Space::Rotation( -dYaw, -dPitch, 0.0 );
-        oUp.x = 0;
-        a_rdRoll = ( oUp.y > 0 ? -1 : 1 ) *
-            std::acos( Point3D::Unit(2).Dot( oUp.Normalize() ) );
-    }
-
-    return true;
+    m_oRotation.SetAngle( a_dAngle );
+    UpdateModelMatrix();
+    return *this;
+}
+Drawable& Drawable::SetRotationAxis( const Point3D& ac_roAxis )
+{
+    m_oRotation.SetAxis( ac_roAxis );
+    UpdateModelMatrix();
+    return *this;
+}
+Drawable& Drawable::SetTaitBryanAngles( double a_dYaw, double a_dPitch, double a_dRoll )
+{
+    m_oRotation.Set( a_dYaw, a_dPitch, a_dRoll );
+    UpdateModelMatrix();
+    return *this;
 }
 
 // Rotate toward something (for unrotated objects, the x-axis is "forward"
@@ -279,25 +257,13 @@ Drawable& Drawable::RotateTowardDirection( const Point3D& ac_roForward,
                                            const Point3D& ac_roUp,
                                            double a_dAmount )
 {
-    if( 0.0 != a_dAmount && Point3D::Zero() != ac_roForward )
+    if( 0.0 != a_dAmount &&
+        ( Point3D::Zero() != ac_roForward || Point3D::Zero() != ac_roUp ) )
     {
-        // Calculate desired Yaw, pitch, and roll
-        double dYaw, dPitch, dRoll;
-        CalculateTaitBryanAngles( dYaw, dPitch, dRoll, ac_roForward, ac_roUp );
-
-        // Set new rotation values
-        m_dYaw = Math::Scroll( m_dYaw,
-                               dYaw + (double)Math::PI,
-                               dYaw - (double)Math::PI );
-        m_dYaw = Math::Interpolate( dYaw, m_dYaw, a_dAmount );
-        m_dPitch = Math::Scroll( m_dPitch,
-                                 dPitch + (double)Math::PI,
-                                 dPitch - (double)Math::PI );
-        m_dPitch = Math::Interpolate( dPitch, m_dPitch, a_dAmount );
-        m_dRoll = Math::Scroll( m_dRoll,
-                                dRoll + (double)Math::PI,
-                                dRoll - (double)Math::PI );
-        m_dRoll = Math::Interpolate( dRoll, m_dRoll, a_dAmount );
+        Rotation3D oTarget( m_oRotation );
+        oTarget.Set( ac_roForward, ac_roUp );
+        m_oRotation.Slerp( oTarget, a_dAmount );
+        UpdateModelMatrix();
     }
     return *this;
 }
@@ -338,65 +304,65 @@ Drawable& Drawable::RotateTowardDirection( const Point3D& ac_roForward,
                                            const Point3D& ac_roUp,
                                            double a_dRadiansPerSecond,
                                            double a_dSeconds,
-                                           double a_dRollSpeed )
+                                           bool a_bClamp )
 {
     if( 0.0 != a_dRadiansPerSecond && 0.0 != a_dSeconds &&
-        Point3D::Zero() != ac_roForward )
+        ( Point3D::Zero() != ac_roForward || Point3D::Zero() != ac_roUp ) )
     {
-        Point3D oUp = ( Point3D::Zero() != ac_roUp ? ac_roUp
-                        : Point3D::Unit(2) *
-                          Space::PointRotation( m_dYaw, m_dPitch, m_dRoll ) );
-        // TODO
+        Rotation3D oTarget( m_oRotation );
+        oTarget.Set( ac_roForward, ac_roUp );
+        m_oRotation.Slerp( oTarget, a_dRadiansPerSecond, a_dSeconds, a_bClamp );
+        UpdateModelMatrix();
     }
     return *this;
 }
 Drawable& Drawable::RotateTowardDirection( const Point3D& ac_roForward,
                                            double a_dRadiansPerSecond,
                                            double a_dSeconds,
-                                           double a_dRollSpeed )
+                                           bool a_bClamp )
 {
     return RotateTowardDirection( ac_roForward, Point3D::Zero(),
-                                  a_dRadiansPerSecond, a_dSeconds );
+                                  a_dRadiansPerSecond, a_dSeconds, a_bClamp );
 }
 Drawable& Drawable::RotateTowardPoint( const Point3D& ac_roTarget,
                                        const Point3D& ac_roUp,
                                        double a_dRadiansPerSecond,
                                        double a_dSeconds,
-                                       double a_dRollSpeed )
+                                       bool a_bClamp )
 {
     return RotateTowardDirection( ac_roTarget - m_oPosition, ac_roUp,
-                                  a_dRadiansPerSecond, a_dSeconds );
+                                  a_dRadiansPerSecond, a_dSeconds, a_bClamp );
 }
 Drawable& Drawable::RotateTowardPoint( const Point3D& ac_roTarget,
                                        double a_dRadiansPerSecond,
                                        double a_dSeconds,
-                                       double a_dRollSpeed )
+                                       bool a_bClamp )
 {
     return RotateTowardDirection( ac_roTarget - m_oPosition, Point3D::Zero(),
-                                  a_dRadiansPerSecond, a_dSeconds );
+                                  a_dRadiansPerSecond, a_dSeconds, a_bClamp );
 }
 Drawable& Drawable::RotateToward( const HVector3D& ac_roHVector,
                                   const Point3D& ac_roUp,
                                   double a_dRadiansPerSecond,
                                   double a_dSeconds,
-                                  double a_dRollSpeed )
+                                  bool a_bClamp )
 {
     return ac_roHVector.h == 0
         ? RotateTowardDirection( ac_roHVector, ac_roUp,
-                                 a_dRadiansPerSecond, a_dSeconds )
+                                 a_dRadiansPerSecond, a_dSeconds, a_bClamp )
         : RotateTowardPoint( ac_roHVector, ac_roUp,
-                             a_dRadiansPerSecond, a_dSeconds );
+                             a_dRadiansPerSecond, a_dSeconds, a_bClamp );
 }
 Drawable& Drawable::RotateToward( const HVector3D& ac_roHVector,
                                   double a_dRadiansPerSecond,
                                   double a_dSeconds,
-                                  double a_dRollSpeed )
+                                  bool a_bClamp)
 {
     return ac_roHVector.h == 0
         ? RotateTowardDirection( ac_roHVector, Point3D::Zero(),
-                                 a_dRadiansPerSecond, a_dSeconds )
-        : RotateTowardPoint( ac_roHVector, ac_roUp,
-                             a_dRadiansPerSecond, a_dSeconds );
+                                 a_dRadiansPerSecond, a_dSeconds, a_bClamp )
+        : RotateTowardPoint( ac_roHVector, Point3D::Zero(),
+                             a_dRadiansPerSecond, a_dSeconds, a_bClamp );
 }
 
 // Add position and scale

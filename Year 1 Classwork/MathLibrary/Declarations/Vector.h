@@ -29,9 +29,10 @@ public:
     typedef Vector< T, N, false > ColumnVectorType;
     typedef Vector< T, N > RowVectorType;
     typedef Vector< T, 1 > IdentityType;
-    typedef Vector< typename InverseOf< T >::Type, N, !t_bIsRow > InverseType;
+    typedef typename InverseOf< T >::Type InverseT;
+    typedef Vector< InverseT, N, !t_bIsRow > InverseType;
     typedef Vector< T, N, !t_bIsRow > TransposeType;
-    typedef Vector< typename InverseOf< T >::Type, N, t_bIsRow > NormalType;
+    typedef Vector< InverseT, N, t_bIsRow > NormalType;
 
     // destructor
     virtual ~Vector();
@@ -116,7 +117,7 @@ public:
     Vector Cross( const TransposeType& ac_roVector ) const;
 
     // Normalization
-    typename InverseOf< T >::Type Magnitude() const;
+    InverseT Magnitude() const;
     T MagnitudeSquared() const; // for efficiency in complex calculations
     Vector& Normalize();
     NormalType Normal() const;
@@ -127,8 +128,8 @@ public:
     typename std::conditional< t_bIsRow, Vector< T, P >, Matrix< T, N, P > >::type
         operator*( const Matrix< T, ( t_bIsRow ? N : 1 ), P >& ac_roMatrix ) const;
     template< unsigned int P >
-    typename std::conditional< t_bIsRow, Vector< typename InverseOf< T >::Type, P >,
-                               Matrix< typename InverseOf< T >::Type, N, P > >::type
+    typename std::conditional< t_bIsRow, Vector< InverseT, P >,
+                               Matrix< InverseT, N, P > >::type
         operator/( const Matrix< T, P, ( t_bIsRow ? N : 1 ) >& ac_roMatrix ) const;
     Vector& operator*=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
     Vector& operator/=( const Matrix< T, ( t_bIsRow ? N : 1 ) >& ac_roMatrix );
