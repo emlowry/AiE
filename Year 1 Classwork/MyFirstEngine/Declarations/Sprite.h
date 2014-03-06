@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 27, 2014
  * Description:        Class representing an textured rectangle, or sprite.
- * Last Modified:      February 27, 2014
+ * Last Modified:      March 5, 2014
  * Last Modification:  Adding copy constructor/operator.
  ******************************************************************************/
 
@@ -16,6 +16,7 @@
 namespace MyFirstEngine
 {
 
+// A textured rectangle
 class IMEXPORT_CLASS Sprite : public Quad
 {
 public:
@@ -33,17 +34,60 @@ public:
         CROP_OPTION_COUNT = 4
     };
 
-    // TODO constructor
+    // Holds attributes for a single frame
+    struct PixelDimensions
+    {
+        IntPoint2D spritePixels;    // size of the sprite in texture pixels
+        IntPoint2D centerOffset;    // pixel location of the center of the
+                                    // sprite relative to m_oPixels / 2
+        IntPoint2D slicePixels;     // size of the slice in texture pixels
+        IntPoint2D sliceLocation;   // pixel location of the top-left pixel in
+                                    // slice relative to the top-left corner of
+                                    // the texture ( +x = down, +y = right )
+        IntPoint2D sliceOffset;     // pixel location of the top-left pixel in
+                                    // slice relative to the top-left corner of
+                                    // the sprite ( +x = down, +y = right )
+        Cropping cropping;
+    };
 
-    virtual ~Sprite() {}
+    // TODO main constructor
+    Sprite( const Sprite& ac_roSprite );
+    Sprite& operator=( const Sprite& ac_roSprite );
 
-    // Get properties
-    const IntPoint2D& GetPixels() const { return m_oPixels; }
-    const IntPoint2D& GetCenterOffset() const { return m_oCenterOffset; }
-    const IntPoint2D& GetSlicePixels() const { return m_oSlicePixels; }
-    const IntPoint2D& GetSliceLocation() const { return m_oSliceLocation; }
-    const IntPoint2D& GetSliceOffset() const { return m_oSliceOffset; }
-    Cropping GetCropping() const { return m_eCropping; }
+    // Destructor actually does something
+    virtual ~Sprite();
+
+    // Frame access operators
+    PixelDimensions& Frame( unsigned int a_uiFrameNumber );
+    const PixelDimensions& Frame( unsigned int a_uiFrameNumber ) const;
+    PixelDimensions& operator[]( unsigned int a_uiFrameNumber );
+    const PixelDimensions& operator[]( unsigned int a_uiFrameNumber ) const;
+
+    // Frame increment/decrement operators
+    Sprite& operator++();
+    Sprite operator++(int);
+    Sprite& operator--();
+    Sprite operator--(int);
+
+    // Sprite properties
+    unsigned int FrameCount() const { return m_uiFrameCount; }
+    unsigned int FrameNumber() const { return m_uiFrameNumber; }
+    PixelDimensions& CurrentFrame();
+    const PixelDimensions& CurrentFrame() const;
+    Sprite& SetFrame( unsigned int a_uiFrameNumber );
+
+    // Current frame properties
+    const IntPoint2D& SpritePixels() const
+    { return CurrentFrame().spritePixels; }
+    const IntPoint2D& CenterOffset() const
+    { return CurrentFrame().centerOffset; }
+    const IntPoint2D& SlicePixels() const
+    { return CurrentFrame().slicePixels; }
+    const IntPoint2D& SliceLocation() const
+    { return CurrentFrame().sliceLocation; }
+    const IntPoint2D& SliceOffset() const
+    { return CurrentFrame().sliceOffset; }
+    Cropping Cropping() const { return CurrentFrame().cropping; }
     // TODO get texture
 
     // Get the cached model view transformation resulting from this object's
@@ -52,38 +96,16 @@ public:
     // recalculate it.
     virtual const Transform3D& GetModelMatrix() const override;
 
-    // Add to pixel dimensions
-    const Sprite& AddPixels( const IntPoint2D& ac_roPixels );
-    const Sprite& AddPixels( int a_iX, int a_iY );
-    const Sprite& AddCenterOffset( const IntPoint2D& ac_roPixels );
-    const Sprite& AddCenterOffset( int a_iX, int a_iY );
-    const Sprite& AddSlicePixels( const IntPoint2D& ac_roPixels );
-    const Sprite& AddSlicePixels( int a_iX, int a_iY );
-    const Sprite& AddSliceLocation( const IntPoint2D& ac_roPixels );
-    const Sprite& AddSliceLocation( int a_iX, int a_iY );
-    const Sprite& AddSliceOffset( const IntPoint2D& ac_roPixels );
-    const Sprite& AddSliceOffset( int a_iX, int a_iY );
-    const Sprite& AddSliceDimensions( const IntPoint2D& ac_roPixels,
-        const IntPoint2D& ac_roCenterOffset = IntPoint2D::Zero(),
-        const IntPoint2D& ac_roSlicePixels = IntPoint2D::Zero(),
-        const IntPoint2D& ac_roSliceLocation = IntPoint2D::Zero(),
-        const IntPoint2D& ac_roSliceOffset = IntPoint2D::Zero() );
-
     // TODO set properties
+
+    static const PixelDimensions ZERO_FRAME;
 
 protected:
 
-    IntPoint2D m_oPixels;       // size of the sprite in texture pixels
-    IntPoint2D m_oCenterOffset; // pixel location of the center of the sprite
-                                // relative to m_oPixels / 2
-    IntPoint2D m_oSlicePixels;  // size of the slice in texture pixels
-    IntPoint2D m_oSliceLocation;// pixel location of the top-left pixel in slice
-                                // relative to the top-left corner of the
-                                // texture ( +x = down, +y = right )
-    IntPoint2D m_oSliceOffset;  // pixel location of the top-left pixel in slice
-                                // relative to the top-left corner of the sprite
-                                // ( +x = down, +y = right )
-    Cropping m_eCropping;
+    // Default constructor creates one frame
+    PixelDimensions* m_paoFrames;
+    unsigned int m_uiFrameCount;
+    unsigned int m_uiFrameNumber;
 
     // TODO indicate texture
 
