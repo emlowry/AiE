@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 5, 2014
  * Description:        Implementations for Sprite functions.
- * Last Modified:      March 5, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 6, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "../Declarations/Sprite.h"
@@ -15,18 +15,38 @@ namespace MyFirstEngine
 {
 
 // Default frame
-const Sprite::PixelDimensions Sprite::ZERO_FRAME = { IntPoint2D::Zero(),
-                                                     IntPoint2D::Zero(),
-                                                     IntPoint2D::Zero(),
-                                                     IntPoint2D::Zero(),
-                                                     IntPoint2D::Zero(),
-                                                     Sprite::CROP_TO_SLICE };
+const Sprite::Frame Sprite::ZERO_FRAME = { IntPoint2D::Zero(),
+                                           IntPoint2D::Zero(),
+                                           IntPoint2D::Zero(),
+                                           IntPoint2D::Zero(),
+                                           IntPoint2D::Zero(),
+                                           Sprite::CROP_TO_SLICE };
+
+// Compare dimensions
+INLINE bool Sprite::Frame::operator==( const Sprite::Frame& ac_roFrame ) const
+{
+    return ( SameSize( ac_roFrame ) &&
+             ac_roFrame.sliceLocation == sliceLocation );
+}
+INLINE bool Sprite::Frame::operator!=( const Sprite::Frame& ac_roFrame ) const
+{
+    return ( !SameSize( ac_roFrame ) ||
+             ac_roFrame.sliceLocation != sliceLocation );
+}
+INLINE bool Sprite::Frame::SameSize( const Sprite::Frame& ac_roFrame ) const
+{
+    return ( ac_roFrame.sliceOffset == sliceOffset &&
+             ac_roFrame.slicePixels == slicePixels &&
+             ac_roFrame.centerOffset == centerOffset &&
+             ac_roFrame.spritePixels == spritePixels &&
+             ac_roFrame.cropping == cropping );
+}
 
 // Copy constructor/operator
 INLINE Sprite::Sprite( const Sprite& ac_roSprite )
     : Quad( ac_roSprite ), m_uiFrameCount( ac_roSprite.m_uiFrameCount ),
       m_paoFrames( 0 == m_uiFrameCount
-                    ? nullptr : new PixelDimensions[ m_uiFrameCount ] ),
+                    ? nullptr : new Frame[ m_uiFrameCount ] ),
       m_uiFrameNumber( ac_roSprite.m_uiFrameNumber % m_uiFrameCount )
 {
     if( 0 < m_uiFrameCount )
@@ -41,9 +61,9 @@ INLINE Sprite& Sprite::operator=( const Sprite& ac_roSprite )
     {
         m_uiFrameCount = ac_roSprite.m_uiFrameCount;
         m_uiFrameNumber = ac_roSprite.m_uiFrameNumber % m_uiFrameCount;
-        PixelDimensions* paoFrames = m_paoFrames;
+        Frame* paoFrames = m_paoFrames;
         m_paoFrames = ( 0 == ac_roSprite.m_uiFrameCount
-                        ? nullptr : new PixelDimensions[ m_uiFrameCount ] );
+                        ? nullptr : new Frame[ m_uiFrameCount ] );
         if( nullptr != paoFrames )
         {
             delete[] paoFrames;
@@ -55,7 +75,7 @@ INLINE Sprite& Sprite::operator=( const Sprite& ac_roSprite )
 // Destructor actually does something
 INLINE Sprite::~Sprite()
 {
-    PixelDimensions* paoFrames = m_paoFrames;
+    Frame* paoFrames = m_paoFrames;
     m_paoFrames = nullptr;
     if( nullptr != paoFrames )
     {
@@ -64,7 +84,7 @@ INLINE Sprite::~Sprite()
 }
 
 // Frame access operators
-INLINE Sprite::PixelDimensions&
+INLINE Sprite::Frame&
     Sprite::Frame( unsigned int a_uiFrameNumber )
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
@@ -73,7 +93,7 @@ INLINE Sprite::PixelDimensions&
     }
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
-INLINE const Sprite::PixelDimensions&
+INLINE const Sprite::Frame&
     Sprite::Frame( unsigned int a_uiFrameNumber ) const
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
@@ -82,7 +102,7 @@ INLINE const Sprite::PixelDimensions&
     }
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
-INLINE Sprite::PixelDimensions&
+INLINE Sprite::Frame&
     Sprite::operator[]( unsigned int a_uiFrameNumber )
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
@@ -91,7 +111,7 @@ INLINE Sprite::PixelDimensions&
     }
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
-INLINE const Sprite::PixelDimensions&
+INLINE const Sprite::Frame&
     Sprite::operator[]( unsigned int a_uiFrameNumber ) const
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
@@ -101,8 +121,50 @@ INLINE const Sprite::PixelDimensions&
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
 
+// Frame increment/decrement operators
+INLINE Sprite& Sprite::operator++()
+{
+    unsigned int uiOldFrame = m_uiFrameNumber;
+    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % m_uiFrameCount;
+    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( m_paoFrames[ uiOldFrame ] ) )
+    {
+        UpdateModelMatrix();
+    }
+    return *this;
+}
+INLINE Sprite Sprite::operator++(int)
+{
+    Sprite oCopy( *this );
+    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % m_uiFrameCount;
+    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( oCopy.CurrentFrame() ) )
+    {
+        UpdateModelMatrix();
+    }
+    return oCopy;
+}
+INLINE Sprite& Sprite::operator--()
+{
+    unsigned int uiOldFrame = m_uiFrameNumber;
+    m_uiFrameNumber = ( m_uiFrameNumber - 1 ) % m_uiFrameCount;
+    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( m_paoFrames[ uiOldFrame ] ) )
+    {
+        UpdateModelMatrix();
+    }
+    return *this;
+}
+INLINE Sprite Sprite::operator--(int)
+{
+    Sprite oCopy( *this );
+    m_uiFrameNumber = ( m_uiFrameNumber - 1 ) % m_uiFrameCount;
+    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( oCopy.CurrentFrame() ) )
+    {
+        UpdateModelMatrix();
+    }
+    return oCopy;
+}
+
 // Sprite properties
-PixelDimensions& CurrentFrame()
+INLINE Sprite::Frame& Sprite::CurrentFrame()
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {
@@ -110,7 +172,7 @@ PixelDimensions& CurrentFrame()
     }
     return m_paoFrames[ m_uiFrameNumber ];
 }
-const PixelDimensions& CurrentFrame() const
+INLINE const Sprite::Frame& Sprite::CurrentFrame() const
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {
@@ -118,7 +180,7 @@ const PixelDimensions& CurrentFrame() const
     }
     return m_paoFrames[ m_uiFrameNumber ];
 }
-Sprite& SetFrame( unsigned int a_uiFrameNumber )
+INLINE Sprite& Sprite::SetFrameNumber( unsigned int a_uiFrameNumber )
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {

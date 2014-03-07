@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the GameWindow class.
- * Last Modified:      February 27, 2014
- * Last Modification:  Adding functions.
+ * Last Modified:      March 6, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #include "..\Declarations\GLFW.h"
@@ -22,44 +22,55 @@ namespace MyFirstEngine
 
 // declare classes instead of typedefs to avoid compiler warnings
 // definition is only in cpp
-class GameWindow::WindowList : public std::vector< GameWindow* >
+class GameWindow::WindowList
+    : public std::vector< GameWindow* >,
+      public Utility::Singleton< GameWindow::WindowList >
 {
+    friend class Utility::Singleton< WindowList >;
 public:
     virtual ~WindowList() {}
+private:
+    WindowList() {}
 };
 class GameWindow::WindowLookup
-    : public std::unordered_map< GLFWwindow*, unsigned int >
+    : public std::unordered_map< GLFWwindow*, unsigned int >,
+      public Utility::Singleton< GameWindow::WindowLookup >
 {
+    friend class Utility::Singleton< WindowLookup >;
 public:
     virtual ~WindowLookup() {}
+private:
+    WindowLookup() {}
 };
 
 // Initialize static containers
-GameWindow::WindowList* GameWindow::sm_poList = new GameWindow::WindowList();
-GameWindow::WindowLookup* GameWindow::sm_poLookup = new GameWindow::WindowLookup();
+GameWindow::WindowList&
+    GameWindow::sm_roList = GameWindow::WindowList::Instance();
+GameWindow::WindowLookup&
+    GameWindow::sm_roLookup = GameWindow::WindowLookup::Instance();
 
 // Constructors
 GameWindow::GameWindow( const IntPoint2D& ac_roSize,
                         const char* ac_pcTitle, const ColorVector& ac_roColor )
     : m_oSize( ac_roSize ), m_oFramePadding( 0 ),
       m_oTitle( ac_pcTitle ), m_poWindow( nullptr ), m_oColor( ac_roColor ),
-      m_uiIndex( List().size() )
+      m_uiIndex( sm_roList.size() )
 {
-    List().push_back( this );
+    sm_roList.push_back( this );
 }
 GameWindow::GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
                         const char* ac_pcTitle, const ColorVector& ac_roColor )
     : m_oSize( a_uiWidth, a_uiHeight ), m_oFramePadding( 0 ),
       m_oTitle( ac_pcTitle ), m_poWindow( nullptr ), m_oColor( ac_roColor ),
-      m_uiIndex( List().size() )
+      m_uiIndex( sm_roList.size() )
 {
-    List().push_back( this );
+    sm_roList.push_back( this );
 }
 // Destructor actually does something in this class
 GameWindow::~GameWindow()
 {
     Destroy();
-    List()[ m_uiIndex ] = nullptr;
+    sm_roList[ m_uiIndex ] = nullptr;
 }
 
 // Set window properties
@@ -163,7 +174,7 @@ void GameWindow::Destroy()
 {
     if( IsOpen() )
     {
-        Lookup().erase( m_poWindow );
+        sm_roLookup.erase( m_poWindow );
         glfwDestroyWindow( m_poWindow );
         m_poWindow = nullptr;
     }
@@ -199,7 +210,7 @@ void GameWindow::CreateWindow()
                                     m_oTitle.CString(), nullptr, nullptr );
     if( nullptr != m_poWindow )
     {
-        Lookup()[ m_poWindow ] = m_uiIndex;
+        sm_roLookup[ m_poWindow ] = m_uiIndex;
         glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
     }
 }
@@ -255,7 +266,7 @@ void GameWindow::ClearCurrent()
 // Destroy all windows
 void GameWindow::DestroyAll()
 {
-    for each( GameWindow* poWindow in List() )
+    for each( GameWindow* poWindow in sm_roList )
     {
         if( nullptr != poWindow )
         {
@@ -267,10 +278,10 @@ void GameWindow::DestroyAll()
 // GLFW callback for window close
 void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 {
-    if( Lookup().count( a_poWindow ) != 0 &&
-        nullptr != List()[ Lookup()[ a_poWindow ] ] )
+    if( sm_roLookup.count( a_poWindow ) != 0 &&
+        nullptr != sm_roList[ sm_roLookup[ a_poWindow ] ] )
     {
-        GameWindow& roWindow = *( List()[ Lookup()[ a_poWindow ] ] );
+        GameWindow& roWindow = *( sm_roList[ sm_roLookup[ a_poWindow ] ] );
         GameEngine::CurrentState().OnCloseWindow( roWindow );
         if( roWindow.IsClosing() )
         {
@@ -282,7 +293,7 @@ void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 // Swap frame buffers of all open windows
 void GameWindow::SwapAllBuffers()
 {
-    for each( GameWindow* poWindow in List() )
+    for each( GameWindow* poWindow in sm_roList )
     {
         if( nullptr != poWindow )
         {

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 27, 2014
  * Description:        Class representing an textured rectangle, or sprite.
- * Last Modified:      March 5, 2014
- * Last Modification:  Adding copy constructor/operator.
+ * Last Modified:      March 6, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef SPRITE__H
@@ -35,7 +35,7 @@ public:
     };
 
     // Holds attributes for a single frame
-    struct PixelDimensions
+    struct Frame
     {
         IntPoint2D spritePixels;    // size of the sprite in texture pixels
         IntPoint2D centerOffset;    // pixel location of the center of the
@@ -48,7 +48,15 @@ public:
                                     // slice relative to the top-left corner of
                                     // the sprite ( +x = down, +y = right )
         Cropping cropping;
+
+        // Compare dimensions
+        bool operator==( const Frame& ac_roFrame ) const;
+        bool operator!=( const Frame& ac_roFrame ) const;
+        bool SameSize( const Frame& ac_roFrame ) const;
     };
+
+    // Holds a sequence of frame attributes
+    class FrameArray;
 
     // TODO main constructor
     Sprite( const Sprite& ac_roSprite );
@@ -58,23 +66,23 @@ public:
     virtual ~Sprite();
 
     // Frame access operators
-    PixelDimensions& Frame( unsigned int a_uiFrameNumber );
-    const PixelDimensions& Frame( unsigned int a_uiFrameNumber ) const;
-    PixelDimensions& operator[]( unsigned int a_uiFrameNumber );
-    const PixelDimensions& operator[]( unsigned int a_uiFrameNumber ) const;
+    Frame& Frame( unsigned int a_uiFrameNumber );
+    const Frame& Frame( unsigned int a_uiFrameNumber ) const;
+    Frame& operator[]( unsigned int a_uiFrameNumber );
+    const Frame& operator[]( unsigned int a_uiFrameNumber ) const;
 
     // Frame increment/decrement operators
-    Sprite& operator++();
-    Sprite operator++(int);
-    Sprite& operator--();
-    Sprite operator--(int);
+    Sprite& operator++();   // ++Sprite - returns incremented sprite
+    Sprite operator++(int); // Sprite++ - returns copy of pre-increment sprite
+    Sprite& operator--();   // --Sprite - returns decremented sprite
+    Sprite operator--(int); // Sprite-- - returns copy of pre-decrement sprite
 
     // Sprite properties
-    unsigned int FrameCount() const { return m_uiFrameCount; }
     unsigned int FrameNumber() const { return m_uiFrameNumber; }
-    PixelDimensions& CurrentFrame();
-    const PixelDimensions& CurrentFrame() const;
-    Sprite& SetFrame( unsigned int a_uiFrameNumber );
+    unsigned int FrameCount() const;
+    Frame& CurrentFrame();
+    const Frame& CurrentFrame() const;
+    Sprite& SetFrameNumber( unsigned int a_uiFrameNumber );
 
     // Current frame properties
     const IntPoint2D& SpritePixels() const
@@ -98,16 +106,13 @@ public:
 
     // TODO set properties
 
-    static const PixelDimensions ZERO_FRAME;
+    static const Frame ZERO_FRAME;
 
 protected:
 
     // Default constructor creates one frame
-    PixelDimensions* m_paoFrames;
-    unsigned int m_uiFrameCount;
+    const FrameArray* m_poFrames; // pointer to const, not const pointer
     unsigned int m_uiFrameNumber;
-
-    // TODO indicate texture
 
 };  // class Sprite
 

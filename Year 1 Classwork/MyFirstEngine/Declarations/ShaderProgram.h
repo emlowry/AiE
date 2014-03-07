@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader program.
- * Last Modified:      February 27, 2014
+ * Last Modified:      March 6, 2014
  * Last Modification:  Refactoring.
  ******************************************************************************/
 
@@ -28,6 +28,11 @@ class IMEXPORT_CLASS ShaderProgram
     : public NotCopyable, public MostDerivedAddress
 {
 public:
+
+    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
+    // from an stl container won't result in warnings.
+    class ProgramList;
+    class ProgramLookup;
 
     // Constructor
     ShaderProgram( const Shader& ac_roVertexShader,
@@ -97,10 +102,8 @@ protected:
 
 private:
 
-    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
+    // PIMPLE idiom - this class is only defined in the cpp, so inheritance
     // from an stl container won't result in warnings.
-    class ProgramList;
-    class ProgramLookup;
     class ShaderList;
 
     // Default constructor used only by Null()
@@ -110,16 +113,12 @@ private:
     ShaderList& Shaders() { return *m_poShaders; }
     const ShaderList& Shaders() const { return *m_poShaders; }
 
-    // Get a reference to the map of already-linked programs
-    static ProgramList& List() { return *sm_poList; }
-    static ProgramLookup& Lookup() { return *sm_poLookup; }
-
     unsigned int m_uiIndex; // location of shader program in list
     ShaderList* m_poShaders; // owned by this object
 
     // store all the programs
-    static ProgramList* sm_poList;
-    static ProgramLookup* sm_poLookup;
+    static ProgramList& sm_roList;
+    static ProgramLookup& sm_roLookup;
 
 };  // class ShaderProgram
 

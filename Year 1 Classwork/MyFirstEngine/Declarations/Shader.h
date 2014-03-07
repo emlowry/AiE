@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader.
- * Last Modified:      February 26, 2014
- * Last Modification:  Got rid of hardcoded default shaders.
+ * Last Modified:      March 6, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef SHADER__H
@@ -26,6 +26,11 @@ using namespace Utility;
 class IMEXPORT_CLASS Shader : public Hashable, public Comparable< Shader >
 {
 public:
+
+    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
+    // an stl container won't result in warnings.
+    class ShaderLookup;
+    class SourceNameLookup;
 
     // Default constructor
     Shader() : m_uiID( 0 ) {}
@@ -81,25 +86,16 @@ public:
 
 private:
 
-    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
-    // an stl container won't result in warnings.
-    class ShaderLookup;
-    class SourceNameLookup;
-
     // Compile a shader from the given source code
     static GLuint CompileShader( GLenum a_eType, const char* ac_pcSourceText );
     static GLuint CompileShader( const char* ac_pcSourceText, GLuint a_uiID );
-
-    // Get a reference to the lookup map
-    static ShaderLookup& Lookup() { return *sm_poLookup; }
-    static SourceNameLookup& SourceLookup() { return *sm_poSourceLookup; }
 
     // ID associated with the GLSL shader object
     GLuint m_uiID;
     
     // store all the compiled shaders
-    static ShaderLookup* sm_poLookup;
-    static SourceNameLookup* sm_poSourceLookup;
+    static ShaderLookup& sm_roLookup;
+    static SourceNameLookup& sm_roSourceLookup;
 
 };  // class Shader
 

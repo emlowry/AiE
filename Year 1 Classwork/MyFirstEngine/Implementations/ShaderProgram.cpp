@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Function implementations for the ShaderProgram class.
- * Last Modified:      February 27, 2014
+ * Last Modified:      March 6, 2014
  * Last Modification:  Refactoring.
  ******************************************************************************/
 
@@ -22,17 +22,27 @@ using namespace Utility;
 
 // declare classes instead of typedefs to avoid compiler warnings
 // definition is only in cpp
-class ShaderProgram::ProgramList : public std::vector< ShaderProgram* >
+class ShaderProgram::ProgramList
+    : public std::vector< ShaderProgram* >,
+      public Singleton< ShaderProgram::ProgramList >
 {
+    friend class Singleton< ProgramList >;
 public:
     virtual ~ProgramList() {}
+private:
+    ProgramList() {}
 };
-class ShaderProgram::ProgramLookup : public std::unordered_map< GLuint, ShaderProgram* >
+class ShaderProgram::ProgramLookup
+    : public std::unordered_map< GLuint, ShaderProgram* >,
+      public Singleton< ShaderProgram::ProgramLookup >
 {
+    friend class Singleton< ProgramLookup >;
 public:
     typedef std::unordered_map< GLuint, ShaderProgram* > BaseType;
     typedef BaseType::value_type ValueType;
     virtual ~ProgramLookup() {}
+private:
+    ProgramLookup();
 };
 class ShaderProgram::ShaderList : public std::list< Shader >
 {
@@ -41,25 +51,25 @@ public:
 };
 
 // store all the programs
-ShaderProgram::ProgramList*
-    ShaderProgram::sm_poList = new ShaderProgram::ProgramList();
-ShaderProgram::ProgramLookup*
-    ShaderProgram::sm_poLookup = new ShaderProgram::ProgramLookup();
+ShaderProgram::ProgramList&
+    ShaderProgram::sm_roList = ShaderProgram::ProgramList::Instance();
+ShaderProgram::ProgramLookup&
+    ShaderProgram::sm_roLookup = ShaderProgram::ProgramLookup::Instance();
 
 // Default constructor used only by Null()
 ShaderProgram::ShaderProgram()
-    : m_uiID( 0 ), m_uiIndex( List().size() ), m_poShaders( new ShaderList() )
+    : m_uiID( 0 ), m_uiIndex( sm_roList.size() ), m_poShaders( new ShaderList() )
 {
-    List().push_back( this );
+    sm_roList.push_back( this );
 }
 
 // Constructor - you should call Setup() after calling these
 ShaderProgram::ShaderProgram( const Shader& ac_roVertexShader,
                               const Shader& ac_roFragmentShader,
                               const Shader& ac_roGeometryShader )
-    : m_uiID( 0 ), m_uiIndex( List().size() ), m_poShaders( new ShaderList() )
+    : m_uiID( 0 ), m_uiIndex( sm_roList.size() ), m_poShaders( new ShaderList() )
 {
-    List().push_back( this );
+    sm_roList.push_back( this );
     if( Shader::Null() != ac_roVertexShader )
     {
         Shaders().push_back( ac_roVertexShader );
@@ -75,9 +85,9 @@ ShaderProgram::ShaderProgram( const Shader& ac_roVertexShader,
 }
 ShaderProgram::ShaderProgram( const Shader* ac_paoShaders,
                               unsigned int a_uiCount )
-    : m_uiID( 0 ), m_uiIndex( List().size() ), m_poShaders( new ShaderList() )
+    : m_uiID( 0 ), m_uiIndex( sm_roList.size() ), m_poShaders( new ShaderList() )
 {
-    List().push_back( this );
+    sm_roList.push_back( this );
     if( nullptr != ac_paoShaders )
     {
         for( unsigned int ui = 0; ui < a_uiCount; ++ui )
@@ -93,7 +103,7 @@ ShaderProgram::ShaderProgram( const Shader* ac_paoShaders,
 // Destructor - you should call Destroy() before calling this.
 ShaderProgram::~ShaderProgram()
 {
-    List()[ m_uiIndex ] = nullptr;
+    sm_roList[ m_uiIndex ] = nullptr;
     delete m_poShaders;
 }
 
@@ -104,7 +114,7 @@ void ShaderProgram::Destroy()
     {
         DestroyData();
         glDeleteProgram( m_uiID );
-        Lookup().erase( m_uiID );
+        sm_roLookup.erase( m_uiID );
         m_uiID = 0;
     }
 }
@@ -125,7 +135,7 @@ void ShaderProgram::Setup()
         glLinkProgram( m_uiID );
         if( IsValid() )
         {
-            Lookup()[ m_uiID ] = this;
+            sm_roLookup[ m_uiID ] = this;
             SetupData();
         }
         else
@@ -195,14 +205,14 @@ const ShaderProgram& ShaderProgram::Current()
 {
     GLint iID;
     glGetIntegerv( GL_CURRENT_PROGRAM, &iID );
-    return 0 < Lookup().count( (GLuint)iID ) ? *( Lookup()[ (GLuint)iID ] )
+    return 0 < sm_roLookup.count( (GLuint)iID ) ? *( sm_roLookup[ (GLuint)iID ] )
                                              : Null();
 }
 
 // destroy all shader programs
 void ShaderProgram::DestroyAll()
 {
-    for each( ShaderProgram* poProgram in List() )
+    for each( ShaderProgram* poProgram in sm_roList )
     {
         if( nullptr != poProgram )
         {

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Class representing a window managed by the game engine.
- * Last Modified:      February 27, 2014
- * Last Modification:  Adding functions.
+ * Last Modified:      March 6, 2014
+ * Last Modification:  Refactoring.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__H
@@ -28,6 +28,11 @@ using Color::Channel;
 class IMEXPORT_CLASS GameWindow : public NotCopyable, public MostDerivedAddress
 {
 public:
+
+    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
+    // from an stl container won't result in warnings.
+    class WindowList;
+    class WindowLookup;
 
     // Constructors
     GameWindow( const IntPoint2D& ac_roSize = IntPoint2D( 800, 600 ),
@@ -89,11 +94,6 @@ protected:
 
 private:
 
-    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
-    // an stl container won't result in warnings.
-    class WindowList;
-    class WindowLookup;
-
     // the two steps of opening a window
     void CreateWindow();
     void AdjustFramePadding();
@@ -105,10 +105,6 @@ private:
     // GLFW callback for window close
     static void OnCloseWindow( GLFWwindow* a_poWindow );
 
-    // get references to the lists
-    static WindowLookup& Lookup() { return *sm_poLookup; }
-    static WindowList& List() { return *sm_poList; }
-
     unsigned int m_uiIndex; // identifies the window by its place in the list
     IntPoint2D m_oSize; // pixels available to draw on with OpenGL
     DumbString m_oTitle;    // Window title
@@ -116,8 +112,9 @@ private:
     IntPoint2D m_oFramePadding; // difference in size between buffer and window
     ColorVector m_oColor;   // Color after clearing frame buffer
 
-    static WindowLookup* sm_poLookup;
-    static WindowList* sm_poList;
+    // store all the windows
+    static WindowLookup& sm_roLookup;
+    static WindowList& sm_roList;
 
 };  // class GameWindow
 
