@@ -138,6 +138,7 @@ void QuadShaderProgram::DrawElements()
 void QuadShaderProgram::DrawQuad( const Color::ColorVector& ac_roColor )
 {
     const ShaderProgram& oPrevious = ShaderProgram::Current();
+    Instance().Use();
     glUniform4fv( Instance().m_iColorID, 1, &( ac_roColor[0] ) );
     DrawElements();
     oPrevious.Use();

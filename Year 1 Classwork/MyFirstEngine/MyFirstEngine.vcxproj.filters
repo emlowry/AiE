@@ -77,6 +77,9 @@
     <ClCompile Include="Implementations\Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Implementations\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Shaders\QuadFragment.glsl" />

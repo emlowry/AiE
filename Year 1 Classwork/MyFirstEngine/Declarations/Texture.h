@@ -23,58 +23,51 @@ using Utility::DumbString;
 class IMEXPORT_CLASS Texture : public Utility::NotCopyable
 {
 public:
-
-    // TODO
+    
+    // TODO constructor parameters
+    Texture( const char* const ac_cpcFile,
+             GLenum a_eWrapS = GL_CLAMP_TO_EDGE,
+             GLenum a_eWrapT = GL_CLAMP_TO_EDGE,
+             GLenum a_eMinFilter = GL_NEAREST_MIPMAP_LINEAR,
+             GLenum a_eMagFilter = GL_NEAREST,
+             const Color::ColorVector& ac_roBorderColor = Color::TRANSPARENT );
+    virtual ~Texture();
 
     bool IsCurrent() const; // is this loaded in the current texture unit?
     bool IsLoaded() const;  // is this loaded in any texture unit?
-    bool IsValid() const;   // is this actually a texture in OpenGL?
 
-    void Destroy();         // unload and delete this texture
-    void MakeCurrent();     // make this texture's unit active (load if needed)
-    void Load();            // load this texture to an unused texture unit (if
+#ifndef MY_FIRST_ENGINE_CACHE_TEXTURES
+#define TEXTURE__H__CACHE_TEXTURES false
+#else
+#define TEXTURE__H__CACHE_TEXTURES true
+#endif
+    void Destroy( bool a_bCache = TEXTURE__H__CACHE_TEXTURES ); // destroy
+    void Load( bool a_bCache = TEXTURE__H__CACHE_TEXTURES );
+                            // load this texture to an unused texture unit (if
                             //  not already loaded), unloading other textures if
-                            //  neccessary, and make that texture unit current
+                            //  neccessary
+#undef TEXTURE__H__CACHE_TEXTURES
+    void MakeCurrent();     // make this texture's unit active (load if needed)
 
     static bool IsInitialized();    // can textures be loaded?
-    static void Initialize();       // set up texture storage
+    static void Initialize();       // get available texture units
     static void Terminate();        // destroy all textures
 
-private:
-    
-    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
-    // from an stl container won't result in warnings.
-    class TextureList;
-    class UnusedUnits;
+protected:
 
-    void Load( GLint a_iUnit ); // load to given texture unit
-    GLint UnLoad();     // unload from texture unit, return former texture unit
+    GLuint m_uiID;      // OpenGL id for the texture, 0 = none
+    GLenum m_eUnit;     // texture unit to which this texture is bound, 0 = none
 
-    GLuint m_uiID;      // OpenGL id for the texture
-    GLint m_iUnit;      // texture unit to which this texture is bound
     IntPoint2D m_oSize; // size in pixels
-
-    GLenum m_iMinFilter;    // default is GL_NEAREST_MIPMAP_LINEAR
-    GLenum m_iMagFilter;    // default is GL_NEAREST
-    GLenum m_iWrapT;        // default is GL_CLAMP_TO_EDGE
-    GLenum m_iWrapS;        // default is GL_CLAMP_TO_EDGE
+    GLenum m_eMinFilter;    // default is GL_NEAREST_MIPMAP_LINEAR
+    GLenum m_eMagFilter;    // default is GL_NEAREST
+    GLenum m_eWrapT;        // default is GL_CLAMP_TO_EDGE
+    GLenum m_eWrapS;        // default is GL_CLAMP_TO_EDGE
     Color::ColorVector m_oBorderColor;  // if wrap setting is GL_CLAMP_TO_BORDER
 
     DumbString m_oFile;         // file from which this texture is loaded
-    unsigned char* m_pucData;   // texture data, if not loaded and no file
+    unsigned char* m_paucData;  // texture data cache
 
-    // if this texture is loaded, the loaded textures made current before and
-    // after this one was last made current, if any.
-    Texture* m_poNextUsedTexture;
-    Texture* m_poPreviousUsedTexture;
-
-    // for determining which texture to unload to make room for a new one
-    static Texture* m_poMostRecentlyUsedTexture;
-    static Texture* m_poLeastRecentlyUsedTexture;
-
-    // store all textures
-    static TextureList& m_roList;
-    static UnusedUnits& m_roUnits;
 };
 
 }   // namespace MyFirstEngine

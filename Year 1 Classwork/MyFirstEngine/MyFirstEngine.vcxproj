@@ -104,6 +104,7 @@
     <ClCompile Include="Implementations\Shader.cpp" />
     <ClCompile Include="Implementations\ShaderProgram.cpp" />
     <ClCompile Include="Implementations\Sprite.cpp" />
+    <ClCompile Include="Implementations\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\Shaders\QuadFragment.glsl" />

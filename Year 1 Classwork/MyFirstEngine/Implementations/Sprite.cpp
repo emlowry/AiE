@@ -9,31 +9,32 @@
 
 #include "../Declarations/Sprite.h"
 #include <stdexcept>
-#include "../Declarations/MyFirstEngineMacros.h"
+#include <vector>
 
 namespace MyFirstEngine
 {
 
 // Default frame
-const Sprite::Frame Sprite::ZERO_FRAME = { IntPoint2D::Zero(),
-                                           IntPoint2D::Zero(),
-                                           IntPoint2D::Zero(),
-                                           IntPoint2D::Zero(),
-                                           IntPoint2D::Zero(),
-                                           Sprite::CROP_TO_SLICE };
+const Sprite::Frame Sprite::Frame::ZERO = Frame();
+
+// Default frame constructor
+Sprite::Frame::Frame()
+    : spritePixels( IntPoint2D::Zero() ), centerOffset( IntPoint2D::Zero() ),
+      sliceLocation( IntPoint2D::Zero() ), slicePixels( IntPoint2D::Zero() ),
+      sliceOffset( IntPoint2D::Zero() ), cropping( Sprite::CROP_TO_SLICE ) {}
 
 // Compare dimensions
-INLINE bool Sprite::Frame::operator==( const Sprite::Frame& ac_roFrame ) const
+bool Sprite::Frame::operator==( const Sprite::Frame& ac_roFrame ) const
 {
     return ( SameSize( ac_roFrame ) &&
              ac_roFrame.sliceLocation == sliceLocation );
 }
-INLINE bool Sprite::Frame::operator!=( const Sprite::Frame& ac_roFrame ) const
+bool Sprite::Frame::operator!=( const Sprite::Frame& ac_roFrame ) const
 {
     return ( !SameSize( ac_roFrame ) ||
              ac_roFrame.sliceLocation != sliceLocation );
 }
-INLINE bool Sprite::Frame::SameSize( const Sprite::Frame& ac_roFrame ) const
+bool Sprite::Frame::SameSize( const Sprite::Frame& ac_roFrame ) const
 {
     return ( ac_roFrame.sliceOffset == sliceOffset &&
              ac_roFrame.slicePixels == slicePixels &&
@@ -43,37 +44,47 @@ INLINE bool Sprite::Frame::SameSize( const Sprite::Frame& ac_roFrame ) const
 }
 
 // Copy constructor/operator
-INLINE Sprite::Sprite( const Sprite& ac_roSprite )
-    : Quad( ac_roSprite ), m_uiFrameCount( ac_roSprite.m_uiFrameCount ),
-      m_paoFrames( 0 == m_uiFrameCount
-                    ? nullptr : new Frame[ m_uiFrameCount ] ),
-      m_uiFrameNumber( ac_roSprite.m_uiFrameNumber % m_uiFrameCount )
+// TODO initialize members not added yet
+Sprite::Sprite( const Sprite& ac_roSprite )
+    : Quad( ac_roSprite ),
+      m_uiFrameCount( nullptr == ac_roSprite.m_paoFrames
+                        ? 0 : ac_roSprite.m_uiFrameCount ),
+      m_uiFrameNumber( 0 == m_uiFrameCount
+                        ? 0 : ac_roSprite.m_uiFrameNumber % m_uiFrameCount ),
+      m_paoFrames( 0 == m_uiFrameCount ? nullptr : new Frame[ m_uiFrameCount ] )
 {
-    if( 0 < m_uiFrameCount )
+    if( 0 != m_uiFrameCount )
     {
         memcpy( m_paoFrames, ac_roSprite.m_paoFrames,
-                sizeof( ZERO_FRAME ) * m_uiFrameCount );
+                m_uiFrameCount * sizeof( Frame ) );
     }
 }
-INLINE Sprite& Sprite::operator=( const Sprite& ac_roSprite )
+Sprite& Sprite::operator=( const Sprite& ac_roSprite )
 {
     if( &m_paoFrames != &(ac_roSprite.m_paoFrames) )
     {
-        m_uiFrameCount = ac_roSprite.m_uiFrameCount;
-        m_uiFrameNumber = ac_roSprite.m_uiFrameNumber % m_uiFrameCount;
-        Frame* paoFrames = m_paoFrames;
-        m_paoFrames = ( 0 == ac_roSprite.m_uiFrameCount
-                        ? nullptr : new Frame[ m_uiFrameCount ] );
-        if( nullptr != paoFrames )
+        if( m_uiFrameCount != ac_roSprite.m_uiFrameCount )
         {
-            delete[] paoFrames;
+            m_uiFrameCount = ( nullptr == ac_roSprite.m_paoFrames
+                                ? 0 : ac_roSprite.m_uiFrameCount );
+            Frame* paoFrames = m_paoFrames;
+            m_paoFrames = ( 0 == m_uiFrameCount
+                            ? nullptr : new Frame[ m_uiFrameCount ] );
+            delete paoFrames;
         }
+        if( 0 != m_uiFrameCount )
+        {
+            memcpy( m_paoFrames, ac_roSprite.m_paoFrames,
+                    m_uiFrameCount * sizeof( Frame ) );
+        }
+        m_uiFrameNumber = ( 0 == m_uiFrameCount
+                            ? 0 : ac_roSprite.m_uiFrameNumber % m_uiFrameCount );
     }
     return *this;
 }
 
 // Destructor actually does something
-INLINE Sprite::~Sprite()
+Sprite::~Sprite()
 {
     Frame* paoFrames = m_paoFrames;
     m_paoFrames = nullptr;
@@ -84,8 +95,8 @@ INLINE Sprite::~Sprite()
 }
 
 // Frame access operators
-INLINE Sprite::Frame&
-    Sprite::Frame( unsigned int a_uiFrameNumber )
+Sprite::Frame&
+    Sprite::GetFrame( unsigned int a_uiFrameNumber )
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {
@@ -93,8 +104,8 @@ INLINE Sprite::Frame&
     }
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
-INLINE const Sprite::Frame&
-    Sprite::Frame( unsigned int a_uiFrameNumber ) const
+const Sprite::Frame&
+    Sprite::GetFrame( unsigned int a_uiFrameNumber ) const
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {
@@ -102,7 +113,7 @@ INLINE const Sprite::Frame&
     }
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
-INLINE Sprite::Frame&
+Sprite::Frame&
     Sprite::operator[]( unsigned int a_uiFrameNumber )
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
@@ -111,7 +122,7 @@ INLINE Sprite::Frame&
     }
     return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
 }
-INLINE const Sprite::Frame&
+const Sprite::Frame&
     Sprite::operator[]( unsigned int a_uiFrameNumber ) const
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
@@ -122,7 +133,7 @@ INLINE const Sprite::Frame&
 }
 
 // Frame increment/decrement operators
-INLINE Sprite& Sprite::operator++()
+Sprite& Sprite::operator++()
 {
     unsigned int uiOldFrame = m_uiFrameNumber;
     m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % m_uiFrameCount;
@@ -132,7 +143,7 @@ INLINE Sprite& Sprite::operator++()
     }
     return *this;
 }
-INLINE Sprite Sprite::operator++(int)
+Sprite Sprite::operator++(int)
 {
     Sprite oCopy( *this );
     m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % m_uiFrameCount;
@@ -142,7 +153,7 @@ INLINE Sprite Sprite::operator++(int)
     }
     return oCopy;
 }
-INLINE Sprite& Sprite::operator--()
+Sprite& Sprite::operator--()
 {
     unsigned int uiOldFrame = m_uiFrameNumber;
     m_uiFrameNumber = ( m_uiFrameNumber - 1 ) % m_uiFrameCount;
@@ -152,7 +163,7 @@ INLINE Sprite& Sprite::operator--()
     }
     return *this;
 }
-INLINE Sprite Sprite::operator--(int)
+Sprite Sprite::operator--(int)
 {
     Sprite oCopy( *this );
     m_uiFrameNumber = ( m_uiFrameNumber - 1 ) % m_uiFrameCount;
@@ -164,7 +175,7 @@ INLINE Sprite Sprite::operator--(int)
 }
 
 // Sprite properties
-INLINE Sprite::Frame& Sprite::CurrentFrame()
+Sprite::Frame& Sprite::CurrentFrame()
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {
@@ -172,7 +183,7 @@ INLINE Sprite::Frame& Sprite::CurrentFrame()
     }
     return m_paoFrames[ m_uiFrameNumber ];
 }
-INLINE const Sprite::Frame& Sprite::CurrentFrame() const
+const Sprite::Frame& Sprite::CurrentFrame() const
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {
@@ -180,7 +191,7 @@ INLINE const Sprite::Frame& Sprite::CurrentFrame() const
     }
     return m_paoFrames[ m_uiFrameNumber ];
 }
-INLINE Sprite& Sprite::SetFrameNumber( unsigned int a_uiFrameNumber )
+Sprite& Sprite::SetFrameNumber( unsigned int a_uiFrameNumber )
 {
     if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
     {

@@ -49,14 +49,16 @@ public:
                                     // the sprite ( +x = down, +y = right )
         Cropping cropping;
 
+        // default constructor
+        Frame();
+
         // Compare dimensions
         bool operator==( const Frame& ac_roFrame ) const;
         bool operator!=( const Frame& ac_roFrame ) const;
         bool SameSize( const Frame& ac_roFrame ) const;
-    };
 
-    // Holds a sequence of frame attributes
-    class FrameArray;
+        static const Frame ZERO;
+    };
 
     // TODO main constructor
     Sprite( const Sprite& ac_roSprite );
@@ -66,8 +68,8 @@ public:
     virtual ~Sprite();
 
     // Frame access operators
-    Frame& Frame( unsigned int a_uiFrameNumber );
-    const Frame& Frame( unsigned int a_uiFrameNumber ) const;
+    Frame& GetFrame( unsigned int a_uiFrameNumber );
+    const Frame& GetFrame( unsigned int a_uiFrameNumber ) const;
     Frame& operator[]( unsigned int a_uiFrameNumber );
     const Frame& operator[]( unsigned int a_uiFrameNumber ) const;
 
@@ -79,7 +81,7 @@ public:
 
     // Sprite properties
     unsigned int FrameNumber() const { return m_uiFrameNumber; }
-    unsigned int FrameCount() const;
+    unsigned int FrameCount() const { return m_uiFrameCount; }
     Frame& CurrentFrame();
     const Frame& CurrentFrame() const;
     Sprite& SetFrameNumber( unsigned int a_uiFrameNumber );
@@ -106,12 +108,11 @@ public:
 
     // TODO set properties
 
-    static const Frame ZERO_FRAME;
-
 protected:
-
+    
     // Default constructor creates one frame
-    const FrameArray* m_poFrames; // pointer to const, not const pointer
+    Frame* m_paoFrames;
+    unsigned int m_uiFrameCount;
     unsigned int m_uiFrameNumber;
 
 };  // class Sprite
