@@ -3,14 +3,16 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 27, 2014
  * Description:        Class representing an textured rectangle, or sprite.
- * Last Modified:      March 6, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 11, 2014
+ * Last Modification:  Moving Frame code to Frame.h.
  ******************************************************************************/
 
 #ifndef SPRITE__H
 #define SPRITE__H
 
 #include "Quad.h"
+#include "Frame.h"
+#include "Texture.h"
 #include "MyFirstEngineMacros.h"
 
 namespace MyFirstEngine
@@ -21,56 +23,15 @@ class IMEXPORT_CLASS Sprite : public Quad
 {
 public:
 
-    // How to handle the sprite area and slice area not matching.  Options other
-    // than CROP_TO_SLICE will draw uncropped pixels not within the slice based
-    // on the current OpenGL clamping options.
-    enum Cropping
-    {
-        CROP_TO_SLICE = 0,      // draw pixels if and only if inside slice area
-        CROP_TO_SPRITE = 1,     // draw pixels if and only if inside sprite area
-        CROP_TO_INTERSECTION = 2,   // draw only where sprite and slice overlap
-        CROP_TO_UNION = 3,      // draw area that contains both sprite and slice
-
-        CROP_OPTION_COUNT = 4
-    };
-
-    // Holds attributes for a single frame
-    struct Frame
-    {
-        IntPoint2D spritePixels;    // size of the sprite in texture pixels
-        IntPoint2D centerOffset;    // pixel location of the center of the
-                                    // sprite relative to m_oPixels / 2
-        IntPoint2D slicePixels;     // size of the slice in texture pixels
-        IntPoint2D sliceLocation;   // pixel location of the top-left pixel in
-                                    // slice relative to the top-left corner of
-                                    // the texture ( +x = down, +y = right )
-        IntPoint2D sliceOffset;     // pixel location of the top-left pixel in
-                                    // slice relative to the top-left corner of
-                                    // the sprite ( +x = down, +y = right )
-        Cropping cropping;
-
-        // default constructor
-        Frame();
-
-        // Compare dimensions
-        bool operator==( const Frame& ac_roFrame ) const;
-        bool operator!=( const Frame& ac_roFrame ) const;
-        bool SameSize( const Frame& ac_roFrame ) const;
-
-        static const Frame ZERO;
-    };
-
     // TODO main constructor
     Sprite( const Sprite& ac_roSprite );
     Sprite& operator=( const Sprite& ac_roSprite );
 
-    // Destructor actually does something
-    virtual ~Sprite();
+    // Destructor
+    virtual ~Sprite() {}
 
     // Frame access operators
-    Frame& GetFrame( unsigned int a_uiFrameNumber );
     const Frame& GetFrame( unsigned int a_uiFrameNumber ) const;
-    Frame& operator[]( unsigned int a_uiFrameNumber );
     const Frame& operator[]( unsigned int a_uiFrameNumber ) const;
 
     // Frame increment/decrement operators
@@ -81,14 +42,27 @@ public:
 
     // Sprite properties
     unsigned int FrameNumber() const { return m_uiFrameNumber; }
-    unsigned int FrameCount() const { return m_uiFrameCount; }
-    Frame& CurrentFrame();
+    const Frame::Array& FrameList() const { return *m_pcoFrameList; }
+    unsigned int FrameCount() const
+    { return ( nullptr == m_pcoFrameList ? 0 : m_pcoFrameList->Size() ); }
     const Frame& CurrentFrame() const;
     Sprite& SetFrameNumber( unsigned int a_uiFrameNumber );
+    Sprite& SetFrameList( const Frame::Array* a_pcoFrameList );
+    const Texture& GetTexture() const { return *m_pcoTexture; }
+    Sprite& SetTexture( const Texture& ac_roTexture );
+    Sprite& SetTexture( Texture&& a_rroTexture );   // sets texture pointer to
+                                                    // null.  This way, lvalue
+                                                    // references to const
+                                                    // textures can be used, but
+                                                    // passing in an rvalue
+                                                    // reference to a temporary
+                                                    // texture won't lead to the
+                                                    // sprite having an invalid
+                                                    // texture pointer.
 
     // Current frame properties
     const IntPoint2D& SpritePixels() const
-    { return CurrentFrame().spritePixels; }
+    { return CurrentFrame().framePixels; }
     const IntPoint2D& CenterOffset() const
     { return CurrentFrame().centerOffset; }
     const IntPoint2D& SlicePixels() const
@@ -97,8 +71,7 @@ public:
     { return CurrentFrame().sliceLocation; }
     const IntPoint2D& SliceOffset() const
     { return CurrentFrame().sliceOffset; }
-    Cropping Cropping() const { return CurrentFrame().cropping; }
-    // TODO get texture
+    Frame::Cropping Cropping() const { return CurrentFrame().cropping; }
 
     // Get the cached model view transformation resulting from this object's
     // scale/rotation/position/pixel dimensions/etc.  If any of those properties
@@ -106,14 +79,30 @@ public:
     // recalculate it.
     virtual const Transform3D& GetModelMatrix() const override;
 
-    // TODO set properties
+    // Get the cached texture coordinate transformation resulting from the
+    // current frame's dimensions and cropping.  If any of those properties have
+    // changed since the last time said transformation was calculated,
+    // recalculate it.
+    virtual const Transform3D& GetTextureMatrix() const;
+
+    // set a flag indicating that the cached texture coordinate transform matrix
+    // for this object should be recalculated
+    void UpdateTextureMatrix() { *m_pbUpdateTextureMatrix = true; }
 
 protected:
+
+    // Draw the sprite
+    virtual void DrawComponents() const override;
     
-    // Default constructor creates one frame
-    Frame* m_paoFrames;
-    unsigned int m_uiFrameCount;
+    // Default constructor creates null frame list, null texture
+    const Frame::Array* m_pcoFrameList;
     unsigned int m_uiFrameNumber;
+    const Texture* m_pcoTexture;
+
+    // Transform texture coordinates so that 0 and 1 correspond to slice
+    // boundaries, not frame boundaries
+    bool* m_pbUpdateTextureMatrix;
+    Transform3D* m_poTextureMatrix;
 
 };  // class Sprite
 

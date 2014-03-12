@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 5, 2014
  * Description:        Implementations for Sprite functions.
- * Last Modified:      March 6, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 11, 2014
+ * Last Modification:  Moving Frame code to Frame.h.
  ******************************************************************************/
 
 #include "../Declarations/Sprite.h"
@@ -14,191 +14,222 @@
 namespace MyFirstEngine
 {
 
-// Default frame
-const Sprite::Frame Sprite::Frame::ZERO = Frame();
-
-// Default frame constructor
-Sprite::Frame::Frame()
-    : spritePixels( IntPoint2D::Zero() ), centerOffset( IntPoint2D::Zero() ),
-      sliceLocation( IntPoint2D::Zero() ), slicePixels( IntPoint2D::Zero() ),
-      sliceOffset( IntPoint2D::Zero() ), cropping( Sprite::CROP_TO_SLICE ) {}
-
-// Compare dimensions
-bool Sprite::Frame::operator==( const Sprite::Frame& ac_roFrame ) const
-{
-    return ( SameSize( ac_roFrame ) &&
-             ac_roFrame.sliceLocation == sliceLocation );
-}
-bool Sprite::Frame::operator!=( const Sprite::Frame& ac_roFrame ) const
-{
-    return ( !SameSize( ac_roFrame ) ||
-             ac_roFrame.sliceLocation != sliceLocation );
-}
-bool Sprite::Frame::SameSize( const Sprite::Frame& ac_roFrame ) const
-{
-    return ( ac_roFrame.sliceOffset == sliceOffset &&
-             ac_roFrame.slicePixels == slicePixels &&
-             ac_roFrame.centerOffset == centerOffset &&
-             ac_roFrame.spritePixels == spritePixels &&
-             ac_roFrame.cropping == cropping );
-}
-
 // Copy constructor/operator
 // TODO initialize members not added yet
 Sprite::Sprite( const Sprite& ac_roSprite )
     : Quad( ac_roSprite ),
-      m_uiFrameCount( nullptr == ac_roSprite.m_paoFrames
-                        ? 0 : ac_roSprite.m_uiFrameCount ),
-      m_uiFrameNumber( 0 == m_uiFrameCount
-                        ? 0 : ac_roSprite.m_uiFrameNumber % m_uiFrameCount ),
-      m_paoFrames( 0 == m_uiFrameCount ? nullptr : new Frame[ m_uiFrameCount ] )
+      m_pcoFrameList( ac_roSprite.m_pcoFrameList ),
+      m_uiFrameNumber( ac_roSprite.m_uiFrameNumber ),
+      m_pcoTexture( ac_roSprite.m_pcoTexture ),
+      m_pbUpdateTextureMatrix( new bool ), m_poTextureMatrix( new Transform3D )
 {
-    if( 0 != m_uiFrameCount )
-    {
-        memcpy( m_paoFrames, ac_roSprite.m_paoFrames,
-                m_uiFrameCount * sizeof( Frame ) );
-    }
+    UpdateTextureMatrix();
 }
 Sprite& Sprite::operator=( const Sprite& ac_roSprite )
 {
-    if( &m_paoFrames != &(ac_roSprite.m_paoFrames) )
+    // if this is this, don't do anything
+    if( &m_uiFrameNumber == &(ac_roSprite.m_uiFrameNumber) )
     {
-        if( m_uiFrameCount != ac_roSprite.m_uiFrameCount )
-        {
-            m_uiFrameCount = ( nullptr == ac_roSprite.m_paoFrames
-                                ? 0 : ac_roSprite.m_uiFrameCount );
-            Frame* paoFrames = m_paoFrames;
-            m_paoFrames = ( 0 == m_uiFrameCount
-                            ? nullptr : new Frame[ m_uiFrameCount ] );
-            delete paoFrames;
-        }
-        if( 0 != m_uiFrameCount )
-        {
-            memcpy( m_paoFrames, ac_roSprite.m_paoFrames,
-                    m_uiFrameCount * sizeof( Frame ) );
-        }
-        m_uiFrameNumber = ( 0 == m_uiFrameCount
-                            ? 0 : ac_roSprite.m_uiFrameNumber % m_uiFrameCount );
+        return *this;
     }
+
+    // Remember the old frame size
+    Frame oFrame = CurrentFrame();
+
+    // Copy properties
+    Quad::operator=( ac_roSprite );
+    m_pcoFrameList = ac_roSprite.m_pcoFrameList;
+    m_uiFrameNumber = ac_roSprite.m_uiFrameNumber;
+    m_pcoTexture = ac_roSprite.m_pcoTexture;
+
+    // If frame size changed, update matrix
+    if( !CurrentFrame().SameSize( oFrame ) )
+    {
+        UpdateModelMatrix();
+        UpdateTextureMatrix();
+    }
+
     return *this;
 }
 
-// Destructor actually does something
-Sprite::~Sprite()
-{
-    Frame* paoFrames = m_paoFrames;
-    m_paoFrames = nullptr;
-    if( nullptr != paoFrames )
-    {
-        delete[] paoFrames;
-    }
-}
-
 // Frame access operators
-Sprite::Frame&
-    Sprite::GetFrame( unsigned int a_uiFrameNumber )
+const Frame& Sprite::GetFrame( unsigned int a_uiFrameNumber ) const
 {
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
+    if( 0 == FrameCount() )
     {
-        throw std::out_of_range( "Sprite has no frames" );
+        return ( nullptr == m_pcoTexture ? Frame::ZERO
+                                         : m_pcoTexture->TextureFrame() );
     }
-    return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
+    return (*m_pcoFrameList)[ a_uiFrameNumber % FrameCount() ];
 }
-const Sprite::Frame&
-    Sprite::GetFrame( unsigned int a_uiFrameNumber ) const
+const Frame& Sprite::operator[]( unsigned int a_uiFrameNumber ) const
 {
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
+    if( 0 == FrameCount() )
     {
-        throw std::out_of_range( "Sprite has no frames" );
+        return ( nullptr == m_pcoTexture ? Frame::ZERO
+                                         : m_pcoTexture->TextureFrame() );
     }
-    return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
-}
-Sprite::Frame&
-    Sprite::operator[]( unsigned int a_uiFrameNumber )
-{
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
-    {
-        throw std::out_of_range( "Sprite has no frames" );
-    }
-    return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
-}
-const Sprite::Frame&
-    Sprite::operator[]( unsigned int a_uiFrameNumber ) const
-{
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
-    {
-        throw std::out_of_range( "Sprite has no frames" );
-    }
-    return m_paoFrames[ a_uiFrameNumber % m_uiFrameCount ];
+    return (*m_pcoFrameList)[ a_uiFrameNumber % FrameCount() ];
 }
 
 // Frame increment/decrement operators
 Sprite& Sprite::operator++()
 {
+    if( 0 == FrameCount() )
+    {
+        return *this;
+    }
     unsigned int uiOldFrame = m_uiFrameNumber;
-    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % m_uiFrameCount;
-    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( m_paoFrames[ uiOldFrame ] ) )
+    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % FrameCount();
+    if( !CurrentFrame().SameSize( GetFrame( uiOldFrame ) ) )
     {
         UpdateModelMatrix();
+        UpdateTextureMatrix();
     }
     return *this;
 }
 Sprite Sprite::operator++(int)
 {
+    if( 0 == FrameCount() )
+    {
+        return *this;
+    }
     Sprite oCopy( *this );
-    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % m_uiFrameCount;
-    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( oCopy.CurrentFrame() ) )
+    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % FrameCount();
+    if( !CurrentFrame().SameSize( oCopy.CurrentFrame() ) )
     {
         UpdateModelMatrix();
+        UpdateTextureMatrix();
     }
     return oCopy;
 }
 Sprite& Sprite::operator--()
 {
+    if( 0 == FrameCount() )
+    {
+        return *this;
+    }
     unsigned int uiOldFrame = m_uiFrameNumber;
-    m_uiFrameNumber = ( m_uiFrameNumber - 1 ) % m_uiFrameCount;
-    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( m_paoFrames[ uiOldFrame ] ) )
+    m_uiFrameNumber = ( 0 == m_uiFrameNumber
+                        ? FrameCount() - 1
+                        : ( m_uiFrameNumber - 1 ) % FrameCount() );
+    if( !CurrentFrame().SameSize( GetFrame( uiOldFrame ) ) )
     {
         UpdateModelMatrix();
+        UpdateTextureMatrix();
     }
     return *this;
 }
 Sprite Sprite::operator--(int)
 {
+    if( 0 == FrameCount() )
+    {
+        return *this;
+    }
     Sprite oCopy( *this );
-    m_uiFrameNumber = ( m_uiFrameNumber - 1 ) % m_uiFrameCount;
-    if( !m_paoFrames[ m_uiFrameNumber ].SameSize( oCopy.CurrentFrame() ) )
+    m_uiFrameNumber = ( 0 == m_uiFrameNumber
+                        ? FrameCount() - 1
+                        : ( m_uiFrameNumber - 1 ) % FrameCount() );
+    if( !CurrentFrame().SameSize( oCopy.CurrentFrame() ) )
     {
         UpdateModelMatrix();
+        UpdateTextureMatrix();
     }
     return oCopy;
 }
 
 // Sprite properties
-Sprite::Frame& Sprite::CurrentFrame()
+const Frame& Sprite::CurrentFrame() const
 {
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
-    {
-        throw std::out_of_range( "Sprite has no frames" );
-    }
-    return m_paoFrames[ m_uiFrameNumber ];
-}
-const Sprite::Frame& Sprite::CurrentFrame() const
-{
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
-    {
-        throw std::out_of_range( "Sprite has no frames" );
-    }
-    return m_paoFrames[ m_uiFrameNumber ];
+    return GetFrame( m_uiFrameNumber );
 }
 Sprite& Sprite::SetFrameNumber( unsigned int a_uiFrameNumber )
 {
-    if( nullptr == m_paoFrames || 0 == m_uiFrameCount )
+    if( 0 == FrameCount() )
     {
-        throw std::out_of_range( "Sprite has no frames" );
+        return *this;
     }
-    m_uiFrameNumber = a_uiFrameNumber % m_uiFrameCount;
+    if( !CurrentFrame().SameSize( GetFrame( a_uiFrameNumber ) ) )
+    {
+        UpdateModelMatrix();
+        UpdateTextureMatrix();
+    }
+    m_uiFrameNumber = a_uiFrameNumber % FrameCount();
     return *this;
+}
+Sprite& Sprite::SetFrameList( const Frame::Array* a_pcoFrameList )
+{
+    // save current frame
+    Frame oFrame = CurrentFrame();
+
+    // set frame list
+    m_pcoFrameList = a_pcoFrameList;
+    m_uiFrameNumber = ( nullptr == m_pcoFrameList
+                        ? 0 : m_uiFrameNumber % FrameCount() );
+
+    // check for change in frame size
+    if( !oFrame.SameSize( CurrentFrame() ) )
+    {
+        UpdateModelMatrix();
+        UpdateTextureMatrix();
+    }
+    return *this;
+}
+Sprite& Sprite::SetTexture( const Texture& ac_roTexture )
+{
+    if( &ac_roTexture != m_pcoTexture )
+    {
+        Frame oFrame = CurrentFrame();
+        m_pcoTexture = &ac_roTexture;
+        if( !oFrame.SameSize( CurrentFrame() ) )
+        {
+            UpdateModelMatrix();
+            UpdateTextureMatrix();
+        }
+    }
+    return *this;
+}
+// sets texture pointer to null.  This way, lvalue references to const textures
+// can be used, but passing in an rvalue reference to a temporary texture won't
+// lead to the sprite having an invalid texture pointer.
+Sprite& Sprite::SetTexture( Texture&& a_rroTexture )
+{
+    Frame oFrame = CurrentFrame();
+    m_pcoTexture = nullptr;
+    if( !oFrame.SameSize( CurrentFrame() ) )
+    {
+        UpdateModelMatrix();
+        UpdateTextureMatrix();
+    }
+    return *this;
+}
+
+// Get the cached model view transformation resulting from this object's
+// scale/rotation/position/pixel dimensions/etc.  If any of those properties
+// have changed since the last time said transformation was calculated,
+// recalculate it.
+const Transform3D& Sprite::GetModelMatrix() const
+{
+    if( *m_pbUpdateModelMatrix )
+    {
+        // TODO
+        *m_pbUpdateModelMatrix = false;
+    }
+    return *m_poModelMatrix;
+}
+
+// Get the cached texture coordinate transformation resulting from the
+// current frame's dimensions and cropping.  If any of those properties have
+// changed since the last time said transformation was calculated,
+// recalculate it.
+const Transform3D& Sprite::GetTextureMatrix() const
+{
+    if( *m_pbUpdateTextureMatrix )
+    {
+        // TODO
+        *m_pbUpdateTextureMatrix = false;
+    }
+    return *m_poTextureMatrix;
 }
 
 }   // namespace MyFirstEngine

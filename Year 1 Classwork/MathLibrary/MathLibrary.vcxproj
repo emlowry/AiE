@@ -15,6 +15,7 @@
     <ClInclude Include="Declarations\ColorVector.h" />
     <ClInclude Include="Declarations\Comparable.h" />
     <ClInclude Include="Declarations\DumbString.h" />
+    <ClInclude Include="Declarations\DynamicArray.h" />
     <ClInclude Include="Declarations\InitializeableSingleton.h" />
     <ClInclude Include="Declarations\Functions.h" />
     <ClInclude Include="Declarations\Hashable.h" />

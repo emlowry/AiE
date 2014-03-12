@@ -23,6 +23,7 @@
 #include "../Declarations/ColorVector.h"
 #include "../Declarations/Comparable.h"
 #include "../Declarations/DumbString.h"
+#include "../Declarations/DynamicArray.h"
 #include "../Declarations/Functions.h"
 #include "../Declarations/Hashable.h"
 #include "../Declarations/Hex.h"

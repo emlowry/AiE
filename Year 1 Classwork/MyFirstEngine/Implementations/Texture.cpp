@@ -132,13 +132,13 @@ Texture::Texture( const char* const ac_cpcFile,
                   GLenum a_eWrapS, GLenum a_eWrapT,
                   GLenum a_eMinFilter, GLenum a_eMagFilter,
                   const Color::ColorVector& ac_roBorderColor )
-    : m_eWrapS( a_eWrapS ), m_eWrapT( a_eWrapT ),
+    : m_oSize( 0, 0 ), m_eWrapS( a_eWrapS ), m_eWrapT( a_eWrapT ),
       m_eMinFilter( a_eMinFilter ), m_eMagFilter( a_eMagFilter ),
       m_oBorderColor( ac_roBorderColor ), m_oFile( ac_cpcFile ), 
-      m_paucData( nullptr ), m_uiID( 0 ), m_eUnit( 0 )
+      m_paucData( nullptr ), m_uiID( 0 ), m_eUnit( 0 ), m_oFrame()
 {
-    LoadedTexture oLoaded = { nullptr, nullptr };
-    Lookup()[ this ] = oLoaded;
+    Lookup()[ this ].next = nullptr;
+    Lookup()[ this ].previous = nullptr;
 }
 
 // Destructor
@@ -255,6 +255,8 @@ void Texture::Load( bool a_bCache )
             SOIL_load_image( m_oFile, &m_oSize.x, &m_oSize.y, 0, GL_RGBA );
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, m_oSize.x, m_oSize.y,
                       0, GL_RGBA, GL_UNSIGNED_BYTE, paucData );
+        m_oFrame.framePixels = m_oSize;
+        m_oFrame.slicePixels = m_oSize;
 
         // if caching is required, copy to cache
         if( a_bCache )
@@ -299,7 +301,7 @@ void Texture::MakeCurrent()
 // can textures be loaded?
 bool Texture::IsInitialized()
 {
-    return !Units().empty();
+    return ( 0 == g_uiMaxUnits );
 }
 
 // get available texture units

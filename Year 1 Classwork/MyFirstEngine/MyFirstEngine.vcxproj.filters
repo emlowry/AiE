@@ -54,6 +54,9 @@
     <ClInclude Include="Declarations\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\Frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\Shader.cpp">

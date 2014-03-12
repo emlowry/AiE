@@ -77,6 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Declarations\Frame.h" />
     <ClInclude Include="Declarations\GameEngine.h" />
     <ClInclude Include="Declarations\GameState.h" />
     <ClInclude Include="Declarations\GameWindow.h" />

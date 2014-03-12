@@ -72,6 +72,9 @@
     <ClInclude Include="Declarations\Quaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\DynamicArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Implementations\ColorVector.inl">

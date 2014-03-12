@@ -11,6 +11,7 @@
 #define TEXTURE__H
 
 #include "GLFW.h"
+#include "Frame.h"
 #include "MathLibrary.h"
 #include "MyFirstEngineMacros.h"
 
@@ -49,6 +50,18 @@ public:
 #undef TEXTURE__H__CACHE_TEXTURES
     void MakeCurrent();     // make this texture's unit active (load if needed)
 
+    // Get properties
+    GLuint ID() const { return m_uiID; }
+    GLenum Unit() const { return m_eUnit; }
+    const IntPoint2D& Size() const { return m_oSize; }
+    const Color::ColorVector& BorderColor() const { return m_oBorderColor; }
+    GLenum MinFilter() const { return m_eMinFilter; }
+    GLenum MagFilter() const { return m_eMagFilter; }
+    GLenum WrapS() const { return m_eWrapS; }
+    GLenum WrapT() const { return m_eWrapT; }
+    const DumbString& FileName() const { return m_oFile; }
+    const Frame& TextureFrame() const { return m_oFrame; }
+
     static bool IsInitialized();    // can textures be loaded?
     static void Initialize();       // get available texture units
     static void Terminate();        // destroy all textures
@@ -58,12 +71,15 @@ protected:
     GLuint m_uiID;      // OpenGL id for the texture, 0 = none
     GLenum m_eUnit;     // texture unit to which this texture is bound, 0 = none
 
-    IntPoint2D m_oSize; // size in pixels
+    IntPoint2D m_oSize;     // size in pixels
     GLenum m_eMinFilter;    // default is GL_NEAREST_MIPMAP_LINEAR
     GLenum m_eMagFilter;    // default is GL_NEAREST
-    GLenum m_eWrapT;        // default is GL_CLAMP_TO_EDGE
     GLenum m_eWrapS;        // default is GL_CLAMP_TO_EDGE
+    GLenum m_eWrapT;        // default is GL_CLAMP_TO_EDGE
     Color::ColorVector m_oBorderColor;  // if wrap setting is GL_CLAMP_TO_BORDER
+
+    // For no-frame sprites using this texture
+    Frame m_oFrame;
 
     DumbString m_oFile;         // file from which this texture is loaded
     unsigned char* m_paucData;  // texture data cache
