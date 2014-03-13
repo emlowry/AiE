@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 27, 2014
  * Description:        Class representing an textured rectangle, or sprite.
- * Last Modified:      March 11, 2014
- * Last Modification:  Moving Frame code to Frame.h.
+ * Last Modified:      March 12, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef SPRITE__H
@@ -23,7 +23,31 @@ class IMEXPORT_CLASS Sprite : public Quad
 {
 public:
 
-    // TODO main constructor
+    // Main constructors
+    Sprite( const Texture* a_pcoTexture = nullptr,
+            const Color::ColorVector& ac_roColor = Color::WHITE,
+            const Point2D& ac_roSize = Point2D( 1.0 ),
+            const Point3D& ac_roPosition = Point3D::Origin(),
+            const Rotation3D& ac_roRotation = Rotation3D::None() );
+    Sprite( const Texture* a_pcoTexture,
+            const Color::ColorVector& ac_roColor,
+            const Point3D& ac_roLowerLeftCorner,
+            const Point3D& ac_roUpperRightCorner,
+            const Point3D& ac_roForward = Point3D::Unit(0) );
+    Sprite( const Texture* a_pcoTexture,
+            const Frame::Array* a_pcoFrameList,
+            const Color::ColorVector& ac_roColor = Color::WHITE,
+            const Point2D& ac_roSize = Point2D( 1.0 ),
+            const Point3D& ac_roPosition = Point3D::Origin(),
+            const Rotation3D& ac_roRotation = Rotation3D::None() );
+    Sprite( const Texture* a_pcoTexture,
+            const Frame::Array* a_pcoFrameList,
+            const Color::ColorVector& ac_roColor,
+            const Point3D& ac_roLowerLeftCorner,
+            const Point3D& ac_roUpperRightCorner,
+            const Point3D& ac_roForward = Point3D::Unit(0) );
+
+    // Copy constructor/operator
     Sprite( const Sprite& ac_roSprite );
     Sprite& operator=( const Sprite& ac_roSprite );
 
@@ -42,26 +66,17 @@ public:
 
     // Sprite properties
     unsigned int FrameNumber() const { return m_uiFrameNumber; }
-    const Frame::Array& FrameList() const { return *m_pcoFrameList; }
+    const Frame::Array* FrameList() const { return m_pcoFrameList; }
     unsigned int FrameCount() const
     { return ( nullptr == m_pcoFrameList ? 0 : m_pcoFrameList->Size() ); }
     const Frame& CurrentFrame() const;
     Sprite& SetFrameNumber( unsigned int a_uiFrameNumber );
     Sprite& SetFrameList( const Frame::Array* a_pcoFrameList );
-    const Texture& GetTexture() const { return *m_pcoTexture; }
-    Sprite& SetTexture( const Texture& ac_roTexture );
-    Sprite& SetTexture( Texture&& a_rroTexture );   // sets texture pointer to
-                                                    // null.  This way, lvalue
-                                                    // references to const
-                                                    // textures can be used, but
-                                                    // passing in an rvalue
-                                                    // reference to a temporary
-                                                    // texture won't lead to the
-                                                    // sprite having an invalid
-                                                    // texture pointer.
+    const Texture* GetTexture() const { return m_pcoTexture; }
+    Sprite& SetTexture( const Texture* a_pcoTexture );
 
     // Current frame properties
-    const IntPoint2D& SpritePixels() const
+    const IntPoint2D& FramePixels() const
     { return CurrentFrame().framePixels; }
     const IntPoint2D& CenterOffset() const
     { return CurrentFrame().centerOffset; }
@@ -73,6 +88,15 @@ public:
     { return CurrentFrame().sliceOffset; }
     Frame::Cropping Cropping() const { return CurrentFrame().cropping; }
 
+    // Get/Set display size ( scale / framePixels )
+    Point2D DisplaySize() const;
+    Sprite& SetDisplaySize( const Point2D& ac_roSize );
+    Sprite& SetDisplaySize( double a_dWidth, double a_dHeight );
+
+    // Get UV dimensions for the current frame's slice
+    Point2D SliceOffsetUV() const;
+    Point2D SliceSizeUV() const;
+
     // Get the cached model view transformation resulting from this object's
     // scale/rotation/position/pixel dimensions/etc.  If any of those properties
     // have changed since the last time said transformation was calculated,
@@ -83,7 +107,7 @@ public:
     // current frame's dimensions and cropping.  If any of those properties have
     // changed since the last time said transformation was calculated,
     // recalculate it.
-    virtual const Transform3D& GetTextureMatrix() const;
+    virtual const Transform2D& GetTextureMatrix() const;
 
     // set a flag indicating that the cached texture coordinate transform matrix
     // for this object should be recalculated
@@ -102,7 +126,7 @@ protected:
     // Transform texture coordinates so that 0 and 1 correspond to slice
     // boundaries, not frame boundaries
     bool* m_pbUpdateTextureMatrix;
-    Transform3D* m_poTextureMatrix;
+    Transform2D* m_poTextureMatrix;
 
 };  // class Sprite
 

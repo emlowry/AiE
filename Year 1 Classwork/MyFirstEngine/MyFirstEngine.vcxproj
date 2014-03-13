@@ -89,6 +89,7 @@
     <ClInclude Include="Declarations\ShaderProgram.h" />
     <ClInclude Include="Declarations\Drawable.h" />
     <ClInclude Include="Declarations\Sprite.h" />
+    <ClInclude Include="Declarations\SpriteShaderProgram.h" />
     <ClInclude Include="Declarations\Texture.h" />
     <ClInclude Include="include\MyFirstEngine.h" />
   </ItemGroup>
@@ -99,15 +100,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\Drawable.cpp" />
+    <ClCompile Include="Implementations\Frame.cpp" />
     <ClCompile Include="Implementations\GameEngine.cpp" />
     <ClCompile Include="Implementations\GameWindow.cpp" />
     <ClCompile Include="Implementations\QuadShaderProgram.cpp" />
     <ClCompile Include="Implementations\Shader.cpp" />
     <ClCompile Include="Implementations\ShaderProgram.cpp" />
     <ClCompile Include="Implementations\Sprite.cpp" />
+    <ClCompile Include="Implementations\SpriteShaderProgram.cpp" />
     <ClCompile Include="Implementations\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\Shaders\SpriteFragment.glsl" />
+    <None Include="resources\Shaders\SpriteVertex.glsl" />
     <None Include="resources\Shaders\QuadFragment.glsl" />
     <None Include="resources\Shaders\QuadVertex.glsl" />
   </ItemGroup>

@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Class representing an untextured rectangle.
- * Last Modified:      March 5, 2014
- * Last Modification:  Adding function for setting dimensions based on corners.
+ * Last Modified:      March 12, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef QUAD__H
@@ -28,8 +28,7 @@ public:
           const Point2D& ac_roSize = Point2D( 1.0 ),
           const Point3D& ac_roPosition = Point3D::Origin(),
           const Rotation3D& ac_roRotation = Rotation3D::None() )
-        : Drawable( &( QuadShaderProgram::Instance() ),
-                    ac_roColor, ac_roSize, ac_roPosition, ac_roRotation ) {}
+        : Drawable( ac_roColor, ac_roSize, ac_roPosition, ac_roRotation ) {}
     Quad( const Quad& ac_roQuad ) : Drawable( ac_roQuad ) {}
     Quad& operator=( const Quad& ac_roQuad )
     {
@@ -40,7 +39,7 @@ public:
           const Point3D& ac_roLowerLeftCorner,
           const Point3D& ac_roUpperRightCorner,
           const Point3D& ac_roForward = Point3D::Unit(0) )
-        : Drawable( &( QuadShaderProgram::Instance() ), ac_roColor )
+        : Drawable( ac_roColor )
     {
         SetDimensions( ac_roLowerLeftCorner, ac_roUpperRightCorner, ac_roForward );
     }
@@ -82,24 +81,6 @@ public:
     }
 
 protected:
-
-    // Protected constructor for child classes that want to use their own shaders
-    Quad( ShaderProgram* a_poProgram,
-          const Color::ColorVector& ac_roColor = Color::WHITE,
-          const Point2D& ac_roSize = Point2D( 1.0 ),
-          const Point3D& ac_roPosition = Point3D::Origin(),
-          const Rotation3D& ac_roRotation = Rotation3D::None() )
-        : Drawable( a_poProgram, ac_roColor, ac_roSize,
-                    ac_roPosition, ac_roRotation ) {}
-    Quad( ShaderProgram* a_poProgram,
-          const Color::ColorVector& ac_roColor,
-          const Point3D& ac_roLowerLeftCorner,
-          const Point3D& ac_roUpperRightCorner,
-          const Point3D& ac_roForward = Point3D::Unit(0) )
-        : Drawable( a_poProgram, ac_roColor )
-    {
-        SetDimensions( ac_roLowerLeftCorner, ac_roUpperRightCorner, ac_roForward );
-    }
 
     // Draw the four corners
     virtual void DrawComponents() const override

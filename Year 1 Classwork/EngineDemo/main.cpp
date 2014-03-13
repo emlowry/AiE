@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Runs a simple game to demonstrate MyFirstEngine.
- * Last Modified:      March 5, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      March 12, 2014
+ * Last Modification:  Sprite testing.
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
@@ -15,9 +15,9 @@
 using namespace MyFirstEngine;
 using namespace Utility;
 
-class SimpleState : public GameState, public Singleton< SimpleState >
+class SimpleState : public GameState, public InitializeableSingleton< SimpleState >
 {
-    friend class Singleton< SimpleState >;
+    friend class InitializeableSingleton< SimpleState >;
 public:
     virtual ~SimpleState() {}
     virtual void Draw() const override
@@ -27,9 +27,20 @@ public:
         {
             croQuad.Draw();
         }
+        m_oSprite.Draw();
         GameEngine::MainWindow().SwapBuffers();
     }
 protected:
+    virtual void InitializeInstance() override
+    {
+        m_oTexture.Load();
+        m_oSprite.UpdateTextureMatrix();
+        m_oSprite.SetDisplaySize( 0.125, 0.25 );
+    }
+    virtual void TerminateInstance() override
+    {
+        m_oTexture.Destroy();
+    }
     virtual void OnEnter() override
     {
         GameEngine::MainWindow().MakeCurrent();
@@ -50,9 +61,10 @@ protected:
                                0.25 + ( 0.25 * std::cos( GameEngine::LastTime() / 2 ) ) );
         m_aoQuads[7].SetPosition( 0.5 * std::sin( GameEngine::LastTime() ),
                                   0.5 * std::cos( GameEngine::LastTime() ) );
+        m_oSprite.SetPosition( m_aoQuads[7].GetPosition() );
     }
 private:
-    SimpleState()
+    SimpleState() : m_oTexture( "resources/images/warhol_soup.jpg" ), m_oSprite( &m_oTexture )
     {
         m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 2.0, 2.0 ) );
         m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 1.75, 1.75 ) );
@@ -64,6 +76,8 @@ private:
         m_aoQuads[7] = Quad( Color::ColorWheel::MEGAMAN_BLUE, Point2D( 0.25, 0.25 ) );
     }
     Quad m_aoQuads[8];
+    Texture m_oTexture;
+    Sprite m_oSprite;
 };
 
 int main(int argc, char* argv[])
@@ -78,11 +92,13 @@ int main(int argc, char* argv[])
     {
         std::cout << "\tGame Engine Initialized." << std::endl
                   << std::endl << "Close game window to exit...";
+        SimpleState::Initialize();
         SimpleState::Instance().Push();
         GameEngine::Run();
 
         std::cout << "\tWindow closed." << std::endl
                   << std::endl << "Terminating Game Engine...";
+        SimpleState::Terminate();
         GameEngine::Terminate();
         std::cout << "\tGame Engine terminated." << std::endl;
     }

@@ -56,8 +56,7 @@ public:
 
 protected:
 
-    // only the Quad class or a class derived from this one can call the
-    // constructors
+    // only the parent class's Initialize function can call this.
     QuadShaderProgram();
 
     // Instance initialization/termination calls Setup()/Destroy() before

@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Implementations for Drawable member functions.
- * Last Modified:      March 5, 2014
+ * Last Modified:      March 12, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -14,14 +14,13 @@ namespace MyFirstEngine
 {
 
 // Constructor
-Drawable::Drawable( ShaderProgram* a_poProgram,
-                    const Color::ColorVector& ac_roColor,
+Drawable::Drawable( const Color::ColorVector& ac_roColor,
                     const Point3D& ac_roScale,
                     const Point3D& ac_roPosition,
                     const Rotation3D& ac_roRotation )
     : m_oColor( ac_roColor ), m_oScale( ac_roScale ),
       m_oPosition( ac_roPosition ), m_oRotation( ac_roRotation ),
-      m_poProgram( a_poProgram ), m_oAfterTransform( Transform3D::Identity() ),
+      m_oAfterTransform( Transform3D::Identity() ),
       m_oBeforeTransform( Transform3D::Identity() ), m_bVisible( true ),
       m_pbUpdateModelMatrix( new bool ), m_poModelMatrix( new Transform3D )
 {
@@ -30,7 +29,7 @@ Drawable::Drawable( ShaderProgram* a_poProgram,
 Drawable::Drawable( const Drawable& ac_roObject )
     : m_oColor( ac_roObject.m_oColor ), m_oScale( ac_roObject.m_oScale ),
       m_oPosition( ac_roObject.m_oPosition ), m_oRotation( ac_roObject.m_oRotation ),
-      m_poProgram( ac_roObject.m_poProgram ), m_bVisible( ac_roObject.m_bVisible ),
+      m_bVisible( ac_roObject.m_bVisible ),
       m_oAfterTransform( ac_roObject.m_oAfterTransform ),
       m_oBeforeTransform( ac_roObject.m_oBeforeTransform ),
       m_pbUpdateModelMatrix( new bool ), m_poModelMatrix( new Transform3D )
@@ -43,7 +42,6 @@ Drawable& Drawable::operator=( const Drawable& ac_roObject )
     m_oScale = ac_roObject.m_oScale;
     m_oPosition = ac_roObject.m_oPosition;
     m_oRotation = ac_roObject.m_oRotation;
-    m_poProgram = ac_roObject.m_poProgram;
     m_bVisible = ac_roObject.m_bVisible;
     m_oAfterTransform = ac_roObject.m_oAfterTransform;
     m_oBeforeTransform = ac_roObject.m_oBeforeTransform;
@@ -68,15 +66,6 @@ void Drawable::Draw() const
         return;
     }
 
-    // In case there is already an active shader program
-    const ShaderProgram& roPreviousProgram = ShaderProgram::Current();
-
-    // start using the shader program
-    if( nullptr != m_poProgram )
-    {
-        m_poProgram->Use();
-    }
-
     // Set modelview matrix
     // OpenGL uses column vectors, while the MathLibrary transforms are made for
     // use with row vectors.  However, OpenGL stores matrix data in column-major
@@ -93,9 +82,6 @@ void Drawable::Draw() const
     // reset modelview matrix
     glMatrixMode( GL_MODELVIEW );
     glPopMatrix();
-
-    // Restore previous shader program
-    roPreviousProgram.Use();
 }
 
 // Apply transformations to the current matrix

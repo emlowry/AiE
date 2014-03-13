@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 6, 2014
  * Description:        Class representing an texture.
- * Last Modified:      March 6, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 12, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef TEXTURE__H

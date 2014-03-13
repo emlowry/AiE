@@ -16,12 +16,17 @@
 #endif
 
 #include "..\Declarations\Drawable.h"
+#include "..\Declarations\Frame.h"
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
 #include "..\Declarations\Quad.h"
+#include "..\Declarations\QuadShaderProgram.h"
 #include "..\Declarations\Shader.h"
 #include "..\Declarations\ShaderProgram.h"
+#include "..\Declarations\Sprite.h"
+#include "..\Declarations\SpriteShaderProgram.h"
+#include "..\Declarations\Texture.h"
 //TODO include declaration headers
 
 #endif  // MY_FIRST_ENGINE__H

@@ -17,9 +17,9 @@ namespace MyFirstEngine
 
 // default quad shader source code files
 const char* const QuadShaderProgram::QUAD_VERTEX_SHADER_FILE =
-                                            "resources/Shaders/QuadVertex.glsl";
+                                            "resources/shaders/QuadVertex.glsl";
 const char* const QuadShaderProgram::QUAD_FRAGMENT_SHADER_FILE =
-                                          "resources/Shaders/QuadFragment.glsl";
+                                          "resources/shaders/QuadFragment.glsl";
 
 // The positions of the four corners of an unscaled, unrotated Quad on the
 // XY plane.
@@ -30,8 +30,7 @@ const float QuadShaderProgram::QUAD_XY_VERTEX_DATA[8] = { -0.5f, 0.5f,
 const unsigned int QuadShaderProgram::QUAD_ELEMENT_DATA[6] = { 0, 1, 2,
                                                                2, 3, 0 };
 
-// only the Quad class or a class derived from this one can call the
-// constructors
+// only the parent class's Initialize function can call this.
 QuadShaderProgram::QuadShaderProgram()
     : m_iColorID( 0 ), m_uiElementBufferID( 0 ),
       m_uiVertexArrayID ( 0 ), m_uiVertexBufferID( 0 ),
@@ -66,6 +65,13 @@ void QuadShaderProgram::SetupData()
     glGenVertexArrays( 1, &uiVAO );
     glBindVertexArray( uiVAO );
 
+    // Load Element buffer
+    GLuint uiEBO;
+    glGenBuffers( 1, &uiEBO );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, uiEBO );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( QUAD_ELEMENT_DATA ),
+                  QUAD_ELEMENT_DATA, GL_STATIC_DRAW );
+
     // Load Vertex buffer
     GLuint uiVBO;
     glGenBuffers( 1, &uiVBO );
@@ -77,13 +83,6 @@ void QuadShaderProgram::SetupData()
     GLint iPositionID = glGetAttribLocation( m_uiID, "i_v2Position" );
     glVertexAttribPointer( iPositionID, 2, GL_FLOAT, GL_FALSE, 0, 0 );
     glEnableVertexAttribArray( iPositionID );
-
-    // Load Element buffer
-    GLuint uiEBO;
-    glGenBuffers( 1, &uiEBO );
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, uiEBO );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( QUAD_ELEMENT_DATA ),
-                  QUAD_ELEMENT_DATA, GL_STATIC_DRAW );
 
     // Unbind vertex array object so that other initialization calls can't
     // accidentally add things to it

@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Base class for drawable objects.
- * Last Modified:      March 5, 2014
+ * Last Modified:      March 12, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -26,8 +26,7 @@ public:
     // is passed in to distinguish between using whatever shader program is
     // current (indicated by a null pointer) or using no shader program
     // (indicated by a pointer to a program equal to ShaderProgram::Null() )
-    Drawable( ShaderProgram* a_poProgram = nullptr,
-              const Color::ColorVector& ac_roColor = Color::WHITE,
+    Drawable( const Color::ColorVector& ac_roColor = Color::WHITE,
               const Point3D& ac_roScale = Point3D( 1.0 ),
               const Point3D& ac_roPosition = Point3D::Origin(),
               const Rotation3D& ac_roRotation = Rotation3D::None() );
@@ -177,9 +176,6 @@ protected:
     // Additional transformations applied to vertices before the transformations
     // due to the above properties
     Transform3D m_oBeforeTransform;
-
-    // Shader program to use - if null, use whatever program is current
-    ShaderProgram* m_poProgram;
 
     // Is this object even visible?
     bool m_bVisible;

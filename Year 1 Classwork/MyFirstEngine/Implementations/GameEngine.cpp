@@ -3,17 +3,18 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Implementations of GameEngine functions.
- * Last Modified:      February 27, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 12, 2014
+ * Last Modification:  Adding sprite and texture initialization.
  ******************************************************************************/
 
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
 #include "..\Declarations\GLFW.h"
-#include "..\Declarations\Quad.h"
+#include "..\Declarations\QuadShaderProgram.h"
 #include "..\Declarations\Shader.h"
 #include "..\Declarations\ShaderProgram.h"
+#include "..\Declarations\SpriteShaderProgram.h"
 #include <iostream>
 
 namespace MyFirstEngine
@@ -91,7 +92,9 @@ bool GameEngine::Initialize( const IntPoint2D& ac_roSize,
         // If context and GLEW initialization succeeded, initialize the rest
         if( IsInitialized() )
         {
+            Texture::Initialize();
             QuadShaderProgram::Initialize();
+            SpriteShaderProgram::Initialize();
             Instance().m_dLastTime = Time();
         }
         else    // otherwise, terminate GLFW
@@ -179,7 +182,9 @@ void GameEngine::Terminate()
 {
     if( IsInitialized() )
     {
+        SpriteShaderProgram::Terminate();
         QuadShaderProgram::Terminate();
+        Texture::Terminate();
         ShaderProgram::DestroyAll();
         Shader::DestroyAll();
         GameWindow::DestroyAll();
