@@ -10,7 +10,6 @@
 #include "../Declarations/Texture.h"
 #include "MathLibrary.h"
 #include "SOIL.h"
-#include <stack>
 #include <unordered_map>
 #include <vector>
 
@@ -21,107 +20,35 @@
 namespace
 {
 
-// keep track of which loaded textures were most recently used
-struct LoadedTexture
+// all texture units
+class TextureList
+    : public std::vector< MyFirstEngine::Texture* >,
+      public Utility::Singleton< TextureList >
 {
-    MyFirstEngine::Texture* next;
-    MyFirstEngine::Texture* previous;
+    friend class Utility::Singleton< TextureList >;
+public:
+    virtual ~TextureList() {}
+private:
+    TextureList() {}
 };
-static MyFirstEngine::Texture* sg_poMostRecentlyUsed = nullptr;
-static MyFirstEngine::Texture* sg_poLeastRecentlyUsed = nullptr;
 
 // reverse lookup
 class TextureLookup
-    : public std::unordered_map< MyFirstEngine::Texture*, LoadedTexture >,
+    : public std::unordered_map< MyFirstEngine::Texture*, unsigned int >,
       public Utility::Singleton< TextureLookup >
 {
     friend class Utility::Singleton< TextureLookup >;
 public:
-    typedef std::unordered_map< MyFirstEngine::Texture*, LoadedTexture > BaseType;
+    typedef std::unordered_map< MyFirstEngine::Texture*, unsigned int > BaseType;
     typedef BaseType::value_type ValueType;
     virtual ~TextureLookup() {}
 private:
     TextureLookup() {}
 };
 
-// texture units with no textures loaded
-class UnusedUnits
-    : public std::stack< GLenum >, public Utility::Singleton< UnusedUnits >
-{
-    friend class Utility::Singleton< UnusedUnits >;
-public:
-    virtual ~UnusedUnits() {}
-private:
-    UnusedUnits() {}
-};
-static unsigned int sg_uiMaxUnits = 0;
-
 // make getting singleton instances shorter to type
 static TextureLookup& Lookup() { return TextureLookup::Instance(); }
-static UnusedUnits& Units() { return UnusedUnits::Instance(); }
-
-// remove a loaded texture from it's current position
-static void RemoveLoadedTexture( MyFirstEngine::Texture* a_poTexture )
-{
-    // get next and previous pointers
-    MyFirstEngine::Texture* poNext = Lookup()[ a_poTexture ].next;
-    MyFirstEngine::Texture* poPrevious = Lookup()[ a_poTexture ].previous;
-
-    // no need to do more if already done
-    if( nullptr == poNext && nullptr == poPrevious )
-    {
-        return;
-    }
-
-    // set pointers to null
-    Lookup()[ a_poTexture ].next = nullptr;
-    Lookup()[ a_poTexture ].previous = nullptr;
-
-    // adjust next and previous textures' pointers
-    if( nullptr != poNext )
-    {
-        Lookup()[ poNext ].previous = poPrevious;
-    }
-    if( nullptr != poPrevious )
-    {
-        Lookup()[ poPrevious ].next = poNext;
-    }
-
-    // adjust least/most recently used texture
-    if( a_poTexture == sg_poLeastRecentlyUsed )
-    {
-        sg_poLeastRecentlyUsed = poNext;
-    }
-    if( a_poTexture == sg_poMostRecentlyUsed )
-    {
-        sg_poMostRecentlyUsed = poPrevious;
-    }
-}
-
-// insert a loaded texture at the front of the list
-static void MakeMostRecentlyUsedTexture( MyFirstEngine::Texture* a_poTexture )
-{
-    // no need to do anything if already done
-    if( a_poTexture == sg_poMostRecentlyUsed )
-    {
-        return;
-    }
-
-    // remove from current position
-    RemoveLoadedTexture( a_poTexture );
-
-    // insert
-    if( nullptr == sg_poLeastRecentlyUsed )
-    {
-        sg_poLeastRecentlyUsed = a_poTexture;
-    }
-    if( nullptr != sg_poMostRecentlyUsed )
-    {
-        Lookup()[ sg_poMostRecentlyUsed ].next = a_poTexture;
-    }
-    Lookup()[ a_poTexture ].previous = sg_poMostRecentlyUsed;
-    sg_poMostRecentlyUsed = a_poTexture;
-}
+static TextureList& List() { return TextureList::Instance(); }
 
 }   // namespace
 
@@ -140,16 +67,17 @@ Texture::Texture( const char* const ac_cpcFile,
     : m_oSize( 0, 0 ), m_eWrapS( a_eWrapS ), m_eWrapT( a_eWrapT ),
       m_eMinFilter( a_eMinFilter ), m_eMagFilter( a_eMagFilter ),
       m_oBorderColor( ac_roBorderColor ), m_oFile( ac_cpcFile ), 
-      m_paucData( nullptr ), m_uiID( 0 ), m_eUnit( 0 ), m_oFrame()
+      m_paucData( nullptr ), m_uiID( 0 ), m_oFrame()
 {
-    Lookup()[ this ].next = nullptr;
-    Lookup()[ this ].previous = nullptr;
+    Lookup()[ this ] = List().size();
+    List().push_back( this );
 }
 
 // Destructor
 Texture::~Texture()
 {
     Destroy( false );
+    List()[ Lookup()[ this ] ] = nullptr;
     Lookup().erase( this );
     unsigned char* paucData = m_paucData;
     m_paucData = nullptr;
@@ -159,54 +87,39 @@ Texture::~Texture()
     }
 }
 
-// Is this loaded in the current texture unit?
-bool Texture::IsCurrent() const
+// Is this a valid texture object in OpenGL?
+bool Texture::IsValid() const
 {
-    if( IsLoaded() )
+    if( GL_TRUE == glIsTexture( m_uiID ) )
     {
-        GLint iActive;
-        glGetIntegerv( GL_ACTIVE_TEXTURE, &iActive );
-        return ( iActive == m_eUnit );
+        // TODO
+        return true;
     }
     return false;
-}
-
-// Is this loaded in any texture unit?
-bool Texture::IsLoaded() const
-{
-    return ( GL_TRUE == glIsTexture( m_uiID ) );
 }
 
 // Unload and delete this texture
 void Texture::Destroy( bool a_bCache )
 {
     // If already destroyed, just return
-    if( !IsLoaded() )
+    if( !IsValid() )
     {
         return;
     }
 
     // cache texture data, if neccessary
-    if( ( m_oFile.IsEmpty() || a_bCache ) && nullptr == m_paucData )
+    if( nullptr == m_paucData && ( m_oFile.IsEmpty() || a_bCache ) )
     {
-        // get the active texture unit before making this one current
-        GLint iActive;
-        glGetIntegerv( GL_ACTIVE_TEXTURE, &iActive );
-        glActiveTexture( m_eUnit );
-
-        // copy data into cache
+        glActiveTexture( GL_TEXTURE0 );
+        glBindTexture( GL_TEXTURE_2D, m_uiID );
         m_paucData = new unsigned char [ m_oSize.x * m_oSize.y * 4 ];
         glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_paucData );
-
-        // reset the active texture unit
-        glActiveTexture( iActive );
+        glBindTexture( GL_TEXTURE_2D, 0 );
     }
 
     // Destroy the texture object
     glDeleteTextures( 1, &m_uiID );
-    Units().push( m_eUnit );
-    m_eUnit = 0;
-    RemoveLoadedTexture( this );
+    m_uiID = 0;
 }
 
 // Load this texture to an unused texture unit (if not already loaded),
@@ -219,33 +132,15 @@ void Texture::Load( bool a_bCache )
         return;
     }
 
-    // get the active texture unit
-    GLint iActive;
-    glGetIntegerv( GL_ACTIVE_TEXTURE, &iActive );
-
-    // get an unused texture unit
-    while( Units().empty() )
-    {
-        if( nullptr == sg_poLeastRecentlyUsed )
-        {
-            throw std::runtime_error( "Texture system not initialized" );
-        }
-        sg_poLeastRecentlyUsed->Destroy( true );
-    }
-    m_eUnit = Units().top();
-    Units().pop();
-    glActiveTexture( m_eUnit );
-
     // create the texture
-    glGenTextures( 1, &m_uiID );
-    glBindTexture( GL_TEXTURE_2D, m_uiID );
+    if( !IsValid() )
+    {
+        glGenTextures( 1, &m_uiID );
+    }
 
-    // set parameters
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_eMinFilter );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_eMagFilter );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_eWrapS );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_eWrapT );
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &(m_oBorderColor[0]) );
+    // bind texture
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D, m_uiID );
 
     // if there's data in the cache, load it
     if( nullptr != m_paucData )
@@ -257,7 +152,7 @@ void Texture::Load( bool a_bCache )
     {
         // if there's no data in the cache, load using SOIL
         unsigned char* paucData =
-            SOIL_load_image( m_oFile, &m_oSize.x, &m_oSize.y, 0, GL_RGBA );
+            SOIL_load_image( m_oFile, &m_oSize.x, &m_oSize.y, 0, SOIL_LOAD_RGBA );
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, m_oSize.x, m_oSize.y,
                       0, GL_RGBA, GL_UNSIGNED_BYTE, paucData );
         m_oFrame.framePixels = m_oSize;
@@ -277,67 +172,39 @@ void Texture::Load( bool a_bCache )
     // generate mipmaps
     glGenerateMipmap(GL_TEXTURE_2D);
 
+    // set parameters
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_eMinFilter );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_eMagFilter );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_eWrapS );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_eWrapT );
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &(m_oBorderColor[0]) );
+
     // finished loading
     glBindTexture( GL_TEXTURE_2D, 0 );
-    glActiveTexture( iActive );
-    MakeMostRecentlyUsedTexture( this );
 }
 
 // Make this texture's unit active (load if needed)
 void Texture::MakeCurrent()
 {
-    // if not loaded, load
-    if( !IsLoaded() )
-    {
-        Load();
-    }
-    // otherwise, adjust pointers here
-    else
-    {
-        MakeMostRecentlyUsedTexture( this );
-    }
-    glActiveTexture( m_eUnit );
+    Load();
+    glActiveTexture( GL_TEXTURE0 );
+    glBindTexture( GL_TEXTURE_2D, m_uiID );
 }
 
 //
 // Static functions
 //
 
-// can textures be loaded?
-bool Texture::IsInitialized()
+// destroy all textures
+void Texture::DestroyAll()
 {
-    return ( 0 != sg_uiMaxUnits );
-}
-
-// get available texture units
-void Texture::Initialize()
-{
-    if( !IsInitialized() )
+    for each( Texture* poTexture in List() )
     {
-        GLint iMax;
-        glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &iMax );
-        sg_uiMaxUnits = iMax;
-        for( GLenum e = GL_TEXTURE0 + iMax - 1; e >= GL_TEXTURE0; --e )
+        if( nullptr != poTexture )
         {
-            Units().push( e );
+            poTexture->Destroy();
         }
     }
-}
-
-// destroy all textures
-void Texture::Terminate()
-{
-    for each( TextureLookup::ValueType oPair in Lookup() )
-    {
-        oPair.first->Destroy();
-    }
-    sg_poMostRecentlyUsed = nullptr;    // just to be sure
-    sg_poLeastRecentlyUsed = nullptr;
-    while( !Units().empty() )
-    {
-        Units().pop();
-    }
-    sg_uiMaxUnits = 0;
 }
 
 }   // namespace MyFirstEngine

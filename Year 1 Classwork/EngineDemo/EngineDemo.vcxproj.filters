@@ -24,7 +24,7 @@
     <None Include="resources\Shaders\QuadVertex.glsl" />
     <None Include="resources\Shaders\SpriteVertex.glsl" />
     <None Include="resources\Shaders\SpriteFragment.glsl" />
-    <None Include="resources\images\warhol_soup.jpg">
+    <None Include="resources\images\warhol_soup.png">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

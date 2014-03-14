@@ -27,17 +27,26 @@ class GameEngine::StateStack : public std::stack< GameState* >
 public:
     virtual ~StateStack() {}
 };
+class GameEngine::TransformStack : public std::stack< Transform3D >
+{
+public:
+    virtual ~TransformStack() {}
+};
 
 // Default constructor is only used by the base Singleton class's Instance()
 // function.  The user never instantiates a GameEngine object directly.
 GameEngine::GameEngine()
     : m_bInitialized( false ), m_dLastTime( 0.0 ),
+      m_poModelView( new TransformStack ),
+      m_poProjection( new TransformStack ),
       m_poStates( new StateStack ) {}
 
 // Destructor is virtual, since inheritance is involved.
 GameEngine::~GameEngine()
 {
     delete m_poStates;
+    delete m_poModelView;
+    delete m_poProjection;
 }
 
 // Returns the time since this function was last called.
@@ -52,6 +61,64 @@ double GameEngine::DeltaTime()
 //
 // STATIC FUNCTIONS
 //
+
+// Replaces the now-deprecated OpenGL matrix stack
+Transform3D GameEngine::ModelViewProjection()
+{
+    return ModelView() * Projection();
+}
+Transform3D& GameEngine::ModelView()
+{
+    if( Instance().m_poModelView->empty() )
+    {
+        Instance().m_poModelView->push( Transform3D::Identity() );
+    }
+    return Instance().m_poModelView->top();
+}
+Transform3D& GameEngine::Projection()
+{
+    if( Instance().m_poProjection->empty() )
+    {
+        Instance().m_poProjection->push( Transform3D::Identity() );
+    }
+    return Instance().m_poProjection->top();
+}
+void GameEngine::ClearModelView()
+{
+    while( !Instance().m_poModelView->empty() )
+    {
+        Instance().m_poModelView->pop();
+    }
+}
+void GameEngine::ClearProjection()
+{
+    while( !Instance().m_poProjection->empty() )
+    {
+        Instance().m_poProjection->pop();
+    }
+}
+Transform3D& GameEngine::PushModelView()    // returns reference to new matrix
+{
+    Instance().m_poModelView->push( ModelView() );
+    return ModelView();
+}
+Transform3D& GameEngine::PushProjection()    // returns reference to new matrix
+{
+    Instance().m_poProjection->push( Projection() );
+    return Projection();
+}
+Transform3D GameEngine::PopModelView()  // returns copy of now-removed top matrix
+{
+    Transform3D oCopy( ModelView() );
+    Instance().m_poModelView->pop();
+    return oCopy;
+}
+Transform3D GameEngine::PopProjection()  // returns copy of now-removed top matrix
+{
+    Transform3D oCopy( Projection() );
+    Instance().m_poProjection->pop();
+    return oCopy;
+}
 
 // Return a reference to the current game state
 GameState& GameEngine::CurrentState()

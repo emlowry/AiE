@@ -52,6 +52,17 @@ public:
     static GameState& PushState( GameState& a_roState );
     static GameState& ReplaceCurrentState( GameState& a_roState );
 
+    // Replaces the now-deprecated OpenGL matrix stack
+    static Transform3D ModelViewProjection();
+    static Transform3D& ModelView();
+    static Transform3D& Projection();
+    static void ClearModelView();
+    static void ClearProjection();
+    static Transform3D PopModelView();
+    static Transform3D PopProjection();
+    static Transform3D& PushModelView();
+    static Transform3D& PushProjection();
+
     // Print error messages to standard error stream.
     static void PrintError( int a_iCode, const char* ac_pcDescription );
     static void PrintError( const char* ac_pcDescription );
@@ -70,9 +81,10 @@ public:
 
 private:
 
-    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
-    // an stl container won't result in warnings.
+    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
+    // from an stl container won't result in warnings.
     class StateStack;
+    class TransformStack;
 
     // Default constructor is only used by the base Singleton class's Instance()
     // function.  The user never instantiates a GameEngine object directly.
@@ -97,6 +109,10 @@ private:
     // store a stack of state objects, the top of which is the current state
     // the stack is hidden in a struct to avaoid a compiler warning
     StateStack* m_poStates;
+
+    // store a stack of transformation matrices
+    TransformStack* m_poModelView;
+    TransformStack* m_poProjection;
 
     // Main game window
     GameWindow m_oMainWindow;

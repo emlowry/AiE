@@ -7,6 +7,7 @@
  * Last Modification:  Refactoring.
  ******************************************************************************/
 
+#include "../Declarations/GameEngine.h"
 #include "../Declarations/GLFW.h"
 #include "../Declarations/Shader.h"
 #include "../Declarations/ShaderProgram.h"
@@ -140,6 +141,13 @@ void ShaderProgram::Setup()
         {
             if( Shader::Null() != oShader )
             {
+                if( !oShader.IsValid() )
+                {
+                    GameEngine::PrintError( oShader.GetLog() );
+                    glDeleteProgram( m_uiID );
+                    m_uiID = 0;
+                    return;
+                }
                 glAttachShader( m_uiID, oShader.ID() );
             }
         }
@@ -151,6 +159,7 @@ void ShaderProgram::Setup()
         }
         else
         {
+            GameEngine::PrintError( GetLog() );
             glDeleteProgram( m_uiID );
             m_uiID = 0;
         }

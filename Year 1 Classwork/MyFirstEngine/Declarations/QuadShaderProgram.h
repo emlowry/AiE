@@ -52,7 +52,7 @@ public:
     // The positions of the four corners of an unscaled, unrotated Quad on the
     // XY plane.
     static const float QUAD_XY_VERTEX_DATA[8];
-    static const unsigned int QUAD_ELEMENT_DATA[6];
+    static const unsigned int QUAD_ELEMENT_DATA[4];
 
 protected:
 

@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 27, 2014
  * Description:        Class representing an textured rectangle, or sprite.
- * Last Modified:      March 12, 2014
+ * Last Modified:      March 13, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -24,28 +24,28 @@ class IMEXPORT_CLASS Sprite : public Quad
 public:
 
     // Main constructors
-    Sprite( const Texture* a_pcoTexture = nullptr,
-            const Color::ColorVector& ac_roColor = Color::WHITE,
-            const Point2D& ac_roSize = Point2D( 1.0 ),
+    Sprite( Texture* a_poTexture = nullptr,
+            const Point2D& ac_roScale = Point2D( 1.0 ),
             const Point3D& ac_roPosition = Point3D::Origin(),
-            const Rotation3D& ac_roRotation = Rotation3D::None() );
-    Sprite( const Texture* a_pcoTexture,
-            const Color::ColorVector& ac_roColor,
+            const Rotation3D& ac_roRotation = Rotation3D::None(),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
+    Sprite( Texture* a_poTexture,
             const Point3D& ac_roLowerLeftCorner,
             const Point3D& ac_roUpperRightCorner,
-            const Point3D& ac_roForward = Point3D::Unit(0) );
-    Sprite( const Texture* a_pcoTexture,
+            const Point3D& ac_roForward = Point3D::Unit(0),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
+    Sprite( Texture* a_poTexture,
             const Frame::Array* a_pcoFrameList,
-            const Color::ColorVector& ac_roColor = Color::WHITE,
-            const Point2D& ac_roSize = Point2D( 1.0 ),
+            const Point2D& ac_roScale = Point2D( 1.0 ),
             const Point3D& ac_roPosition = Point3D::Origin(),
-            const Rotation3D& ac_roRotation = Rotation3D::None() );
-    Sprite( const Texture* a_pcoTexture,
+            const Rotation3D& ac_roRotation = Rotation3D::None(),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
+    Sprite( Texture* a_poTexture,
             const Frame::Array* a_pcoFrameList,
-            const Color::ColorVector& ac_roColor,
             const Point3D& ac_roLowerLeftCorner,
             const Point3D& ac_roUpperRightCorner,
-            const Point3D& ac_roForward = Point3D::Unit(0) );
+            const Point3D& ac_roForward = Point3D::Unit(0),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
 
     // Copy constructor/operator
     Sprite( const Sprite& ac_roSprite );
@@ -72,8 +72,8 @@ public:
     const Frame& CurrentFrame() const;
     Sprite& SetFrameNumber( unsigned int a_uiFrameNumber );
     Sprite& SetFrameList( const Frame::Array* a_pcoFrameList );
-    const Texture* GetTexture() const { return m_pcoTexture; }
-    Sprite& SetTexture( const Texture* a_pcoTexture );
+    Texture* GetTexture() const { return m_poTexture; }
+    Sprite& SetTexture( Texture* a_poTexture );
 
     // Current frame properties
     const IntPoint2D& FramePixels() const
@@ -121,7 +121,7 @@ protected:
     // Default constructor creates null frame list, null texture
     const Frame::Array* m_pcoFrameList;
     unsigned int m_uiFrameNumber;
-    const Texture* m_pcoTexture;
+    Texture* m_poTexture;
 
     // Transform texture coordinates so that 0 and 1 correspond to slice
     // boundaries, not frame boundaries

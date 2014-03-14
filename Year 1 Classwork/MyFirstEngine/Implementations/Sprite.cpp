@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 5, 2014
  * Description:        Implementations for Sprite functions.
- * Last Modified:      March 12, 2014
+ * Last Modified:      March 13, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -16,53 +16,53 @@ namespace MyFirstEngine
 {
 
 // Main constructors
-Sprite::Sprite( const Texture* a_pcoTexture,
-                const Color::ColorVector& ac_roColor,
-                const Point2D& ac_roSize,
+Sprite::Sprite( Texture* a_poTexture,
+                const Point2D& ac_roScale,
                 const Point3D& ac_roPosition,
-                const Rotation3D& ac_roRotation )
-    : Quad( ac_roColor, ac_roSize, ac_roPosition, ac_roRotation ),
-      m_pcoTexture( a_pcoTexture ), m_pcoFrameList( nullptr ),
+                const Rotation3D& ac_roRotation,
+                const Color::ColorVector& ac_roColor )
+    : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roRotation ),
+      m_poTexture( a_poTexture ), m_pcoFrameList( nullptr ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( const Texture* a_pcoTexture,
-                const Color::ColorVector& ac_roColor,
+Sprite::Sprite( Texture* a_poTexture,
                 const Point3D& ac_roLowerLeftCorner,
                 const Point3D& ac_roUpperRightCorner,
-                const Point3D& ac_roForward )
+                const Point3D& ac_roForward,
+                const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roLowerLeftCorner,
             ac_roUpperRightCorner, ac_roForward ),
-      m_pcoTexture( a_pcoTexture ), m_pcoFrameList( nullptr ),
+      m_poTexture( a_poTexture ), m_pcoFrameList( nullptr ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( const Texture* a_pcoTexture,
+Sprite::Sprite( Texture* a_poTexture,
                 const Frame::Array* a_pcoFrameList,
-                const Color::ColorVector& ac_roColor,
-                const Point2D& ac_roSize,
+                const Point2D& ac_roScale,
                 const Point3D& ac_roPosition,
-                const Rotation3D& ac_roRotation )
-    : Quad( ac_roColor, ac_roSize, ac_roPosition, ac_roRotation ),
-      m_pcoTexture( a_pcoTexture ), m_pcoFrameList( a_pcoFrameList ),
+                const Rotation3D& ac_roRotation,
+                const Color::ColorVector& ac_roColor )
+    : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roRotation ),
+      m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( const Texture* a_pcoTexture,
+Sprite::Sprite( Texture* a_poTexture,
                 const Frame::Array* a_pcoFrameList,
-                const Color::ColorVector& ac_roColor,
                 const Point3D& ac_roLowerLeftCorner,
                 const Point3D& ac_roUpperRightCorner,
-                const Point3D& ac_roForward )
+                const Point3D& ac_roForward,
+                const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roLowerLeftCorner,
             ac_roUpperRightCorner, ac_roForward ),
-      m_pcoTexture( a_pcoTexture ), m_pcoFrameList( a_pcoFrameList ),
+      m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
@@ -72,7 +72,7 @@ Sprite::Sprite( const Texture* a_pcoTexture,
 // Copy constructor/operator
 Sprite::Sprite( const Sprite& ac_roSprite )
     : Quad( ac_roSprite ),
-      m_pcoTexture( ac_roSprite.m_pcoTexture ),
+      m_poTexture( ac_roSprite.m_poTexture ),
       m_pcoFrameList( ac_roSprite.m_pcoFrameList ),
       m_uiFrameNumber( ac_roSprite.m_uiFrameNumber ),
       m_pbUpdateTextureMatrix( new bool ), m_poTextureMatrix( new Transform2D )
@@ -94,7 +94,7 @@ Sprite& Sprite::operator=( const Sprite& ac_roSprite )
     Quad::operator=( ac_roSprite );
     m_pcoFrameList = ac_roSprite.m_pcoFrameList;
     m_uiFrameNumber = ac_roSprite.m_uiFrameNumber;
-    m_pcoTexture = ac_roSprite.m_pcoTexture;
+    m_poTexture = ac_roSprite.m_poTexture;
 
     // If frame size changed, update matrix
     if( !CurrentFrame().SameSize( oFrame ) )
@@ -111,8 +111,8 @@ const Frame& Sprite::GetFrame( unsigned int a_uiFrameNumber ) const
 {
     if( 0 == FrameCount() )
     {
-        return ( nullptr == m_pcoTexture ? Frame::ZERO
-                                         : m_pcoTexture->TextureFrame() );
+        return ( nullptr == m_poTexture ? Frame::ZERO
+                                         : m_poTexture->TextureFrame() );
     }
     return (*m_pcoFrameList)[ a_uiFrameNumber % FrameCount() ];
 }
@@ -120,8 +120,8 @@ const Frame& Sprite::operator[]( unsigned int a_uiFrameNumber ) const
 {
     if( 0 == FrameCount() )
     {
-        return ( nullptr == m_pcoTexture ? Frame::ZERO
-                                         : m_pcoTexture->TextureFrame() );
+        return ( nullptr == m_poTexture ? Frame::ZERO
+                                         : m_poTexture->TextureFrame() );
     }
     return (*m_pcoFrameList)[ a_uiFrameNumber % FrameCount() ];
 }
@@ -213,30 +213,30 @@ Sprite& Sprite::SetDisplaySize( double a_dWidth, double a_dHeight )
 Point2D Sprite::SliceOffsetUV() const
 {
     // If there's no texture, return zero
-    if( nullptr == m_pcoTexture ||
-        0 == m_pcoTexture->Size().x ||
-        0 == m_pcoTexture->Size().y )
+    if( nullptr == m_poTexture ||
+        0 == m_poTexture->Size().x ||
+        0 == m_poTexture->Size().y )
     {
         return Point2D::Zero();
     }
 
     // otherwise, translate pixel coordinates to UV coordinates
-    return Point2D( (double)( SliceOffset().x ) / m_pcoTexture->Size().x,
-                    (double)( SliceOffset().y ) / m_pcoTexture->Size().y );
+    return Point2D( (double)( SliceOffset().x ) / m_poTexture->Size().x,
+                    (double)( SliceOffset().y ) / m_poTexture->Size().y );
 }
 Point2D Sprite::SliceSizeUV() const
 {
     // If there's no texture, return zero
-    if( nullptr == m_pcoTexture ||
-        0 == m_pcoTexture->Size().x ||
-        0 == m_pcoTexture->Size().y )
+    if( nullptr == m_poTexture ||
+        0 == m_poTexture->Size().x ||
+        0 == m_poTexture->Size().y )
     {
         return Point2D::Zero();
     }
 
     // otherwise, translate pixel coordinates to UV coordinates
-    return Point2D( (double)( SlicePixels().x ) / m_pcoTexture->Size().x,
-                    (double)( SlicePixels().y ) / m_pcoTexture->Size().y );
+    return Point2D( (double)( SlicePixels().x ) / m_poTexture->Size().x,
+                    (double)( SlicePixels().y ) / m_poTexture->Size().y );
 }
 
 // Sprite properties
@@ -276,12 +276,12 @@ Sprite& Sprite::SetFrameList( const Frame::Array* a_pcoFrameList )
     }
     return *this;
 }
-Sprite& Sprite::SetTexture( const Texture* a_pcoTexture )
+Sprite& Sprite::SetTexture( Texture* a_poTexture )
 {
-    if( a_pcoTexture != m_pcoTexture )
+    if( a_poTexture != m_poTexture )
     {
         Frame oFrame = CurrentFrame();
-        m_pcoTexture = a_pcoTexture;
+        m_poTexture = a_poTexture;
         if( !oFrame.SameSize( CurrentFrame() ) )
         {
             UpdateModelMatrix();
@@ -296,7 +296,7 @@ Sprite& Sprite::SetTexture( const Texture* a_pcoTexture )
 // have changed since the last time said transformation was calculated,
 // recalculate it.
 const Transform3D& Sprite::GetModelMatrix() const
-{
+{/*
     if( *m_pbUpdateModelMatrix )
     {
         Point3D oDisplayArea = CurrentFrame().DisplayAreaPixels();
@@ -307,8 +307,8 @@ const Transform3D& Sprite::GetModelMatrix() const
                            m_oRotation.MakeTransform() *
                            Space::Translation( m_oPosition ) * m_oAfterTransform;
         *m_pbUpdateModelMatrix = false;
-    }
-    return *m_poModelMatrix;
+    }/**/
+    return Drawable::GetModelMatrix();//*m_poModelMatrix;
 }
 
 // Get the cached texture coordinate transformation resulting from the
@@ -318,7 +318,7 @@ const Transform3D& Sprite::GetModelMatrix() const
 const Transform2D& Sprite::GetTextureMatrix() const
 {
     if( *m_pbUpdateTextureMatrix )
-    {
+    {/*
         Point2D oDisplayArea = CurrentFrame().DisplayAreaPixels();
         Point2D oSliceArea = CurrentFrame().slicePixels;
         Point2D oOffset = CurrentFrame().DisplayAreaSliceOffset();
@@ -330,7 +330,8 @@ const Transform2D& Sprite::GetTextureMatrix() const
             Plane::Translation( 0 == oSliceArea.x
                                 ? 0 : -oOffset.x / oSliceArea.x,
                                 0 == oSliceArea.y
-                                ? 0 : -oOffset.y / oSliceArea.y );
+                                ? 0 : -oOffset.y / oSliceArea.y );/**/
+        *m_poTextureMatrix = Transform2D::Identity();
         *m_pbUpdateTextureMatrix = false;
     }
     return *m_poTextureMatrix;
@@ -340,9 +341,9 @@ const Transform2D& Sprite::GetTextureMatrix() const
 void Sprite::DrawComponents() const
 {
     // Only draw if there's area to draw
-    if( nullptr != m_pcoTexture && CurrentFrame().HasDisplayArea() )
+    if( nullptr != m_poTexture && CurrentFrame().HasDisplayArea() )
     {
-        SpriteShaderProgram::DrawSprite( *m_pcoTexture,
+        SpriteShaderProgram::DrawSprite( *m_poTexture,
                                          SliceOffsetUV(), SliceSizeUV(),
                                          GetTextureMatrix(), m_oColor );
     }

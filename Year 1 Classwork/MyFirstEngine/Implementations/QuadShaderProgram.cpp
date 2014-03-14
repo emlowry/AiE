@@ -27,8 +27,7 @@ const float QuadShaderProgram::QUAD_XY_VERTEX_DATA[8] = { -0.5f, 0.5f,
                                                           0.5f, 0.5f,
                                                           0.5f, -0.5f,
                                                           -0.5f, -0.5f };
-const unsigned int QuadShaderProgram::QUAD_ELEMENT_DATA[6] = { 0, 1, 2,
-                                                               2, 3, 0 };
+const unsigned int QuadShaderProgram::QUAD_ELEMENT_DATA[4] = { 0, 1, 3, 2 };
 
 // only the parent class's Initialize function can call this.
 QuadShaderProgram::QuadShaderProgram()
@@ -100,6 +99,7 @@ void QuadShaderProgram::SetupData()
 // Bind vertex array
 void QuadShaderProgram::UseData() const
 {
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_uiElementBufferID );
     glBindVertexArray( m_uiVertexArrayID );
 }
 
@@ -130,7 +130,7 @@ void QuadShaderProgram::BindElementBuffer()
 // For use by other shader programs that reuse this one's elements
 void QuadShaderProgram::DrawElements()
 {
-    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+    glDrawElements( GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_INT, 0 );
 }
 
 // Draw a solid-color 1x1 quad at the origin of the XY plane (in model space)

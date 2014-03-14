@@ -8,10 +8,15 @@
  ******************************************************************************/
 
 #include "../Declarations/Drawable.h"
+#include "../Declarations/GameEngine.h"
 #include <cmath>
 
 namespace MyFirstEngine
 {
+
+//
+// Class functions
+//
 
 // Constructor
 Drawable::Drawable( const Color::ColorVector& ac_roColor,

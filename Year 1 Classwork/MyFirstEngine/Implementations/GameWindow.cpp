@@ -205,6 +205,7 @@ bool GameWindow::Open()
 }
 void GameWindow::CreateWindow()
 {
+	glfwWindowHint (GLFW_SAMPLES, 4);
     m_poWindow = glfwCreateWindow( m_oSize.x + m_oFramePadding.x,
                                     m_oSize.y + m_oFramePadding.y,
                                     m_oTitle.CString(), nullptr, nullptr );
@@ -260,7 +261,7 @@ void GameWindow::SwapBuffers()
 // Clear frame buffer of current window
 void GameWindow::ClearCurrent()
 {
-    glClear( GL_COLOR_BUFFER_BIT );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 // Destroy all windows
