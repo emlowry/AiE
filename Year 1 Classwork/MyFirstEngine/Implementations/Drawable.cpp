@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 24, 2014
  * Description:        Implementations for Drawable member functions.
- * Last Modified:      March 12, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Adding replacement for deprecated OpenGL matrix stack.
  ******************************************************************************/
 
 #include "../Declarations/Drawable.h"
@@ -72,21 +72,15 @@ void Drawable::Draw() const
     }
 
     // Set modelview matrix
-    // OpenGL uses column vectors, while the MathLibrary transforms are made for
-    // use with row vectors.  However, OpenGL stores matrix data in column-major
-    // order, while the MathLibrary matrices store data in row-major order, so
-    // feeding data from the latter to the former is an automatic transposition.
-    glMatrixMode( GL_MODELVIEW );
-    glPushMatrix();
-    glMultMatrixd( &( GetModelMatrix()[0][0] ) );
+    GameEngine::PushModelView();
+    GameEngine::ApplyBeforeModelView( GetModelMatrix() );
 
     // Draw the components of this drawable object - points, lines, other
     // drawable objects, etc.
     DrawComponents();
 
     // reset modelview matrix
-    glMatrixMode( GL_MODELVIEW );
-    glPopMatrix();
+    GameEngine::PopModelView();
 }
 
 // Apply transformations to the current matrix

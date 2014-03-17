@@ -3,10 +3,11 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 26, 2014
  * Description:        Function implementations for the QuadShaderProgram class.
- * Last Modified:      February 26, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Adding replacement for deprecated OpenGL matrix stack.
  ******************************************************************************/
 
+#include "../Declarations/GameEngine.h"
 #include "../Declarations/GLFW.h"
 #include "../Declarations/QuadShaderProgram.h"
 #include "../Declarations/Shader.h"
@@ -31,7 +32,7 @@ const unsigned int QuadShaderProgram::QUAD_ELEMENT_DATA[4] = { 0, 1, 3, 2 };
 
 // only the parent class's Initialize function can call this.
 QuadShaderProgram::QuadShaderProgram()
-    : m_iColorID( 0 ), m_uiElementBufferID( 0 ),
+    : m_iModelViewProjectionID( 0 ), m_iColorID( 0 ), m_uiElementBufferID( 0 ),
       m_uiVertexArrayID ( 0 ), m_uiVertexBufferID( 0 ),
       ShaderProgram( Shader( GL_VERTEX_SHADER, QUAD_VERTEX_SHADER_FILE ),
                      Shader( GL_FRAGMENT_SHADER, QUAD_FRAGMENT_SHADER_FILE ) ) {}
@@ -39,7 +40,8 @@ QuadShaderProgram::QuadShaderProgram()
 // Destroy data used by the shader
 void QuadShaderProgram::DestroyData()
 {
-    // Zero out the uniform variable location
+    // Zero out the uniform variable locations
+    m_iModelViewProjectionID = 0;
     m_iColorID = 0;
 
     // Destroy the vertex array object
@@ -56,7 +58,9 @@ void QuadShaderProgram::DestroyData()
 // Load data used by the shader
 void QuadShaderProgram::SetupData()
 {
-    // Get location of color uniform variable
+    // Get location of uniform variables
+    GLint iModelViewProjectionID =
+        glGetUniformLocation( m_uiID, "u_dm4ModelViewProjection" );
     GLint iColorID = glGetUniformLocation( m_uiID, "u_v4Color" );
 
     // Create vertex array object
@@ -90,6 +94,7 @@ void QuadShaderProgram::SetupData()
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
     // now that everything is initialized, store IDs in static variables
+    m_iModelViewProjectionID = iModelViewProjectionID;
     m_iColorID = iColorID;
     m_uiElementBufferID = uiEBO;
     m_uiVertexBufferID = uiVBO;
@@ -136,10 +141,22 @@ void QuadShaderProgram::DrawElements()
 // Draw a solid-color 1x1 quad at the origin of the XY plane (in model space)
 void QuadShaderProgram::DrawQuad( const Color::ColorVector& ac_roColor )
 {
+    // save previous program
     const ShaderProgram& oPrevious = ShaderProgram::Current();
     Instance().Use();
+
+    // OpenGL uses column vectors, while the MathLibrary transforms are made for
+    // use with row vectors.  However, OpenGL stores matrix data in column-major
+    // order, while the MathLibrary matrices store data in row-major order, so
+    // feeding data from the latter to the former is an automatic transposition.
+    glUniformMatrix4dv( Instance().m_iModelViewProjectionID, 1, false,
+                        &( GameEngine::ModelViewProjection()[0][0] ) );
+    
+    // Set other uniforms and draw
     glUniform4fv( Instance().m_iColorID, 1, &( ac_roColor[0] ) );
     DrawElements();
+
+    // return to previous program
     oPrevious.Use();
 }
 

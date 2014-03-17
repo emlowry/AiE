@@ -3,15 +3,14 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 11, 2014
  * Description:        Class representing an array that can be resized.
- * Last Modified:      March 11, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef DYNAMIC_ARRAY__H
 #define DYNAMIC_ARRAY__H
 
 #include <stdexcept>
-#include <type_traits>
 
 namespace Utility
 {
@@ -22,9 +21,9 @@ class DynamicArray
 public:
 
     // default constructor
-    DynamicArray( unsigned int a_uiSize = 1 )
+    DynamicArray( unsigned int a_uiSize = 0 )
         : m_uiSize( a_uiSize ),
-          m_paData( 0 == m_uiSize ? nullptr : new T[ m_uiSize ] ) {}
+          m_paData( 0 == a_uiSize ? nullptr : new T[ a_uiSize ] ) {}
 
     // construct from data
     DynamicArray( const T& ac_rData )
@@ -34,17 +33,25 @@ public:
     }
     DynamicArray( const T* a_pacData, unsigned int a_uiSize )
         : m_uiSize( nullptr == a_pacData ? 0 : a_uiSize ),
-          m_paData( 0 == m_uiSize ? nullptr : new T[ m_uiSize ] )
+          m_paData( 0 == a_uiSize || nullptr == a_pacData ? nullptr
+                                                          : new T[ a_uiSize ] )
     {
-        CopyData( a_pacData, a_uiSize );
+        if( 0 < m_uiSize )
+        {
+            CopyData( a_pacData, a_uiSize );
+        }
     }
 
     // copy construct
     DynamicArray( const DynamicArray& ac_roArray )
         : m_uiSize( nullptr == ac_roArray.m_paData ? 0 : ac_roArray.m_uiSize ),
-          m_paData( 0 == m_uiSize ? nullptr : new T[ m_uiSize ] )
+          m_paData( 0 == a_uiSize || nullptr == a_pacData ? nullptr
+                                                          : new T[ a_uiSize ] )
     {
-        CopyData( ac_roArray.m_paData, ac_roArray.m_uiSize );
+        if( 0 < m_uiSize )
+        {
+            CopyData( ac_roArray.m_paData, ac_roArray.m_uiSize );
+        }
     }
 
     // destroy
@@ -64,8 +71,11 @@ public:
     {
         if( &ac_roArray.m_uiSize != &m_uiSize )
         {
-            SetSize( ac_roArray.m_uiSize );
-            CopyData( ac_roArray.m_paData, ac_roArray.m_uiSize );
+            SetSize( nullptr == ac_roArray.m_paData ? 0 : ac_roArray.m_uiSize );
+            if( 0 < m_uiSize )
+            {
+                CopyData( ac_roArray.m_paData, ac_roArray.m_uiSize );
+            }
         }
         return *this;
     }
@@ -107,33 +117,25 @@ public:
             m_uiSize = a_uiSize;
             if( nullptr != paData )
             {
-                delete[] paoFrames;
+                delete[] paData;
             }
         }
         return *this;
     }
 
     // copy data
-    DynamicArray& CopyData( const T* a_pacoData, unsigned int a_uiSize,
+    DynamicArray& CopyData( const T* a_pacData, unsigned int a_uiSize,
                             unsigned int a_uiStart = 0 )
     {
-        if( nullptr != m_paoData && nullptr != a_pacoData &&
+        if( nullptr != m_paData && nullptr != a_pacData &&
             0 < a_uiSize && a_uiStart < m_uiSize )
         {
             unsigned int uiSize = ( m_uiSize - a_uiStart < a_uiSize
                                     ? m_uiSize - a_uiStart : a_uiSize );
-            if( std::is_trivially_assignable< T >() )
+            T* paData = m_paData + a_uiStart;
+            for( unsigned int ui = 0; ui < uiSize; ++ui )
             {
-                memcpy( m_paoData + a_uiStart, a_pacoData,
-                        uiSize * sizeof( Frame ) );
-            }
-            else
-            {
-                Frame* paoData = m_paoData + a_uiStart;
-                for( unsigned int ui = 0; ui < uiSize; ++ui )
-                {
-                    paoData[ ui ] = a_pacoData[ ui ];
-                }
+                paData[ ui ] = a_pacData[ ui ];
             }
         }
         return *this;

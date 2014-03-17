@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Implementations of GameEngine functions.
- * Last Modified:      March 12, 2014
- * Last Modification:  Adding sprite and texture initialization.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Adding replacement for deprecated OpenGL matrix stack.
  ******************************************************************************/
 
 #include "..\Declarations\GameEngine.h"
@@ -83,6 +83,36 @@ Transform3D& GameEngine::Projection()
     }
     return Instance().m_poProjection->top();
 }
+Transform3D& GameEngine::SetModelView( const Transform3D& ac_roMatrix )
+{
+    ModelView() = ac_roMatrix;
+    return ModelView();
+}
+Transform3D& GameEngine::SetProjection( const Transform3D& ac_roMatrix )
+{
+    Projection() = ac_roMatrix;
+    return Projection();
+}
+Transform3D& GameEngine::ApplyAfterModelView( const Transform3D& ac_roMatrix )
+{
+    ModelView() *= ac_roMatrix;
+    return ModelView();
+}
+Transform3D& GameEngine::ApplyAfterProjection( const Transform3D& ac_roMatrix )
+{
+    Projection() *= ac_roMatrix;
+    return Projection();
+}
+Transform3D& GameEngine::ApplyBeforeModelView( const Transform3D& ac_roMatrix )
+{
+    ModelView() = ac_roMatrix * ModelView();
+    return ModelView();
+}
+Transform3D& GameEngine::ApplyBeforeProjection( const Transform3D& ac_roMatrix )
+{
+    Projection() = ac_roMatrix * Projection();
+    return Projection();
+}
 void GameEngine::ClearModelView()
 {
     while( !Instance().m_poModelView->empty() )
@@ -97,16 +127,6 @@ void GameEngine::ClearProjection()
         Instance().m_poProjection->pop();
     }
 }
-Transform3D& GameEngine::PushModelView()    // returns reference to new matrix
-{
-    Instance().m_poModelView->push( ModelView() );
-    return ModelView();
-}
-Transform3D& GameEngine::PushProjection()    // returns reference to new matrix
-{
-    Instance().m_poProjection->push( Projection() );
-    return Projection();
-}
 Transform3D GameEngine::PopModelView()  // returns copy of now-removed top matrix
 {
     Transform3D oCopy( ModelView() );
@@ -118,6 +138,16 @@ Transform3D GameEngine::PopProjection()  // returns copy of now-removed top matr
     Transform3D oCopy( Projection() );
     Instance().m_poProjection->pop();
     return oCopy;
+}
+Transform3D& GameEngine::PushModelView( const Transform3D& ac_roMatrix )
+{
+    Instance().m_poModelView->push( ac_roMatrix );
+    return ModelView();
+}
+Transform3D& GameEngine::PushProjection( const Transform3D& ac_roMatrix )
+{
+    Instance().m_poProjection->push( ac_roMatrix );
+    return Projection();
 }
 
 // Return a reference to the current game state
@@ -159,7 +189,6 @@ bool GameEngine::Initialize( const IntPoint2D& ac_roSize,
         // If context and GLEW initialization succeeded, initialize the rest
         if( IsInitialized() )
         {
-            Texture::Initialize();
             QuadShaderProgram::Initialize();
             SpriteShaderProgram::Initialize();
             Instance().m_dLastTime = Time();
@@ -251,7 +280,7 @@ void GameEngine::Terminate()
     {
         SpriteShaderProgram::Terminate();
         QuadShaderProgram::Terminate();
-        Texture::Terminate();
+        Texture::DestroyAll();
         ShaderProgram::DestroyAll();
         Shader::DestroyAll();
         GameWindow::DestroyAll();

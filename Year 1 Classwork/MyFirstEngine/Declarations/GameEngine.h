@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Singleton class representing the game engine as a whole.
- * Last Modified:      February 25, 2014
- * Last Modification:  Adding a main window for the game engine.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Adding replacement for deprecated OpenGL matrix stack.
  ******************************************************************************/
 
 #ifndef GAME_ENGINE__H
@@ -56,12 +56,18 @@ public:
     static Transform3D ModelViewProjection();
     static Transform3D& ModelView();
     static Transform3D& Projection();
+    static Transform3D& SetModelView( const Transform3D& ac_roMatrix );
+    static Transform3D& SetProjection( const Transform3D& ac_roMatrix );
+    static Transform3D& ApplyAfterModelView( const Transform3D& ac_roMatrix );
+    static Transform3D& ApplyAfterProjection( const Transform3D& ac_roMatrix );
+    static Transform3D& ApplyBeforeModelView( const Transform3D& ac_roMatrix );
+    static Transform3D& ApplyBeforeProjection( const Transform3D& ac_roMatrix );
     static void ClearModelView();
     static void ClearProjection();
     static Transform3D PopModelView();
     static Transform3D PopProjection();
-    static Transform3D& PushModelView();
-    static Transform3D& PushProjection();
+    static Transform3D& PushModelView( const Transform3D& ac_roMatrix = ModelView() );
+    static Transform3D& PushProjection( const Transform3D& ac_roMatrix = Projection() );
 
     // Print error messages to standard error stream.
     static void PrintError( int a_iCode, const char* ac_pcDescription );

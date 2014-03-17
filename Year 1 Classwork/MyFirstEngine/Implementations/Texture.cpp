@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 6, 2014
  * Description:        Class representing an texture.
- * Last Modified:      March 6, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "../Declarations/Texture.h"
@@ -90,12 +90,7 @@ Texture::~Texture()
 // Is this a valid texture object in OpenGL?
 bool Texture::IsValid() const
 {
-    if( GL_TRUE == glIsTexture( m_uiID ) )
-    {
-        // TODO
-        return true;
-    }
-    return false;
+    return ( GL_TRUE == glIsTexture( m_uiID ) );
 }
 
 // Unload and delete this texture
@@ -127,7 +122,7 @@ void Texture::Destroy( bool a_bCache )
 void Texture::Load( bool a_bCache )
 {
     // If the image is already loaded, nothing needs to be done
-    if( IsLoaded() )
+    if( IsValid() )
     {
         return;
     }
@@ -169,8 +164,12 @@ void Texture::Load( bool a_bCache )
         SOIL_free_image_data( paucData );
     }
 
-    // generate mipmaps
-    glGenerateMipmap(GL_TEXTURE_2D);
+    // generate mipmaps if neccessary
+    if( ( m_eMinFilter != GL_LINEAR && m_eMinFilter != GL_NEAREST ) ||
+        ( m_eMagFilter != GL_NEAREST && m_eMagFilter != GL_LINEAR ) )
+    {
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
 
     // set parameters
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_eMinFilter );
@@ -187,7 +186,6 @@ void Texture::Load( bool a_bCache )
 void Texture::MakeCurrent()
 {
     Load();
-    glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, m_uiID );
 }
 

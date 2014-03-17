@@ -22,11 +22,11 @@ public:
     virtual ~SimpleState() {}
     virtual void Draw() const override
     {
-        GameEngine::MainWindow().Clear();/*
+        GameEngine::MainWindow().Clear();
         for each( const Quad& croQuad in m_aoQuads )
         {
             croQuad.Draw();
-        }/**/
+        }
         m_oSprite.Draw();
         GameEngine::MainWindow().SwapBuffers();
     }
@@ -34,8 +34,17 @@ protected:
     virtual void InitializeInstance() override
     {
         m_oTexture.Load();
+        m_oFrameList.SetSize( 4 );
+        for( unsigned int ui = 0; ui < 4; ++ui )
+        {
+            m_oFrameList[ui] = Frame::ZERO;
+            m_oFrameList[ui].framePixels = m_oTexture.Size() / 2;
+            m_oFrameList[ui].slicePixels = m_oTexture.Size() / 2;
+            m_oFrameList[ui].sliceLocation.x = ( ui / 2 ) * ( m_oTexture.Size().x / 2 );
+            m_oFrameList[ui].sliceLocation.y = ( ui % 2 ) * ( m_oTexture.Size().y / 2 );
+        }
         m_oSprite.UpdateTextureMatrix();
-        //m_oSprite.SetDisplaySize( 0.125, 0.25 );
+        m_oSprite.SetDisplaySize( 0.125, 0.25 );
     }
     virtual void TerminateInstance() override
     {
@@ -46,7 +55,7 @@ protected:
         GameEngine::MainWindow().MakeCurrent();
     }
     virtual void OnUpdate( double a_dDeltaTime )
-    {/*
+    {
         m_aoQuads[0].SetYaw( GameEngine::LastTime() );
         m_aoQuads[1].SetPitch( GameEngine::LastTime() );
         m_aoQuads[2].SetRoll( GameEngine::LastTime() );
@@ -61,11 +70,12 @@ protected:
                                0.25 + ( 0.25 * std::cos( GameEngine::LastTime() / 2 ) ) );
         m_aoQuads[7].SetPosition( 0.5 * std::sin( GameEngine::LastTime() ),
                                   0.5 * std::cos( GameEngine::LastTime() ) );
-        m_oSprite.SetPosition( m_aoQuads[7].GetPosition() );/**/
+        m_oSprite.SetPosition( m_aoQuads[7].GetPosition() );
+        m_oSprite.SetFrameNumber( GameEngine::LastTime() );
     }
 private:
-    SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ), m_oSprite( &m_oTexture )
-    {/*
+    SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ), m_oSprite( &m_oTexture, &m_oFrameList )
+    {
         m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 2.0, 2.0 ) );
         m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 1.75, 1.75 ) );
         m_aoQuads[2] = Quad( Color::GrayScale::ONE_HALF, Point2D( 1.5, 1.5 ) );
@@ -73,11 +83,12 @@ private:
         m_aoQuads[4] = Quad( Color::BLACK, Point2D( 1.0, 1.0 ) );
         m_aoQuads[5] = Quad( Color::ColorWheel::ROSE, Point2D( 0.75, 0.75 ) );
         m_aoQuads[6] = Quad( Color::ColorWheel::VIOLET, Point2D( 0.5, 0.5 ) );
-        m_aoQuads[7] = Quad( Color::ColorWheel::MEGAMAN_BLUE, Point2D( 0.25, 0.25 ) );/**/
+        m_aoQuads[7] = Quad( Color::ColorWheel::MEGAMAN_BLUE, Point2D( 0.25, 0.25 ) );
     }
-    //Quad m_aoQuads[8];
+    Quad m_aoQuads[8];
     Texture m_oTexture;
     Sprite m_oSprite;
+    Frame::Array m_oFrameList;
 };
 
 int main(int argc, char* argv[])

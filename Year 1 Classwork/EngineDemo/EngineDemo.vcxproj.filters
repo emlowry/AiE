@@ -20,12 +20,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\Shaders\QuadFragment.glsl" />
-    <None Include="resources\Shaders\QuadVertex.glsl" />
-    <None Include="resources\Shaders\SpriteVertex.glsl" />
-    <None Include="resources\Shaders\SpriteFragment.glsl" />
     <None Include="resources\images\warhol_soup.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\shaders\SpriteVertex.glsl" />
+    <None Include="resources\shaders\QuadFragment.glsl" />
+    <None Include="resources\shaders\QuadVertex.glsl" />
+    <None Include="resources\shaders\SpriteFragment.glsl" />
   </ItemGroup>
 </Project>

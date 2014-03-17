@@ -29,7 +29,7 @@ public:
     Texture( const char* const ac_cpcFile,
              GLenum a_eWrapS = GL_CLAMP_TO_EDGE,
              GLenum a_eWrapT = GL_CLAMP_TO_EDGE,
-             GLenum a_eMinFilter = GL_NEAREST_MIPMAP_LINEAR,
+             GLenum a_eMinFilter = GL_LINEAR_MIPMAP_LINEAR,
              GLenum a_eMagFilter = GL_NEAREST,
              const Color::ColorVector& ac_roBorderColor = Color::TRANSPARENT );
     virtual ~Texture();

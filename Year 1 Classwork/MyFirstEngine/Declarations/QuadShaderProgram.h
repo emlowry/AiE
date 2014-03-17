@@ -69,7 +69,8 @@ protected:
     virtual void SetupData() override;
     virtual void UseData() const override;
 
-    // Color uniform variable
+    // Uniform variable locations
+    GLint m_iModelViewProjectionID;
     GLint m_iColorID;
 
     // Element buffer

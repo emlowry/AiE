@@ -89,10 +89,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\images\warhol_soup.png" />
-    <None Include="resources\Shaders\QuadFragment.glsl" />
-    <None Include="resources\Shaders\QuadVertex.glsl" />
-    <None Include="resources\Shaders\SpriteFragment.glsl" />
-    <None Include="resources\Shaders\SpriteVertex.glsl" />
+    <None Include="resources\shaders\QuadFragment.glsl" />
+    <None Include="resources\shaders\QuadVertex.glsl" />
+    <None Include="resources\shaders\SpriteFragment.glsl" />
+    <None Include="resources\shaders\SpriteVertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,15 +3,17 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 25, 2014
  * Description:        Vertex shader for a solid Quad.
- * Last Modified:      February 25, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 17, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
-# version 150
+#version 410
+
+uniform dmat4 u_dm4ModelViewProjection;
 
 in vec2 i_v2Position;
 
 void main()
 {
-    gl_Position = gl_ModelViewProjectionMatrix * vec4( i_v2Position, 0.0, 1.0 );
+    gl_Position = u_dm4ModelViewProjection * vec4( i_v2Position, 0.0, 1.0 );
 }

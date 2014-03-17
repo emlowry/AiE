@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 5, 2014
  * Description:        Implementations for Sprite functions.
- * Last Modified:      March 13, 2014
+ * Last Modified:      March 17, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -204,8 +204,8 @@ Sprite& Sprite::SetDisplaySize( const Point2D& ac_roSize )
 }
 Sprite& Sprite::SetDisplaySize( double a_dWidth, double a_dHeight )
 {
-    m_oScale.x = ( 0 == FramePixels().x ? 0 : a_dWidth / FramePixels().x );
-    m_oScale.y = ( 0 == FramePixels().y ? 0 : a_dHeight / FramePixels().y );
+    SetScale( ( 0 == FramePixels().x ? 0 : a_dWidth / FramePixels().x ),
+              ( 0 == FramePixels().y ? 0 : a_dHeight / FramePixels().y ) );
     return *this;
 }
 
@@ -221,8 +221,8 @@ Point2D Sprite::SliceOffsetUV() const
     }
 
     // otherwise, translate pixel coordinates to UV coordinates
-    return Point2D( (double)( SliceOffset().x ) / m_poTexture->Size().x,
-                    (double)( SliceOffset().y ) / m_poTexture->Size().y );
+    return Point2D( (double)( SliceLocation().x ) / m_poTexture->Size().x,
+                    (double)( SliceLocation().y ) / m_poTexture->Size().y );
 }
 Point2D Sprite::SliceSizeUV() const
 {
@@ -296,7 +296,7 @@ Sprite& Sprite::SetTexture( Texture* a_poTexture )
 // have changed since the last time said transformation was calculated,
 // recalculate it.
 const Transform3D& Sprite::GetModelMatrix() const
-{/*
+{
     if( *m_pbUpdateModelMatrix )
     {
         Point3D oDisplayArea = CurrentFrame().DisplayAreaPixels();
@@ -307,8 +307,8 @@ const Transform3D& Sprite::GetModelMatrix() const
                            m_oRotation.MakeTransform() *
                            Space::Translation( m_oPosition ) * m_oAfterTransform;
         *m_pbUpdateModelMatrix = false;
-    }/**/
-    return Drawable::GetModelMatrix();//*m_poModelMatrix;
+    }
+    return *m_poModelMatrix;
 }
 
 // Get the cached texture coordinate transformation resulting from the
@@ -318,7 +318,7 @@ const Transform3D& Sprite::GetModelMatrix() const
 const Transform2D& Sprite::GetTextureMatrix() const
 {
     if( *m_pbUpdateTextureMatrix )
-    {/*
+    {
         Point2D oDisplayArea = CurrentFrame().DisplayAreaPixels();
         Point2D oSliceArea = CurrentFrame().slicePixels;
         Point2D oOffset = CurrentFrame().DisplayAreaSliceOffset();
@@ -330,7 +330,7 @@ const Transform2D& Sprite::GetTextureMatrix() const
             Plane::Translation( 0 == oSliceArea.x
                                 ? 0 : -oOffset.x / oSliceArea.x,
                                 0 == oSliceArea.y
-                                ? 0 : -oOffset.y / oSliceArea.y );/**/
+                                ? 0 : -oOffset.y / oSliceArea.y );
         *m_poTextureMatrix = Transform2D::Identity();
         *m_pbUpdateTextureMatrix = false;
     }
