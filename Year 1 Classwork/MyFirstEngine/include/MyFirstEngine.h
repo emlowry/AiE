@@ -15,6 +15,7 @@
 #define INCLUDING_DYNAMIC_MY_FIRST_ENGINE_LIBRARY
 #endif
 
+#include "..\Declarations\AnimatedSprite.h"
 #include "..\Declarations\Drawable.h"
 #include "..\Declarations\Frame.h"
 #include "..\Declarations\GameEngine.h"

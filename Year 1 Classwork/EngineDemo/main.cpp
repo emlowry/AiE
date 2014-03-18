@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Runs a simple game to demonstrate MyFirstEngine.
- * Last Modified:      March 13, 2014
- * Last Modification:  Sprite testing.
+ * Last Modified:      March 18, 2014
+ * Last Modification:  Animated sprite testing.
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
@@ -45,6 +45,7 @@ protected:
         }
         m_oSprite.UpdateTextureMatrix();
         m_oSprite.SetDisplaySize( 0.125, 0.25 );
+        m_oSprite.Play();
     }
     virtual void TerminateInstance() override
     {
@@ -56,25 +57,32 @@ protected:
     }
     virtual void OnUpdate( double a_dDeltaTime )
     {
-        m_aoQuads[0].SetYaw( GameEngine::LastTime() );
-        m_aoQuads[1].SetPitch( GameEngine::LastTime() );
-        m_aoQuads[2].SetRoll( GameEngine::LastTime() );
-        m_aoQuads[3].SetTaitBryanAngles( GameEngine::LastTime(),
-                                         GameEngine::LastTime(),
-                                         GameEngine::LastTime() );
-        m_aoQuads[4].SetTaitBryanAngles( -GameEngine::LastTime(),
-                                         -GameEngine::LastTime(),
-                                         -GameEngine::LastTime() );
-        m_aoQuads[5].SetScale( 0.625 + ( 0.125 * std::sin( 2 * GameEngine::LastTime() ) ) );
-        m_aoQuads[6].SetScale( 0.25 + ( 0.25 * std::sin( GameEngine::LastTime() / 2 ) ),
-                               0.25 + ( 0.25 * std::cos( GameEngine::LastTime() / 2 ) ) );
-        m_aoQuads[7].SetPosition( 0.5 * std::sin( GameEngine::LastTime() ),
-                                  0.5 * std::cos( GameEngine::LastTime() ) );
+        double dAngle1 = Math::ScrollRadians( GameEngine::LastTime() );
+        double dAngle2 = Math::ScrollRadians( GameEngine::LastTime() * 2 );
+        double dAngle3 = Math::ScrollRadians( GameEngine::LastTime() / 2 );
+        m_aoQuads[0].SetYaw( dAngle1 );
+        m_aoQuads[1].SetPitch( dAngle1 );
+        m_aoQuads[2].SetRoll( dAngle1 );
+        m_aoQuads[3].SetTaitBryanAngles( dAngle1,
+                                         dAngle1,
+                                         dAngle1 );
+        m_aoQuads[4].SetTaitBryanAngles( -dAngle1,
+                                         -dAngle1,
+                                         -dAngle1 );
+        m_aoQuads[5].SetScale( 0.625 + ( 0.125 * std::sin( dAngle2 ) ) );
+        m_aoQuads[6].SetScale( 0.25 + ( 0.25 * std::sin( dAngle3 ) ),
+                               0.25 + ( 0.25 * std::cos( dAngle3 ) ) );
+        m_aoQuads[7].SetPosition( 0.5 * std::sin( dAngle1 ),
+                                  0.5 * std::cos( dAngle1 ) );
         m_oSprite.SetPosition( m_aoQuads[7].GetPosition() );
-        m_oSprite.SetFrameNumber( GameEngine::LastTime() );
+        if( 0.0 < dAngle1 && a_dDeltaTime > dAngle1 )
+        {
+            m_oSprite.Seek( dAngle1 );
+        }
+        m_oSprite.Update( a_dDeltaTime );
     }
 private:
-    SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ), m_oSprite( &m_oTexture, &m_oFrameList )
+    SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ), m_oSprite( &m_oTexture, &m_oFrameList, 2, 1 )
     {
         m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 2.0, 2.0 ) );
         m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 1.75, 1.75 ) );
@@ -87,7 +95,7 @@ private:
     }
     Quad m_aoQuads[8];
     Texture m_oTexture;
-    Sprite m_oSprite;
+    AnimatedSprite m_oSprite;
     Frame::Array m_oFrameList;
 };
 

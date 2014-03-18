@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       December 4, 2013
  * Description:        Inline and template function implementations.
- * Last Modified:      March 5, 2014
+ * Last Modified:      March 18, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -172,7 +172,7 @@ template< typename T >
 inline typename std::enable_if< std::is_scalar< T >::value, T >::type
     ScrollRadians( const T& ac_rValue )
 {
-    return Scroll( -ac_rValue, -(T)PI, (T)PI );
+    return -Scroll( -ac_rValue, -(T)PI, (T)PI );
 }
 
 // Complex conjugate (if you ever want to use a matrix full of complex numbers,

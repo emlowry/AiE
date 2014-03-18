@@ -48,7 +48,7 @@ public:
             const Color::ColorVector& ac_roColor = Color::WHITE );
     Sprite( Texture* a_poTexture,
             const Frame::Array* a_pcoFrameList,
-            const Point2D& ac_roSize,
+            const Point2D& ac_roScale,
             const Point3D& ac_roPosition,
             const Point3D& ac_roForward,
             const Point3D& ac_roUp = Point3D::Unit(2),
