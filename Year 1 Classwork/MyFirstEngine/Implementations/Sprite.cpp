@@ -29,6 +29,19 @@ Sprite::Sprite( Texture* a_poTexture,
     UpdateTextureMatrix();
 }
 Sprite::Sprite( Texture* a_poTexture,
+                const Point2D& ac_roScale,
+                const Point3D& ac_roPosition,
+                const Point3D& ac_roForward,
+                const Point3D& ac_roUp,
+                const Color::ColorVector& ac_roColor )
+    : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roForward, ac_roUp ),
+      m_poTexture( a_poTexture ), m_pcoFrameList( nullptr ),
+      m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
+      m_poTextureMatrix( new Transform2D )
+{
+    UpdateTextureMatrix();
+}
+Sprite::Sprite( Texture* a_poTexture,
                 const Point3D& ac_roLowerLeftCorner,
                 const Point3D& ac_roUpperRightCorner,
                 const Point3D& ac_roForward,
@@ -48,6 +61,20 @@ Sprite::Sprite( Texture* a_poTexture,
                 const Rotation3D& ac_roRotation,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roRotation ),
+      m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
+      m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
+      m_poTextureMatrix( new Transform2D )
+{
+    UpdateTextureMatrix();
+}
+Sprite::Sprite( Texture* a_poTexture,
+                const Frame::Array* a_pcoFrameList,
+                const Point2D& ac_roScale,
+                const Point3D& ac_roPosition,
+                const Point3D& ac_roForward,
+                const Point3D& ac_roUp,
+                const Color::ColorVector& ac_roColor )
+    : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roForward, ac_roUp ),
       m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
@@ -124,72 +151,6 @@ const Frame& Sprite::operator[]( unsigned int a_uiFrameNumber ) const
                                          : m_poTexture->TextureFrame() );
     }
     return (*m_pcoFrameList)[ a_uiFrameNumber % FrameCount() ];
-}
-
-// Frame increment/decrement operators
-Sprite& Sprite::operator++()
-{
-    if( 0 == FrameCount() )
-    {
-        return *this;
-    }
-    unsigned int uiOldFrame = m_uiFrameNumber;
-    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % FrameCount();
-    if( !CurrentFrame().SameSize( GetFrame( uiOldFrame ) ) )
-    {
-        UpdateModelMatrix();
-        UpdateTextureMatrix();
-    }
-    return *this;
-}
-Sprite Sprite::operator++(int)
-{
-    if( 0 == FrameCount() )
-    {
-        return *this;
-    }
-    Sprite oCopy( *this );
-    m_uiFrameNumber = ( m_uiFrameNumber + 1 ) % FrameCount();
-    if( !CurrentFrame().SameSize( oCopy.CurrentFrame() ) )
-    {
-        UpdateModelMatrix();
-        UpdateTextureMatrix();
-    }
-    return oCopy;
-}
-Sprite& Sprite::operator--()
-{
-    if( 0 == FrameCount() )
-    {
-        return *this;
-    }
-    unsigned int uiOldFrame = m_uiFrameNumber;
-    m_uiFrameNumber = ( 0 == m_uiFrameNumber
-                        ? FrameCount() - 1
-                        : ( m_uiFrameNumber - 1 ) % FrameCount() );
-    if( !CurrentFrame().SameSize( GetFrame( uiOldFrame ) ) )
-    {
-        UpdateModelMatrix();
-        UpdateTextureMatrix();
-    }
-    return *this;
-}
-Sprite Sprite::operator--(int)
-{
-    if( 0 == FrameCount() )
-    {
-        return *this;
-    }
-    Sprite oCopy( *this );
-    m_uiFrameNumber = ( 0 == m_uiFrameNumber
-                        ? FrameCount() - 1
-                        : ( m_uiFrameNumber - 1 ) % FrameCount() );
-    if( !CurrentFrame().SameSize( oCopy.CurrentFrame() ) )
-    {
-        UpdateModelMatrix();
-        UpdateTextureMatrix();
-    }
-    return oCopy;
 }
 
 // Get/Set display size ( scale / framePixels )

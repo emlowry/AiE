@@ -29,12 +29,13 @@ public:
           const Point3D& ac_roPosition = Point3D::Origin(),
           const Rotation3D& ac_roRotation = Rotation3D::None() )
         : Drawable( ac_roColor, ac_roSize, ac_roPosition, ac_roRotation ) {}
-    Quad( const Quad& ac_roQuad ) : Drawable( ac_roQuad ) {}
-    Quad& operator=( const Quad& ac_roQuad )
-    {
-        Drawable::operator=( ac_roQuad );
-        return *this;
-    }
+    Quad( const Color::ColorVector& ac_roColor,
+          const Point2D& ac_roSize,
+          const Point3D& ac_roPosition,
+          const Point3D& ac_roForward,
+          const Point3D& ac_roUp = Point3D::Unit(2) )
+        : Drawable( ac_roColor, ac_roSize, ac_roPosition,
+                    Rotation3D( ac_roForward, ac_roUp ) ) {}
     Quad( const Color::ColorVector& ac_roColor,
           const Point3D& ac_roLowerLeftCorner,
           const Point3D& ac_roUpperRightCorner,
@@ -42,6 +43,14 @@ public:
         : Drawable( ac_roColor )
     {
         SetDimensions( ac_roLowerLeftCorner, ac_roUpperRightCorner, ac_roForward );
+    }
+
+    // Copy constructor/operator
+    Quad( const Quad& ac_roQuad ) : Drawable( ac_roQuad ) {}
+    Quad& operator=( const Quad& ac_roQuad )
+    {
+        Drawable::operator=( ac_roQuad );
+        return *this;
     }
 
     // destructor is virtual, since Sprite inherits from Quad
