@@ -63,6 +63,9 @@
     <ClInclude Include="Declarations\AnimatedSprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Declarations\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\Shader.cpp">

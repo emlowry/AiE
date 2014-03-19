@@ -25,14 +25,14 @@ public:
     typedef void (*Callback)( AnimatedSprite& a_roSprite );
     
     // Main constructors
-    AnimatedSprite( Texture* a_poTexture = nullptr,
+    AnimatedSprite( Texture& a_roTexture,
                     const Frame::Array* a_pcoFrameList = nullptr,
                     double a_dFPS = 0.0, unsigned int a_uiLoops = 0,
                     const Point2D& ac_roScale = Point2D( 1.0 ),
                     const Point3D& ac_roPosition = Point3D::Origin(),
                     const Rotation3D& ac_roRotation = Rotation3D::None(),
                     const Color::ColorVector& ac_roColor = Color::WHITE );
-    AnimatedSprite( Texture* a_poTexture,
+    AnimatedSprite( Texture& a_roTexture,
                     const Frame::Array* a_pcoFrameList,
                     double a_dFPS, unsigned int a_uiLoops,
                     const Point2D& ac_roScale,
@@ -40,14 +40,14 @@ public:
                     const Point3D& ac_roForward,
                     const Point3D& ac_roUp = Point3D::Unit(2),
                     const Color::ColorVector& ac_roColor = Color::WHITE );
-    AnimatedSprite( Texture* a_poTexture,
+    AnimatedSprite( Texture& a_roTexture,
                     const Frame::Array* a_pcoFrameList,
                     double a_dFPS, unsigned int a_uiLoops,
                     const Point3D& ac_roLowerLeftCorner,
                     const Point3D& ac_roUpperRightCorner,
                     const Point3D& ac_roForward = Point3D::Unit(0),
                     const Color::ColorVector& ac_roColor = Color::WHITE );
-    AnimatedSprite( Texture* a_poTexture,
+    AnimatedSprite( Texture& a_roTexture,
                     const Frame::Array* a_pcoFrameList,
                     double a_dFPS, unsigned int a_uiLoops,
                     Callback a_pOnComplete,
@@ -55,7 +55,7 @@ public:
                     const Point3D& ac_roPosition = Point3D::Origin(),
                     const Rotation3D& ac_roRotation = Rotation3D::None(),
                     const Color::ColorVector& ac_roColor = Color::WHITE );
-    AnimatedSprite( Texture* a_poTexture,
+    AnimatedSprite( Texture& a_roTexture,
                     const Frame::Array* a_pcoFrameList,
                     double a_dFPS, unsigned int a_uiLoops,
                     Callback a_pOnComplete,
@@ -64,7 +64,7 @@ public:
                     const Point3D& ac_roForward,
                     const Point3D& ac_roUp = Point3D::Unit(2),
                     const Color::ColorVector& ac_roColor = Color::WHITE );
-    AnimatedSprite( Texture* a_poTexture,
+    AnimatedSprite( Texture& a_roTexture,
                     const Frame::Array* a_pcoFrameList,
                     double a_dFPS, unsigned int a_uiLoops,
                     Callback a_pOnComplete,

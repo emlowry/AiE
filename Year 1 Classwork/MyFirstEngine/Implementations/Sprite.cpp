@@ -16,80 +16,80 @@ namespace MyFirstEngine
 {
 
 // Main constructors
-Sprite::Sprite( Texture* a_poTexture,
+Sprite::Sprite( Texture& a_roTexture,
                 const Point2D& ac_roScale,
                 const Point3D& ac_roPosition,
                 const Rotation3D& ac_roRotation,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roRotation ),
-      m_poTexture( a_poTexture ), m_pcoFrameList( nullptr ),
+      m_poTexture( &a_roTexture ), m_pcoFrameList( nullptr ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( Texture* a_poTexture,
+Sprite::Sprite( Texture& a_roTexture,
                 const Point2D& ac_roScale,
                 const Point3D& ac_roPosition,
                 const Point3D& ac_roForward,
                 const Point3D& ac_roUp,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roForward, ac_roUp ),
-      m_poTexture( a_poTexture ), m_pcoFrameList( nullptr ),
+      m_poTexture( &a_roTexture ), m_pcoFrameList( nullptr ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( Texture* a_poTexture,
+Sprite::Sprite( Texture& a_roTexture,
                 const Point3D& ac_roLowerLeftCorner,
                 const Point3D& ac_roUpperRightCorner,
                 const Point3D& ac_roForward,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roLowerLeftCorner,
             ac_roUpperRightCorner, ac_roForward ),
-      m_poTexture( a_poTexture ), m_pcoFrameList( nullptr ),
+      m_poTexture( &a_roTexture ), m_pcoFrameList( nullptr ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( Texture* a_poTexture,
-                const Frame::Array* a_pcoFrameList,
+Sprite::Sprite( Texture& a_roTexture,
+                const Frame::Array& ac_roFrameList,
                 const Point2D& ac_roScale,
                 const Point3D& ac_roPosition,
                 const Rotation3D& ac_roRotation,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roRotation ),
-      m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
+      m_poTexture( &a_roTexture ), m_pcoFrameList( &ac_roFrameList ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( Texture* a_poTexture,
-                const Frame::Array* a_pcoFrameList,
+Sprite::Sprite( Texture& a_roTexture,
+                const Frame::Array& ac_roFrameList,
                 const Point2D& ac_roScale,
                 const Point3D& ac_roPosition,
                 const Point3D& ac_roForward,
                 const Point3D& ac_roUp,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roScale, ac_roPosition, ac_roForward, ac_roUp ),
-      m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
+      m_poTexture( &a_roTexture ), m_pcoFrameList( &ac_roFrameList ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
     UpdateTextureMatrix();
 }
-Sprite::Sprite( Texture* a_poTexture,
-                const Frame::Array* a_pcoFrameList,
+Sprite::Sprite( Texture& a_roTexture,
+                const Frame::Array& ac_roFrameList,
                 const Point3D& ac_roLowerLeftCorner,
                 const Point3D& ac_roUpperRightCorner,
                 const Point3D& ac_roForward,
                 const Color::ColorVector& ac_roColor )
     : Quad( ac_roColor, ac_roLowerLeftCorner,
             ac_roUpperRightCorner, ac_roForward ),
-      m_poTexture( a_poTexture ), m_pcoFrameList( a_pcoFrameList ),
+      m_poTexture( &a_roTexture ), m_pcoFrameList( &ac_roFrameList ),
       m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
       m_poTextureMatrix( new Transform2D )
 {
@@ -201,6 +201,11 @@ Point2D Sprite::SliceSizeUV() const
 }
 
 // Sprite properties
+const Frame::Array& Sprite::FrameList() const
+{
+    return ( nullptr == m_pcoFrameList ? Frame::EMPTY_ARRAY
+                                       : *m_pcoFrameList );
+}
 const Frame& Sprite::CurrentFrame() const
 {
     return GetFrame( m_uiFrameNumber );
@@ -219,13 +224,14 @@ Sprite& Sprite::SetFrameNumber( unsigned int a_uiFrameNumber )
     m_uiFrameNumber = a_uiFrameNumber % FrameCount();
     return *this;
 }
-Sprite& Sprite::SetFrameList( const Frame::Array* a_pcoFrameList )
+Sprite& Sprite::SetFrameList( const Frame::Array& ac_roFrameList )
 {
     // save current frame
     Frame oFrame = CurrentFrame();
 
     // set frame list
-    m_pcoFrameList = a_pcoFrameList;
+    m_pcoFrameList = ( &Frame::EMPTY_ARRAY == &ac_roFrameList
+                       ? nullptr : &ac_roFrameList );
     m_uiFrameNumber = ( nullptr == m_pcoFrameList
                         ? 0 : m_uiFrameNumber % FrameCount() );
 
@@ -237,12 +243,12 @@ Sprite& Sprite::SetFrameList( const Frame::Array* a_pcoFrameList )
     }
     return *this;
 }
-Sprite& Sprite::SetTexture( Texture* a_poTexture )
+Sprite& Sprite::SetTexture( Texture& a_roTexture )
 {
-    if( a_poTexture != m_poTexture )
+    if( &a_roTexture != m_poTexture )
     {
         Frame oFrame = CurrentFrame();
-        m_poTexture = a_poTexture;
+        m_poTexture = &a_roTexture;
         if( !oFrame.SameSize( CurrentFrame() ) )
         {
             UpdateModelMatrix();

@@ -78,6 +78,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Declarations\AnimatedSprite.h" />
+    <ClInclude Include="Declarations\Font.h" />
     <ClInclude Include="Declarations\Frame.h" />
     <ClInclude Include="Declarations\GameEngine.h" />
     <ClInclude Include="Declarations\GameState.h" />

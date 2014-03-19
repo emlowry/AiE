@@ -93,8 +93,29 @@ struct IMEXPORT_CLASS Frame
     Cropping cropping;
 
     static const Frame ZERO;
+    static const Array EMPTY_ARRAY;
 };
 
 }   // namespace MyFirstEngine
+
+#ifndef INSTANTIATE_FRAME_ARRAY
+
+//disable warnings on extern before template instantiation
+#pragma warning(push)
+#pragma warning (disable : 4231)
+
+// explicit instantiation
+extern template class DLL_IMPORT
+    Utility::DynamicArray< MyFirstEngine::Frame >;
+
+// reenable warnings
+#pragma warning(pop)
+
+#else
+
+template class DLL_EXPORT
+    Utility::DynamicArray< MyFirstEngine::Frame >;
+
+#endif  // COMPILING__FRAME__CPP
 
 #endif  // FRAME__H

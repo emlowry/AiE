@@ -24,37 +24,37 @@ class IMEXPORT_CLASS Sprite : public Quad
 public:
 
     // Main constructors
-    Sprite( Texture* a_poTexture = nullptr,
+    Sprite( Texture& a_roTexture,
             const Point2D& ac_roScale = Point2D( 1.0 ),
             const Point3D& ac_roPosition = Point3D::Origin(),
             const Rotation3D& ac_roRotation = Rotation3D::None(),
             const Color::ColorVector& ac_roColor = Color::WHITE );
-    Sprite( Texture* a_poTexture,
+    Sprite( Texture& a_roTexture,
             const Point2D& ac_roScale,
             const Point3D& ac_roPosition,
             const Point3D& ac_roForward,
             const Point3D& ac_roUp = Point3D::Unit(2),
             const Color::ColorVector& ac_roColor = Color::WHITE );
-    Sprite( Texture* a_poTexture,
+    Sprite( Texture& a_roTexture,
             const Point3D& ac_roLowerLeftCorner,
             const Point3D& ac_roUpperRightCorner,
             const Point3D& ac_roForward = Point3D::Unit(0),
             const Color::ColorVector& ac_roColor = Color::WHITE );
-    Sprite( Texture* a_poTexture,
-            const Frame::Array* a_pcoFrameList,
+    Sprite( Texture& a_roTexture,
+            const Frame::Array& ac_roFrameList,
             const Point2D& ac_roScale = Point2D( 1.0 ),
             const Point3D& ac_roPosition = Point3D::Origin(),
             const Rotation3D& ac_roRotation = Rotation3D::None(),
             const Color::ColorVector& ac_roColor = Color::WHITE );
-    Sprite( Texture* a_poTexture,
-            const Frame::Array* a_pcoFrameList,
+    Sprite( Texture& a_roTexture,
+            const Frame::Array& ac_roFrameList,
             const Point2D& ac_roScale,
             const Point3D& ac_roPosition,
             const Point3D& ac_roForward,
             const Point3D& ac_roUp = Point3D::Unit(2),
             const Color::ColorVector& ac_roColor = Color::WHITE );
-    Sprite( Texture* a_poTexture,
-            const Frame::Array* a_pcoFrameList,
+    Sprite( Texture& a_roTexture,
+            const Frame::Array& ac_roFrameList,
             const Point3D& ac_roLowerLeftCorner,
             const Point3D& ac_roUpperRightCorner,
             const Point3D& ac_roForward = Point3D::Unit(0),
@@ -73,14 +73,15 @@ public:
 
     // Sprite properties
     unsigned int FrameNumber() const { return m_uiFrameNumber; }
-    const Frame::Array* FrameList() const { return m_pcoFrameList; }
     unsigned int FrameCount() const
     { return ( nullptr == m_pcoFrameList ? 0 : m_pcoFrameList->Size() ); }
+    const Frame::Array& FrameList() const;
     const Frame& CurrentFrame() const;
-    Sprite& SetFrameNumber( unsigned int a_uiFrameNumber );
-    Sprite& SetFrameList( const Frame::Array* a_pcoFrameList );
-    Texture* GetTexture() const { return m_poTexture; }
-    Sprite& SetTexture( Texture* a_poTexture );
+    Sprite& SetFrameNumber( unsigned int a_uiFrameNumber = 0 );
+    Sprite& SetFrameList( const Frame::Array& ac_roFrameList = Frame::EMPTY_ARRAY );
+    Sprite& SetFrameList( const Frame::Array&& ac_rroFrameList ) = delete;
+    Texture& GetTexture() const { return *m_poTexture; }
+    Sprite& SetTexture( Texture& a_roTexture );
 
     // Current frame properties
     const IntPoint2D& FramePixels() const
@@ -134,6 +135,29 @@ protected:
     // boundaries, not frame boundaries
     bool* m_pbUpdateTextureMatrix;
     Transform2D* m_poTextureMatrix;
+
+private:
+
+    // make sure frame list r-values don't bind to public constructors
+    Sprite( Texture& a_roTexture,
+            const Frame::Array&& ac_rroFrameList,
+            const Point2D& ac_roScale = Point2D( 1.0 ),
+            const Point3D& ac_roPosition = Point3D::Origin(),
+            const Rotation3D& ac_roRotation = Rotation3D::None(),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
+    Sprite( Texture& a_roTexture,
+            const Frame::Array&& ac_rroFrameList,
+            const Point2D& ac_roScale,
+            const Point3D& ac_roPosition,
+            const Point3D& ac_roForward,
+            const Point3D& ac_roUp = Point3D::Unit(2),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
+    Sprite( Texture& a_roTexture,
+            const Frame::Array&& ac_rroFrameList,
+            const Point3D& ac_roLowerLeftCorner,
+            const Point3D& ac_roUpperRightCorner,
+            const Point3D& ac_roForward = Point3D::Unit(0),
+            const Color::ColorVector& ac_roColor = Color::WHITE );
 
 };  // class Sprite
 

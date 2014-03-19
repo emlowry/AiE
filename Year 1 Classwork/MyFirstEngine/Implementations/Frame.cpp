@@ -7,7 +7,9 @@
  * Last Modification:  Moving code out of Frame.h.
  ******************************************************************************/
 
+#define INSTANTIATE_FRAME_ARRAY
 #include "../Declarations/Frame.h"
+#undef INSTANTIATE_FRAME_ARRAY
 
 //
 // File-local helper functions
@@ -70,6 +72,9 @@ namespace MyFirstEngine
 
 // all-zero frame
 const Frame Frame::ZERO = Frame();
+
+// empty frame list
+const Frame::Array Frame::EMPTY_ARRAY = Frame::Array();
 
 // default constructor
 Frame::Frame( const IntPoint2D& ac_roFramePixels,
