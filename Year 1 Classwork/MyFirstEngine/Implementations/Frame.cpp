@@ -7,9 +7,7 @@
  * Last Modification:  Moving code out of Frame.h.
  ******************************************************************************/
 
-#define INSTANTIATE_FRAME_ARRAY
 #include "../Declarations/Frame.h"
-#undef INSTANTIATE_FRAME_ARRAY
 
 //
 // File-local helper functions
@@ -72,9 +70,6 @@ namespace MyFirstEngine
 
 // all-zero frame
 const Frame Frame::ZERO = Frame();
-
-// empty frame list
-const Frame::Array Frame::EMPTY_ARRAY = Frame::Array();
 
 // default constructor
 Frame::Frame( const IntPoint2D& ac_roFramePixels,
@@ -224,8 +219,7 @@ IntPoint2D Frame::DisplayAreaOffset() const
     {
         IntPoint2D oTopLeft, oBottomRight;
         IntersectionCorners( *this, oTopLeft, oBottomRight );
-        oResult = ( oTopLeft + oBottomRight - framePixels ) / 2
-                    + centerOffset;
+        oResult = ( oTopLeft + oBottomRight ) / 2 + centerOffset;
         break;
     }
 
@@ -234,8 +228,7 @@ IntPoint2D Frame::DisplayAreaOffset() const
     {
         IntPoint2D oTopLeft, oBottomRight;
         UnionCorners( *this, oTopLeft, oBottomRight );
-        oResult = ( oTopLeft + oBottomRight - framePixels ) / 2
-                    + centerOffset;
+        oResult = ( oTopLeft + oBottomRight ) / 2 + centerOffset;
         break;
     }
 
@@ -334,6 +327,55 @@ bool Frame::HasDisplayArea() const
 
     }   // switch( cropping )
     return bResult;
+}
+
+// Create a transformation matrix for transforming texture coordinates of a
+// quad into the corresponding texture coordinates of the frame display area
+Transform2D& Frame::
+    DisplayAreaTextureTransform( Transform2D& a_roTransform ) const
+{
+    Point2D oDisplayArea = DisplayAreaPixels();
+    Point2D oSliceArea = slicePixels;
+    Point2D oOffset = DisplayAreaSliceOffset();
+    a_roTransform = Plane::Scaling( 0 == oSliceArea.x
+                                    ? 0 : oDisplayArea.x / oSliceArea.x,
+                                    0 == oSliceArea.y
+                                    ? 0 : oDisplayArea.y / oSliceArea.y ) *
+                    Plane::Translation( 0 == oSliceArea.x
+                                        ? 0 : -oOffset.x / oSliceArea.x,
+                                        0 == oSliceArea.y
+                                        ? 0 : -oOffset.y / oSliceArea.y );
+    return a_roTransform;
+}
+
+// Create a transformation matrix for transforming a default quad (1x1
+// centered on origin) into a quad of the size and dimensions of the display
+// area
+Transform3D& Frame::
+    DisplayAreaVertexTransform( Transform3D& a_roTransform ) const
+{
+    Point3D oDisplayArea = DisplayAreaPixels();
+    Point3D oOffset = DisplayAreaOffset();
+    a_roTransform = Space::Scaling( oDisplayArea ) *
+                    Space::Translation( oOffset.x, -oOffset.y );
+    return a_roTransform;
+}
+
+// Get UV dimensions for the current frame's slice on a texture of the given
+// size.
+Point2D Frame::SliceOffsetUV( int a_iTextureWidth, int a_iTextureHeight ) const
+{
+    return ( ( 0 == a_iTextureWidth || 0 == a_iTextureHeight )
+             ? Point2D::Zero()
+             : Point2D( (double)( sliceLocation.x ) / a_iTextureWidth,
+                        (double)( sliceLocation.y ) / a_iTextureHeight ) );
+}
+Point2D Frame::SliceSizeUV( int a_iTextureWidth, int a_iTextureHeight ) const
+{
+    return ( ( 0 == a_iTextureWidth || 0 == a_iTextureHeight )
+             ? Point2D::Zero()
+             : Point2D( (double)( slicePixels.x ) / a_iTextureWidth,
+                        (double)( slicePixels.y ) / a_iTextureHeight ) );
 }
 
 }   // namespace MyFirstEngine

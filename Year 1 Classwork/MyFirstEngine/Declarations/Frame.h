@@ -76,8 +76,30 @@ struct IMEXPORT_CLASS Frame
     // corner of the display area
     IntPoint2D DisplayAreaSliceOffset() const;
 
+    // Create a transformation matrix for transforming texture coordinates of a
+    // quad into the corresponding texture coordinates of the frame display area
+    Transform2D DisplayAreaTextureTransform() const
+    { Transform2D oResult; return DisplayAreaTextureTransform( oResult ); }
+    Transform2D& DisplayAreaTextureTransform( Transform2D& a_roTransform ) const;
+
+    // Create a transformation matrix for transforming a default quad (1x1
+    // centered on origin) into a quad of the size and dimensions of the display
+    // area
+    Transform3D DisplayAreaVertexTransform() const
+    { Transform3D oResult; return DisplayAreaVertexTransform( oResult ); }
+    Transform3D& DisplayAreaVertexTransform( Transform3D& a_roTransform ) const;
+
     // Does this frame contain any drawable pixels?
     bool HasDisplayArea() const;
+
+    // Get UV dimensions for the current frame's slice on a texture of the given
+    // size.
+    Point2D SliceOffsetUV( int a_iTextureWidth, int a_iTextureHeight ) const;
+    Point2D SliceSizeUV( int a_iTextureWidth, int a_iTextureHeight ) const;
+    Point2D SliceOffsetUV( const IntPoint2D& ac_roTextureSize ) const
+    { return SliceOffsetUV( ac_roTextureSize.x, ac_roTextureSize.y ); }
+    Point2D SliceSizeUV( const IntPoint2D& ac_roTextureSize ) const
+    { return SliceSizeUV( ac_roTextureSize.x, ac_roTextureSize.y ); }
 
     IntPoint2D framePixels;     // size of the frame in texture pixels
     IntPoint2D centerOffset;    // pixel location of the center of the
@@ -93,29 +115,8 @@ struct IMEXPORT_CLASS Frame
     Cropping cropping;
 
     static const Frame ZERO;
-    static const Array EMPTY_ARRAY;
 };
 
 }   // namespace MyFirstEngine
-
-#ifndef INSTANTIATE_FRAME_ARRAY
-
-//disable warnings on extern before template instantiation
-#pragma warning(push)
-#pragma warning (disable : 4231)
-
-// explicit instantiation
-extern template class DLL_IMPORT
-    Utility::DynamicArray< MyFirstEngine::Frame >;
-
-// reenable warnings
-#pragma warning(pop)
-
-#else
-
-template class DLL_EXPORT
-    Utility::DynamicArray< MyFirstEngine::Frame >;
-
-#endif  // COMPILING__FRAME__CPP
 
 #endif  // FRAME__H

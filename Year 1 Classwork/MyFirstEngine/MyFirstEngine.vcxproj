@@ -103,6 +103,7 @@
   <ItemGroup>
     <ClCompile Include="Implementations\AnimatedSprite.cpp" />
     <ClCompile Include="Implementations\Drawable.cpp" />
+    <ClCompile Include="Implementations\Font.cpp" />
     <ClCompile Include="Implementations\Frame.cpp" />
     <ClCompile Include="Implementations\GameEngine.cpp" />
     <ClCompile Include="Implementations\GameWindow.cpp" />

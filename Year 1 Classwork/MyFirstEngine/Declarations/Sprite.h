@@ -78,8 +78,7 @@ public:
     const Frame::Array& FrameList() const;
     const Frame& CurrentFrame() const;
     Sprite& SetFrameNumber( unsigned int a_uiFrameNumber = 0 );
-    Sprite& SetFrameList( const Frame::Array& ac_roFrameList = Frame::EMPTY_ARRAY );
-    Sprite& SetFrameList( const Frame::Array&& ac_rroFrameList ) = delete;
+    Sprite& SetFrameList( const Frame::Array& ac_roFrameList = Frame::Array::EMPTY );
     Texture& GetTexture() const { return *m_poTexture; }
     Sprite& SetTexture( Texture& a_roTexture );
 
@@ -138,7 +137,7 @@ protected:
 
 private:
 
-    // make sure frame list r-values don't bind to public constructors
+    // make sure frame list r-values don't bind to public methods
     Sprite( Texture& a_roTexture,
             const Frame::Array&& ac_rroFrameList,
             const Point2D& ac_roScale = Point2D( 1.0 ),
@@ -158,6 +157,7 @@ private:
             const Point3D& ac_roUpperRightCorner,
             const Point3D& ac_roForward = Point3D::Unit(0),
             const Color::ColorVector& ac_roColor = Color::WHITE );
+    Sprite& SetFrameList( const Frame::Array&& ac_rroFrameList );
 
 };  // class Sprite
 

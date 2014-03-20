@@ -82,7 +82,7 @@ protected:
         m_oSprite.Update( a_dDeltaTime );
     }
 private:
-    SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ), m_oSprite( &m_oTexture, &m_oFrameList, 2, 1 )
+    SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ), m_oSprite( m_oTexture, m_oFrameList, 2, 1 )
     {
         m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 2.0, 2.0 ) );
         m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 1.75, 1.75 ) );

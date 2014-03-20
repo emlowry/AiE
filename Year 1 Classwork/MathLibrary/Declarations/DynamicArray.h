@@ -24,6 +24,12 @@ public:
     DynamicArray( unsigned int a_uiSize = 0 )
         : m_uiSize( a_uiSize ),
           m_paData( 0 == a_uiSize ? nullptr : new T[ a_uiSize ] ) {}
+    DynamicArray( unsigned int a_uiSize, const T& ac_rFill )
+        : m_uiSize( a_uiSize ),
+          m_paData( 0 == a_uiSize ? nullptr : new T[ a_uiSize ] )
+    {
+        Fill( ac_rFill );
+    }
 
     // construct from data
     DynamicArray( const T& ac_rData )
@@ -122,6 +128,25 @@ public:
         }
         return *this;
     }
+    DynamicArray& SetSize( unsigned int a_uiSize, const T& ac_rFill )
+    {
+        unsigned int uiSize = m_uiSize;
+        SetSize( a_uiSize );
+        for( unsigned int ui = uiSize; ui < m_uiSize; ++ui )
+        {
+            m_paData[ ui ] = ac_rFill;
+        }
+        return *this;
+    }
+
+    // set all elements to the given value
+    DynamicArray& Fill( const T& ac_rFill )
+    {
+        for( unsigned int ui = 0; ui < m_uiSize; ++ui )
+        {
+            m_paData[ui] = ac_rFill;
+        }
+    }
 
     // copy data
     DynamicArray& CopyData( const T* a_pacData, unsigned int a_uiSize,
@@ -141,12 +166,17 @@ public:
         return *this;
     }
 
+    static const DynamicArray EMPTY;
+
 protected:
 
     T* m_paData;
     unsigned int m_uiSize;
 
 };  // class DynamicArray
+
+template< typename T >
+const DynamicArray< T > DynamicArray< T >::EMPTY = DynamicArray< T >( 0 );
 
 }   // namespace Utility
 

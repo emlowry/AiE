@@ -173,37 +173,19 @@ Sprite& Sprite::SetDisplaySize( double a_dWidth, double a_dHeight )
 // Get UV dimensions for the current frame's slice
 Point2D Sprite::SliceOffsetUV() const
 {
-    // If there's no texture, return zero
-    if( nullptr == m_poTexture ||
-        0 == m_poTexture->Size().x ||
-        0 == m_poTexture->Size().y )
-    {
-        return Point2D::Zero();
-    }
-
-    // otherwise, translate pixel coordinates to UV coordinates
-    return Point2D( (double)( SliceLocation().x ) / m_poTexture->Size().x,
-                    (double)( SliceLocation().y ) / m_poTexture->Size().y );
+    return ( nullptr == m_poTexture ? Point2D::Zero() :
+             CurrentFrame().SliceOffsetUV( m_poTexture->Size() ) );
 }
 Point2D Sprite::SliceSizeUV() const
 {
-    // If there's no texture, return zero
-    if( nullptr == m_poTexture ||
-        0 == m_poTexture->Size().x ||
-        0 == m_poTexture->Size().y )
-    {
-        return Point2D::Zero();
-    }
-
-    // otherwise, translate pixel coordinates to UV coordinates
-    return Point2D( (double)( SlicePixels().x ) / m_poTexture->Size().x,
-                    (double)( SlicePixels().y ) / m_poTexture->Size().y );
+    return ( nullptr == m_poTexture ? Point2D::Zero() :
+             CurrentFrame().SliceSizeUV( m_poTexture->Size() ) );
 }
 
 // Sprite properties
 const Frame::Array& Sprite::FrameList() const
 {
-    return ( nullptr == m_pcoFrameList ? Frame::EMPTY_ARRAY
+    return ( nullptr == m_pcoFrameList ? Frame::Array::EMPTY
                                        : *m_pcoFrameList );
 }
 const Frame& Sprite::CurrentFrame() const
@@ -230,7 +212,7 @@ Sprite& Sprite::SetFrameList( const Frame::Array& ac_roFrameList )
     Frame oFrame = CurrentFrame();
 
     // set frame list
-    m_pcoFrameList = ( &Frame::EMPTY_ARRAY == &ac_roFrameList
+    m_pcoFrameList = ( &Frame::Array::EMPTY == &ac_roFrameList
                        ? nullptr : &ac_roFrameList );
     m_uiFrameNumber = ( nullptr == m_pcoFrameList
                         ? 0 : m_uiFrameNumber % FrameCount() );
@@ -266,13 +248,12 @@ const Transform3D& Sprite::GetModelMatrix() const
 {
     if( *m_pbUpdateModelMatrix )
     {
-        Point3D oDisplayArea = CurrentFrame().DisplayAreaPixels();
-        Point3D oOffset = CurrentFrame().DisplayAreaOffset();
-        *m_poModelMatrix = Space::Scaling( oDisplayArea ) *
-                           Space::Translation( oOffset ) * m_oBeforeTransform *
-                           Space::Scaling( m_oScale ) *
-                           m_oRotation.MakeTransform() *
-                           Space::Translation( m_oPosition ) * m_oAfterTransform;
+        CurrentFrame().DisplayAreaVertexTransform( *m_poModelMatrix );
+        *m_poModelMatrix *= m_oBeforeTransform *
+                            Space::Scaling( m_oScale ) *
+                            m_oRotation.MakeTransform() *
+                            Space::Translation( m_oPosition ) *
+                            m_oAfterTransform;
         *m_pbUpdateModelMatrix = false;
     }
     return *m_poModelMatrix;
@@ -286,19 +267,7 @@ const Transform2D& Sprite::GetTextureMatrix() const
 {
     if( *m_pbUpdateTextureMatrix )
     {
-        Point2D oDisplayArea = CurrentFrame().DisplayAreaPixels();
-        Point2D oSliceArea = CurrentFrame().slicePixels;
-        Point2D oOffset = CurrentFrame().DisplayAreaSliceOffset();
-        *m_poTextureMatrix =
-            Plane::Scaling( 0 == oSliceArea.x
-                            ? 0 : oDisplayArea.x / oSliceArea.x,
-                            0 == oSliceArea.y
-                            ? 0 : oDisplayArea.y / oSliceArea.y ) *
-            Plane::Translation( 0 == oSliceArea.x
-                                ? 0 : -oOffset.x / oSliceArea.x,
-                                0 == oSliceArea.y
-                                ? 0 : -oOffset.y / oSliceArea.y );
-        *m_poTextureMatrix = Transform2D::Identity();
+        CurrentFrame().DisplayAreaTextureTransform( *m_poTextureMatrix );
         *m_pbUpdateTextureMatrix = false;
     }
     return *m_poTextureMatrix;
