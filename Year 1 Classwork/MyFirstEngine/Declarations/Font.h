@@ -22,18 +22,21 @@ class IMEXPORT_CLASS Font
 {
 public:
 
-    // Frame list is for the printable ascii characters 32-126, in order. Frame
-    // center (as determined by offset) should be on the baseline at the
+    // Frame center (as determined by offset) should be on the baseline at the
     // beginning of the character.  Default kerning should be handled via choice
     // of frame size, slice size, and slice offset - the default distance
     // between the "centers" of the "a" and "b" frames when printing "ab" is the
     // width of the "a" frame.
     Font( Texture& a_roTexture, const Frame::Array& ac_roFrameList,
+          const char* ac_pcFrameCharacters, // characters mapping to each frame
           unsigned int a_uiLeading = 0, unsigned int a_uiEm = 0,
-          char a_cUnknownCharacter = '?' );
+          char a_cUnknown = '?' );
     Font( Texture& a_roTexture,
           unsigned int a_uiLeading = 0, unsigned int a_uiEm = 0,
-          char a_cUnknownCharacter = '?' );
+          char a_cUnknown = '?' );
+
+    // Destructor actually does something
+    ~Font();
 
     // Get the number of pixels in an em
     unsigned int Em() const;
@@ -46,8 +49,8 @@ public:
     { return ( 0 != m_uiLeading ? m_uiLeading : Em() ); }
 
     // Character that substitutes for characters not present in the font
-    // (if absent, (space) is used )
-    char UnknownCharacter() const { return m_cUnknownCharacter; }
+    // (if absent, (space) is used if present and Frame::Zero if not )
+    char UnknownCharacter() const { return m_cUnknown; }
 
     // for getting and setting character frames directly
     Frame& operator[]( char a_cCharacter );
@@ -71,21 +74,30 @@ public:
 
     // set the given sprite to show a tab of the given size
     Sprite& SetTabSlug( Sprite& a_roSlug, double a_dTabDisplaySize,
-                        char a_cTabCharacter = ' ' );
+                        char a_cTabCharacter = ' ' ) const;
     Sprite& SetTabSlug( Sprite& a_roSlug, double a_dTabDisplaySize,
-                        double a_dEmDisplaySize, char a_cTabCharacter = ' ' );
+                        double a_dEmDisplaySize,
+                        char a_cTabCharacter = ' ' ) const;
     
-protected:
+private:
 
-    // What is (or would be) the frame number of the given character?
-    unsigned int IndexOf( char a_cCharacter ) const
-    { return (unsigned int)a_cCharacter + ( a_cCharacter < 32 ? 224 : -32 ); }
+    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
+    // an stl container won't result in warnings.
+    class CharacterMap;
 
     Texture* m_poTexture;
+    CharacterMap* m_poMap;
+#ifdef MYFIRSTENGINE_EXPORTS        // disable warning about needing a dll
+#pragma warning(push)               // interface for DynamicArray< Frame > - the
+#pragma warning (disable : 4251)    // interface is provided by Frame.cpp
+#endif                              // compilation
     Frame::Array m_oFrameList;
+#ifdef MYFIRSTENGINE_EXPORTS
+#pragma warning(pop)
+#endif
     unsigned int m_uiLeading;   // pixels between baselines - 0 means use 1 em
     unsigned int m_uiEm;    // pixels in an em - 0 means use width of "M" frame
-    char m_cUnknownCharacter;   // takes the place of characters not in the font
+    char m_cUnknown;    // takes the place of characters not in the font
 
 };  // class Font
 

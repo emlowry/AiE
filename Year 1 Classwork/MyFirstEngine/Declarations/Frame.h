@@ -15,7 +15,7 @@
 
 namespace MyFirstEngine
 {
-
+    
 // Holds attributes for a single frame
 struct IMEXPORT_CLASS Frame
 {
@@ -118,5 +118,26 @@ struct IMEXPORT_CLASS Frame
 };
 
 }   // namespace MyFirstEngine
+
+// When compiling the Frame class, compile DynamicArray< Frame >
+#ifdef FRAME__CPP
+
+// Explicit instantiation
+template class DLL_EXPORT Utility::DynamicArray< MyFirstEngine::Frame >;
+
+// When compiling other classes, just use extern explicit template instantiation
+#else
+
+// disable warnings on extern before template instantiation
+#pragma warning(push)
+#pragma warning (disable : 4231)
+
+// Extern explicit instantiation
+extern template class DLL_IMPORT Utility::DynamicArray< MyFirstEngine::Frame >;
+
+// reenable warnings
+#pragma warning(pop)
+
+#endif  // DynamicArray< Frame > explicit instantiation
 
 #endif  // FRAME__H

@@ -7,6 +7,7 @@
  * Last Modification:  Moving code out of Frame.h.
  ******************************************************************************/
 
+#define FRAME__CPP
 #include "../Declarations/Frame.h"
 
 //
