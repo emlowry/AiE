@@ -205,6 +205,7 @@ Sprite& Font::SetSlug( Sprite& a_roSlug, char a_cCharacter ) const
     a_roSlug.SetTexture( *m_poTexture );
     a_roSlug.SetFrameList( m_oFrameList );
     a_roSlug.SetFrameNumber( (unsigned int)cCharacter );
+    a_roSlug.SetScale( a_roSlug.GetScale().y ); // in case previous slug was tab
     return a_roSlug;
 }
 Sprite& Font::SetSlug( Sprite& a_roSlug, char a_cCharacter,

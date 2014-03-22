@@ -22,19 +22,16 @@ class CharacterMap::CharacterLookup
 public:
     typedef std::unordered_map< Utility::DumbString, char > BaseType;
     typedef BaseType::value_type ValueType;
+    CharacterLookup() {}
+    CharacterLookup( const CharacterLookup& ac_roLookup )
+        : BaseType( ac_roLookup ) {}
     virtual ~CharacterLookup() {}
 };
 
 // Constructors
 CharacterMap::CharacterMap() : m_poLookup( new CharacterLookup ) {}
 CharacterMap::CharacterMap( const CharacterMap& ac_roMap )
-    : m_poLookup( new CharacterLookup )
-{
-    for each( CharacterLookup::ValueType oPair in *(ac_roMap.m_poLookup) )
-    {
-        (*m_poLookup)[ oPair.first ] = oPair.second;
-    }
-}
+    : m_poLookup( new CharacterLookup( *( ac_roMap.m_poLookup ) ) {}
 
 // Destructor
 CharacterMap::~CharacterMap()
