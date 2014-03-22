@@ -78,12 +78,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Declarations\AnimatedSprite.h" />
+    <ClInclude Include="Declarations\CharacterMap.h" />
     <ClInclude Include="Declarations\Font.h" />
     <ClInclude Include="Declarations\Frame.h" />
     <ClInclude Include="Declarations\GameEngine.h" />
     <ClInclude Include="Declarations\GameState.h" />
     <ClInclude Include="Declarations\GameWindow.h" />
     <ClInclude Include="Declarations\GLFW.h" />
+    <ClInclude Include="Declarations\HTMLCharacters.h" />
     <ClInclude Include="Declarations\MyFirstEngineMacros.h" />
     <ClInclude Include="Declarations\Quad.h" />
     <ClInclude Include="Declarations\QuadShaderProgram.h" />
@@ -102,11 +104,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\AnimatedSprite.cpp" />
+    <ClCompile Include="Implementations\CharacterMap.cpp" />
     <ClCompile Include="Implementations\Drawable.cpp" />
     <ClCompile Include="Implementations\Font.cpp" />
     <ClCompile Include="Implementations\Frame.cpp" />
     <ClCompile Include="Implementations\GameEngine.cpp" />
     <ClCompile Include="Implementations\GameWindow.cpp" />
+    <ClCompile Include="Implementations\HTMLCharacters.cpp" />
     <ClCompile Include="Implementations\QuadShaderProgram.cpp" />
     <ClCompile Include="Implementations\Shader.cpp" />
     <ClCompile Include="Implementations\ShaderProgram.cpp" />

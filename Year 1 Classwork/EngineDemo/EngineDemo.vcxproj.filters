@@ -27,5 +27,8 @@
     <None Include="resources\shaders\QuadFragment.glsl" />
     <None Include="resources\shaders\QuadVertex.glsl" />
     <None Include="resources\shaders\SpriteFragment.glsl" />
+    <None Include="resources\images\font.png">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

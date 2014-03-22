@@ -16,12 +16,14 @@
 #endif
 
 #include "..\Declarations\AnimatedSprite.h"
+#include "..\Declarations\CharacterMap.h"
 #include "..\Declarations\Drawable.h"
 #include "..\Declarations\Font.h"
 #include "..\Declarations\Frame.h"
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
+#include "..\Declarations\HTMLCharacters.h"
 #include "..\Declarations\Quad.h"
 #include "..\Declarations\QuadShaderProgram.h"
 #include "..\Declarations\Shader.h"

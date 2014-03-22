@@ -3,23 +3,17 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 19, 2014
  * Description:        Class representing a font.
- * Last Modified:      March 19, 2014
- * Last Modification:  Creation.
+ * Last Modified:      March 21, 2014
+ * Last Modification:  Refactoring and debugging.
  ******************************************************************************/
 
 #include "../Declarations/Font.h"
+#include "../Declarations/HTMLCharacters.h"
+#include "MathLibrary.h"
 #include <unordered_map>
 
 namespace MyFirstEngine
 {
-
-// declare classes instead of typedefs to avoid compiler warnings
-// definition is only in cpp
-class Font::CharacterMap : public std::unordered_map< char, unsigned int >
-{
-public:
-    virtual ~CharacterMap() {}
-};
 
 // Frame center (as determined by offset) should be on the baseline at the
 // beginning of the character.  Default kerning should be handled via choice
@@ -29,42 +23,45 @@ public:
 Font::Font( Texture& a_roTexture, const Frame::Array& ac_roFrameList,
             const char* ac_pcFrameCharacters, unsigned int a_uiLeading,
             unsigned int a_uiEm, char a_cUnknown )
-    : m_poTexture( &a_roTexture ), m_poMap( new CharacterMap() ),
-      m_oFrameList( ac_roFrameList.Size() ), m_uiLeading( a_uiLeading ),
-      m_uiEm( a_uiEm ), m_cUnknown( a_cUnknown )
+    : m_poTexture( &a_roTexture ), m_oFrameList( 256 ),
+      m_uiLeading( a_uiLeading ), m_uiEm( a_uiEm ), m_cUnknown( a_cUnknown )
 {
+    // Zero out all frame dimensions
+    for( unsigned int ui = 0; ui < 256; ++ui )
+    {
+        m_oFrameList[ ui ] = Frame::ZERO;
+    }
+
+    // Map provided characters to provided frame dimensions
     if( nullptr != ac_pcFrameCharacters )
     {
-        unsigned int uiCount = std::strlen( ac_pcFrameCharacters );
-        uiCount = ( ac_roFrameList.Size() < uiCount
-                    ? ac_roFrameList.Size() : uiCount );
-        for( unsigned int ui = 0; ui < uiCount; ++ui )
+        unsigned int uiSize = std::strlen( ac_pcFrameCharacters );
+        uiSize = ( uiSize > ac_roFrameList.Size()
+                   ? ac_roFrameList.Size() : uiSize );
+        for( unsigned int ui = 0; ui < uiSize; ++ui )
         {
-            (*m_poMap)[ ac_pcFrameCharacters[ ui ] ] = ui;
+            Map( ac_pcFrameCharacters[ ui ], ac_roFrameList[ ui ] );
         }
     }
 }
 Font::Font( Texture& a_roTexture, unsigned int a_uiLeading,
             unsigned int a_uiEm, char a_cUnknown )
-    : m_poTexture( &a_roTexture ), m_poMap( new CharacterMap() ),
-      m_oFrameList( Frame( IntPoint2D( a_uiEm, a_uiLeading ),
-                           IntPoint2D::Zero(), IntPoint2D::Zero(),
-                           IntPoint2D( -(int)a_uiEm / 2, a_uiLeading / 2 ) ) ),
-      m_uiLeading( a_uiLeading ), m_uiEm( a_uiEm ),
-      m_cUnknown( a_cUnknown )
+    : m_poTexture( &a_roTexture ), m_oFrameList( 256 ),
+      m_uiLeading( a_uiLeading ), m_uiEm( a_uiEm ), m_cUnknown( a_cUnknown )
 {
-    (*m_poMap)[ m_cUnknown ] = 0;
-}
-
-// Destructor actually does something
-Font::~Font()
-{
-    if( nullptr != m_poMap )
+    // Zero out all frame dimensions
+    for( unsigned int ui = 0; ui < 256; ++ui )
     {
-        CharacterMap* poMap = m_poMap;
-        m_poMap = nullptr;
-        delete poMap;
+        m_oFrameList[ ui ] = Frame::ZERO;
     }
+
+    // Map ' ' to an empty frame 1/2 em wide and leading pixels high with a
+    // baseline halfway between the center and bottom of the frame.
+    unsigned int uiWidth = ( 0 != a_uiEm ? a_uiEm : a_uiLeading ) / 2;
+    unsigned int uiHeight = ( 0 != a_uiLeading ? a_uiLeading : a_uiEm );
+    Map( ' ', Frame( IntPoint2D( uiWidth, uiHeight ),
+                     IntPoint2D::Zero(), IntPoint2D::Zero(),
+                     IntPoint2D( -(int)uiWidth / 2, uiHeight / 4 ) ) );
 }
 
 // Get the number of pixels in an em
@@ -80,43 +77,65 @@ unsigned int Font::Em() const
 // Does this font have a non-zero frame defined for this character?
 bool Font::Has( char a_cCharacter ) const
 {
-    return ( 0 < m_poMap->count( a_cCharacter ) );
+    return ( Frame::ZERO != m_oFrameList[ (unsigned int)a_cCharacter ] );
+}
+bool Font::Has( const char* ac_pcCharacterName ) const
+{
+    return ( m_oMap.Has( ac_pcCharacterName )
+                ? Has( m_oMap[ ac_pcCharacterName ] ) :
+             HTML::Map().Has( ac_pcCharacterName )
+                ? Has( HTML::Map()[ ac_pcCharacterName ] ) : false );
+}
+char Font::GetCharacter( const char* ac_pcCharacterName ) const
+{
+    return ( m_oMap.Has( ac_pcCharacterName ) ? m_oMap[ ac_pcCharacterName ] :
+             HTML::Map().Has( ac_pcCharacterName )
+                ? HTML::Map()[ ac_pcCharacterName ] : m_cUnknown );
 }
 
 // for getting and setting character frames directly
-Frame& Font::operator[]( char a_cCharacter )
+Frame& Font::operator[]( const char* ac_pcCharacterName )
 {
-    if( !Has( a_cCharacter ) )
+    // If the symbol is mapped in the font's character map, return frame
+    if( m_oMap.Has( ac_pcCharacterName ) )
     {
-        unsigned int uiIndex = m_oFrameList.Size();
-        m_oFrameList.SetSize( uiIndex + 1 );
-        m_oFrameList[ uiIndex ] =
-            ( Has( m_cUnknown ) ? operator[]( m_cUnknown ) : Frame::ZERO );
-        (*m_poMap)[ a_cCharacter ] = uiIndex;
+        return m_oFrameList[ m_oMap[ ac_pcCharacterName ] ];
     }
-    return m_oFrameList[ m_poMap->at( a_cCharacter ) ];
+
+    // Otherwise, check HTML character map
+    if( HTML::Map().Has( ac_pcCharacterName ) )
+    {
+        return m_oFrameList[ HTML::Map()[ ac_pcCharacterName ] ];
+    }
+
+    // If neither map has the symbol, return a reference to a static frame not
+    // used for any character
+    static Frame soAbsentCharacterFrame;
+    soAbsentCharacterFrame = Frame::ZERO;
+    return soAbsentCharacterFrame;
 }
-const Frame& Font::operator[]( char a_cCharacter ) const
+const Frame& Font::operator[]( const char* ac_pcCharacterName ) const
 {
-    return ( Has( a_cCharacter ) ? m_oFrameList[ m_poMap->at( a_cCharacter ) ] :
-             Has( m_cUnknown ) ? m_oFrameList[ m_poMap->at( m_cUnknown ) ] :
-             Frame::ZERO );
+    // If the symbol is mapped in the font's character map, return frame
+    if( m_oMap.Has( ac_pcCharacterName ) )
+    {
+        return m_oFrameList[ m_oMap[ ac_pcCharacterName ] ];
+    }
+
+    // Otherwise, check HTML character map
+    if( HTML::Map().Has( ac_pcCharacterName ) )
+    {
+        return m_oFrameList[ HTML::Map()[ ac_pcCharacterName ] ];
+    }
+
+    // If neither map has the symbol, return a reference to the zero frame
+    return Frame::ZERO;
 }
 
 // set the frame dimensions for the given character
 Font& Font::Map( char a_cCharacter, const Frame& ac_roFrame )
 {
-    if( Has( a_cCharacter ) )
-    {
-        m_oFrameList[ m_poMap->at( a_cCharacter ) ] = ac_roFrame;
-    }
-    else
-    {
-        unsigned int uiIndex = m_oFrameList.Size();
-        m_oFrameList.SetSize( uiIndex + 1 );
-        m_oFrameList[ uiIndex ] = ac_roFrame;
-        (*m_poMap)[ a_cCharacter ] = uiIndex;
-    }
+    m_oFrameList[ (unsigned int)a_cCharacter ] = ac_roFrame;
     return *this;
 }
 Font& Font::Map( char a_cCharacter,
@@ -141,16 +160,51 @@ Font& Font::Map( char a_cCharacter,
                   oCenterOffset );
     return Map( a_cCharacter, oFrame );
 }
+    
+// Map the given character to the given symbol name and, if provided, set
+// the frame dimensions.
+Font& Font::Map( char a_cCharacter, const char* ac_pcCharacterName )
+{
+    if( nullptr != ac_pcCharacterName )
+    {
+        m_oMap[ ac_pcCharacterName ] = a_cCharacter;
+    }
+    return *this;
+}
+Font& Font::Map( char a_cCharacter, const char* ac_pcCharacterName,
+                 const Frame& ac_roFrame )
+{
+    Map( a_cCharacter, ac_pcCharacterName );
+    return Map( a_cCharacter, ac_roFrame );
+}
+Font& Font::Map( char a_cCharacter, const char* ac_pcCharacterName,
+                 const IntPoint2D& ac_roSlicePixels,
+                 const IntPoint2D& ac_roSliceLocation,
+                 int a_iDescenderHeight )
+{
+    Map( a_cCharacter, ac_pcCharacterName );
+    return Map( a_cCharacter, ac_roSlicePixels,
+                ac_roSliceLocation, a_iDescenderHeight );
+}
+Font& Font::Map( char a_cCharacter, const char* ac_pcCharacterName,
+                 int a_iSlicePixelsX, int a_iSlicePixelsY,
+                 int a_iSliceLocationX, int a_iSliceLocationY,
+                 int a_iDescenderHeight )
+{
+    Map( a_cCharacter, ac_pcCharacterName );
+    return Map( a_cCharacter, a_iSlicePixelsX, a_iSlicePixelsY,
+                a_iSliceLocationX, a_iSliceLocationY, a_iDescenderHeight );
+}
 
 // set the given sprite to show the given character in this font
 Sprite& Font::SetSlug( Sprite& a_roSlug, char a_cCharacter ) const
 {
-    unsigned int uiIndex = ( Has( a_cCharacter ) ? m_poMap->at( a_cCharacter ) :
-                             Has( m_cUnknown ) ? m_poMap->at( m_cUnknown ) :
-                             Has( ' ' ) ? m_poMap->at( ' ' ) : 0 );
+    char cCharacter = ( Has( a_cCharacter ) ? a_cCharacter :
+                        Has( m_cUnknown ) ? m_cUnknown :
+                        Has( ' ' ) ? ' ' : 0 );
     a_roSlug.SetTexture( *m_poTexture );
     a_roSlug.SetFrameList( m_oFrameList );
-    a_roSlug.SetFrameNumber( uiIndex );
+    a_roSlug.SetFrameNumber( (unsigned int)cCharacter );
     return a_roSlug;
 }
 Sprite& Font::SetSlug( Sprite& a_roSlug, char a_cCharacter,
@@ -158,6 +212,16 @@ Sprite& Font::SetSlug( Sprite& a_roSlug, char a_cCharacter,
 {
     a_roSlug.SetScale( a_dEmDisplaySize / ( 0 != Em() ? Em() : 1 ) );
     return SetSlug( a_roSlug, a_cCharacter );
+}
+Sprite& Font::SetSlug( Sprite& a_roSlug, const char* ac_pcCharacterName ) const
+{
+    return SetSlug( a_roSlug, GetCharacter( ac_pcCharacterName ) );
+}
+Sprite& Font::SetSlug( Sprite& a_roSlug, const char* ac_pcCharacterName,
+                       double a_dEmDisplaySize ) const
+{
+    return SetSlug( a_roSlug, GetCharacter( ac_pcCharacterName ),
+                    a_dEmDisplaySize );
 }
 
 // set the given sprite to show a tab of the given size

@@ -88,6 +88,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\images\font.png" />
     <None Include="resources\images\warhol_soup.png" />
     <None Include="resources\shaders\QuadFragment.glsl" />
     <None Include="resources\shaders\QuadVertex.glsl" />
