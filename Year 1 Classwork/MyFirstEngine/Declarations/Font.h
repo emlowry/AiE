@@ -55,9 +55,9 @@ public:
 
     // for getting and setting character frames directly
     Frame& operator[]( char a_cCharacter )
-    { return m_oFrameList[ (unsigned int)a_cCharacter ]; }
+    { return m_oFrameList[ ((unsigned int)a_cCharacter) % 256 ]; }
     const Frame& operator[]( char a_cCharacter ) const
-    { return m_oFrameList[ (unsigned int)a_cCharacter ]; }
+    { return m_oFrameList[ ((unsigned int)a_cCharacter) % 256 ]; }
     Frame& operator[]( const char* ac_pcCharacterName );
     const Frame& operator[]( const char* ac_pcCharacterName ) const;
 

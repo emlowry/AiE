@@ -7,6 +7,7 @@
  * Last Modification:  Adding replacement for deprecated OpenGL matrix stack.
  ******************************************************************************/
 
+#include "..\Declarations\Camera.h"
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
@@ -189,6 +190,8 @@ bool GameEngine::Initialize( const IntPoint2D& ac_roSize,
         // If context and GLEW initialization succeeded, initialize the rest
         if( IsInitialized() )
         {
+            glEnable (GL_BLEND);
+            glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             QuadShaderProgram::Initialize();
             SpriteShaderProgram::Initialize();
             Instance().m_dLastTime = Time();
@@ -269,6 +272,7 @@ void GameEngine::Run()
     {
         CurrentState().OnUpdate( Instance().DeltaTime() );
         glfwPollEvents();
+        Camera::Refresh();
         CurrentState().Draw();
     }
 }

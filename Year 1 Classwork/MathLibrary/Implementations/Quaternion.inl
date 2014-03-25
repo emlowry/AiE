@@ -26,19 +26,13 @@ INLINE Quaternion::Quaternion( const Quaternion& ac_roQuaternion )
       w( m_aaData[0][0] ),
       x( m_aaData[0][1] ),
       y( m_aaData[0][2] ),
-      z( m_aaData[0][3] )
-{
-    w = 1;
-}
+      z( m_aaData[0][3] ) {}
 INLINE Quaternion::Quaternion( const BaseType& ac_roVector )
     : BaseType( ac_roVector ),
       w( m_aaData[0][0] ),
       x( m_aaData[0][1] ),
       y( m_aaData[0][2] ),
-      z( m_aaData[0][3] )
-{
-    w = 1;
-}
+      z( m_aaData[0][3] ) {}
 INLINE Quaternion::Quaternion( double a_dAngle, const Point3D& ac_roAxis )
     : w( m_aaData[0][0] ),
       x( m_aaData[0][1] ),
@@ -529,8 +523,8 @@ INLINE void Quaternion::MakeTransform( Transform& a_roTransform ) const
 {
     double adData[4][4] =
     { { 1 - 2*( y*y + z*z ), 2*x*y + 2*w*z,       2*x*z - 2*w*y,       0.0 },
-      { 2*x*y - 2*w*z,       1 - 2*( x*x + z*z ), 2*y*z - 2*w*z,       0.0 },
-      { 2*x*z + 2*w*y,       2*y*z + 2*w*x,       1 - 2*( x*x + y*y ), 0.0 },
+      { 2*x*y - 2*w*z,       1 - 2*( x*x + z*z ), 2*y*z + 2*w*x,       0.0 },
+      { 2*x*z + 2*w*y,       2*y*z - 2*w*x,       1 - 2*( x*x + y*y ), 0.0 },
       { 0.0,                 0.0,                 0.0,                 1.0 } };
     a_roTransform = adData;
 }
@@ -544,8 +538,8 @@ INLINE void Quaternion::MakePointTransform( PointTransform& a_roTransform ) cons
 {
     double adData[3][3] =
     { { 1 - 2*( y*y + z*z ), 2*x*y + 2*w*z,       2*x*z - 2*w*y },
-      { 2*x*y - 2*w*z,       1 - 2*( x*x + z*z ), 2*y*z - 2*w*z },
-      { 2*x*z + 2*w*y,       2*y*z + 2*w*x,       1 - 2*( x*x + y*y ) } };
+      { 2*x*y - 2*w*z,       1 - 2*( x*x + z*z ), 2*y*z + 2*w*x },
+      { 2*x*z + 2*w*y,       2*y*z - 2*w*x,       1 - 2*( x*x + y*y ) } };
     a_roTransform = adData;
 }
 

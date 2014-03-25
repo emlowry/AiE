@@ -28,6 +28,72 @@ public:
             croQuad.Draw();
         }
         m_oSprite.Draw();
+        Typewriter::ReturnToStart();
+        Typewriter::SetColor( Color::VGA::SILVER );
+        Typewriter::Type( "Konami code:\t");
+        Typewriter::SetColor( Color::WHITE );
+        Typewriter::TypeSymbol( "up" );
+        Typewriter::TypeSymbol( "up" );
+        Typewriter::TypeSymbol( "down" );
+        Typewriter::TypeSymbol( "down" );
+        Typewriter::TypeSymbol( "left" );
+        Typewriter::TypeSymbol( "right" );
+        Typewriter::TypeSymbol( "left" );
+        Typewriter::TypeSymbol( "right" );
+        Typewriter::Type( "BA[START]\n" );
+        Typewriter::SetColor( Color::VGA::SILVER );
+        Typewriter::Type( "Missing char:\t");
+        Typewriter::SetColor( Color::WHITE );
+        Typewriter::TypeSymbol( "horseshoe" );
+        Typewriter::Type( "\n\n" );
+        Typewriter::SetColor( Color::ColorWheel::RED );
+        Typewriter::TypeSymbol( "heart" );
+        Typewriter::SetColor( Color::ColorWheel::RED_ORANGE );
+        Typewriter::TypeSymbol( "music" );
+        Typewriter::SetColor( Color::ColorWheel::ORANGE );
+        Typewriter::TypeSymbol( "heart" );
+        Typewriter::SetColor( Color::ColorWheel::GOLD );
+        Typewriter::Type( "T" );
+        Typewriter::SetColor( Color::ColorWheel::YELLOW );
+        Typewriter::Type( "A" );
+        Typewriter::SetColor( Color::ColorWheel::GREEN_YELLOW );
+        Typewriter::Type( "S" );
+        Typewriter::SetColor( Color::ColorWheel::CHARTREUSE );
+        Typewriter::Type( "T" );
+        Typewriter::SetColor( Color::ColorWheel::HARLEQUIN_GREEN );
+        Typewriter::Type( "E " );
+        Typewriter::SetColor( Color::ColorWheel::GREEN );
+        Typewriter::Type( "T" );
+        Typewriter::SetColor( Color::ColorWheel::LEAF_GREEN );
+        Typewriter::Type( "H" );
+        Typewriter::SetColor( Color::ColorWheel::SPRING_GREEN );
+        Typewriter::Type( "E " );
+        Typewriter::SetColor( Color::ColorWheel::AQUAMARINE );
+        Typewriter::Type( "R" );
+        Typewriter::SetColor( Color::ColorWheel::CYAN );
+        Typewriter::Type( "A" );
+        Typewriter::SetColor( Color::ColorWheel::SKY_BLUE );
+        Typewriter::Type( "I" );
+        Typewriter::SetColor( Color::ColorWheel::MEGAMAN_BLUE );
+        Typewriter::Type( "N" );
+        Typewriter::SetColor( Color::ColorWheel::ROYAL_BLUE );
+        Typewriter::Type( "B" );
+        Typewriter::SetColor( Color::ColorWheel::BLUE );
+        Typewriter::Type( "O" );
+        Typewriter::SetColor( Color::ColorWheel::VIOLET_BLUE );
+        Typewriter::Type( "W" );
+        Typewriter::SetColor( Color::ColorWheel::VIOLET );
+        Typewriter::Type( "!" );
+        Typewriter::SetColor( Color::ColorWheel::PURPLE );
+        Typewriter::Type( "!" );
+        Typewriter::SetColor( Color::ColorWheel::MAGENTA );
+        Typewriter::Type( "!" );
+        Typewriter::SetColor( Color::ColorWheel::VIOLET_RED );
+        Typewriter::TypeSymbol( "heart" );
+        Typewriter::SetColor( Color::ColorWheel::ROSE );
+        Typewriter::TypeSymbol( "music" );
+        Typewriter::SetColor( Color::ColorWheel::CRIMSON );
+        Typewriter::TypeSymbol( "heart" );
         GameEngine::MainWindow().SwapBuffers();
     }
 protected:
@@ -45,7 +111,7 @@ protected:
             m_oFrameList[ui].sliceLocation.y = ( ui % 2 ) * ( m_oTexture.Size().y / 2 );
         }
         m_oSprite.UpdateTextureMatrix();
-        m_oSprite.SetDisplaySize( 0.125, 0.25 );
+        m_oSprite.SetDisplaySize( 40, 80 );
         m_oSprite.Play();
     }
     virtual void TerminateInstance() override
@@ -55,6 +121,11 @@ protected:
     virtual void OnEnter() override
     {
         GameEngine::MainWindow().MakeCurrent();
+        Typewriter::SetFont( m_oFont );
+        Typewriter::SetFontSize( 32 );
+        Typewriter::SetStartPosition( -225, 40 );
+        Camera::Enable();
+        Camera::UseWindowPixelScreenSize();
     }
     virtual void OnUpdate( double a_dDeltaTime )
     {
@@ -70,11 +141,11 @@ protected:
         m_aoQuads[4].SetTaitBryanAngles( -dAngle1,
                                          -dAngle1,
                                          -dAngle1 );
-        m_aoQuads[5].SetScale( 0.625 + ( 0.125 * std::sin( dAngle2 ) ) );
-        m_aoQuads[6].SetScale( 0.25 + ( 0.25 * std::sin( dAngle3 ) ),
-                               0.25 + ( 0.25 * std::cos( dAngle3 ) ) );
-        m_aoQuads[7].SetPosition( 0.5 * std::sin( dAngle1 ),
-                                  0.5 * std::cos( dAngle1 ) );
+        m_aoQuads[5].SetScale( 200 + ( 40 * std::sin( dAngle2 ) ) );
+        m_aoQuads[6].SetScale( 80 + ( 80 * std::sin( dAngle3 ) ),
+                               80 + ( 80 * std::cos( dAngle3 ) ) );
+        m_aoQuads[7].SetPosition( 80 * std::sin( dAngle1 ),
+                                  80 * std::cos( dAngle1 ) );
         m_oSprite.SetPosition( m_aoQuads[7].GetPosition() );
         if( 0.0 < dAngle1 && a_dDeltaTime > dAngle1 )
         {
@@ -88,14 +159,14 @@ private:
                     m_oFont( m_oFontTexture, 16, 8 ),
                     m_oSprite( m_oTexture, m_oFrameList, 2, 1 )
     {
-        m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 2.0, 2.0 ) );
-        m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 1.75, 1.75 ) );
-        m_aoQuads[2] = Quad( Color::GrayScale::ONE_HALF, Point2D( 1.5, 1.5 ) );
-        m_aoQuads[3] = Quad( Color::GrayScale::ONE_QUARTER, Point2D( 1.25, 1.25 ) );
-        m_aoQuads[4] = Quad( Color::BLACK, Point2D( 1.0, 1.0 ) );
-        m_aoQuads[5] = Quad( Color::ColorWheel::ROSE, Point2D( 0.75, 0.75 ) );
-        m_aoQuads[6] = Quad( Color::ColorWheel::VIOLET, Point2D( 0.5, 0.5 ) );
-        m_aoQuads[7] = Quad( Color::ColorWheel::MEGAMAN_BLUE, Point2D( 0.25, 0.25 ) );
+        m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 640, 640 ) );
+        m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 560, 560 ) );
+        m_aoQuads[2] = Quad( Color::GrayScale::ONE_HALF, Point2D( 480, 480 ) );
+        m_aoQuads[3] = Quad( Color::GrayScale::ONE_QUARTER, Point2D( 400, 400 ) );
+        m_aoQuads[4] = Quad( Color::BLACK, Point2D( 320, 320 ) );
+        m_aoQuads[5] = Quad( Color::ColorWheel::ROSE, Point2D( 240, 240 ) );
+        m_aoQuads[6] = Quad( Color::ColorWheel::VIOLET, Point2D( 160, 160 ) );
+        m_aoQuads[7] = Quad( Color::ColorWheel::MEGAMAN_BLUE, Point2D( 80, 80 ) );
 
         // printable ascii frames
         for( unsigned int ui = 0; ui < 95; ++ui )

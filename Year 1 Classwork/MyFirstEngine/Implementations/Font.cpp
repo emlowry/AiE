@@ -77,7 +77,7 @@ unsigned int Font::Em() const
 // Does this font have a non-zero frame defined for this character?
 bool Font::Has( char a_cCharacter ) const
 {
-    return ( Frame::ZERO != m_oFrameList[ (unsigned int)a_cCharacter ] );
+    return ( Frame::ZERO != m_oFrameList[ ((unsigned int)a_cCharacter) % 256 ] );
 }
 bool Font::Has( const char* ac_pcCharacterName ) const
 {
@@ -119,13 +119,13 @@ const Frame& Font::operator[]( const char* ac_pcCharacterName ) const
     // If the symbol is mapped in the font's character map, return frame
     if( m_oMap.Has( ac_pcCharacterName ) )
     {
-        return m_oFrameList[ m_oMap[ ac_pcCharacterName ] ];
+        return m_oFrameList[ ((unsigned int)m_oMap[ ac_pcCharacterName ]) % 256 ];
     }
 
     // Otherwise, check HTML character map
     if( HTML::Map().Has( ac_pcCharacterName ) )
     {
-        return m_oFrameList[ HTML::Map()[ ac_pcCharacterName ] ];
+        return m_oFrameList[ ((unsigned int)HTML::Map()[ ac_pcCharacterName ]) % 256 ];
     }
 
     // If neither map has the symbol, return a reference to the zero frame
@@ -135,7 +135,7 @@ const Frame& Font::operator[]( const char* ac_pcCharacterName ) const
 // set the frame dimensions for the given character
 Font& Font::Map( char a_cCharacter, const Frame& ac_roFrame )
 {
-    m_oFrameList[ (unsigned int)a_cCharacter ] = ac_roFrame;
+    m_oFrameList[ ((unsigned int)a_cCharacter) % 256 ] = ac_roFrame;
     return *this;
 }
 Font& Font::Map( char a_cCharacter,

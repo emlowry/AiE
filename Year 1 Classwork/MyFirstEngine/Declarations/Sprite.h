@@ -121,6 +121,9 @@ public:
     void UpdateTextureMatrix() { *m_pbUpdateTextureMatrix = true; }
 
 protected:
+    
+    // Called by certain derived classes
+    Sprite();
 
     // Draw the sprite
     virtual void DrawComponents() const override;

@@ -95,6 +95,8 @@
     <ClInclude Include="Declarations\Sprite.h" />
     <ClInclude Include="Declarations\SpriteShaderProgram.h" />
     <ClInclude Include="Declarations\Texture.h" />
+    <ClInclude Include="Declarations\Typewriter.h" />
+    <ClInclude Include="Declarations\Camera.h" />
     <ClInclude Include="include\MyFirstEngine.h" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Implementations\AnimatedSprite.cpp" />
+    <ClCompile Include="Implementations\Camera.cpp" />
     <ClCompile Include="Implementations\CharacterMap.cpp" />
     <ClCompile Include="Implementations\Drawable.cpp" />
     <ClCompile Include="Implementations\Font.cpp" />
@@ -117,6 +120,7 @@
     <ClCompile Include="Implementations\Sprite.cpp" />
     <ClCompile Include="Implementations\SpriteShaderProgram.cpp" />
     <ClCompile Include="Implementations\Texture.cpp" />
+    <ClCompile Include="Implementations\Typewriter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\QuadFragment.glsl" />

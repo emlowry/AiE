@@ -95,6 +95,12 @@ Sprite::Sprite( Texture& a_roTexture,
 {
     UpdateTextureMatrix();
 }
+    
+// Default constructor only callable by derived classes
+Sprite::Sprite()
+    : m_poTexture( nullptr ), m_pcoFrameList( nullptr ),
+      m_uiFrameNumber( 0 ), m_pbUpdateTextureMatrix( new bool ),
+      m_poTextureMatrix( new Transform2D ) {}
 
 // Copy constructor/operator
 Sprite::Sprite( const Sprite& ac_roSprite )

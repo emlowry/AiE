@@ -74,6 +74,7 @@ public:
     // make/check if current context window
     bool IsCurrent();
     GameWindow& MakeCurrent();
+    static GameWindow& Current();
 
     // advance by frame
     void SwapBuffers();

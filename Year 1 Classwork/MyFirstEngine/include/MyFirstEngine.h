@@ -16,6 +16,7 @@
 #endif
 
 #include "..\Declarations\AnimatedSprite.h"
+#include "..\Declarations\Camera.h"
 #include "..\Declarations\CharacterMap.h"
 #include "..\Declarations\Drawable.h"
 #include "..\Declarations\Font.h"
@@ -31,5 +32,6 @@
 #include "..\Declarations\Sprite.h"
 #include "..\Declarations\SpriteShaderProgram.h"
 #include "..\Declarations\Texture.h"
+#include "..\Declarations\Typewriter.h"
 
 #endif  // MY_FIRST_ENGINE__H

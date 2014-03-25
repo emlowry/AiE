@@ -31,7 +31,7 @@ public:
 // Constructors
 CharacterMap::CharacterMap() : m_poLookup( new CharacterLookup ) {}
 CharacterMap::CharacterMap( const CharacterMap& ac_roMap )
-    : m_poLookup( new CharacterLookup( *( ac_roMap.m_poLookup ) ) {}
+    : m_poLookup( new CharacterLookup( *( ac_roMap.m_poLookup ) ) ) {}
 
 // Destructor
 CharacterMap::~CharacterMap()
@@ -76,13 +76,15 @@ char& CharacterMap::operator[]( const char* ac_pcName )
 {
     if( !Has( ac_pcName ) )
     {
-        m_poLookup->at( ac_pcName ) = ABSENT_CHARACTER;
+        m_poLookup->emplace( CharacterLookup::ValueType( ac_pcName ,
+                                                         ABSENT_CHARACTER ) );
     }
     return m_poLookup->at( ac_pcName );
 }
 const char& CharacterMap::operator[]( const char* ac_pcName ) const
 {
-    return ( Has( ac_pcName ) ? m_poLookup->at( ac_pcName ) : ABSENT_CHARACTER );
+    const CharacterLookup& croLookup = *m_poLookup;
+    return ( Has( ac_pcName ) ? croLookup.at( ac_pcName ) : ABSENT_CHARACTER );
 }
 
 }   // namespace MyFirstEngine

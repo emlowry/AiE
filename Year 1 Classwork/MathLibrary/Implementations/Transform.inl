@@ -59,7 +59,7 @@ INLINE Transform
                            const Point2D& ac_roScreenSize,
                            const Point2D& ac_roScreenCenter)
 {
-    const Point2D& roSize = ac_roScreenSize;
+    const Point2D& roSize = ac_roScreenSize / 2;
     const Point2D& roCenter = ac_roScreenCenter;
     // x' = x/sizeX + centerX*z
     // y' = y/sizeY + centerY*z
@@ -88,7 +88,7 @@ INLINE Transform
                         const Point2D& ac_roScreenSize,
                         const Point2D& ac_roScreenCenter)
 {
-    const Point2D& roSize = ac_roScreenSize;
+    const Point2D& roSize = ac_roScreenSize / 2;
     const Point2D& roCenter = ac_roScreenCenter;
     // x' = x'/w' = x/sizeX - centerX
     // y' = y'/w' = y/sizeY - centerY

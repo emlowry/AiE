@@ -264,6 +264,17 @@ void GameWindow::ClearCurrent()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
+// Get the window associated with the current context. if none, return main window.
+GameWindow& GameWindow::Current()
+{
+    GLFWwindow* poCurrent = glfwGetCurrentContext();
+    if( nullptr == poCurrent || 0 >= sm_roLookup.count( poCurrent ) )
+    {
+        return GameEngine::MainWindow();
+    }
+    return *sm_roList[ sm_roLookup[ poCurrent ] ];
+}
+
 // Destroy all windows
 void GameWindow::DestroyAll()
 {
