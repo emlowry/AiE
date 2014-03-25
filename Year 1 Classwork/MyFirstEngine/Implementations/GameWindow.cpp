@@ -3,14 +3,16 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Inline function implementations for the GameWindow class.
- * Last Modified:      March 6, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 25, 2014
+ * Last Modification:  Hooking up mouse and keyboard event handling.
  ******************************************************************************/
 
 #include "..\Declarations\GLFW.h"
 #include "..\Declarations\GameEngine.h"
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
+#include "..\Declarations\Keyboard.h"
+#include "..\Declarations\Mouse.h"
 #include "MathLibrary.h"
 #include <stdexcept>
 #include <string>
@@ -174,6 +176,8 @@ void GameWindow::Destroy()
 {
     if( IsOpen() )
     {
+        Keyboard::Deregister( *this );
+        Mouse::Deregister( *this );
         sm_roLookup.erase( m_poWindow );
         glfwDestroyWindow( m_poWindow );
         m_poWindow = nullptr;
@@ -213,6 +217,8 @@ void GameWindow::CreateWindow()
     {
         sm_roLookup[ m_poWindow ] = m_uiIndex;
         glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
+        Mouse::Register( *this );
+        Keyboard::Register( *this );
     }
 }
 void GameWindow::AdjustFramePadding()
@@ -285,6 +291,17 @@ void GameWindow::DestroyAll()
             poWindow->Destroy();
         }
     }
+}
+    
+// retrieve the gamewindow associated with the given GLFWwindow pointer.
+// if no window is given, retrieve the main window.
+GameWindow* GameWindow::Get( GLFWwindow* a_poWindow )
+{
+    if( nullptr == a_poWindow || 0 == sm_roLookup.count( a_poWindow ) )
+    {
+        return nullptr;
+    }
+    return sm_roList[ sm_roLookup[ a_poWindow ] ];
 }
 
 // GLFW callback for window close

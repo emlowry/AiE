@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 4, 2014
  * Description:        Runs a simple game to demonstrate MyFirstEngine.
- * Last Modified:      March 21, 2014
- * Last Modification:  Preparing to test text.
+ * Last Modified:      March 25, 2014
+ * Last Modification:  Testing mouse and keyboard input.
  ******************************************************************************/
 
 #include "MyFirstEngine.h"
@@ -30,6 +30,12 @@ public:
         m_oSprite.Draw();
         Typewriter::ReturnToStart();
         Typewriter::SetColor( Color::VGA::SILVER );
+        Typewriter::Type( "\t\tMy pixel art font:\n");
+        Typewriter::SetColor( Color::WHITE );
+        Typewriter::Type( " !\"#$%&'()*+,-./0123456789:;<=>?\n"
+                          "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_\n"
+                          "`abcdefghijklmnopqrstuvwxyz{|}~\n\n");
+        Typewriter::SetColor( Color::VGA::SILVER );
         Typewriter::Type( "Konami code:\t");
         Typewriter::SetColor( Color::WHITE );
         Typewriter::TypeSymbol( "up" );
@@ -45,7 +51,7 @@ public:
         Typewriter::Type( "Missing char:\t");
         Typewriter::SetColor( Color::WHITE );
         Typewriter::TypeSymbol( "horseshoe" );
-        Typewriter::Type( "\n\n" );
+        Typewriter::Type( "\n\n\t" );
         Typewriter::SetColor( Color::ColorWheel::RED );
         Typewriter::TypeSymbol( "heart" );
         Typewriter::SetColor( Color::ColorWheel::RED_ORANGE );
@@ -112,7 +118,6 @@ protected:
         }
         m_oSprite.UpdateTextureMatrix();
         m_oSprite.SetDisplaySize( 40, 80 );
-        m_oSprite.Play();
     }
     virtual void TerminateInstance() override
     {
@@ -122,10 +127,14 @@ protected:
     {
         GameEngine::MainWindow().MakeCurrent();
         Typewriter::SetFont( m_oFont );
-        Typewriter::SetFontSize( 32 );
-        Typewriter::SetStartPosition( -225, 40 );
+        Typewriter::SetFontSize( 16 );
+        Typewriter::SetTabSize( 64 );
+        Typewriter::SetStartPosition( -300, 100 );
         Camera::Enable();
         Camera::UseWindowPixelScreenSize();
+        Camera::SetDepthOfView( 800 );
+        m_oSprite.Rewind();
+        m_oSprite.Play();
     }
     virtual void OnUpdate( double a_dDeltaTime )
     {
@@ -144,20 +153,43 @@ protected:
         m_aoQuads[5].SetScale( 200 + ( 40 * std::sin( dAngle2 ) ) );
         m_aoQuads[6].SetScale( 80 + ( 80 * std::sin( dAngle3 ) ),
                                80 + ( 80 * std::cos( dAngle3 ) ) );
-        m_aoQuads[7].SetPosition( 80 * std::sin( dAngle1 ),
-                                  80 * std::cos( dAngle1 ) );
-        m_oSprite.SetPosition( m_aoQuads[7].GetPosition() );
-        if( 0.0 < dAngle1 && a_dDeltaTime > dAngle1 )
+        m_aoQuads[7].SetPosition( 240 * std::sin( dAngle1 ),
+                                  240 * std::cos( dAngle1 ) );
+        m_oSprite.SetPosition( Mouse::Position() );
+        m_oSprite.SetVisible( Mouse::Window() == &GameEngine::MainWindow() );
+        if( Mouse::ButtonTime() <= a_dDeltaTime )
         {
-            m_oSprite.Seek( dAngle1 );
+            if( Mouse::ButtonIsPressed() )
+            {
+                m_oSprite.Pause();
+            }
+            else
+            {
+                m_oSprite.Play();
+            }
+        }
+        if( Keyboard::KeyTime( Keyboard::SPACE ) <= a_dDeltaTime )
+        {
+            if( Keyboard::KeyIsPressed( Keyboard::SPACE ) )
+            {
+                m_oSprite.SetColor( Color::Opacity::HALF );
+            }
+            else
+            {
+                m_oSprite.SetColor( Color::OPAQUE );
+            }
         }
         m_oSprite.Update( a_dDeltaTime );
+        if( Keyboard::KeyIsPressed( Keyboard::ESCAPE ) )
+        {
+            GameEngine::ClearStates();
+        }
     }
 private:
     SimpleState() : m_oTexture( "resources/images/warhol_soup.png" ),
                     m_oFontTexture( "resources/images/font.png" ),
                     m_oFont( m_oFontTexture, 16, 8 ),
-                    m_oSprite( m_oTexture, m_oFrameList, 2, 1 )
+                    m_oSprite( m_oTexture, m_oFrameList, 4 )
     {
         m_aoQuads[0] = Quad( Color::GrayScale::WHITE, Point2D( 640, 640 ) );
         m_aoQuads[1] = Quad( Color::GrayScale::THREE_QUARTERS, Point2D( 560, 560 ) );
@@ -256,7 +288,7 @@ int main(int argc, char* argv[])
     else
     {
         std::cout << "\tGame Engine Initialized." << std::endl
-                  << std::endl << "Close game window to exit...";
+                  << std::endl << "Close game window or press Escape to exit...";
         SimpleState::Initialize();
         GameEngine::MainWindow().SetClearColor( Color::GrayScale::ONE_HALF );
         SimpleState::Instance().Push();

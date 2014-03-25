@@ -25,6 +25,8 @@
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
 #include "..\Declarations\HTMLCharacters.h"
+#include "..\Declarations\Keyboard.h"
+#include "..\Declarations\Mouse.h"
 #include "..\Declarations\Quad.h"
 #include "..\Declarations\QuadShaderProgram.h"
 #include "..\Declarations\Shader.h"

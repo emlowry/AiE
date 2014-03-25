@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 5, 2014
  * Description:        Implementations of GameEngine functions.
- * Last Modified:      March 17, 2014
- * Last Modification:  Adding replacement for deprecated OpenGL matrix stack.
+ * Last Modified:      March 25, 2014
+ * Last Modification:  Hooking up mouse and keyboard event handling.
  ******************************************************************************/
 
 #include "..\Declarations\Camera.h"
@@ -12,6 +12,8 @@
 #include "..\Declarations\GameState.h"
 #include "..\Declarations\GameWindow.h"
 #include "..\Declarations\GLFW.h"
+#include "..\Declarations\Keyboard.h"
+#include "..\Declarations\Mouse.h"
 #include "..\Declarations\QuadShaderProgram.h"
 #include "..\Declarations\Shader.h"
 #include "..\Declarations\ShaderProgram.h"
@@ -179,6 +181,8 @@ bool GameEngine::Initialize( const IntPoint2D& ac_roSize,
         }
 
         // Otherwise, attempt to create an OpenGL context and call glewInit()
+        Mouse::Initialize();
+        Keyboard::Initialize();
         MainWindow().SetClearColor( ac_roColor );
         MainWindow().SetSize( ac_roSize );
         MainWindow().SetTitle( ac_pcTitle );
@@ -270,8 +274,10 @@ void GameEngine::Run()
 {
     while( GameState::End() != CurrentState() )
     {
-        CurrentState().OnUpdate( Instance().DeltaTime() );
+        Instance().DeltaTime();
         glfwPollEvents();
+        CurrentState().OnUpdate( Instance().LastDeltaTime() );
+        glfwPollEvents();   // in case OnUpdate triggers anything
         Camera::Refresh();
         CurrentState().Draw();
     }
@@ -288,6 +294,8 @@ void GameEngine::Terminate()
         ShaderProgram::DestroyAll();
         Shader::DestroyAll();
         GameWindow::DestroyAll();
+        Keyboard::Terminate();
+        Mouse::Terminate();
         glfwTerminate();
         Instance().m_bInitialized = false;
     }

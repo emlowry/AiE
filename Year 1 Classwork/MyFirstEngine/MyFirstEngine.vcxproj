@@ -86,6 +86,8 @@
     <ClInclude Include="Declarations\GameWindow.h" />
     <ClInclude Include="Declarations\GLFW.h" />
     <ClInclude Include="Declarations\HTMLCharacters.h" />
+    <ClInclude Include="Declarations\Keyboard.h" />
+    <ClInclude Include="Declarations\Mouse.h" />
     <ClInclude Include="Declarations\MyFirstEngineMacros.h" />
     <ClInclude Include="Declarations\Quad.h" />
     <ClInclude Include="Declarations\QuadShaderProgram.h" />
@@ -114,6 +116,8 @@
     <ClCompile Include="Implementations\GameEngine.cpp" />
     <ClCompile Include="Implementations\GameWindow.cpp" />
     <ClCompile Include="Implementations\HTMLCharacters.cpp" />
+    <ClCompile Include="Implementations\Keyboard.cpp" />
+    <ClCompile Include="Implementations\Mouse.cpp" />
     <ClCompile Include="Implementations\QuadShaderProgram.cpp" />
     <ClCompile Include="Implementations\Shader.cpp" />
     <ClCompile Include="Implementations\ShaderProgram.cpp" />

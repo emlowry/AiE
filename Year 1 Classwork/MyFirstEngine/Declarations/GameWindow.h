@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 10, 2014
  * Description:        Class representing a window managed by the game engine.
- * Last Modified:      March 6, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 25, 2014
+ * Last Modification:  Hooking up mouse and keyboard event handling.
  ******************************************************************************/
 
 #ifndef GAME_WINDOW__H
@@ -87,6 +87,11 @@ public:
     // Destroy all windows
     static void DestroyAll();
 
+    // retrieve the GameWindow associated with the given GLFWwindow pointer.
+    // if no window is given or if the pointer doesn't correspond to any
+    // GameWindow, return null.
+    static GameWindow* Get( GLFWwindow* a_poWindow );
+
 protected:
 
     // called when this window is closed
@@ -94,6 +99,10 @@ protected:
     virtual void OnClose() {}
 
 private:
+
+    // for registering callbacks
+    friend class Mouse;
+    friend class Keyboard;
 
     // the two steps of opening a window
     void CreateWindow();
@@ -105,7 +114,7 @@ private:
 
     // GLFW callback for window close
     static void OnCloseWindow( GLFWwindow* a_poWindow );
-
+    
     unsigned int m_uiIndex; // identifies the window by its place in the list
     IntPoint2D m_oSize; // pixels available to draw on with OpenGL
     DumbString m_oTitle;    // Window title
