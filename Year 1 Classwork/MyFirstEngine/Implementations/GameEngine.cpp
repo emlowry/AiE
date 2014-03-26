@@ -280,8 +280,11 @@ void GameEngine::Run()
     {
         Instance().DeltaTime();
         glfwPollEvents();
-        CurrentState().OnUpdate( Instance().LastDeltaTime() );
-        glfwPollEvents();   // in case OnUpdate triggers anything
+        if( GameState::End() == CurrentState() ) { break; }
+        CurrentState().OnUpdate( LastDeltaTime() );
+        if( GameState::End() == CurrentState() ) { break; }
+        glfwPollEvents();   // in case OnUpdate triggered anything
+        if( GameState::End() == CurrentState() ) { break; }
         Camera::Refresh();
         CurrentState().Draw();
     }

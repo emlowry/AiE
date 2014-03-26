@@ -146,5 +146,6 @@
     <None Include="resources\shaders\SpriteVertex.glsl" />
     <None Include="resources\shaders\QuadVertex.glsl" />
     <None Include="resources\shaders\SpriteFragment.glsl" />
+    <None Include="README.pdf" />
   </ItemGroup>
 </Project>
