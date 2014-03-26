@@ -19,14 +19,16 @@
 #include <vector>
 #include <unordered_map>
 
-namespace MyFirstEngine
+//
+// File-only helper functions and classes
+//
+namespace
 {
-
-// declare classes instead of typedefs to avoid compiler warnings
-// definition is only in cpp
-class GameWindow::WindowList
-    : public std::vector< GameWindow* >,
-      public Utility::Singleton< GameWindow::WindowList >
+    
+// store all the windows
+class WindowList
+    : public std::vector< MyFirstEngine::GameWindow* >,
+      public Utility::Singleton< WindowList >
 {
     friend class Utility::Singleton< WindowList >;
 public:
@@ -34,9 +36,9 @@ public:
 private:
     WindowList() {}
 };
-class GameWindow::WindowLookup
+class WindowLookup
     : public std::unordered_map< GLFWwindow*, unsigned int >,
-      public Utility::Singleton< GameWindow::WindowLookup >
+      public Utility::Singleton< WindowLookup >
 {
     friend class Utility::Singleton< WindowLookup >;
 public:
@@ -44,35 +46,45 @@ public:
 private:
     WindowLookup() {}
 };
+WindowList& List()
+{
+    return WindowList::Instance();
+}
+WindowLookup& Lookup()
+{
+    return WindowLookup::Instance();
+}
 
-// Initialize static containers
-GameWindow::WindowList&
-    GameWindow::sm_roList = GameWindow::WindowList::Instance();
-GameWindow::WindowLookup&
-    GameWindow::sm_roLookup = GameWindow::WindowLookup::Instance();
+}   // namespace
+
+//
+// Class functions
+//
+namespace MyFirstEngine
+{
 
 // Constructors
 GameWindow::GameWindow( const IntPoint2D& ac_roSize,
                         const char* ac_pcTitle, const ColorVector& ac_roColor )
     : m_oSize( ac_roSize ), m_oFramePadding( 0 ),
       m_oTitle( ac_pcTitle ), m_poWindow( nullptr ), m_oColor( ac_roColor ),
-      m_uiIndex( sm_roList.size() )
+      m_uiIndex( List().size() )
 {
-    sm_roList.push_back( this );
+    List().push_back( this );
 }
 GameWindow::GameWindow( unsigned int a_uiWidth, unsigned int a_uiHeight,
                         const char* ac_pcTitle, const ColorVector& ac_roColor )
     : m_oSize( a_uiWidth, a_uiHeight ), m_oFramePadding( 0 ),
       m_oTitle( ac_pcTitle ), m_poWindow( nullptr ), m_oColor( ac_roColor ),
-      m_uiIndex( sm_roList.size() )
+      m_uiIndex( List().size() )
 {
-    sm_roList.push_back( this );
+    List().push_back( this );
 }
 // Destructor actually does something in this class
 GameWindow::~GameWindow()
 {
     Destroy();
-    sm_roList[ m_uiIndex ] = nullptr;
+    List()[ m_uiIndex ] = nullptr;
 }
 
 // Set window properties
@@ -178,7 +190,7 @@ void GameWindow::Destroy()
     {
         Keyboard::Deregister( *this );
         Mouse::Deregister( *this );
-        sm_roLookup.erase( m_poWindow );
+        Lookup().erase( m_poWindow );
         glfwDestroyWindow( m_poWindow );
         m_poWindow = nullptr;
     }
@@ -215,7 +227,7 @@ void GameWindow::CreateWindow()
                                     m_oTitle.CString(), nullptr, nullptr );
     if( nullptr != m_poWindow )
     {
-        sm_roLookup[ m_poWindow ] = m_uiIndex;
+        Lookup()[ m_poWindow ] = m_uiIndex;
         glfwSetWindowCloseCallback( m_poWindow, OnCloseWindow );
         Mouse::Register( *this );
         Keyboard::Register( *this );
@@ -274,17 +286,17 @@ void GameWindow::ClearCurrent()
 GameWindow& GameWindow::Current()
 {
     GLFWwindow* poCurrent = glfwGetCurrentContext();
-    if( nullptr == poCurrent || 0 >= sm_roLookup.count( poCurrent ) )
+    if( nullptr == poCurrent || 0 >= Lookup().count( poCurrent ) )
     {
         return GameEngine::MainWindow();
     }
-    return *sm_roList[ sm_roLookup[ poCurrent ] ];
+    return *List()[ Lookup()[ poCurrent ] ];
 }
 
 // Destroy all windows
 void GameWindow::DestroyAll()
 {
-    for each( GameWindow* poWindow in sm_roList )
+    for each( GameWindow* poWindow in List() )
     {
         if( nullptr != poWindow )
         {
@@ -297,20 +309,20 @@ void GameWindow::DestroyAll()
 // if no window is given, retrieve the main window.
 GameWindow* GameWindow::Get( GLFWwindow* a_poWindow )
 {
-    if( nullptr == a_poWindow || 0 == sm_roLookup.count( a_poWindow ) )
+    if( nullptr == a_poWindow || 0 == Lookup().count( a_poWindow ) )
     {
         return nullptr;
     }
-    return sm_roList[ sm_roLookup[ a_poWindow ] ];
+    return List()[ Lookup()[ a_poWindow ] ];
 }
 
 // GLFW callback for window close
 void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 {
-    if( sm_roLookup.count( a_poWindow ) != 0 &&
-        nullptr != sm_roList[ sm_roLookup[ a_poWindow ] ] )
+    if( Lookup().count( a_poWindow ) != 0 &&
+        nullptr != List()[ Lookup()[ a_poWindow ] ] )
     {
-        GameWindow& roWindow = *( sm_roList[ sm_roLookup[ a_poWindow ] ] );
+        GameWindow& roWindow = *( List()[ Lookup()[ a_poWindow ] ] );
         GameEngine::CurrentState().OnCloseWindow( roWindow );
         if( roWindow.IsClosing() )
         {
@@ -322,7 +334,7 @@ void GameWindow::OnCloseWindow( GLFWwindow* a_poWindow )
 // Swap frame buffers of all open windows
 void GameWindow::SwapAllBuffers()
 {
-    for each( GameWindow* poWindow in sm_roList )
+    for each( GameWindow* poWindow in List() )
     {
         if( nullptr != poWindow )
         {

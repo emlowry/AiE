@@ -29,11 +29,6 @@ class IMEXPORT_CLASS GameWindow : public NotCopyable, public MostDerivedAddress
 {
 public:
 
-    // PIMPLE idiom - these classes are only defined in the cpp, so inheritance
-    // from an stl container won't result in warnings.
-    class WindowList;
-    class WindowLookup;
-
     // Constructors
     GameWindow( const IntPoint2D& ac_roSize = IntPoint2D( 800, 600 ),
                 const char* ac_pcTitle = "",
@@ -121,10 +116,6 @@ private:
     GLFWwindow* m_poWindow; // pointer to the GLFW window object, if open
     IntPoint2D m_oFramePadding; // difference in size between buffer and window
     ColorVector m_oColor;   // Color after clearing frame buffer
-
-    // store all the windows
-    static WindowLookup& sm_roLookup;
-    static WindowList& sm_roList;
 
 };  // class GameWindow
 

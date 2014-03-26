@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       February 13, 2014
  * Description:        Represents a GLSL shader.
- * Last Modified:      March 6, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      March 25, 2014
+ * Last Modification:  Removing PIMPL static pointers from header.
  ******************************************************************************/
 
 #ifndef SHADER__H
@@ -26,11 +26,6 @@ using namespace Utility;
 class IMEXPORT_CLASS Shader : public Hashable, public Comparable< Shader >
 {
 public:
-
-    // PIMPLE idiom - this class is only defined in the cpp, so inheritance from
-    // an stl container won't result in warnings.
-    class ShaderLookup;
-    class SourceNameLookup;
 
     // Default constructor
     Shader() : m_uiID( 0 ) {}
@@ -86,17 +81,9 @@ public:
 
 private:
 
-    // Compile a shader from the given source code
-    static GLuint CompileShader( GLenum a_eType, const char* ac_pcSourceText );
-    static GLuint CompileShader( const char* ac_pcSourceText, GLuint a_uiID );
-
     // ID associated with the GLSL shader object
     GLuint m_uiID;
     
-    // store all the compiled shaders
-    static ShaderLookup& sm_roLookup;
-    static SourceNameLookup& sm_roSourceLookup;
-
 };  // class Shader
 
 }   // namespace MyFirstEngine
