@@ -272,6 +272,10 @@ GameState& GameEngine::ReplaceCurrentState( GameState& a_roState )
 // GameState::End().
 void GameEngine::Run()
 {
+    if( !IsInitialized() )
+    {
+        throw std::runtime_error( "Game engine not initialized" );
+    }
     while( GameState::End() != CurrentState() )
     {
         Instance().DeltaTime();
