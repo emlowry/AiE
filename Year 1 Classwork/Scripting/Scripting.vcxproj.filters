@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4e14a02f-4dce-4b0c-a600-adc3a10e60ba}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{2e99cff3-17f5-4331-a7da-538afaba001e}</UniqueIdentifier>
+      <Extensions>hpp;h</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="resources\fonts\arial.fnt" />
+    <None Include="resources\shaders\StaticFW_Pixel.glsl" />
+    <None Include="resources\shaders\StaticFW_Vertex.glsl" />
+    <None Include="resources\shaders\vertex.glsl" />
+    <None Include="resources\shaders\pixel.glsl" />
+    <None Include="resources\shaders\cm_vertex.glsl" />
+    <None Include="resources\shaders\cm_pixel.glsl" />
+    <None Include="resources\scripts\Level_Grid.py" />
+    <None Include="resources\scripts\game.py" />
+    <None Include="resources\scripts\Entity.py" />
+    <None Include="resources\GLFW.dll" />
+    <None Include="resources\AIE_GL_Static_Framework.dll" />
+    <None Include="resources\AIE_GL_Static_Framework_d.dll" />
+    <None Include="resources\FreeImage.dll" />
+    <None Include="resources\FreeImaged.dll" />
+    <None Include="resources\scripts\Level_Grid.pyc" />
+    <None Include="resources\scripts\game.pyc" />
+    <None Include="resources\scripts\Entity.pyc" />
+    <None Include="resources\fonts\arial_0.png" />
+    <None Include="resources\images\arial_0.png" />
+    <None Include="resources\images\Red_Desert.jpg" />
+    <None Include="resources\images\Arial_00.png" />
+    <None Include="resources\images\crate_sideup.png" />
+    <None Include="resources\images\PlayerTanks.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\AIE_Py.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AIE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AIE_Py.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libs\AIE_GL_Static_Framework_d.lib" />
+    <Library Include="libs\AIE_GL_Static_Framework.lib" />
+  </ItemGroup>
+</Project>

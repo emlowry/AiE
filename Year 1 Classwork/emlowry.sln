@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EngineDemo", "EngineDemo\En
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MathLibrary", "MathLibrary\MathLibrary.vcxproj", "{760CFE98-F0A1-42CF-B14C-9A601C462C5B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scripting", "Scripting\Scripting.vcxproj", "{249CC68B-8D58-460D-9309-BAFD52840C1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -97,6 +99,12 @@ Global
 		{760CFE98-F0A1-42CF-B14C-9A601C462C5B}.Release|Win32.ActiveCfg = Release|Win32
 		{760CFE98-F0A1-42CF-B14C-9A601C462C5B}.Release|Win32.Build.0 = Release|Win32
 		{760CFE98-F0A1-42CF-B14C-9A601C462C5B}.Release|x64.ActiveCfg = Release|Win32
+		{249CC68B-8D58-460D-9309-BAFD52840C1B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{249CC68B-8D58-460D-9309-BAFD52840C1B}.Debug|Win32.Build.0 = Debug|Win32
+		{249CC68B-8D58-460D-9309-BAFD52840C1B}.Debug|x64.ActiveCfg = Debug|Win32
+		{249CC68B-8D58-460D-9309-BAFD52840C1B}.Release|Win32.ActiveCfg = Release|Win32
+		{249CC68B-8D58-460D-9309-BAFD52840C1B}.Release|Win32.Build.0 = Release|Win32
+		{249CC68B-8D58-460D-9309-BAFD52840C1B}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
