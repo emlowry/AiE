@@ -1,5 +1,7 @@
 import AIE
 import game
+import math
+import Level_Grid
 
 #Tank Entity
 #   A simple entity that can be placed on the screen with a right click, you should modify this so that the tank can be told to 
@@ -7,8 +9,10 @@ import game
 
 class TankEntity:
 
-	def __init__(self):
+	def __init__(self, level):
+		self.level = level
 		self.Position = ( 1200, 600 )
+		self.Target = ( 1200, 600 )
 		self.Rotation = 0
 		self.spriteName = "./images/PlayerTanks.png"
 		self.size = (57, 72 )
@@ -22,8 +26,13 @@ class TankEntity:
 	def update(self, fDeltaTime ):
 		mouseX, mouseY = AIE.GetMouseLocation()
 		if( AIE.GetMouseButton(1)  ):
-			self.Position = (mouseX, mouseY)
-		AIE.MoveSprite( self.spriteID, self.Position[0], self.Position[1] )
+			self.Rotation = math.atan2( self.Position[0] - mouseX, self.Position[1] - mouseY )
+			self.Target = ( mouseX, mouseY )
+		if( fDeltaTime > 1.0 ):
+			self.Position = self.Target
+		elif( fDeltaTime > 0.0 ):
+			self.Position = ( self.Target[0] * fDeltaTime + self.Position[0] * ( 1 - fDeltaTime ), self.Target[1] * fDeltaTime + self.Position[1] * ( 1.0 - fDeltaTime ) )
+		AIE.PositionSprite( self.spriteID, math.degrees( self.Rotation ),self.Position[0], self.Position[1] )
 		self.turret.update(fDeltaTime)
 	
 	def draw(self):
@@ -69,7 +78,9 @@ class Turret:
 	
 	def update(self, fDeltaTime):
 		turretLocation = self.owner.getPosition()
-		AIE.MoveSprite( self.spriteID, turretLocation[0], turretLocation[1] )
+		mouseX, mouseY = AIE.GetMouseLocation()
+		rotation = math.atan2( turretLocation[0] - mouseX, turretLocation[1] - mouseY )
+		AIE.PositionSprite( self.spriteID, math.degrees( rotation ), turretLocation[0], turretLocation[1] )
 		
 	def draw(self):
 		AIE.DrawSprite( self.spriteID )

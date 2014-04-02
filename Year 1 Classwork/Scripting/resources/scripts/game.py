@@ -35,7 +35,7 @@ def PyLoad():
 	_level.loadSprites()
 	#Here we set up a Tank Entity, this is just a simple NPC Entity that will move to where we click the second mouse button within our window
 	global _entity
-	_entity = Entity.TankEntity()
+	_entity = Entity.TankEntity(_level)
 	
 	return 0
 	

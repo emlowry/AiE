@@ -1,5 +1,6 @@
 #include <Python.h>
 #include "AIE_Py.h"
+#include "Geometry_Py.h"
 #include "AIE.h"
 #include <iostream>
 
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
 	//\ we will need to add "import AIE" to any Python files that we wish to use these functions in
 	//\================================================================================================
 	Py_InitModule("AIE", AIE_Functions);
+	Py_InitModule("Geometry", Geometry_Functions);
 	//\================================================================================================
 	//\ Here we are loading our Python Entry point this is the name of the game.py file that we will be 
 	//\ using for this project.
@@ -106,18 +108,6 @@ namespace AIE
 
 	void Load( PyObject* a_pModule )
 	{
-		//"./images/crate_sideup.png", 64.0, 64.0, 0.5, 0.5, 0.0, 0.0, 1.0, 1.0, 255, 255, 255, 255
-		float fv2Size[2] = { 64.f, 64.f };
-		float fv2Origin[2] = { 0.5f, 0.5f };
-		float fv4UVCoords[4] = { 0.f, 0.f, 1.f, 1.f };
-		float vColour[4] = { 1.f, 1.f, 1.f, 1.f };
-        
-		unsigned int uiSpriteID = CreateSprite( "./images/crate_sideup.png", fv2Size, fv2Origin, fv4UVCoords,
-                                                SColour( (unsigned char)(vColour[0]*255),
-                                                         (unsigned char)(vColour[1]*255),
-                                                         (unsigned char)(vColour[2]*255),
-                                                         (unsigned char)(vColour[3]*255) ) );
-	
 		PyObject* pLoad = GetHandleToPythonFunction( a_pModule, "PyLoad" );
 		if( pLoad )
 		{

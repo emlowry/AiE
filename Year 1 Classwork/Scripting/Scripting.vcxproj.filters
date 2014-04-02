@@ -44,12 +44,24 @@
     <ClCompile Include="source\AIE_Py.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Geometry_Py.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AIE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\AIE_Py.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Geometry_Py.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

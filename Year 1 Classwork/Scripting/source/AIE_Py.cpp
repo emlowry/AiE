@@ -11,6 +11,8 @@ PyMethodDef AIE_Functions[] =
 	{"CreateSprite",			AIE_CreateSprite,				METH_VARARGS,		"Create a sprite object"								},
 	{"DestroySprite",			AIE_DestroySprite,				METH_VARARGS,		"Destroy a sprite object"								},
 	{"MoveSprite",				AIE_MoveSprite,					METH_VARARGS,		"Move Sprite"											},
+	{"RotateSprite",			AIE_RotateSprite,				METH_VARARGS,		"Rotate Sprite"											},
+	{"PositionSprite",			AIE_PositionSprite,				METH_VARARGS,		"Rotate and move Sprite"								},
 	{"DrawSprite",				AIE_DrawSprite,					METH_VARARGS,		"Draw Sprite"											},
 	{"GetMouseLocation",		AIE_GetMouseLocation,			METH_VARARGS,		"Where is the Mouse?"									},
 	{"GetMouseButton",			AIE_GetMouseButtonDown,			METH_VARARGS,		"Mouse Button Pressed?"									},
@@ -141,8 +143,7 @@ PyObject* AIE_GetSpriteColour(PyObject *self, PyObject *args)
 PyObject* AIE_MoveSprite(PyObject *self, PyObject *args)
 {
 	unsigned int iSpriteID; float v2fPos[2];
-	if (!PyArg_ParseTuple(args, "iff", &iSpriteID, 
-												 &v2fPos[0], &v2fPos[1]) ) 
+	if (!PyArg_ParseTuple(args, "iff", &iSpriteID, &v2fPos[0], &v2fPos[1]) ) 
 	{
 		ParsePyTupleError( __func__, __LINE__ );
 		return nullptr;
@@ -158,6 +159,27 @@ PyObject* AIE_SetSpriteMatrix(PyObject *self, PyObject *args)
 
 PyObject* AIE_RotateSprite(PyObject *self, PyObject *args)
 {
+    unsigned int iSpriteID; float fRotation;
+    if( !PyArg_ParseTuple( args, "if", &iSpriteID, &fRotation ) )
+    {
+        ParsePyTupleError( __func__, __LINE__ );
+        return nullptr;
+    }
+    RotateSprite( iSpriteID, fRotation );
+	Py_RETURN_NONE;
+}
+
+PyObject* AIE_PositionSprite(PyObject *self, PyObject *args)
+{
+    unsigned int iSpriteID; float fRotation; float v2fPos[2];
+    if( !PyArg_ParseTuple( args, "ifff", &iSpriteID, &fRotation, &v2fPos[0], &v2fPos[1] ) )
+    {
+        ParsePyTupleError( __func__, __LINE__ );
+        return nullptr;
+    }
+	MoveSprite( iSpriteID, 0, 0 );
+    RotateSprite( iSpriteID, fRotation );
+	MoveSprite( iSpriteID, v2fPos );
 	Py_RETURN_NONE;
 }
 

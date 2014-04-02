@@ -61,6 +61,7 @@
 	static PyObject* AIE_MoveSprite				(PyObject *self, PyObject *args);
 	static PyObject* AIE_SetSpriteMatrix		(PyObject *self, PyObject *args);
 	static PyObject* AIE_RotateSprite			(PyObject *self, PyObject *args);
+	static PyObject* AIE_PositionSprite			(PyObject *self, PyObject *args);   // move and rotate
 	static PyObject* AIE_DestroySprite			(PyObject *self, PyObject *args);
 	static PyObject* AIE_DrawSprite				(PyObject *self, PyObject *args);
 	static PyObject* AIE_SetSpriteUVCoordinates	(PyObject *self, PyObject *args);

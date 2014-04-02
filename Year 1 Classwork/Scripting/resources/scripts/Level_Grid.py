@@ -27,8 +27,11 @@ class LevelGrid:
 		for i in range(int(self.levelSize)):
 			spriteID = AIE.CreateSprite( self.levelTiles[i].getImageName(), self.tileSize['width'], self.tileSize['height'], 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0xff, 0xff, 0xff, 0xff )
 			self.levelTiles[i].setSpriteID(spriteID)
+			spriteID = AIE.CreateSprite( self.levelTiles[i].getOtherImageName(), self.tileSize['width'], self.tileSize['height'], 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0xff, 0xff, 0xff, 0xff )
+			self.levelTiles[i].setOtherSpriteID(spriteID)
 			#Move Tile to appropriate location
 			AIE.MoveSprite( self.levelTiles[i].getSpriteID(), self.levelTiles[i].x, self.levelTiles[i].y )
+			AIE.MoveSprite( self.levelTiles[i].getOtherSpriteID(), self.levelTiles[i].x, self.levelTiles[i].y )
 	
 	def update(self, fDeltaTime):
 		mouseX, mouseY = AIE.GetMouseLocation()
@@ -46,23 +49,55 @@ class LevelGrid:
 		for i in range( int(self.levelSize) ):
 			if( self.levelTiles[i].shouldDraw() ):
 				AIE.DrawSprite( self.levelTiles[i].getSpriteID() )
-	
+			else:
+				AIE.DrawSprite( self.levelTiles[i].getOtherSpriteID() )
+
+	def obstacleAt( self, xGrid, yGrid ):
+		return( !self.levelTiles[ ( yGrid * self.levelWidth ) + xGrid ].shouldDraw() )
+
+	def toCorners( self, xGrid, yGrid ):
+		xMin = xGrid * self.tileSize['width']
+		yMin = yGrid * self.tileSize['height']
+		return ( xMin, yMin, xMin + self.tileSize['width'], yMin + self.tileSize['height'] )
+
+	def toGrid( self, xPixel, yPixel ):
+		xGrid = math.floor(xPixel/self.tileSize['width'])
+		yGrid = math.floor(yPixel/self.tileSize['height'])
+		return ( xGrid, yGrid )
+
 	def resolveGridSquare(self, xPos, yPos):
-		xGridPos = math.floor(xPos/self.tileSize['width'])
-		yGridPos = math.floor(yPos/self.tileSize['height'])
+		xGridPos, yGridPos = self.toGrid( xPos, yPos )
 		return (yGridPos * self.levelWidth) + xGridPos
+
+	def crossesObstacle( self, xPos, yPos, xTarget, yTarget ):
+		xGridPos, yGridPos = self.toGrid( xPos, yPos )
+		xGridTarget, yGridTarget = self.toGrid( xTarget, yTarget )
+		if( xGridPos == xGridTarget && yGridPos == yGridTarget ):
+			return False
+		xMin = xGridPos if ( xGridPos < xGridTarget ) else xGridTarget
+		yMin = yGridPos if ( yGridPos < yGridTarget ) else yGridTarget
+		xMax = xGridPos if ( xGridPos > xGridTarget ) else xGridTarget
+		yMax = yGridPos if ( yGridPos > yGridTarget ) else yGridTarget
+		for x in range( xMin, xMax + 1 ):
+			for y in range( yMin, yMax + 1 ):
+				if( ( x != xGridPos || y != yGridPos ) && ( x != xGridTarget || x != yGridTarget ) ):
+					corner1x, corner1y, corner2x, corner2y = self.toCorners( x, y )
 	
 	def cleanUp(self):
 		for i in range( int(self.levelSize) ):
 			if( self.levelTiles[i].getSpriteID() != -1 ):
 				AIE.DestroySprite( self.levelTiles[i].getSpriteID() )
+			if( self.levelTiles[i].getOtherSpriteID() != -1 ):
+				AIE.DestroySprite( self.levelTiles[i].getOtherSpriteID() )
 
 #A simple tile class that is set up to control each individual tile in the game level
 #each tile has a sprite ID and can be turned on or off to allow for tiles to be drawn or not.				
 class Tile:
 	def __init__(self):
 		self.imageName = "./images/Red_Desert.jpg"
+		self.otherImageName = "./images/crate_sideup.png"
 		self.spriteID = -1
+		self.otherSpriteID = -1
 		self.bShouldDraw = True
 		self.state = 0
 		self.x = 0
@@ -70,6 +105,9 @@ class Tile:
 	
 	def getImageName(self):
 		return self.imageName
+	
+	def getOtherImageName(self):
+		return self.otherImageName
 		
 	def getState(self):
 		return self.state
@@ -79,6 +117,12 @@ class Tile:
 		
 	def setSpriteID(self, a_spriteID):
 		self.spriteID = a_spriteID
+	
+	def getOtherSpriteID(self):
+		return self.otherSpriteID
+		
+	def setOtherSpriteID(self, a_spriteID):
+		self.otherSpriteID = a_spriteID
 	
 	def setDraw(self):
 		self.bShouldDraw = not self.bShouldDraw

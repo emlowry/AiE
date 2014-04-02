@@ -126,11 +126,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\AIE_Py.cpp" />
+    <ClCompile Include="source\Geometry.cpp" />
+    <ClCompile Include="source\Geometry_Py.cpp" />
     <ClCompile Include="source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AIE.h" />
     <ClInclude Include="include\AIE_Py.h" />
+    <ClInclude Include="include\Geometry.h" />
+    <ClInclude Include="include\Geometry_Py.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libs\AIE_GL_Static_Framework.lib" />
