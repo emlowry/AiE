@@ -1,4 +1,5 @@
 import AIE
+import Geometry
 import game
 import math
 
@@ -16,6 +17,7 @@ class LevelGrid:
 		self.levelSize = self.levelWidth * (self.levelHeight+1)
 		print "LevelSize :", self.levelWidth, " ", self.levelHeight
 		self.levelTiles = [None] * int(self.levelSize)
+		self.observers = ObserverList()
 		
 		for i in range(int(self.levelSize)):
 			self.levelTiles[i] = Tile()
@@ -32,6 +34,12 @@ class LevelGrid:
 			#Move Tile to appropriate location
 			AIE.MoveSprite( self.levelTiles[i].getSpriteID(), self.levelTiles[i].x, self.levelTiles[i].y )
 			AIE.MoveSprite( self.levelTiles[i].getOtherSpriteID(), self.levelTiles[i].x, self.levelTiles[i].y )
+
+	def register( self, observer, notification ):
+		self.observers.add( observer, notification )
+
+	def deregister( self, observer, notification ):
+		self.observers.remove( observer, notification )
 	
 	def update(self, fDeltaTime):
 		mouseX, mouseY = AIE.GetMouseLocation()
@@ -41,9 +49,9 @@ class LevelGrid:
 			tileIndex = int(self.resolveGridSquare(mouseX, mouseY))
 			if( tileIndex >= 0 and tileIndex < self.levelSize ):
 				self.levelTiles[tileIndex].setDraw()
+				self.observers.notify( self )
 				
 		self.buttonPressed = not AIE.GetMouseButtonRelease(0)		
-		
 		
 	def draw(self):
 		for i in range( int(self.levelSize) ):
@@ -53,7 +61,7 @@ class LevelGrid:
 				AIE.DrawSprite( self.levelTiles[i].getOtherSpriteID() )
 
 	def obstacleAt( self, xGrid, yGrid ):
-		return( !self.levelTiles[ ( yGrid * self.levelWidth ) + xGrid ].shouldDraw() )
+		return( not self.levelTiles[ ( int(yGrid) * int(self.levelWidth) ) + int(xGrid) ].shouldDraw() )
 
 	def toCorners( self, xGrid, yGrid ):
 		xMin = xGrid * self.tileSize['width']
@@ -69,21 +77,39 @@ class LevelGrid:
 		xGridPos, yGridPos = self.toGrid( xPos, yPos )
 		return (yGridPos * self.levelWidth) + xGridPos
 
-	def crossesObstacle( self, xPos, yPos, xTarget, yTarget ):
+	# Returns true if there are no obstacles between the given position and the
+	# given target, excluding the grid squares of the position and target if
+	# indicated
+	def lineOfSight( self, xPos, yPos, xTarget, yTarget, bIgnorePosition, bIgnoreTarget ):
 		xGridPos, yGridPos = self.toGrid( xPos, yPos )
 		xGridTarget, yGridTarget = self.toGrid( xTarget, yTarget )
-		if( xGridPos == xGridTarget && yGridPos == yGridTarget ):
-			return False
+		if( ( xGridPos == xGridTarget and 1 >= math.fabs( yGridPos - yGridTarget ) ) or
+			( yGridPos == yGridTarget and 1 >= math.fabs( xGridPos - xGridTarget ) ) ):
+			return ( ( bIgnorePosition or not self.obstacleAt( xGridPos, yGridPos ) ) and
+					 ( bIgnoreTarget or not self.obstacleAt( xGridTarget, yGridTarget ) ) )
 		xMin = xGridPos if ( xGridPos < xGridTarget ) else xGridTarget
 		yMin = yGridPos if ( yGridPos < yGridTarget ) else yGridTarget
 		xMax = xGridPos if ( xGridPos > xGridTarget ) else xGridTarget
 		yMax = yGridPos if ( yGridPos > yGridTarget ) else yGridTarget
-		for x in range( xMin, xMax + 1 ):
-			for y in range( yMin, yMax + 1 ):
-				if( ( x != xGridPos || y != yGridPos ) && ( x != xGridTarget || x != yGridTarget ) ):
-					corner1x, corner1y, corner2x, corner2y = self.toCorners( x, y )
+		x = xMin
+		y = yMin
+		while( x <= xMax and y <= yMax ):
+			if( ( not bIgnorePosition or x != xGridPos or y != yGridPos ) and
+				( not bIgnoreTarget or x != xGridTarget or y != yGridTarget ) and
+				self.obstacleAt( x, y ) ):
+				return False
+			corner1x, corner1y, corner2x, corner2y = self.toCorners( x + 1, y )
+			if( Geometry.SegmentSquareIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
+				x = x + 1
+			else:
+				corner1x, corner1y, corner2x, corner2y = self.toCorners( x, y + 1 )
+				if( not Geometry.SegmentSquareIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
+					x = x + 1
+				y = y + 1
+		return True
 	
 	def cleanUp(self):
+		self.observers.clear()
 		for i in range( int(self.levelSize) ):
 			if( self.levelTiles[i].getSpriteID() != -1 ):
 				AIE.DestroySprite( self.levelTiles[i].getSpriteID() )
@@ -129,3 +155,21 @@ class Tile:
 	
 	def shouldDraw(self):
 		return self.bShouldDraw
+
+# Simple class for handling observers
+class ObserverList:
+	def __init__(self):
+		self.observers = set()
+		
+	def add( self, observer, notification ):
+		self.observers.add( ( observer, notification ) )
+		
+	def remove( self, observer, notification ):
+		self.observers.discard( ( observer, notification ) )
+		
+	def clear(self):
+		self.observers.clear()
+		
+	def notify( self, publisher ):
+		for ( observer, notification ) in self.observers:
+			notification( observer, publisher )
