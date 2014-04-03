@@ -12,6 +12,7 @@ class TankEntity:
 	def __init__(self, level):
 		self.level = level
 		self.Position = ( 1200, 600 )
+        self.Velocity = ( 0, 0 )
 		self.Target = ( 1200, 600 )
 		self.Waypoint = None
 		self.Rotation = 0
@@ -23,6 +24,13 @@ class TankEntity:
 		level.register( self, TankEntity.recalculateRoute )
 		self.turret = Turret(self)
 
+	def squaredDistanceFromWaypoint( self ):
+		if( self.Waypoint == None )
+			return 0.0;
+		x = self.Position[0] - self.Waypoint[0]
+		y = self.Position[1] - self.Waypoint[1]
+        return x*x + y*y
+
 	def recalculateRoute( self, level ):
 		print "Recalculating route from position ", self.Position, " to target ", self.Target
 		self.Rotation = math.atan2( self.Position[0] - self.Target[0], self.Position[1] - self.Target[1] )
@@ -31,10 +39,11 @@ class TankEntity:
 		else:
 			self.Waypoint = None
 
-	def seek( self, xPos, yPos, fDeltaTime ):
-		if( fDeltaTime > 1.0 ):
+	def arrive( self, xPos, yPos, slowDistance, fDeltaTime ):
+		squaredDistance = self.squaredDistanceFromWaypoint()
+		if( squaredDistance > slowDistance * slowDistance ):
 			self.Position = ( xPos, yPos )
-		elif( fDeltaTime > 0.0 ):
+		else:
 			self.Position = ( xPos * fDeltaTime + self.Position[0] * ( 1.0 - fDeltaTime ),
 							  yPos * fDeltaTime + self.Position[1] * ( 1.0 - fDeltaTime ) )
 		
