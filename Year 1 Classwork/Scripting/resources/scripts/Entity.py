@@ -11,9 +11,9 @@ class TankEntity:
 
 	def __init__(self, level):
 		self.level = level
-		self.Position = ( 1200, 600 )
-        self.Velocity = ( 0, 0 )
-		self.Target = ( 1200, 600 )
+		self.Position = ( 600, 300 )
+		self.Velocity = ( 0, 0 )
+		self.Target = ( 600, 300 )
 		self.Waypoint = None
 		self.Rotation = 0
 		self.spriteName = "./images/PlayerTanks.png"
@@ -24,37 +24,89 @@ class TankEntity:
 		level.register( self, TankEntity.recalculateRoute )
 		self.turret = Turret(self)
 
-	def squaredDistanceFromWaypoint( self ):
-		if( self.Waypoint == None )
-			return 0.0;
-		x = self.Position[0] - self.Waypoint[0]
-		y = self.Position[1] - self.Waypoint[1]
-        return x*x + y*y
-
 	def recalculateRoute( self, level ):
 		print "Recalculating route from position ", self.Position, " to target ", self.Target
-		self.Rotation = math.atan2( self.Position[0] - self.Target[0], self.Position[1] - self.Target[1] )
-		if( level.lineOfSight( self.Position[0], self.Position[1], self.Target[0], self.Target[1], True, True ) ):
+		if( self.Position != self.Target and
+            level.lineOfSight( self.Position[0], self.Position[1], self.Target[0], self.Target[1], True, True ) ):
 			self.Waypoint = self.Target
 		else:
 			self.Waypoint = None
 
-	def arrive( self, xPos, yPos, slowDistance, fDeltaTime ):
-		squaredDistance = self.squaredDistanceFromWaypoint()
-		if( squaredDistance > slowDistance * slowDistance ):
-			self.Position = ( xPos, yPos )
-		else:
-			self.Position = ( xPos * fDeltaTime + self.Position[0] * ( 1.0 - fDeltaTime ),
-							  yPos * fDeltaTime + self.Position[1] * ( 1.0 - fDeltaTime ) )
-		
+	def isWithin( self, xPos, yPos, radius ):
+		if( xPos == self.Position[0] and yPos == self.Position[1] ):
+			return True
+		squaredDistance = ( self.Position[0] - xPos )**2 + ( self.Position[1] - yPos )**2
+		if( squaredDistance < radius**2 ):
+			return True
+		return False
+
+	def slowWithin( self, xPos, yPos, radius, strength ):
+		if( xPos == self.Position[0] and yPos == self.Position[1] ):
+			return ( -self.Velocity[0] * strength, -self.Velocity[1] * strength )
+		if( not self.isWithin( xPos, yPos, radius ) ):
+			return ( 0.0, 0.0 )
+		squaredDistance = ( self.Position[0] - xPos )**2 + ( self.Position[1] - yPos )**2
+		breakStrength = ( 1 - squaredDistance/radius**2 ) * strength
+		return ( -self.Velocity[0] * breakStrength, -self.Velocity[1] * breakStrength )
+
+	def seek( self, xPos, yPos ):
+		displacement = ( self.Position[0] - xPos, self.Position[1] - yPos )
+		squaredDistance = displacement[0]**2 + displacement[1]**2
+		if( squaredDistance <= 0.0 ):
+			return ( 0.0, 0.0 )
+		distance = math.sqrt( squaredDistance )
+		speed = math.sqrt( self.Velocity[0]**2 + self.Velocity[1]**2 )
+		return ( -displacement[0]*speed/distance - self.Velocity[0],
+                 -displacement[1]*speed/distance - self.Velocity[1] )
+
+	def accelerateTo( self, speed, acceleration ):
+		speedSquared = self.Velocity[0]**2 + self.Velocity[1]**2
+		if( speedSquared == speed**2 ):
+			return ( 0.0, 0.0 )
+		if( speedSquared <= 0.0 ):
+			return ( math.cos( self.Rotation ) * acceleration,
+                     math.sin( self.Rotation ) * acceleration )
+		currentSpeed = math.sqrt( speedSquared )
+		if( currentSpeed < speed ):
+			return ( self.Velocity[0] * acceleration / currentSpeed,
+                     self.Velocity[1] * acceleration / currentSpeed )
+		return ( -self.Velocity[0] * acceleration / currentSpeed,
+                 -self.Velocity[1] * acceleration / currentSpeed )
+
+	def arriveWithin( self, xPos, yPos, radius, speed, acceleration ):
+		seek = self.seek( xPos, yPos )
+		if( self.isWithin( xPos, yPos, radius ) ):
+			slow = self.slowWithin( xPos, yPos, radius, acceleration )
+			return ( seek[0] + slow[0], seek[1] + slow[1] )
+		accel = self.accelerateTo( speed, acceleration )
+		return ( seek[0] + accel[0], seek[1] + accel[1] )
+
 	def update(self, fDeltaTime ):
+
+        # recalculate route if right mouse button is clicked
 		mouseX, mouseY = AIE.GetMouseLocation()
-		if( AIE.GetMouseButton(1)  ):
+		if( AIE.GetMouseButton(1) ):
 			self.Target = ( mouseX, mouseY )
 			self.recalculateRoute( self.level )
-		if( self.Waypoint != None ):
-			self.seek( self.Waypoint[0], self.Waypoint[1], fDeltaTime )
-		AIE.PositionSprite( self.spriteID, math.degrees( self.Rotation ), self.Position[0], self.Position[1] )
+
+        # calculate acceleration
+		acceleration = None
+		if( None == self.Waypoint ):
+			acceleration = self.accelerateTo( 0, 200 )
+		else:
+			acceleration = self.arriveWithin( self.Waypoint[0], self.Waypoint[1], 20, 200, 200 )
+		print "acceleration: ", acceleration
+
+        # calculate position, velocity, and rotation
+		self.Position = ( self.Position[0] + self.Velocity[0]*fDeltaTime + acceleration[0]*fDeltaTime**2/2,
+                          self.Position[1] + self.Velocity[1]*fDeltaTime + acceleration[1]*fDeltaTime**2/2 )
+		self.Velocity = ( self.Velocity[0] + acceleration[0] * fDeltaTime,
+                          self.Velocity[1] + acceleration[1] * fDeltaTime )
+		if( self.Velocity[0] != 0.0 or self.Velocity[1] != 0.0 ):
+			self.Rotation = math.atan2( -self.Velocity[1], self.Velocity[0] )
+
+        # move OpenGL sprite and turret sprite
+		AIE.PositionSprite( self.spriteID, math.degrees( self.Rotation - ( math.pi / 2 ) ), self.Position[0], self.Position[1] )
 		self.turret.update(fDeltaTime)
 	
 	def draw(self):
@@ -101,8 +153,8 @@ class Turret:
 	def update(self, fDeltaTime):
 		turretLocation = self.owner.getPosition()
 		mouseX, mouseY = AIE.GetMouseLocation()
-		rotation = math.atan2( turretLocation[0] - mouseX, turretLocation[1] - mouseY )
-		AIE.PositionSprite( self.spriteID, math.degrees( rotation ), turretLocation[0], turretLocation[1] )
+		rotation = math.atan2( -mouseY + turretLocation[1], mouseX - turretLocation[0] )
+		AIE.PositionSprite( self.spriteID, math.degrees( rotation - ( math.pi / 2 ) ), turretLocation[0], turretLocation[1] )
 		
 	def draw(self):
 		AIE.DrawSprite( self.spriteID )
