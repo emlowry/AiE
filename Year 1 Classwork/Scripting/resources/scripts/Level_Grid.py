@@ -68,6 +68,20 @@ class LevelGrid:
 		yMin = yGrid * self.tileSize['height']
 		return ( xMin, yMin, xMin + self.tileSize['width'], yMin + self.tileSize['height'] )
 
+	def tileBorder( self, xGrid, yGrid, xDir, yDir ):
+		corner1x, corner1y, corner2x, corner2y = self.toCorners( xGrid, yGrid )
+		if ( 0 == xDir and 0 == yDir ):
+			return ( corner1x, corner1y, corner2x, corner2y )
+		if ( 0 == xDir ):
+			return ( corner1x, corner1y if ( yDir < 0 ) else corner2y,
+                     corner2x, corner1y if ( yDir < 0 ) else corner2y )
+		if ( 0 == yDir ):
+			return ( corner1x if ( xDir < 0 ) else corner2x, corner1y,
+                     corner1x if ( xDir < 0 ) else corner2x, corner2y )
+		x = corner1x if ( xDir < 0 ) else corner2x
+		y = corner1y if ( yDir < 0 ) else corner2y
+		return ( x, y, x, y )
+
 	def toGrid( self, xPixel, yPixel ):
 		xGrid = math.floor(xPixel/self.tileSize['width'])
 		yGrid = math.floor(yPixel/self.tileSize['height'])
@@ -91,21 +105,23 @@ class LevelGrid:
 		yMin = yGridPos if ( yGridPos < yGridTarget ) else yGridTarget
 		xMax = xGridPos if ( xGridPos > xGridTarget ) else xGridTarget
 		yMax = yGridPos if ( yGridPos > yGridTarget ) else yGridTarget
-		x = xMin
-		y = yMin
-		while( x <= xMax and y <= yMax ):
+		xInc = 1 if ( xGridPos < xGridTarget ) else -1
+		yInc = 1 if ( yGridPos < yGridTarget ) else -1
+		x = xGridPos
+		y = yGridPos
+		while( xMin <= x <= xMax and yMin <= y <= yMax ):
 			if( ( not bIgnorePosition or x != xGridPos or y != yGridPos ) and
 				( not bIgnoreTarget or x != xGridTarget or y != yGridTarget ) and
 				self.obstacleAt( x, y ) ):
 				return False
-			corner1x, corner1y, corner2x, corner2y = self.toCorners( x + 1, y )
-			if( Geometry.SegmentSquareIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
-				x = x + 1
+			corner1x, corner1y, corner2x, corner2y = self.tileBorder( x, y, xInc, 0 )
+			if( Geometry.SegmentsIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
+				x += xInc
 			else:
-				corner1x, corner1y, corner2x, corner2y = self.toCorners( x, y + 1 )
-				if( not Geometry.SegmentSquareIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
-					x = x + 1
-				y = y + 1
+				corner1x, corner1y, corner2x, corner2y = self.tileBorder( x, y, 0, yInc )
+				if( not Geometry.SegmentsIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
+					x += xInc
+				y += yInc
 		return True
 	
 	def cleanUp(self):
