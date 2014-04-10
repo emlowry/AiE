@@ -12,8 +12,8 @@ class LevelGrid:
 	def __init__(self, screenProperties, tileSize ):
 		self.tileSize = tileSize
 		self.buttonPressed = False
-		self.levelWidth = math.ceil(screenProperties['width']/ tileSize['width'])
-		self.levelHeight= math.ceil(screenProperties['height']/ tileSize['height'])
+		self.levelWidth = int( math.ceil(screenProperties['width']/ tileSize['width']) )
+		self.levelHeight= int( math.ceil(screenProperties['height']/ tileSize['height']) )
 		self.levelSize = self.levelWidth * (self.levelHeight+1)
 		print "LevelSize :", self.levelWidth, " ", self.levelHeight
 		self.levelTiles = [None] * int(self.levelSize)
@@ -23,6 +23,12 @@ class LevelGrid:
 			self.levelTiles[i] = Tile()
 			self.levelTiles[i].x = self.tileSize['width'] * (i % int(self.levelWidth))
 			self.levelTiles[i].y = self.tileSize['height'] * ( (int(i)/(int(self.levelWidth))))
+	
+	def tileHeight(self):
+		return 0 if ( None == tileSize ) else self.tileSize['height']
+	
+	def tileWidth(self):
+		return 0 if ( None == tileSize ) else self.tileSize['width']
 	
 	def loadSprites(self):
 		#load all sprites for each tile
@@ -61,7 +67,9 @@ class LevelGrid:
 				AIE.DrawSprite( self.levelTiles[i].getOtherSpriteID() )
 
 	def obstacleAt( self, xGrid, yGrid ):
-		return( not self.levelTiles[ ( int(yGrid) * int(self.levelWidth) ) + int(xGrid) ].shouldDraw() )
+		xGrid = int(xGrid) % self.levelWidth
+		yGrid = int(yGrid) % self.levelHeight
+		return( not self.levelTiles[ ( yGrid * self.levelWidth ) + xGrid ].shouldDraw() )
 
 	def toCorners( self, xGrid, yGrid ):
 		xMin = xGrid * self.tileSize['width']
@@ -83,8 +91,8 @@ class LevelGrid:
 		return ( x, y, x, y )
 
 	def toGrid( self, xPixel, yPixel ):
-		xGrid = math.floor(xPixel/self.tileSize['width'])
-		yGrid = math.floor(yPixel/self.tileSize['height'])
+		xGrid = int( math.floor(xPixel/self.tileSize['width']) )
+		yGrid = int( math.floor(yPixel/self.tileSize['height']) )
 		return ( xGrid, yGrid )
 
 	def resolveGridSquare(self, xPos, yPos):
@@ -110,9 +118,9 @@ class LevelGrid:
 		x = xGridPos
 		y = yGridPos
 		while( xMin <= x <= xMax and yMin <= y <= yMax ):
-			if( ( not bIgnorePosition or x != xGridPos or y != yGridPos ) and
-				( not bIgnoreTarget or x != xGridTarget or y != yGridTarget ) and
-				self.obstacleAt( x, y ) ):
+			if( self.obstacleAt( x, y ) and
+				( not bIgnorePosition or x != xGridPos or y != yGridPos ) and
+				( not bIgnoreTarget or x != xGridTarget or y != yGridTarget ) ):
 				return False
 			corner1x, corner1y, corner2x, corner2y = self.tileBorder( x, y, xInc, 0 )
 			if( Geometry.SegmentsIntersect( xPos, yPos, xTarget, yTarget, corner1x, corner1y, corner2x, corner2y ) ):
