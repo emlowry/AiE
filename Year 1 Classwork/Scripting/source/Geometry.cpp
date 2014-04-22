@@ -68,3 +68,58 @@ bool PointInSquare( const Point& ac_roPoint, const Square& ac_roSquare )
            ac_roPoint.y <= std::min( ac_roSquare.corner1.y, ac_roSquare.corner2.y ) &&
            ac_roPoint.y >= std::max( ac_roSquare.corner1.y, ac_roSquare.corner2.y );
 }
+
+float RaySquareDistance( const Ray& ac_roRay, const Square& ac_roSquare )
+{
+    // if ray starts inside square, return 0 (meaning already inside)
+    if( PointInSquare( ac_roRay.location, ac_roSquare ) )
+    {
+        return 0;
+    }
+
+    // if ray has no direction, return -1 (meaning no intersection)
+    if( ( 0.0f == ac_roRay.direction.x && 0.0f == ac_roRay.direction.y ) )
+    {
+        return -1;
+    }
+
+    // minimum discovered distance
+    float fResult = -1;
+
+    // check each edge of the square
+    LineSegment oEdges[4];
+    ac_roSquare.Edges( oEdges[0], oEdges[1], oEdges[2], oEdges[3] );
+    for each( LineSegment oSegment in oEdges )
+    {
+        float fDistance = RaySegmentDistance( ac_roRay, oSegment );
+        if ( -1 != fDistance && fDistance < fResult )
+        {
+            fResult = fDistance;
+        }
+    }
+
+    return fResult;
+}
+
+float RaySegmentDistance( const Ray& ac_roRay, const LineSegment& ac_roSegment )
+{
+    float fMag = std::sqrt( ac_roRay.direction.x*ac_roRay.direction.x +
+                            ac_roRay.direction.y*ac_roRay.direction.y );
+    Ray oRay( ac_roRay.location, Point( ac_roRay.direction.x / fMag,
+                                        ac_roRay.direction.y / fMag ) );
+    float denominator = ( ac_roSegment.point2.y - ac_roSegment.point1.y ) * oRay.direction.x -
+                        ( ac_roSegment.point2.x - ac_roSegment.point1.x ) * oRay.direction.y;
+    if( 0.0f == denominator )
+    {
+        return false;
+    }
+    float u1 = ( ac_roSegment.point2.x - ac_roSegment.point1.x ) *
+               ( oRay.location.y - ac_roSegment.point1.y ) -
+               ( ac_roSegment.point2.y - ac_roSegment.point1.y ) *
+               ( oRay.location.x - ac_roSegment.point1.x );
+    u1 /= denominator;
+    float u2 = oRay.direction.x * ( oRay.location.y - ac_roSegment.point1.y ) -
+               oRay.direction.y * ( oRay.location.x - ac_roSegment.point1.x );
+    u2 /= denominator;
+    return ( 0.0f <= u1 && 0.0f <= u2 && 1.0f >= u2 ? u1 : -1 );
+}

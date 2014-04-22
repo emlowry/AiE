@@ -34,11 +34,23 @@ struct Square
     void Edges( LineSegment& a_roEdge1, LineSegment& a_roEdge2,
                 LineSegment& a_roEdge3, LineSegment& a_roEdge4 ) const;
 };
+struct Ray
+{
+    Point location, direction;
+    Ray( float a_xLoc = 0, float a_yLoc = 0, float a_xDir = 0, float a_yDir = 0 )
+        : location( a_xLoc, a_yLoc ), direction( a_xDir, a_yDir ) {}
+    Ray( const Point& ac_roLocation, const Point& ac_roDirection = Point() )
+        : location( ac_roLocation ), direction( ac_roDirection ) {}
+};
 
 bool SegmentSquareIntersect( const LineSegment& ac_roSegment,
                                     const Square& ac_roSquare );
 bool SegmentsIntersect( const LineSegment& ac_roSegment1,
                                const LineSegment& ac_roSegment2 );
 bool PointInSquare( const Point& ac_roPoint, const Square& ac_roSquare );
+
+float RaySquareDistance( const Ray& ac_roRay, const Square& ac_roSquare );
+
+float RaySegmentDistance( const Ray& ac_roRay, const LineSegment& ac_roSegment );
 
 #endif  // GEOMETRY__H

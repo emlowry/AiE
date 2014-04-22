@@ -97,7 +97,7 @@ class TankEntity:
 			seek = self.seek( xPos, yPos, turnPower )
 			slow = self.slowWithin( xPos, yPos, breakRadius, breakPower )
 			return ( seek[0] + slow[0], seek[1] + slow[1] )
-		return self.accelerateAndSeek( xPos, yPos, turnPower, speed, acceleration, cruiseSpeedRange );
+		return self.accelerateAndSeek( xPos, yPos, turnPower, speed, acceleration, cruiseSpeedRange )
 
 	def avoidCollisions( self, collisionDistance, turnDistance, turnPower, fDeltaTime ):
 
@@ -106,136 +106,108 @@ class TankEntity:
 		if( self.level.obstacleAt( xGrid, yGrid ) ):
 			return ( 0.0, 0.0 )
 
-        # check to see if there are any obstacles ahead given current velocity
-		xDir = 0 if ( 0.0 == self.Velocity[0] ) else -1 if ( 0.0 > self.Velocity[0] ) else 1
-		yDir = 0 if ( 0.0 == self.Velocity[1] ) else -1 if ( 0.0 > self.Velocity[1] ) else 1
-		xObstacle = False if ( 0 == xDir ) else self.level.obstacleAt( xGrid + xDir, yGrid )
-		yObstacle = False if ( 0 == yDir ) else self.level.obstacleAt( xGrid, yGrid + yDir )
-		xyObstacle = ( False if ( 0 == xDir or 0 == yDir or ( xObstacle and yObstacle ) )
-                             else self.level.obstacleAt( xGrid + xDir, yGrid + yDir ) )
+        # check to see if there are any obstacles ahead given current direction
+		speed = math.sqrt( self.Velocity[0]**2 + self.Velocity[1]**2 )
+		direction = ( ( math.cos( self.Rotation ), math.sin( self.Rotation ) ) if ( 0.0 == speed )
+                      else ( self.Velocity[0] / speed, self.Velocity[1] / speed ) )
+		xDir = 0 if ( 0.0 == direction[0] ) else -1 if ( 0.0 > direction[0] ) else 1
+		yDir = 0 if ( 0.0 == direction[1] ) else -1 if ( 0.0 > direction[1] ) else 1
+		obstacles = []
+		if( 0 == xDir ):
+			if( self.level.obstacleAt( xGrid - 1, yGrid ) ):
+				obstacles.append( ( -1, 0 ) )
+			if( self.level.obstacleAt( xGrid - 1, yGrid + yDir ) ):
+				obstacles.append( ( -1, yDir ) )
+			if( self.level.obstacleAt( xGrid, yGrid + yDir ) ):
+				obstacles.append( ( 0, yDir ) )
+			if( self.level.obstacleAt( xGrid + 1, yGrid + yDir ) ):
+				obstacles.append( ( 1, yDir ) )
+			if( self.level.obstacleAt( xGrid + 1, yGrid ) ):
+				obstacles.append( ( 1, 0 ) )
+		elif( 0 == yDir ):
+			if( self.level.obstacleAt( xGrid, yGrid - 1 ) ):
+				obstacles.append( ( 0, -1 ) )
+			if( self.level.obstacleAt( xGrid + xDir, yGrid - 1 ) ):
+				obstacles.append( ( xDir, -1 ) )
+			if( self.level.obstacleAt( xGrid + xDir, yGrid ) ):
+				obstacles.append( ( xDir, 0 ) )
+			if( self.level.obstacleAt( xGrid + xDir, yGrid + 1 ) ):
+				obstacles.append( ( xDir, 1 ) )
+			if( self.level.obstacleAt( xGrid, yGrid + 1 ) ):
+				obstacles.append( ( 0, 1 ) )
+		else:
+			if( self.level.obstacleAt( xGrid - xDir, yGrid + yDir ) ):
+				obstacles.append( ( -xDir, yDir ) )
+			if( self.level.obstacleAt( xGrid, yGrid + yDir ) ):
+				obstacles.append( ( 0, yDir ) )
+			if( self.level.obstacleAt( xGrid + xDir, yGrid + yDir ) ):
+				obstacles.append( ( xDir, yDir ) )
+			if( self.level.obstacleAt( xGrid + xDir, yGrid ) ):
+				obstacles.append( ( xDir, 0 ) )
+			if( self.level.obstacleAt( xGrid + xDir, yGrid - yDir ) ):
+				obstacles.append( ( xDir, -yDir ) )
 
         # if there are no obstacles in the way, just keep going
-		if( not xObstacle and not yObstacle and not xyObstacle ):
+		if( 0 == len( obstacles ) ):
 			return ( 0.0, 0.0 )
 
 		# "whiskers" should intersect with any obstacle edges close enough to worry about colliding
-		speed = math.sqrt( self.Velocity[0]**2 + self.Velocity[1]**2 )
-		direction = ( self.Velocity[0] / speed, self.Velocity[1] / speed )
-		whiskerLength = collisionDistance + turnDistance + speed*reactionTime
-		leftWhisker = ( self.Position[0] - direction[1]*collisionDistance,
-                        self.Position[1] + direction[0]*collisionDistance )
-		rightWhisker = ( self.Position[0] + direction[1]*collisionDistance,
-                         self.Position[1] - direction[0]*collisionDistance )
+		whiskerLength = 2*collisionDistance + turnDistance + speed*reactionTime
+		leftWhisker = ( self.Position[0] - ( direction[0] + direction[1] )*collisionDistance,
+                     self.Position[1] + ( direction[0] - direction[1] )*collisionDistance )
+		rightWhisker = ( self.Position[0] - ( direction[0] - direction[1] )*collisionDistance,
+                      self.Position[1] - ( direction[0] + direction[1] )*collisionDistance )
 		leftWhisker = ( leftWhisker[0], leftWhisker[1],
                         leftWhisker[0] + direction[0]*whiskerLength,
                         leftWhisker[1] + direction[1]*whiskerLength )
 		rightWhisker = ( rightWhisker[0], rightWhisker[1],
                          rightWhisker[0] + direction[0]*whiskerLength,
                          rightWhisker[1] + direction[1]*whiskerLength )
-
-        # the velocity if completely turned
-		targetVelocity = ( 0.0, 0.0 )
         
-        # distance
-        
-        # if the only obstacle is in the corner
-		if( xyObstacle ):
-			left = Geometry.SegmentSquareIntersect( leftWhisker[0], leftWhisker[1],
-                                                    leftWhisker[2], leftWhisker[3],
-                                                    xyCorners[0], xyCorners[1],
-                                                    xyCorners[2], xyCorners[3] )
-			right = Geometry.SegmentSquareIntersect( rightWhisker[0], rightWhisker[1],
-                                                     rightWhisker[2], rightWhisker[3],
-                                                     xyCorners[0], xyCorners[1],
-                                                     xyCorners[2], xyCorners[3] )
-			if( left and not right ):
-				targetVelocity = ( 0.0, speed * yDir ) if ( 0.0 < direction[0]*direction[1] ) else ( speed * xDir, 0.0 )
-			elif( right and not left ):
-				targetVelocity = ( speed * xDir, 0.0 ) if ( 0.0 < direction[0]*direction[1] ) else ( 0.0, speed * yDir )
-			elif( ( right and left ) or
-                  Geometry.SegmentSquareIntersect( leftWhisker[2], leftWhisker[3],
-                                                   rightWhisker[2], rightWhisker[3],
-                                                   xyCorners[0], xyCorners[1],
-                                                   xyCorners[2], xyCorners[3] ) ):
-				corner = ( min( xyCorners[0], xyCorners[2] ) if xDir > 0 else max( xyCorners[0], xyCorners[2] ),
-                           min( xyCorners[1], xyCorners[3] ) if yDir > 0 else max( xyCorners[1], xyCorners[3] ) )
-				leftDistance = direction[0]*whiskerLength*( corner[0] - leftWhisker[0] ) +
-                               direction[1]*whiskerLength*( corner[1] - leftWhisker[1] )
-				rightDistance = direction[0]*whiskerLength*( corner[0] - rightWhisker[0] ) +
-                               direction[1]*whiskerLength*( corner[1] - rightWhisker[1] )
-                targetVelocity = ( speed * xDir, 0.0 ) if ( 0.0 < direction[0]*direction[1] ) else ( 0.0, speed * yDir )
+		leftDistance = -1
+		rightDistance = -1
+        minDistance = -1
 
-        # check to see if obstacles are close enough to bother turning and, if so, which is closest
-		xDistance, temp1, temp2, temp3 = self.level.tileBorder( xGrid, yGrid, xDir, 0 )
-		temp1, yDistance, temp2, temp3 = self.level.tileBorder( xGrid, yGrid, 0, yDir )
-        xDistance = math.fabs( self.Position[0] - xDistance )
-        yDistance = math.fabs( self.Position[1] - yDistance )
-		xObstacle = False if ( not xObstacle ) else ( xDistance < turnDistance )
-		yObstacle = False if ( not yObstacle ) else ( yDistance < turnDistance )
-		xyObstacle = ( False if ( not xyObstacle or xObstacle or yObstacle )
-                             else ( xDistance < turnDistance and yDistance < turnDistance ) )
+        # loop through obstacles to find closest one for each whisker
+		for obstacle in obstacles:
+			corners = self.level.toCorners( xGrid + obstacle[0], yGrid + obstacle[1] )
+            # check for intersection with whisker area
+			bLeft = Geometry.SegmentSquareIntersect( leftWhisker[0], leftWhisker[1],
+                                                     leftWhisker[2], leftWhisker[3],
+                                                     corners[0], corners[1],
+                                                     corners[2], corners[3] )
+			bRight = Geometry.SegmentSquareIntersect( rightWhisker[0], rightWhisker[1],
+                                                      rightWhisker[2], rightWhisker[3],
+                                                      corners[0], corners[1],
+                                                      corners[2], corners[3] )
+			bCenter = Geometry.SegmentSquareIntersect( leftWhisker[2], leftWhisker[3],
+                                                       rightWhisker[2], rightWhisker[3],
+                                                       corners[0], corners[1],
+                                                       corners[2], corners[3] )
 
-        # if there are no obstacles in the way, just keep going
-		if( not xObstacle and not yObstacle and not xyObstacle ):
+            # get distance from each whisker
+			fLeft = -1
+			fRight = -1
+			if( bLeft or bCenter ):
+				fLeft = Geometry.RaySquareDistance( leftWhisker[0], leftWhisker[1],
+                                                   direction[0], direction[1],
+                                                   corners[0], corners[1],
+                                                   corners[2], corners[3] )
+			if( bRight or bCenter ):
+				fRight = Geometry.RaySquareDistance( rightWhisker[0], rightWhisker[1],
+                                                    direction[0], direction[1],
+                                                    corners[0], corners[1],
+                                                    corners[2], corners[3] )
+			
+            # if travelling in a diagonal direction with the corner of the obstacle
+            # between the whiskers, get its distance
+			if( 0 != xDir && 0 != yDir ):
+
+		# if neither whisker registers a collision, return no acceleration
+        if( -1 == leftDistance && -1 == rightDistance )
 			return ( 0.0, 0.0 )
 
-        # if there are obstacles in both the x and the y directions, pick the closest one
-		if( xObstacle and yObstacle ):
-			xObstacle = ( ( xDistance < yDistance ) if ( xDistance != yDistance )
-                          else ( math.fabs( self.Velocity[0] ) > math.fabs( self.Velocity[1] ) ) )
-			yObstacle = not xObstacle
-
-        # velocity if course turned parallel to nearest obstacle edge
-		speed = math.sqrt( self.Velocity[0]**2 + self.Velocity[1]**2 )
-		turnedVelocity = ( 0.0, 0.0 )
-
-        # zero or less means not close enough to turn, 1 or more means colliding
-		urgency = 0
-
-        # figure out where to turn if the nearest obstacle is in the x-direction
-		if( xObstacle ):
-			if( 0 == yDir ):
-				if( self.level.obstacleAt( xGrid, yGrid - 1 ) ):
-					yDir = 1 if ( not self.level.obstacleAt( xGrid, yGrid + 1 ) or
-                                  yDistance >= float(self.level.tileHeight()) / 2 ) else -1
-				elif( self.level.obstacleAt( xGrid, yGrid + 1 ) ):
-					yDir = -1
-				elif( self.level.obstacleAt( xGrid + xDir, yGrid - 1 ) ):
-					yDir = 1 if ( not self.level.obstacleAt( xGrid + xDir, yGrid + 1 ) or
-                                  yDistance >= float(self.level.tileHeight()) / 2 ) else -1
-				else:
-					yDir = -1 if ( self.level.obstacleAt( xGrid + xDir, yGrid + 1 ) or
-                                   yDistance < float(self.level.tileHeight()) / 2 ) else 1
-			turnedVelocity = ( 0.0, speed * yDir )
-        
-        # figure out where to turn if the nearest obstacle is in the y-direction
-		elif( yObstacle ):
-			if( 0 == xDir ):
-				if( self.level.obstacleAt( xGrid - 1, yGrid ) ):
-					xDir = 1 if ( not self.level.obstacleAt( xGrid + 1, yGrid ) or
-                                  xDistance >= float(self.level.tileWidth()) / 2 ) else -1
-				elif( self.level.obstacleAt( xGrid + 1, yGrid ) ):
-					xDir = -1
-				elif( self.level.obstacleAt( xGrid - 1, yGrid + yDir ) ):
-					xDir = 1 if ( not self.level.obstacleAt( xGrid + 1, yGrid + yDir ) or
-                                  xDistance >= float(self.level.tileWidth()) / 2 ) else -1
-				else:
-					xDir = -1 if ( self.level.obstacleAt( xGrid + 1, yGrid + yDir ) or
-                                   xDistance < float(self.level.tileWidth()) / 2 ) else 1
-			turnedVelocity = ( speed * xDir, 0.0 )
-
-        # figure out where to turn if the nearest obstacle is in the x- and y-directions
-		elif( xyObstacle ):
-			velocityTangent = math.fabs( self.Velocity[1] / self.Velocity[0] )
-			displacementTangent = math.fabs( yDistance / xDistance )
-			if( ( velocityTangent > displacementTangent or
-                  ( velocityTangent == displacementTangent and velocityTangent > 1 ) ) and
-                ( xDistance > collisionDistance or yDistance <= collisionDistance ) ):
-				turnedVelocity = ( 0.0, speed * yDir )
-			else:
-				turnedVelocity = ( speed * xDir, 0.0 )
-
-        # if there are no obstacles close enough to collide with
+        # if one 
 
 		# TODO
 		return ( 0.0, 0.0 )

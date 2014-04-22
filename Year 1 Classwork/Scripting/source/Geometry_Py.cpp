@@ -17,6 +17,8 @@ PyMethodDef Geometry_Functions[] =
 	{"SegmentSquareIntersect",  Geometry_SegmentSquareIntersect,    METH_VARARGS,   "Checks if a line segment and a square intersect"   },
 	{"SegmentsIntersect",       Geometry_SegmentsIntersect,         METH_VARARGS,   "Checks if a pair of line segments intersect"       },
 	{"PointInSquare",           Geometry_PointInSquare,             METH_VARARGS,   "Checks if a point is within a square"              },
+	{"RaySquareDistance",       Geometry_RaySquareDistance,         METH_VARARGS,   "Returns distance along a ray to a square"          },
+	{"RaySegmentDistance",      Geometry_RaySegmentDistance,        METH_VARARGS,   "Returns distance along a ray to a line segment"    },
 	{NULL, NULL, 0, NULL}
 };
 
@@ -75,4 +77,36 @@ PyObject* Geometry_PointInSquare( PyObject *self, PyObject *args )
         Py_RETURN_TRUE;
     }
     Py_RETURN_FALSE;
+}
+
+PyObject* Geometry_RaySquareDistance( PyObject *self, PyObject *args )
+{
+    Ray oRay;
+    Square oSquare;
+    if ( !PyArg_ParseTuple( args, "ffffffff",
+                            &oRay.location.x, &oRay.location.y,
+                            &oRay.direction.x, &oRay.direction.y,
+                            &oSquare.corner1.x, &oSquare.corner1.y,
+                            &oSquare.corner2.x, &oSquare.corner2.y ) )
+    {
+		ParsePyTupleError( __func__, __LINE__ );
+		return nullptr;
+    }
+	return Py_BuildValue("f", RaySquareDistance( oRay, oSquare ) );
+}
+
+PyObject* Geometry_RaySegmentDistance( PyObject *self, PyObject *args )
+{
+    Ray oRay;
+    LineSegment oSegment;
+    if ( !PyArg_ParseTuple( args, "ffffffff",
+                            &oRay.location.x, &oRay.location.y,
+                            &oRay.direction.x, &oRay.direction.y,
+                            &oSegment.point1.x, &oSegment.point1.y,
+                            &oSegment.point2.x, &oSegment.point2.y ) )
+    {
+		ParsePyTupleError( __func__, __LINE__ );
+		return nullptr;
+    }
+	return Py_BuildValue("f", RaySegmentDistance( oRay, oSegment ) );
 }

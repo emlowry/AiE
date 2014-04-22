@@ -21,5 +21,7 @@ extern PyMethodDef Geometry_Functions[];
 static PyObject* Geometry_SegmentSquareIntersect( PyObject *self, PyObject *args );
 static PyObject* Geometry_SegmentsIntersect( PyObject *self, PyObject *args );
 static PyObject* Geometry_PointInSquare( PyObject *self, PyObject *args );
+static PyObject* Geometry_RaySquareDistance( PyObject *self, PyObject *args );
+static PyObject* Geometry_RaySegmentDistance( PyObject *self, PyObject *args );
 
 #endif  // GEOMETRY__PY__H
