@@ -109,6 +109,49 @@ class LevelGrid:
                                                 ( float(yGrid) + 0.5 ) * self.tileSize['width'],
                                                 0.5 * self.tileSize['width'] )
 
+	def getObstacles( self, xGrid, yGrid, xDir, yDir, bIgnoreStart = False ):
+		obstacles = []
+		if( 0 == xDir ):
+			if( not bIgnoreStart and self.obstacleAt( xGrid, yGrid ) ):
+				obstacles.append( ( xGrid, yGrid ) )
+			if( self.obstacleAt( xGrid - 1, yGrid ) ):
+				obstacles.append( ( xGrid - 1, yGrid ) )
+			if( self.obstacleAt( xGrid - 1, yGrid + yDir ) ):
+				obstacles.append( ( xGrid - 1, yGrid + yDir ) )
+			if( self.obstacleAt( xGrid, yGrid + yDir ) ):
+				obstacles.append( ( xGrid, yGrid + yDir ) )
+			if( self.obstacleAt( xGrid + 1, yGrid + yDir ) ):
+				obstacles.append( ( xGrid + 1, yGrid + yDir ) )
+			if( self.obstacleAt( xGrid + 1, yGrid ) ):
+				obstacles.append( ( xGrid + 1, yGrid ) )
+		elif( 0 == yDir ):
+			if( not bIgnoreStart and self.obstacleAt( xGrid, yGrid ) ):
+				obstacles.append( ( xGrid, yGrid ) )
+			if( self.obstacleAt( xGrid, yGrid - 1 ) ):
+				obstacles.append( ( xGrid, yGrid - 1 ) )
+			if( self.obstacleAt( xGrid + xDir, yGrid - 1 ) ):
+				obstacles.append( ( xGrid + xDir, yGrid - 1 ) )
+			if( self.obstacleAt( xGrid + xDir, yGrid ) ):
+				obstacles.append( ( xGrid + xDir, yGrid ) )
+			if( self.obstacleAt( xGrid + xDir, yGrid + 1 ) ):
+				obstacles.append( ( xGrid + xDir, yGrid + 1 ) )
+			if( self.obstacleAt( xGrid, yGrid + 1 ) ):
+				obstacles.append( ( xGrid, yGrid + 1 ) )
+		else:
+			if( not bIgnoreStart and self.obstacleAt( xGrid, yGrid ) ):
+				obstacles.append( ( xGrid, yGrid ) )
+			if( self.obstacleAt( xGrid - xDir, yGrid + yDir ) ):
+				obstacles.append( ( xGrid - xDir, yGrid + yDir ) )
+			if( self.obstacleAt( xGrid, yGrid + yDir ) ):
+				obstacles.append( ( xGrid, yGrid + yDir ) )
+			if( self.obstacleAt( xGrid + xDir, yGrid + yDir ) ):
+				obstacles.append( ( xGrid + xDir, yGrid + yDir ) )
+			if( self.obstacleAt( xGrid + xDir, yGrid ) ):
+				obstacles.append( ( xGrid + xDir, yGrid ) )
+			if( self.obstacleAt( xGrid + xDir, yGrid - yDir ) ):
+				obstacles.append( ( xGrid + xDir, yGrid - yDir ) )
+		return obstacles
+
 	def distanceToObstacle( self, xGrid, yGrid, xStart, yStart, xDir, yDir ):
 		tileAspectRatio = float(self.tileSize['width']) / float(self.tileSize['height'])
 		adjustedYStart = yStart * tileAspectRatio
@@ -123,7 +166,7 @@ class LevelGrid:
 	# Returns true if there are no obstacles between the given position and the
 	# given target, excluding the grid squares of the position and target if
 	# indicated
-	def lineOfSight( self, xPos, yPos, xTarget, yTarget, bIgnorePosition, bIgnoreTarget ):
+	def lineOfSight( self, xPos, yPos, xTarget, yTarget, bIgnorePosition = False, bIgnoreTarget = False ):
 		xGridPos, yGridPos = self.toGrid( xPos, yPos )
 		xGridTarget, yGridTarget = self.toGrid( xTarget, yTarget )
 		if( ( xGridPos == xGridTarget and 1 >= math.fabs( yGridPos - yGridTarget ) ) or
