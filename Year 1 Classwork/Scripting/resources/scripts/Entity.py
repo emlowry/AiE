@@ -1,7 +1,8 @@
 import AIE
 import game
-import math
 import Level_Grid
+import math
+import random
 
 #Tank Entity
 #   A simple entity that can be placed on the screen with a right click, you should modify this so that the tank can be told to 
@@ -12,10 +13,11 @@ class TankEntity:
 	def __init__(self, level):
 		self.level = level
 		self.Position = ( 600, 300 )
-		self.Velocity = ( 0, 0 )
+		self.Velocity = ( 0.0, 0.0 )
 		self.Target = ( 600, 300 )
 		self.Waypoint = None
-		self.Rotation = 0
+		self.Wander = ( 0.0, 0.0 )
+		self.Rotation = 0.0
 		self.spriteName = "./images/PlayerTanks.png"
 		self.size = (57, 72 )
 		self.origin = (0.5, 0.5)
@@ -25,13 +27,8 @@ class TankEntity:
 		level.register( self, TankEntity.recalculateRoute )
 		self.turret = Turret(self)
 
-	def recalculateRoute( self, level ):
-		print "Recalculating route from position ", self.Position, " to target ", self.Target
-		if( self.Position != self.Target and
-            level.lineOfSight( self.Position[0], self.Position[1], self.Target[0], self.Target[1], True, True ) ):
-			self.Waypoint = self.Target
-		else:
-			self.Waypoint = None
+	def recalculateRoute( self ):
+		self.Waypoint = self.Target
 
 	def isWithin( self, xPos, yPos, radius ):
 		if( xPos == self.Position[0] and yPos == self.Position[1] ):
@@ -99,7 +96,7 @@ class TankEntity:
 			return ( seek[0] + slow[0], seek[1] + slow[1] )
 		return self.accelerateAndSeek( xPos, yPos, turnPower, speed, acceleration, cruiseSpeedRange )
 
-	def avoidCollisions( self, collisionDistance, turnDistance, turnPower, fDeltaTime ):
+	def avoidCollisions( self, turnDistance, turnPower, breakPower, fDeltaTime ):
 
 		# if inside an obstacle, it's far too late.  Just keep going.
 		xGrid, yGrid = self.level.toGrid( self.Position[0], self.Position[1] )
@@ -152,11 +149,11 @@ class TankEntity:
 			return ( 0.0, 0.0 )
 
 		# "whiskers" should intersect with any obstacle edges close enough to worry about colliding
-		whiskerLength = 2*collisionDistance + turnDistance + speed*reactionTime
-		leftWhisker = ( self.Position[0] - ( direction[0] + direction[1] )*collisionDistance,
-                     self.Position[1] + ( direction[0] - direction[1] )*collisionDistance )
-		rightWhisker = ( self.Position[0] - ( direction[0] - direction[1] )*collisionDistance,
-                      self.Position[1] - ( direction[0] + direction[1] )*collisionDistance )
+		whiskerLength = self.size[1] + turnDistance + speed*fDeltaTime
+		leftWhisker = ( self.Position[0] - ( direction[0]*self.size[1] + direction[1]*self.size[0] )/2,
+                        self.Position[1] + ( direction[0]*self.size[0] - direction[1]*self.size[1] )/2 )
+		rightWhisker = ( self.Position[0] - ( direction[0]*self.size[1] - direction[1]*self.size[0] )/2,
+                         self.Position[1] - ( direction[0]*self.size[0] + direction[1]*self.size[1] )/2 )
 		leftWhisker = ( leftWhisker[0], leftWhisker[1],
                         leftWhisker[0] + direction[0]*whiskerLength,
                         leftWhisker[1] + direction[1]*whiskerLength )
@@ -166,51 +163,88 @@ class TankEntity:
         
 		leftDistance = -1
 		rightDistance = -1
-        minDistance = -1
+		minDistance = -1
 
         # loop through obstacles to find closest one for each whisker
 		for obstacle in obstacles:
-			corners = self.level.toCorners( xGrid + obstacle[0], yGrid + obstacle[1] )
-            # check for intersection with whisker area
-			bLeft = Geometry.SegmentSquareIntersect( leftWhisker[0], leftWhisker[1],
-                                                     leftWhisker[2], leftWhisker[3],
-                                                     corners[0], corners[1],
-                                                     corners[2], corners[3] )
-			bRight = Geometry.SegmentSquareIntersect( rightWhisker[0], rightWhisker[1],
-                                                      rightWhisker[2], rightWhisker[3],
-                                                      corners[0], corners[1],
-                                                      corners[2], corners[3] )
-			bCenter = Geometry.SegmentSquareIntersect( leftWhisker[2], leftWhisker[3],
-                                                       rightWhisker[2], rightWhisker[3],
-                                                       corners[0], corners[1],
-                                                       corners[2], corners[3] )
 
-            # get distance from each whisker
-			fLeft = -1
-			fRight = -1
-			if( bLeft or bCenter ):
-				fLeft = Geometry.RaySquareDistance( leftWhisker[0], leftWhisker[1],
-                                                   direction[0], direction[1],
-                                                   corners[0], corners[1],
-                                                   corners[2], corners[3] )
-			if( bRight or bCenter ):
-				fRight = Geometry.RaySquareDistance( rightWhisker[0], rightWhisker[1],
-                                                    direction[0], direction[1],
-                                                    corners[0], corners[1],
-                                                    corners[2], corners[3] )
-			
-            # if travelling in a diagonal direction with the corner of the obstacle
-            # between the whiskers, get its distance
-			if( 0 != xDir && 0 != yDir ):
+			# get distance from each whisker
+			fLeft = self.level.distanceToObstacle( xGrid + obstacle[0], yGrid + obstacle[1],
+                                                   leftWhisker[0], leftWhisker[1],
+                                                   direction[0], direction[1] )
+			fRight = self.level.distanceToObstacle( xGrid + obstacle[0], yGrid + obstacle[1],
+                                                    rightWhisker[0], rightWhisker[1],
+                                                    direction[0], direction[1] )
+			fCenter = self.level.distanceToObstacle( xGrid + obstacle[0], yGrid + obstacle[1],
+                                                     ( leftWhisker[0] + rightWhisker[0] ) / 2,
+                                                     ( leftWhisker[1] + rightWhisker[1] ) / 2,
+                                                     direction[0], direction[1] )
 
-		# if neither whisker registers a collision, return no acceleration
-        if( -1 == leftDistance && -1 == rightDistance )
+            # if the shortest distance is close enough to prompt turning,
+			fMin = ( -1 if ( -1 == fLeft and -1 == fRight and -1 == fCenter )
+                     else fLeft if ( -1 == fRight and -1 == fCenter )
+                     else fRight if ( -1 == fLeft and -1 == fCenter )
+                     else fCenter if ( -1 == fLeft and -1 == fRight )
+                     else min( fLeft, fRight ) if ( -1 == fCenter )
+                     else min( fLeft, fCenter ) if ( -1 == fRight )
+                     else min( fRight, fCenter ) if ( -1 == fLeft )
+                     else min( fLeft, fRight, fCenter ) )
+			if( -1 != fMin and fMin < whiskerLength ):
+
+                # make sure at least one of the left and right whiskers registers the collision
+				if( -1 != fCenter and -1 == fLeft and -1 == fRight ):
+					fEndLeft = self.level.distanceToObstacle( xGrid + obstacle[0], yGrid + obstacle[1],
+                                                              leftWhisker[2], leftWhisker[3],
+                                                              direction[1], -direction[0] )
+					fEndRight = self.level.distanceToObstacle( xGrid + obstacle[0], yGrid + obstacle[1],
+                                                               rightWhisker[2], rightWhisker[3],
+                                                               -direction[1], direction[0] )
+					if( fEndLeft < fEndRight ):
+						fLeft = fCenter
+					else:
+						fRight = fCenter
+
+				# update closest collision distances
+				minDistance = min( fMin, minDistance ) if ( -1 != minDistance ) else fMin
+				leftDistance = ( min( fLeft, leftDistance ) if ( -1 != leftDistance )
+                                 else fLeft if ( -1 != fLeft ) else leftDistance )
+				rightDistance = ( min( fRight, rightDistance ) if ( -1 != rightDistance )
+                                  else fRight if ( -1 != fRight ) else rightDistance )
+
+            # end of checking obstacles
+
+        # if neither whisker registered a collision, return no force
+		if( -1 == leftDistance and -1 == rightDistance ):
 			return ( 0.0, 0.0 )
 
-        # if one 
+		# calculate turn force
+		force = speed * turnPower
+		breakForce = 0
+		if( minDistance >= self.size[1] ):
+			breakForce = ( ( minDistance - self.size[1] )**2/
+                           ( whiskerLength - self.size[1] )**2 - 1 ) * speed * breakPower
+		if( ( leftDistance == rightDistance and bool(random.getrandbits(1)) ) or
+            -1 == rightDistance or ( -1 != leftDistance and leftDistance < rightDistance ) ):
+			force *= -1
+		return ( direction[0]*breakForce - direction[1]*force,
+                 direction[1]*breakForce + direction[0]*force )
 
-		# TODO
-		return ( 0.0, 0.0 )
+	def wander( self, wanderPower, wanderOffset, wanderRadius, changeRate, fDeltaTime ):
+		deltaWander = ( random.random() * wanderRadius * fDeltaTime * changeRate *
+                        ( 1 if bool(random.getrandbits(1)) else -1 ),
+                        random.random() * wanderRadius * fDeltaTime * changeRate *
+                        ( 1 if bool(random.getrandbits(1)) else -1 ) )
+		print "Wander: ", self.Wander, ", deltaWander: ", deltaWander
+		wander = ( self.Wander[0] + deltaWander[0], self.Wander[1] + deltaWander[1] )
+		correction = math.sqrt( wanderRadius**2 / ( wander[0]**2 + wander[1]**2 ) )
+		wander = ( wander[0] * correction, wander[1] * correction )
+		self.Wander = wander
+		wander = ( wander[0] + wanderOffset, wander[1] )
+		speed = math.sqrt( ( self.Velocity[0]**2 + self.Velocity[1]**2 ) / ( wander[0]**2 + wander[1]**2 ) )
+		c = math.cos( self.Rotation )
+		s = math.sin( self.Rotation )
+		return ( ( ( wander[0]*c - wander[1]*s )*speed - self.Velocity[0] ) * wanderPower,
+                 ( ( wander[0]*s + wander[1]*c )*speed - self.Velocity[1] ) * wanderPower )
 
 	def update(self, fDeltaTime ):
 
@@ -218,18 +252,30 @@ class TankEntity:
 		mouseX, mouseY = AIE.GetMouseLocation()
 		if( AIE.GetMouseButton(1) ):
 			self.Target = ( mouseX, mouseY )
-			self.recalculateRoute( self.level )
+			self.recalculateRoute()
 
         # calculate acceleration
-		acceleration = None
-		if( None == self.Waypoint ):
-			acceleration = self.accelerateTo( 0, 200, 10 )
+		accelerations = []
+		if( None == self.Waypoint or
+            not self.level.lineOfSight( self.Position[0], self.Position[1],
+                                        self.Waypoint[0], self.Waypoint[1],
+                                        True, False ) ):
+			accelerations.append( self.accelerateTo( 150, 150, 10 ) )
+			accelerations.append( self.wander( 150, 20, 10, 10, fDeltaTime ) )
 		else:
-			acceleration = self.arriveWithin( self.Waypoint[0], self.Waypoint[1], 20, 20, 10, 250, 250, 10 )
+			accelerations.append( self.arriveWithin( self.Waypoint[0], self.Waypoint[1], 20, 20, 10, 250, 250, 10 ) )
+		accelerations.append( self.avoidCollisions( 50, 10, 20, fDeltaTime ) )
+		acceleration = ( 0.0, 0.0 )
+		for accel in accelerations:
+			acceleration = ( acceleration[0] + accel[0], acceleration[1] + accel[1] )
 
         # calculate position, velocity, and rotation
 		self.Position = ( self.Position[0] + self.Velocity[0]*fDeltaTime + acceleration[0]*fDeltaTime**2/2,
                           self.Position[1] + self.Velocity[1]*fDeltaTime + acceleration[1]*fDeltaTime**2/2 )
+		self.Position = ( math.fmod( self.Position[0], self.level.screenSize[0] ),
+                          math.fmod( self.Position[1], self.level.screenSize[1] ) )
+		self.Position = ( self.Position[0] + self.level.screenSize[0] if ( self.Position[0] < 0.0 ) else self.Position[0],
+                          self.Position[1] + self.level.screenSize[1] if ( self.Position[1] < 0.0 ) else self.Position[1] )
 		self.Velocity = ( self.Velocity[0] + acceleration[0] * fDeltaTime,
                           self.Velocity[1] + acceleration[1] * fDeltaTime )
 		if( self.Velocity[0] != 0.0 or self.Velocity[1] != 0.0 ):

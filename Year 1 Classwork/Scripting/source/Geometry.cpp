@@ -9,6 +9,54 @@
 
 #include "Geometry.h"
 #include <algorithm>
+#include <iostream>
+
+bool SegmentCircleIntersect( const LineSegment& ac_roSegment,
+                             const Circle& ac_roCircle )
+{
+    // get vector from start of segment to end of segment and from start of
+    // segment to center of circle
+    Point segV( ac_roSegment.point2.x - ac_roSegment.point1.x,
+                ac_roSegment.point2.y - ac_roSegment.point1.y );
+    Point circV( ac_roCircle.location.x - ac_roSegment.point1.x,
+                 ac_roCircle.location.y - ac_roSegment.point1.y );
+
+    // if distance from either end of segment to center of circle is less than
+    // radius of circle, return true
+    float segLenSq = segV.x*segV.x + segV.y*segV.y;
+    float circDist1Sq = circV.x*circV.x + circV.y*circV.y;
+    float radSq = ac_roCircle.radius*ac_roCircle.radius;
+    if( circDist1Sq <= radSq )
+    {
+        return true;
+    }
+    float circDist2Sq = ( circV.x - segV.x )*( circV.x - segV.x ) +
+                        ( circV.y - segV.y )*( circV.y - segV.y );
+    if( circDist2Sq <= radSq )
+    {
+        return true;
+    }
+
+    // distance from center of circle to nearest point on line containing
+    // segment, multiplied by segment length and squared, must be less than or
+    // equal to square of product of segment length and circle radius
+    float perp = segV.x*circV.y - segV.y*circV.x;
+    if( perp*perp > segLenSq * radSq )
+    {
+        return false;
+    }
+
+    // half the length of area of line containing segment that intersects with
+    // circle, multiplied by segment length
+    float intersect = std::sqrt( segLenSq*radSq - perp*perp );
+
+    // distance from start of segment to point on line containing segment
+    // nearest to center of circle, multiplied by segment length
+    float parallel = segV.x*circV.x + segV.y*circV.y;
+
+    // parallel distance must be within [-intersect, segment length + intersect]
+    return ( -intersect <= parallel && parallel <= segLenSq + intersect );
+}
 
 void Square::Edges( LineSegment& a_roEdge1, LineSegment& a_roEdge2,
                     LineSegment& a_roEdge3, LineSegment& a_roEdge4 ) const
@@ -67,6 +115,46 @@ bool PointInSquare( const Point& ac_roPoint, const Square& ac_roSquare )
            ac_roPoint.x >= std::max( ac_roSquare.corner1.x, ac_roSquare.corner2.x ) &&
            ac_roPoint.y <= std::min( ac_roSquare.corner1.y, ac_roSquare.corner2.y ) &&
            ac_roPoint.y >= std::max( ac_roSquare.corner1.y, ac_roSquare.corner2.y );
+}
+
+float RayCircleDistance( const Ray& ac_roRay, const Circle& ac_roCircle )
+{
+    
+    Point circV( ac_roCircle.location.x - ac_roRay.location.x,
+                 ac_roCircle.location.y - ac_roRay.location.y );
+
+    // If ray starts inside circle, return 0
+    float rayLenSq = ac_roRay.direction.x*ac_roRay.direction.x +
+                     ac_roRay.direction.y*ac_roRay.direction.y;
+    float circDistSq = circV.x*circV.x + circV.y*circV.y;
+    float radSq = ac_roCircle.radius*ac_roCircle.radius;
+    if( circDistSq <= radSq )
+    {
+        return 0;
+    }
+
+    // distance from start of ray to point on ray nearest to center of circle,
+    // multiplied by ray direction vector magnitude, must be greater than zero
+    float parallel = ac_roRay.direction.x*circV.x + ac_roRay.direction.y*circV.y;
+    if ( parallel < 0 )
+    {
+        return -1;
+    }
+
+    // distance from center of circle to nearest point on ray, multiplied by ray
+    // direction vector magnitude, must be less than or equal to product of ray
+    // direction vector magnitude and circle radius
+    float perp = ac_roRay.direction.x*circV.y - ac_roRay.direction.y*circV.x;
+    if( perp*perp > rayLenSq * radSq )
+    {
+        return -1;
+    }
+
+    // length of area of line containing ray that intersects with circle,
+    // multiplied by ray direction vector magnitude, minus half the length of the
+    // segment of the line containing the ray that intersects the circle is the
+    // distance from the start of the ray to the edge of the circle
+    return ( parallel - std::sqrt( rayLenSq*radSq - perp*perp ) ) / std::sqrt( rayLenSq );
 }
 
 float RaySquareDistance( const Ray& ac_roRay, const Square& ac_roSquare )

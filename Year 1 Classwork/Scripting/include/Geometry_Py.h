@@ -18,9 +18,11 @@
 
 extern PyMethodDef Geometry_Functions[];
 
+static PyObject* Geometry_SegmentCircleIntersect( PyObject *self, PyObject *args );
 static PyObject* Geometry_SegmentSquareIntersect( PyObject *self, PyObject *args );
 static PyObject* Geometry_SegmentsIntersect( PyObject *self, PyObject *args );
 static PyObject* Geometry_PointInSquare( PyObject *self, PyObject *args );
+static PyObject* Geometry_RayCircleDistance( PyObject *self, PyObject *args );
 static PyObject* Geometry_RaySquareDistance( PyObject *self, PyObject *args );
 static PyObject* Geometry_RaySegmentDistance( PyObject *self, PyObject *args );
 

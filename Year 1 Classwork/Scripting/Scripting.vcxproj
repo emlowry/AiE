@@ -111,6 +111,7 @@
     <None Include="resources\images\crate_sideup.png" />
     <None Include="resources\images\PlayerTanks.png" />
     <None Include="resources\images\Red_Desert.jpg" />
+    <None Include="resources\images\Red_Desert_With_Rock.jpg" />
     <None Include="resources\scripts\Entity.py" />
     <None Include="resources\scripts\Entity.pyc" />
     <None Include="resources\scripts\game.py" />

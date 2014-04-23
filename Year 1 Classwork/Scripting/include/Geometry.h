@@ -42,15 +42,25 @@ struct Ray
     Ray( const Point& ac_roLocation, const Point& ac_roDirection = Point() )
         : location( ac_roLocation ), direction( ac_roDirection ) {}
 };
+struct Circle
+{
+    Point location;
+    float radius;
+    Circle( float a_x = 0, float a_y = 0, float a_r = 0 )
+        : location( a_x, a_y ), radius( a_r ) {}
+    Circle( const Point& ac_roPoint, float a_r = 0 )
+        : location( ac_roPoint ), radius( a_r ) {}
+};
 
+bool SegmentCircleIntersect( const LineSegment& ac_roSegment,
+                             const Circle& ac_roCircle );
 bool SegmentSquareIntersect( const LineSegment& ac_roSegment,
-                                    const Square& ac_roSquare );
+                             const Square& ac_roSquare );
 bool SegmentsIntersect( const LineSegment& ac_roSegment1,
-                               const LineSegment& ac_roSegment2 );
+                        const LineSegment& ac_roSegment2 );
 bool PointInSquare( const Point& ac_roPoint, const Square& ac_roSquare );
-
+float RayCircleDistance( const Ray& ac_roRay, const Circle& ac_roCircle );
 float RaySquareDistance( const Ray& ac_roRay, const Square& ac_roSquare );
-
 float RaySegmentDistance( const Ray& ac_roRay, const LineSegment& ac_roSegment );
 
 #endif  // GEOMETRY__H

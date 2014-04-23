@@ -36,6 +36,7 @@
     <None Include="resources\images\Arial_00.png" />
     <None Include="resources\images\crate_sideup.png" />
     <None Include="resources\images\PlayerTanks.png" />
+    <None Include="resources\images\Red_Desert_With_Rock.jpg" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">

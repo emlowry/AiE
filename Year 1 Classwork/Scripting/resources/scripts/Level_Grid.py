@@ -15,6 +15,7 @@ class LevelGrid:
 		self.levelWidth = int( math.ceil(screenProperties['width']/ tileSize['width']) )
 		self.levelHeight= int( math.ceil(screenProperties['height']/ tileSize['height']) )
 		self.levelSize = self.levelWidth * (self.levelHeight+1)
+		self.screenSize = ( self.levelWidth * self.tileSize['width'], self.levelHeight * self.tileSize['height'] )
 		print "LevelSize :", self.levelWidth, " ", self.levelHeight
 		self.levelTiles = [None] * int(self.levelSize)
 		self.observers = ObserverList()
@@ -99,6 +100,26 @@ class LevelGrid:
 		xGridPos, yGridPos = self.toGrid( xPos, yPos )
 		return (yGridPos * self.levelWidth) + xGridPos
 
+	def obstacleIntersects( self, xGrid, yGrid, xPoint1, yPoint1, xPoint2, yPoint2 ):
+		tileAspectRatio = float(self.tileSize['width']) / float(self.tileSize['height'])
+		adjustedYPoint1 = yPoint1 * tileAspectRatio
+		adjustedYPoint2 = yPoint2 * tileAspectRatio
+		return Geometry.SegmentCircleIntersect( xPoint1, adjustedYPoint1, xPoint2, adjustedYPoint2,
+                                                ( float(xGrid) + 0.5 ) * self.tileSize['width'],
+                                                ( float(yGrid) + 0.5 ) * self.tileSize['width'],
+                                                0.5 * self.tileSize['width'] )
+
+	def distanceToObstacle( self, xGrid, yGrid, xStart, yStart, xDir, yDir ):
+		tileAspectRatio = float(self.tileSize['width']) / float(self.tileSize['height'])
+		adjustedYStart = yStart * tileAspectRatio
+		adjustedYDir = yDir * tileAspectRatio
+		adjustedDistance = Geometry.RayCircleDistance( xStart, adjustedYStart, xDir, adjustedYDir,
+                                                       ( float(xGrid) + 0.5 ) * self.tileSize['width'],
+                                                       ( float(yGrid) + 0.5 ) * self.tileSize['width'],
+                                                       0.5 * self.tileSize['width'] )
+		return ( adjustedDistance if ( 1.0 == tileAspectRatio )
+                 else adjustedDistance * math.sqrt( ( 1 + tileAspectRatio**-2 ) / 2 ) )
+
 	# Returns true if there are no obstacles between the given position and the
 	# given target, excluding the grid squares of the position and target if
 	# indicated
@@ -145,7 +166,7 @@ class LevelGrid:
 class Tile:
 	def __init__(self):
 		self.imageName = "./images/Red_Desert.jpg"
-		self.otherImageName = "./images/crate_sideup.png"
+		self.otherImageName = "./images/Red_Desert_With_Rock.jpg"
 		self.spriteID = -1
 		self.otherSpriteID = -1
 		self.bShouldDraw = True
