@@ -39,8 +39,6 @@ namespace PlotPoints
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.Title = "Load canvas contents from xml";
-            dlg.FileName = "canvas"; // Default file name 
-            dlg.DefaultExt = ".xml"; // Default file extension 
             dlg.Filter = "Canvas XML|*.xml|All Files|*.*"; // Filter files by extension
 
             // Show open file dialog box 
@@ -52,14 +50,19 @@ namespace PlotPoints
                 // grab the file name of the image 
                 string filename = dlg.FileName;
 
-                // load background and circles from canvas
-                XmlDocument file = new XmlDocument();
-                file.Load(filename);
-                canvas1.ReadXml(file);
+                // check validity
+                Uri uri = new Uri(filename);
+                if (uri.IsFile)
+                {
+                    // load background and circles from canvas
+                    XmlDocument file = new XmlDocument();
+                    file.Load(filename);
+                    canvas1.ReadXml(file);
 
-                // update window title
-                this.Title = filename;
-                loadedFile = true;
+                    // update window title
+                    this.Title = System.IO.Path.GetFileName(uri.LocalPath);
+                    loadedFile = true;
+                }
             }
         }
 
@@ -101,10 +104,8 @@ namespace PlotPoints
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.Title = "Load a background image";
-            dlg.FileName = "background"; // Default file name 
-            dlg.DefaultExt = ".png"; // Default file extension 
             dlg.Filter = "All Images|*.bmp;*.gif;*.jpeg;*.jpg;*.png;*.tiff;*.tif|" +
-                         "All Files|*.*" +
+                         "All Files|*.*|" +
                          "Windows Bitmap|*.bmp|" +
                          "Graphics Interchange Format|*.gif|" +
                          "Joint Photographics Experts Group|*.jpeg;*.jpg|" +

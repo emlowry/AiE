@@ -12,7 +12,7 @@ namespace PlotPoints
 {
     class MyCanvas : Canvas
     {
-        BitmapImage background = null;
+        BitmapSource background = null;
         List<EllipseGeometry> circles = new List<EllipseGeometry>();
         EllipseGeometry inProgress = null;
         Pen pen = new Pen(Brushes.Transparent,0);
@@ -87,57 +87,71 @@ namespace PlotPoints
 
         public void ReadXml(XmlDocument source)
         {
+            // If there's no canvas data to read, don't bother
             if (source == null || source.SelectSingleNode("/canvas") == null)
             {
                 return;
             }
+            XmlNode canvas = source.SelectSingleNode("/canvas");
+
+            // Erase the current canvas contents
             ClearCircles();
             ClearImage();
-            XmlNode canvas = source.SelectSingleNode("/canvas");
-            if (canvas.Attributes["background"] != null)
-            {
-                LoadImage(canvas.Attributes["background"].Value);
-            }
+
+            // Read all the circle data
             foreach (XmlNode circleNode in canvas.SelectNodes("./circle"))
             {
                 EllipseGeometry circle = new EllipseGeometry();
                 Point center = circle.Center;
                 double d;
                 if (circleNode.Attributes["x"] != null &&
-                    double.TryParse(circleNode.Attributes["x"].ToString(), out d))
+                    double.TryParse(circleNode.Attributes["x"].Value, out d))
                 {
                     center.X = d;
                 }
                 if (circleNode.Attributes["y"] != null &&
-                    double.TryParse(circleNode.Attributes["y"].ToString(), out d))
+                    double.TryParse(circleNode.Attributes["y"].Value, out d))
                 {
                     center.Y = d;
                 }
                 circle.Center = center;
                 if (circleNode.Attributes["r"] != null &&
-                    double.TryParse(circleNode.Attributes["r"].ToString(), out d))
+                    double.TryParse(circleNode.Attributes["r"].Value, out d))
                 {
                     circle.RadiusX = d;
                     circle.RadiusY = d;
                 }
                 circles.Add(circle);
             }
+
+            // Read the background image data
+            XmlNode backgroundNode = canvas.SelectSingleNode("./background");
+            if (backgroundNode != null)
+            {
+                System.IO.MemoryStream memory = new System.IO.MemoryStream(Convert.FromBase64String(backgroundNode.InnerText));
+                PngBitmapDecoder decoder = new PngBitmapDecoder(memory,BitmapCreateOptions.None,BitmapCacheOption.Default);
+                if (decoder.Frames.Count > 0 && decoder.Frames[0] != null)
+                {
+                    background = decoder.Frames[0];
+                }
+            }
+
+            // make sure canvas updates
             this.InvalidateVisual();
         }
 
         public XmlDocument WriteXml(XmlDocument destination = null)
         {
+            // If no document is passed in, create one
             if (destination == null)
             {
                 destination = new XmlDocument();
             }
+
+            // create root node
             XmlNode canvas = destination.CreateElement("canvas");
-            if (background != null)
-            {
-                XmlAttribute backgroundAttribute = destination.CreateAttribute("background");
-                backgroundAttribute.Value = background.UriSource.ToString();
-                canvas.Attributes.Append(backgroundAttribute);
-            }
+
+            // create circle nodes
             foreach (EllipseGeometry circle in circles)
             {
                 XmlElement circleElement = destination.CreateElement("circle");
@@ -152,6 +166,20 @@ namespace PlotPoints
                 circleElement.Attributes.Append(rAttribute);
                 canvas.AppendChild(circleElement);
             }
+
+            // create background image node
+            if (background != null)
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(background));
+                System.IO.MemoryStream memory = new System.IO.MemoryStream();
+                encoder.Save(memory);
+                XmlElement backgroundElement = destination.CreateElement("background");
+                backgroundElement.InnerText = Convert.ToBase64String(memory.ToArray());
+                canvas.AppendChild(backgroundElement);
+            }
+
+            // add root node to document and return
             destination.AppendChild(canvas);
             return destination;
         }
