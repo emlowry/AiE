@@ -91,10 +91,9 @@ class TankEntity:
         # return result
 		return ( direction[0] * magnitude, direction[1] * magnitude )
 
-	def whiskerCollisionDistances( self, whiskerExtension, direction, obstacles ):
-		leftDistance = -1
-		rightDistance = -1
+	def mostThreateningObstacle( self, whiskerExtension, direction, obstacles ):
 		minDistance = -1
+		mostThreatening = None
 
 		whiskerLength = self.size[1] + whiskerExtension
 		leftWhisker = ( self.Position[0] - ( direction[0]*self.size[1] + direction[1]*self.size[0] )/2,
@@ -123,7 +122,7 @@ class TankEntity:
                                                      ( leftWhisker[1] + rightWhisker[1] ) / 2,
                                                      direction[0], direction[1] )
 
-            # if the shortest distance is close enough to prompt turning,
+            # if the shortest distance is close enough to prompt turning, update closest collision distances
 			fMin = ( -1 if ( -1 == fLeft and -1 == fRight and -1 == fCenter )
                      else fLeft if ( -1 == fRight and -1 == fCenter )
                      else fRight if ( -1 == fLeft and -1 == fCenter )
@@ -132,34 +131,24 @@ class TankEntity:
                      else min( fLeft, fCenter ) if ( -1 == fRight )
                      else min( fRight, fCenter ) if ( -1 == fLeft )
                      else min( fLeft, fRight, fCenter ) )
-			if( -1 != fMin and fMin < whiskerLength ):
-
-                # make sure at least one of the left and right whiskers registers the collision
-				if( -1 != fCenter and -1 == fLeft and -1 == fRight ):
-					fEndLeft = self.level.distanceToObstacle( obstacle[0], obstacle[1],
-                                                              leftWhisker[2], leftWhisker[3],
-                                                              direction[1], -direction[0] )
-					fEndRight = self.level.distanceToObstacle( obstacle[0], obstacle[1],
-                                                               rightWhisker[2], rightWhisker[3],
-                                                               -direction[1], direction[0] )
-					if( fEndLeft < fEndRight ):
-						fLeft = fCenter
-					else:
-						fRight = fCenter
-
-				# update closest collision distances
-				if( -1 == minDistance or ( -1 != fMin and fMin < minDistance ) ):
-					minDistance = fMin
-				if( -1 == leftDistance or ( -1 != fLeft and fLeft < leftDistance ) ):
-					leftDistance = fLeft
-				if( -1 == rightDistance or ( -1 != fRight and fRight < rightDistance ) ):
-					rightDistance = fRight
+			if( -1 != fMin and fMin < whiskerLength and ( -1 == minDistance or fMin < minDistance ) ):
+				minDistance = fMin
+				mostThreatening = obstacle
 
             # end of checking obstacles
 
-		return ( leftDistance, rightDistance, minDistance )
+		return mostThreatening
 
-	def avoidCollisions( self, turnDistance, turnPower, breakPower, fDeltaTime = 0.0 ):
+	def turnDirection( self, obstacle, whiskerLength, direction ):
+		corners = self.level.toCorners( obstacle[0], obstacle[1] )
+		center = ( ( corners[0] + corners[2] ) / 2, ( corners[1] + corners[3] ) / 2 )
+		whiskerEnd = ( self.Position[0] + direction[0]*( self.size[1]/2 + whiskerLength ),
+                       self.Position[1] + direction[1]*( self.size[1]/2 + whiskerLength ) )
+		turn = ( whiskerEnd[0] - center[0], whiskerEnd[1] - center[1] )
+		correction = math.sqrt( turn[0]**2 + turn[1]**2 )
+		return ( turn[0] * correction, turn[1] * correction )
+
+	def avoidCollisions( self, turnDistance, turnPower, fDeltaTime = 0.0 ):
 
 		# if inside an obstacle, it's far too late.  Just keep going.
 		xGrid, yGrid = self.level.toGrid( self.Position[0], self.Position[1] )
@@ -178,23 +167,17 @@ class TankEntity:
 		if( 0 == len( obstacles ) ):
 			return ( 0.0, 0.0 )
             
-		# "whiskers" should intersect with any obstacle edges close enough to worry about colliding
-		left, right, min = self.whiskerCollisionDistances( turnDistance + speed*fDeltaTime, direction, obstacles )
+		# get the most threatening obstacle
+		mostThreatening = self.mostThreateningObstacle( turnDistance + speed*fDeltaTime, direction, obstacles )
 
-        # if neither whisker registered a collision, return no force
-		if( -1 == left and -1 == right ):
+        # if no obstacles threaten collision, return no force
+		if( None == mostThreatening ):
 			return ( 0.0, 0.0 )
 
 		# calculate turn force
 		turnForce = speed * turnPower
-		breakForce = 0
-		if( min >= self.size[1] ):
-			breakForce = speed * breakPower * turnDistance**2 / ( min - self.size[1] )**2
-		if( ( left == right and bool(random.getrandbits(1)) ) or
-            -1 == right or ( -1 != left and left < right ) ):
-			turnForce *= -1
-		return ( -direction[0]*breakForce - direction[1]*turnForce,
-                 -direction[1]*breakForce + direction[0]*turnForce )
+		turn = self.turnDirection( mostThreatening, speed*fDeltaTime, direction )
+		return ( turn[0] * turnForce, turn[1] * turnForce )
 
 	def wander( self, wanderPower, wanderOffset, wanderRadius, changeRadius, fDeltaTime = 0.0, changeInterval = 0.0 ):
 		self.WanderTime += fDeltaTime
@@ -235,7 +218,7 @@ class TankEntity:
 			self.RemovingTarget = False
 
 	def calculateForce( self, fDeltaTime ):
-		forces = [ self.avoidCollisions( 50, 10, 20, fDeltaTime ) ]
+		forces = [ self.avoidCollisions( 50, 1, fDeltaTime ) ]
 		if( None == self.Waypoint or
             not self.level.lineOfSight( self.Position[0], self.Position[1],
                                         self.Waypoint[0], self.Waypoint[1],
@@ -248,9 +231,6 @@ class TankEntity:
 				forces.append( self.accelerateTo( 250, 250, 10 ) )
 			if( self.Waypoint == self.Target and self.isWithin( self.Waypoint[0], self.Waypoint[1], 80 ) ):
 				forces.append( self.slowWithin( self.Waypoint[0], self.Waypoint[1], 80, 20 ) )
-				if( self.isWithin( self.Waypoint[0], self.Waypoint[1], 40 ) ):
-					self.Target = None
-					self.recalculateRoute()
 		totalForce = ( 0.0, 0.0 )
 		for force in forces:
 			totalForce = ( totalForce[0] + force[0], totalForce[1] + force[1] )
@@ -277,6 +257,11 @@ class TankEntity:
 
         # calculate position, velocity, and rotation
 		self.applyForce( force, fDeltaTime )
+
+        # remove target if arrived at
+		if( None != self.Target and self.Waypoint == self.Target and self.isWithin( self.Waypoint[0], self.Waypoint[1], 40 ) ):
+			self.Target = None
+			self.recalculateRoute()
 
         # move OpenGL sprite and turret sprite
 		AIE.PositionSprite( self.spriteID, math.degrees( -self.Rotation - ( math.pi / 2 ) ), self.Position[0], self.Position[1] )

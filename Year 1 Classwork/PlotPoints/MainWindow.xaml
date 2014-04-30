@@ -1,0 +1,21 @@
+﻿<Window x:Class="PlotPoints.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:PlotPoints"
+        Title="*new" Height="350" Width="525">
+    <Grid>
+        <Menu Name="menu1" Height="23" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" Click="MenuItemNew_Click"></MenuItem>
+                <MenuItem Header="_Open..." Click="MenuItemOpen_Click"></MenuItem>
+                <MenuItem Header="_Save..." Click="MenuItemSave_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Paint">
+                <MenuItem Header="_Add Background..." Click="MenuItemAddBackground_Click"></MenuItem>
+                <MenuItem Header="_Clear Background" Click="MenuItemClearBackground_Click"></MenuItem>
+                <MenuItem Header="_Erase Circles" Click="MenuItemEraseCircles_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <local:MyCanvas x:Name="canvas1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,23,0,0" Cursor="Cross" ClipToBounds="True" Background="#00000000" />
+    </Grid>
+</Window>
