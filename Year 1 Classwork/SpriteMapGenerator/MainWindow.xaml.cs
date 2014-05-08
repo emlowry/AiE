@@ -78,8 +78,28 @@ namespace SpriteMapGenerator
 
         void CommandBindingPlaceImage_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            //TODO
-            ShowNotImplementedMessage(e);
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Title = "Load a background image";
+            dlg.Filter = "All Images|*.bmp;*.gif;*.jpeg;*.jpg;*.png;*.tiff;*.tif|" +
+                         "All Files|*.*|" +
+                         "Windows Bitmap|*.bmp|" +
+                         "Graphics Interchange Format|*.gif|" +
+                         "Joint Photographics Experts Group|*.jpeg;*.jpg|" +
+                         "Portable Network Graphics|*.png|" +
+                         "Tagged Image File Format|*.tiff;*.tif"; // Filter files by extension 
+
+            // Show open file dialog box 
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process open file dialog box results 
+            if (result == true)
+            {
+                // grab the file name of the image 
+                string filename = dlg.FileName;
+
+                // and load the image 
+                sheetCanvas.AddSprite(new Sprite(filename));
+            }
         }
 
         void CommandBindingCut_CanExecute(object target, CanExecuteRoutedEventArgs e)
@@ -106,25 +126,19 @@ namespace SpriteMapGenerator
 
         void CommandBindingPaste_CanExecute(object target, CanExecuteRoutedEventArgs e)
         {
-            if (System.Windows.Clipboard.ContainsImage())
-            {
-                e.CanExecute = true;
-            }
-            else if (System.Windows.Clipboard.ContainsText(TextDataFormat.Xaml))
-            {
-                //string xaml = System.Windows.Clipboard.GetText(TextDataFormat.Xaml);
-                e.CanExecute = false/*TODO check if xaml contains sprite data*/;
-            }
-            else
-            {
-                e.CanExecute = false;
-            }
+            e.CanExecute = Sprite.CanCreateFromClipboard();
         }
 
         void CommandBindingPaste_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            //TODO
-            ShowNotImplementedMessage(e);
+            Sprite[] sprites = Sprite.CreateFromClipboard();
+            foreach (Sprite sprite in sprites)
+            {
+                if (null != sprite)
+                {
+                    sheetCanvas.AddSprite(sprite);
+                }
+            }
         }
 
         void CommandBindingDelete_CanExecute(object target, CanExecuteRoutedEventArgs e)
