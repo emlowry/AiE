@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -10,10 +11,9 @@ using System.Xml;
 
 namespace SpriteMapGenerator
 {
-    public class Sprite : Canvas
+    public class Sprite
     {
         BitmapSource source;
-        //Rect sourceSlice = new Rect(0,0,0,0);
 
         // Accessors for sprite image data source
         public BitmapSource Source
@@ -23,85 +23,48 @@ namespace SpriteMapGenerator
             {
                 if (value != source)
                 {
-                    /*if (value == null)
-                    {
-                        sourceSlice = new Rect(0, 0, 0, 0);
-                    }
-                    else if (sourceSlice.Right > value.PixelWidth ||
-                             sourceSlice.Bottom > value.PixelHeight)
-                    {
-                        Point shift = new Point( sourceSlice.Right - value.PixelWidth,
-                                                 sourceSlice.Bottom - value.PixelHeight );
-                        sourceSlice = new Rect(Math.Max(sourceSlice.Left - shift.X, 0),
-                                               Math.Max(sourceSlice.Top - shift.Y, 0),
-                                               value.PixelWidth,
-                                               value.PixelHeight);
-                    }/**/
                     source = value;
-                    Width = (null == source) ? 0 : source.PixelWidth;
-                    Height = (null == source) ? 0 : source.PixelHeight;
-                    InvalidateVisual();
+                    Size = (null == source) ? new Size(0,0)
+                        : new Size(source.PixelWidth, source.PixelHeight);
                 }
             }
         }
 
-        /*// Accessors for source slice dimensions
-        public Rect SourceSlice
-        {
-            get { return sourceSlice; }
-            set
-            {
-                if (null == source)
-                {
-                    return;
-                }
-                Rect correctedValue = new Rect(Math.Max(Math.Round(value.Left), 0),
-                                               Math.Max(Math.Round(value.Top), 0),
-                                               Math.Min(Math.Round(value.Right), source.PixelWidth),
-                                               Math.Min(Math.Round(value.Bottom), source.PixelHeight));
-                if (correctedValue != sourceSlice)
-                {
-                    sourceSlice = correctedValue;
-                    InvalidateVisual();
-                }
-            }
-        }/**/
+        // Size
+        public Size Size { get; protected set; }
+        public int Width { get { return (int)Size.Width; } }
+        public int Height { get { return (int)Size.Height; } }
 
         // Location
-        public double Left
+        Point location;
+        public Point Location
         {
-            get { return Canvas.GetLeft(this); }
-            set
-            {
-                if (value != Canvas.GetLeft(this))
-                {
-                    Canvas.SetLeft(this, value);
-                    InvalidateVisual();
-                }
-            }
+            get { return location; }
+            set { location = new Point((int)value.X, (int)value.Y); }
         }
-        public double Top
+        public int X
         {
-            get { return Canvas.GetTop(this); }
-            set
-            {
-                if (value != Canvas.GetTop(this))
-                {
-                    Canvas.SetTop(this, value);
-                    InvalidateVisual();
-                }
-            }
+            get { return (int)location.X; }
+            set { location.X = value; }
         }
-        public Rect Boundary
+        public int Y
         {
-            get { return new Rect(Left, Top, Left + Width, Top + Height); }
+            get { return (int)location.X; }
+            set { location.X = value; }
         }
+        public int Left { get { return X; } }
+        public int Top { get { return Y; } }
+        public int Right { get { return X + Width; } }
+        public int Bottom { get { return Y + Height; } }
+
+        // sprite boundary rectangle
+        public Rect Boundary { get { return new Rect(Location, Size); } }
 
         // constructors
         private void Setup()
         {
-            Left = 0;
-            Top = 0;
+            X = 0;
+            Y = 0;
         }
         public Sprite()
         {
@@ -123,7 +86,7 @@ namespace SpriteMapGenerator
             Setup();
             LoadPngData(pngData);
         }
-        public Sprite(System.IO.Stream pngStream)
+        public Sprite(Stream pngStream)
         {
             Setup();
             LoadPngStream(pngStream);
@@ -147,7 +110,7 @@ namespace SpriteMapGenerator
         }
 
         // load image from a stream containing PNG data
-        public void LoadPngStream(System.IO.Stream pngStream)
+        public void LoadPngStream(Stream pngStream)
         {
             PngBitmapDecoder decoder =
                 new PngBitmapDecoder(pngStream,
@@ -167,12 +130,14 @@ namespace SpriteMapGenerator
                 Source = null;
                 return;
             }
-            LoadPngStream(new System.IO.MemoryStream(pngData));
+            LoadPngStream(new MemoryStream(pngData));
         }
 
         // load image and location from xml node
         public void LoadXml(XmlNode node)
         {
+            int i;
+
             // load image file or data
             if (node.Attributes["src"] != null &&
                 node.Attributes["src"].Value.Length > 0)
@@ -183,22 +148,35 @@ namespace SpriteMapGenerator
             {
                 LoadPngData(Convert.FromBase64String(node.InnerText));
             }
+
+            // load image dimensions, if no data is available
             else
             {
                 Source = null;
+                Size size = new Size(0,0);
+                if (node.Attributes["w"] != null &&
+                    int.TryParse(node.Attributes["w"].Value, out i))
+                {
+                    size.Width = i;
+                }
+                if (node.Attributes["h"] != null &&
+                    int.TryParse(node.Attributes["h"].Value, out i))
+                {
+                    size.Height = i;
+                }
+                this.Size = size;
             }
 
             // update position
-            double d;
             if (node.Attributes["x"] != null &&
-                double.TryParse(node.Attributes["x"].Value, out d))
+                int.TryParse(node.Attributes["x"].Value, out i))
             {
-                Left = d;
+                X = i;
             }
             if (node.Attributes["y"] != null &&
-                double.TryParse(node.Attributes["y"].Value, out d))
+                int.TryParse(node.Attributes["y"].Value, out i))
             {
-                Top = d;
+                Y = i;
             }
         }
 
@@ -217,36 +195,27 @@ namespace SpriteMapGenerator
             {
                 PngBitmapEncoder encoder = new PngBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(source));
-                System.IO.MemoryStream memory = new System.IO.MemoryStream();
+                MemoryStream memory = new MemoryStream();
                 encoder.Save(memory);
                 element.InnerText = Convert.ToBase64String(memory.ToArray());
             }
 
             // add size attributes
             XmlAttribute xAttribute = document.CreateAttribute("x");
-            xAttribute.Value = Left.ToString();
-            element.AppendChild(xAttribute);
+            xAttribute.Value = X.ToString();
+            element.Attributes.Append(xAttribute);
             XmlAttribute yAttribute = document.CreateAttribute("y");
-            yAttribute.Value = Top.ToString();
-            element.AppendChild(yAttribute);
+            yAttribute.Value = Y.ToString();
+            element.Attributes.Append(yAttribute);
             XmlAttribute wAttribute = document.CreateAttribute("w");
             wAttribute.Value = Width.ToString();
-            element.AppendChild(xAttribute);
+            element.Attributes.Append(wAttribute);
             XmlAttribute hAttribute = document.CreateAttribute("h");
             hAttribute.Value = Height.ToString();
-            element.AppendChild(hAttribute);
+            element.Attributes.Append(hAttribute);
 
             // return
             return element;
-        }
-
-        // draw the sprite
-        protected override void OnRender(DrawingContext dc)
-        {
-            if (source != null)
-            {
-                dc.DrawImage(this.Source, new Rect(0, 0, Width, Height));
-            }
         }
 
         // does the clipboard contain data that can be converted to a sprite?
@@ -254,7 +223,29 @@ namespace SpriteMapGenerator
         {
             if (Clipboard.ContainsText(TextDataFormat.Xaml))
             {
-                //TODO implement check for valid xml data
+                XmlDocument document = new XmlDocument();
+                try
+                {
+                    document.LoadXml(Clipboard.GetText(TextDataFormat.Xaml));
+                    if (document.SelectNodes("//sprite").Count > 0)
+                    {
+                        return true;
+                    }
+                }
+                catch { }
+            }
+            if (Clipboard.ContainsText())
+            {
+                XmlDocument document = new XmlDocument();
+                try
+                {
+                    document.LoadXml(Clipboard.GetText());
+                    if (document.SelectNodes("//sprite").Count > 0)
+                    {
+                        return true;
+                    }
+                }
+                catch { }
             }
             if (Clipboard.ContainsData("PNG") || Clipboard.ContainsImage())
             {
@@ -266,16 +257,48 @@ namespace SpriteMapGenerator
         // return a sprite created from data on the clipboad
         public static Sprite[] CreateFromClipboard()
         {
+            List<Sprite> sprites = new List<Sprite>();
             if (Clipboard.ContainsText(TextDataFormat.Xaml))
             {
-                //TODO read xml data from clipboard
+                XmlDocument document = new XmlDocument();
+                try
+                {
+                    document.LoadXml(Clipboard.GetText(TextDataFormat.Xaml));
+                    XmlNodeList nodes = document.SelectNodes("//sprite");
+                    if (nodes.Count > 0)
+                    {
+                        foreach (XmlNode sprite in nodes)
+                        {
+                            sprites.Add(new Sprite(sprite));
+                        }
+                        return sprites.ToArray();
+                    }
+                }
+                catch { }
+            }
+            if (Clipboard.ContainsText())
+            {
+                XmlDocument document = new XmlDocument();
+                try
+                {
+                    document.LoadXml(Clipboard.GetText());
+                    XmlNodeList nodes = document.SelectNodes("//sprite");
+                    if (nodes.Count > 0)
+                    {
+                        foreach (XmlNode sprite in nodes)
+                        {
+                            sprites.Add(new Sprite(sprite));
+                        }
+                        return sprites.ToArray();
+                    }
+                }
+                catch { }
             }
             if (Clipboard.ContainsData("PNG"))
             {
                 Object pngObject = Clipboard.GetData("PNG");
                 if (pngObject is System.IO.MemoryStream)
                 {
-                    List<Sprite> sprites = new List<Sprite>();
                     PngBitmapDecoder decoder =
                         new PngBitmapDecoder(pngObject as System.IO.MemoryStream,
                                              BitmapCreateOptions.None,
@@ -292,7 +315,7 @@ namespace SpriteMapGenerator
             }
             if (Clipboard.ContainsImage())
             {
-                return new Sprite[]{new Sprite(ClipboardDibDecoder.GetBitmapFrame())};
+                return new Sprite[] { new Sprite(ClipboardDibDecoder.GetBitmapFrame()) };
             }
             return new Sprite[0];
         }

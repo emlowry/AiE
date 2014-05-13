@@ -47,8 +47,10 @@
                 <MenuItem Command="SelectAll" />
             </MenuItem>
         </Menu>
-        <ScrollViewer Name="sheetViewer" Grid.Row="1" Grid.Column="0" Background="{StaticResource TransparencyPattern}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <local:SheetCanvas x:Name="sheetCanvas" />
+        <ScrollViewer Name="sheetViewer" Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Border BorderThickness="1" BorderBrush="Black" Background="{StaticResource TransparencyPattern}" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <local:SheetCanvas x:Name="sheetCanvas" Width="128" Height="128" />
+            </Border>
         </ScrollViewer>
     </Grid>
 </Window>
