@@ -59,6 +59,7 @@
     <Compile Include="ClipboardDibDecoder.cs" />
     <Compile Include="SheetCanvas.cs" />
     <Compile Include="Sprite.cs" />
+    <Compile Include="SpriteBin.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

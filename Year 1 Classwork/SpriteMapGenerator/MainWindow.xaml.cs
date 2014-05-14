@@ -279,5 +279,45 @@ namespace SpriteMapGenerator
         {
             sheetCanvas.SelectAll();
         }
+
+        /**
+         * Arrange Menu Event Handlers
+         */
+
+        void CommandBindingRearrange_CanExecute(object target, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (sheetCanvas.Sprites > 0);
+        }
+
+        void CommandBindingRearrange_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            sheetCanvas.Rearrange();
+        }
+
+        void CommandBindingAutoArrange_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            sheetCanvas.AutoArrange = !sheetCanvas.AutoArrange;
+            //autoArrangeMenuItem.IsChecked = sheetCanvas.AutoArrange;
+        }
+
+        void CommandBindingArrangeShapeDown_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            switch (sheetCanvas.Shape)
+            {
+                case SpriteBin.BinShape.Square: sheetCanvas.Shape = SpriteBin.BinShape.Tall; break;
+                case SpriteBin.BinShape.Tall: sheetCanvas.Shape = SpriteBin.BinShape.Wide; break;
+                default: sheetCanvas.Shape = SpriteBin.BinShape.Square; break;
+            }
+        }
+
+        void CommandBindingArrangeShapeUp_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            switch (sheetCanvas.Shape)
+            {
+                case SpriteBin.BinShape.Square: sheetCanvas.Shape = SpriteBin.BinShape.Wide; break;
+                case SpriteBin.BinShape.Wide: sheetCanvas.Shape = SpriteBin.BinShape.Tall; break;
+                default: sheetCanvas.Shape = SpriteBin.BinShape.Square; break;
+            }
+        }
     }
 }

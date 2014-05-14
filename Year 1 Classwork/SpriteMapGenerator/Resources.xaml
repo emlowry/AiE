@@ -2,6 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <RoutedUICommand x:Key="PlaceImage" Text="Place Image" />
     <RoutedUICommand x:Key="Export" Text="Export" />
+    <RoutedUICommand x:Key="Rearrange" Text="Rearrange" />
+    <RoutedCommand x:Key="AutoArrange" />
+    <RoutedCommand x:Key="ArrangeShapeDown" />
+    <RoutedCommand x:Key="ArrangeShapeUp" />
     <DrawingBrush x:Key="TransparencyPattern" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute">
         <DrawingBrush.Drawing>
             <GeometryDrawing Brush="LightGray">

@@ -13,9 +13,9 @@ namespace SpriteMapGenerator
 {
     public class Sprite
     {
-        BitmapSource source;
 
         // Accessors for sprite image data source
+        BitmapSource source;
         public BitmapSource Source
         {
             get { return source; }
@@ -31,26 +31,29 @@ namespace SpriteMapGenerator
         }
 
         // Size
-        public Size Size { get; protected set; }
-        public int Width { get { return (int)Size.Width; } }
-        public int Height { get { return (int)Size.Height; } }
+        public int Width { get; protected set; }
+        public int Height { get; protected set; }
+        public Size Size
+        {
+            get { return new Size(Width, Height); }
+            protected set
+            {
+                Width = (int)value.Width;
+                Height = (int)value.Height;
+            }
+        }
 
         // Location
-        Point location;
+        public int X { get; set; }
+        public int Y { get; set; }
         public Point Location
         {
-            get { return location; }
-            set { location = new Point((int)value.X, (int)value.Y); }
-        }
-        public int X
-        {
-            get { return (int)location.X; }
-            set { location.X = value; }
-        }
-        public int Y
-        {
-            get { return (int)location.X; }
-            set { location.X = value; }
+            get { return new Point(X, Y); }
+            set
+            {
+                X = (int)value.X;
+                Y = (int)value.Y;
+            }
         }
         public int Left { get { return X; } }
         public int Top { get { return Y; } }
@@ -59,41 +62,68 @@ namespace SpriteMapGenerator
 
         // sprite boundary rectangle
         public Rect Boundary { get { return new Rect(Location, Size); } }
+        public static Rect UnionBoundary(ICollection<Sprite> members)
+        {
+            Rect boundary = new Rect();
+            bool hasBoundary = false;
+            foreach (Sprite sprite in members)
+            {
+                if (hasBoundary)
+                {
+                    boundary.Union(sprite.Boundary);
+                }
+                else
+                {
+                    boundary = sprite.Boundary;
+                    hasBoundary = true;
+                }
+            }
+            return boundary;
+        }
+
+        // Name
+        public string Name { get; set; }
+        public void AdjustName()
+        {
+            //TODO - add/increment number to name to avoid duplicates
+        }
 
         // constructors
-        private void Setup()
+        private void Setup(string name)
         {
             X = 0;
             Y = 0;
+            Name = name;
         }
-        public Sprite()
+        public Sprite(int width = 0, int height = 0, string name = "")
         {
-            Setup();
+            Setup(name);
             Source = null;
+            Size = new Size(width, height);
         }
-        public Sprite(BitmapSource source)
+        public Sprite(BitmapSource source, string name = "")
         {
-            Setup();
+            Setup(name);
             Source = source;
         }
-        public Sprite(string filename)
+        public Sprite(string filename, string name = "")
         {
-            Setup();
+            Setup(name.Length > 0 ? name : filename);
             LoadFile(filename);
         }
-        public Sprite(byte[] pngData)
+        public Sprite(byte[] pngData, string name = "")
         {
-            Setup();
+            Setup(name);
             LoadPngData(pngData);
         }
-        public Sprite(Stream pngStream)
+        public Sprite(Stream pngStream, string name = "")
         {
-            Setup();
+            Setup(name);
             LoadPngStream(pngStream);
         }
-        public Sprite(XmlNode node)
+        public Sprite(XmlNode node, string name = "")
         {
-            Setup();
+            Setup(name);
             LoadXml(node);
         }
 
@@ -138,11 +168,23 @@ namespace SpriteMapGenerator
         {
             int i;
 
+            // load name
+            if ((null == Name || Name.Length == 0) &&
+                node.Attributes["name"] != null &&
+                node.Attributes["name"].Value.Length > 0)
+            {
+                Name = node.Attributes["name"].Value;
+            }
+
             // load image file or data
             if (node.Attributes["src"] != null &&
                 node.Attributes["src"].Value.Length > 0)
             {
                 LoadFile(node.Attributes["src"].Value);
+                if (null == Name || Name.Length == 0)
+                {
+                    Name = node.Attributes["src"].Value;
+                }
             }
             else if (node.InnerText.Length > 0)
             {
@@ -199,6 +241,11 @@ namespace SpriteMapGenerator
                 encoder.Save(memory);
                 element.InnerText = Convert.ToBase64String(memory.ToArray());
             }
+
+            // add name attributes
+            XmlAttribute nameAttribute = document.CreateAttribute("name");
+            nameAttribute.Value = Name;
+            element.Attributes.Append(nameAttribute);
 
             // add size attributes
             XmlAttribute xAttribute = document.CreateAttribute("x");
@@ -297,10 +344,10 @@ namespace SpriteMapGenerator
             if (Clipboard.ContainsData("PNG"))
             {
                 Object pngObject = Clipboard.GetData("PNG");
-                if (pngObject is System.IO.MemoryStream)
+                if (pngObject is MemoryStream)
                 {
                     PngBitmapDecoder decoder =
-                        new PngBitmapDecoder(pngObject as System.IO.MemoryStream,
+                        new PngBitmapDecoder(pngObject as MemoryStream,
                                              BitmapCreateOptions.None,
                                              BitmapCacheOption.Default);
                     foreach (BitmapFrame sprite in decoder.Frames)
@@ -310,6 +357,7 @@ namespace SpriteMapGenerator
                             sprites.Add(new Sprite(sprite));
                         }
                     }
+                    SpriteBin.Pack(sprites, SpriteBin.BinShape.Square);
                     return sprites.ToArray();
                 }
             }

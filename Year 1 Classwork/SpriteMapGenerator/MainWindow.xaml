@@ -15,12 +15,24 @@
         <CommandBinding Command="Paste" CanExecute="CommandBindingPaste_CanExecute" Executed="CommandBindingPaste_Executed" />
         <CommandBinding Command="Delete" CanExecute="CommandBindingDelete_CanExecute" Executed="CommandBindingDelete_Executed" />
         <CommandBinding Command="SelectAll" CanExecute="CommandBindingSelectAll_CanExecute" Executed="CommandBindingSelectAll_Executed" />
+        <CommandBinding Command="{StaticResource Rearrange}" CanExecute="CommandBindingRearrange_CanExecute" Executed="CommandBindingRearrange_Executed" />
+        <CommandBinding Command="{StaticResource AutoArrange}" Executed="CommandBindingAutoArrange_Executed" />
+        <CommandBinding Command="{StaticResource ArrangeShapeDown}" Executed="CommandBindingArrangeShapeDown_Executed" />
+        <CommandBinding Command="{StaticResource ArrangeShapeUp}" Executed="CommandBindingArrangeShapeUp_Executed" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Key="S" Modifiers="Control+Alt" Command="SaveAs" />
         <KeyBinding Key="E" Modifiers="Control" Command="{StaticResource Export}" />
         <KeyBinding Key="I" Modifiers="Control" Command="{StaticResource PlaceImage}" />
         <KeyBinding Key="Insert" Command="{StaticResource PlaceImage}" />
+        <KeyBinding Key="R" Modifiers="Control" Command="{StaticResource Rearrange}" />
+        <KeyBinding Key="F4" Command="{StaticResource Rearrange}" />
+        <KeyBinding Key="R" Modifiers="Control+Alt" Command="{StaticResource AutoArrange}" />
+        <KeyBinding Key="F4" Modifiers="Alt" Command="{StaticResource AutoArrange}" />
+        <KeyBinding Key="R" Modifiers="Control+Shift" Command="{StaticResource ArrangeShapeDown}" />
+        <KeyBinding Key="F4" Modifiers="Shift" Command="{StaticResource ArrangeShapeDown}" />
+        <KeyBinding Key="R" Modifiers="Control+Alt+Shift" Command="{StaticResource ArrangeShapeUp}" />
+        <KeyBinding Key="F4" Modifiers="Shift+Alt" Command="{StaticResource ArrangeShapeUp}" />
     </Window.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -45,6 +57,18 @@
                 <MenuItem Command="Paste" />
                 <MenuItem Command="Delete" />
                 <MenuItem Command="SelectAll" />
+            </MenuItem>
+            <MenuItem Header="_Arrange">
+                <MenuItem Command="{StaticResource Rearrange}" InputGestureText="Ctrl+R" />
+                <MenuItem Name="autoArrangeMenuItem" Header="Arrange Automatically" InputGestureText="Ctrl+Alt+R" IsCheckable="True"
+                          IsChecked="{Binding ElementName=sheetCanvas, Path=AutoArrange}" />
+                <Separator />
+                <MenuItem Name="arrangeSquareMenuItem" Header="Square" IsCheckable="True"
+                          IsChecked="{Binding ElementName=sheetCanvas, Path=ArrangeSquare}" />
+                <MenuItem Name="arrangeTallMenuItem" Header="Vertical Strip" IsCheckable="True"
+                          IsChecked="{Binding ElementName=sheetCanvas, Path=ArrangeTall}" />
+                <MenuItem Name="arrangeWideMenuItem" Header="Horizontal Strip" IsCheckable="True"
+                          IsChecked="{Binding ElementName=sheetCanvas, Path=ArrangeWide}" />
             </MenuItem>
         </Menu>
         <ScrollViewer Name="sheetViewer" Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
