@@ -1,4 +1,16 @@
-﻿using System;
+﻿/******************************************************************************
+ * File:               SpriteBin.cs
+ * Author:             Elizabeth Lowry
+ * Date Created:       May 12, 2014
+ * Description:        Class implementing a sorting algorithm for packing
+ *                      sprites into a collision-free, relatively compact layout
+ *                      of roughly square, vertical strip, or horizontal strip
+ *                      shape.
+ * Last Modified:      May 14, 2014
+ * Last Modification:  Adding header comment.
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +18,7 @@ using System.Windows;
 
 namespace SpriteMapGenerator
 {
-    // This class only exposes a static method for arranging sprites and an enum
+    // This class only exposes static methods for arranging sprites and an enum
     // for indicating what shape to aim for for the sprite sheet as a whole.
     // The sprite packing algorithm was posted by Jake Gordon on May 7, 2011 at
     // http://codeincomplete.com/posts/2011/5/7/bin_packing/ - thanks Mr. Gordon!
@@ -126,6 +138,8 @@ namespace SpriteMapGenerator
         {
             return Pack(sprites, 0, 0, shape);
         }
+
+        // Pack sprites around an existing set of free and filled space.
         public static SpriteBin Pack(SpriteBin bin, IEnumerable<Sprite> sprites,
                                      BinShape shape = BinShape.Square)
         {
@@ -141,6 +155,8 @@ namespace SpriteMapGenerator
             bin.Pack(sorted, shape);
             return bin;
         }
+
+        // Pack a single sprite into a bin
         public static SpriteBin Pack(Sprite sprite, int x = 0, int y = 0)
         {
             if (null == sprite)
@@ -295,7 +311,7 @@ namespace SpriteMapGenerator
             Used = true;
             if (!Down.Pack(sprite))
             {
-                throw new Exception("Sprites not sorted properly by packer");
+                throw new Exception("It shouldn't be possible to reach this line");
             }
         }
 
@@ -319,7 +335,7 @@ namespace SpriteMapGenerator
             Used = true;
             if (!Right.Pack(sprite))
             {
-                throw new Exception("Sprites not sorted properly by packer");
+                throw new Exception("It shouldn't be possible to reach this line");
             }
         }
     }

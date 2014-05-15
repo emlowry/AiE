@@ -1,4 +1,13 @@
-﻿using System;
+﻿/******************************************************************************
+ * File:               MainWindow.xaml.cs
+ * Author:             Elizabeth Lowry
+ * Date Created:       May 5, 2014
+ * Description:        C# backend for the main window of the WPF App.
+ * Last Modified:      May 14, 2014
+ * Last Modification:  Adding header comment.
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +20,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-//using System.Windows.Shapes;
 using System.Xml;
 
 namespace SpriteMapGenerator
@@ -21,6 +29,7 @@ namespace SpriteMapGenerator
     /// </summary>
     public partial class MainWindow : Window
     {
+        // Current file, if any
         Uri fileUri = null;
 
         public MainWindow()
@@ -30,14 +39,27 @@ namespace SpriteMapGenerator
 
         void CopySelected()
         {
-            if (sheetCanvas.Selections > 0)
+            if (sheetCanvas.SelectionCount > 0)
             {
+                // Save text, both regular and xaml
                 DataObject data = new DataObject();
-                string xml = sheetCanvas.SelectedXmlText();
+                XmlDocument document = sheetCanvas.SelectedXml();
+                StringWriter writer = new StringWriter();
+                document.Save(writer);
+                string xml = writer.ToString();
                 data.SetText(xml, TextDataFormat.Xaml);
                 data.SetText(xml, TextDataFormat.Text);
-                data.SetData("PNG", sheetCanvas.SelectedPngData());
-                data.SetImage(sheetCanvas.SelectedBmpImage());
+
+                // Save image with transparency
+                MemoryStream ms = new MemoryStream();
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(sheetCanvas.SelectedBitmap());
+                encoder.Save(ms);
+                data.SetData("PNG", ms);
+
+                // Save image without transparency
+                ms = new MemoryStream();
+                data.SetImage(sheetCanvas.SelectedBitmap(Brushes.White));
                 Clipboard.SetDataObject(data);
             }
         }
@@ -52,11 +74,21 @@ namespace SpriteMapGenerator
             }
         }
 
-        void ShowNotImplementedMessage(ExecutedRoutedEventArgs e)
+        /**
+         * Mouse Event Handlers
+         */
+
+        void CanvasMoveHandler(object sender, MouseEventArgs e)
         {
-            string command = ((RoutedUICommand)e.Command).Text;
-            MessageBox.Show("The \"" + command + "\" command is not yet implemented!",
-                            "Command not implemented", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                sheetCanvas.Drag(e.GetPosition(sheetCanvas));
+            }
+        }
+
+        void CanvasLeftButtonUpHandler(object sender, MouseButtonEventArgs e)
+        {
+            sheetCanvas.EndDrag(e.GetPosition(sheetCanvas));
         }
 
         /**
@@ -149,6 +181,8 @@ namespace SpriteMapGenerator
             }
         }
 
+        // Export the sprite sheet as either a PNG image or as XML without
+        // embedded base64 PNG image data
         void CommandBindingExport_Executed(object target, ExecutedRoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -174,28 +208,25 @@ namespace SpriteMapGenerator
                 Uri uri = new Uri(dlg.FileName);
                 if (uri != null && uri.IsFile)
                 {
+                    // Export to image-free xml
                     if (dlg.FilterIndex == 1)
                     {
                         Save(uri, false);
                     }
+                    // Export to PNG
                     else
                     {
-                        using (FileStream stream = new FileStream(uri.LocalPath, FileMode.Create))
-                        {
-                            PngBitmapEncoder encoder = new PngBitmapEncoder();
-                            encoder.Frames.Add(sheetCanvas.ToBitmap());
-                            encoder.Save(stream);
-                        }
+                        FileStream stream = new FileStream(uri.LocalPath, FileMode.Create)
+                        PngBitmapEncoder encoder = new PngBitmapEncoder();
+                        encoder.Frames.Add(sheetCanvas.ToBitmap());
+                        encoder.Save(stream);
                     }
                 }
             }
         }
 
-        /**
-         * Edit Menu Event Handlers
-         */
-
-        void CommandBindingPlaceImage_Executed(object target, ExecutedRoutedEventArgs e)
+        // Add images as new sprites
+        void CommandBindingImport_Executed(object target, ExecutedRoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.Multiselect = true;
@@ -215,16 +246,30 @@ namespace SpriteMapGenerator
             if (result == true)
             {
                 // grab the file name of each image and load as a sprite
+                List<Sprite> sprites = new List<Sprite>();
                 foreach (string filename in dlg.FileNames)
                 {
-                    sheetCanvas.AddSprite(new Sprite(filename));
+                    sprites.Add(new Sprite(filename));
                 }
+
+                // If the canvas isn't in autoarrange mode, spread out the new sprites now
+                if (!sheetCanvas.AutoArrange)
+                {
+                    SpriteBin.Pack(sprites, sheetCanvas.SpriteLayout);
+                }
+
+                // Add sprites to sheet
+                sheetCanvas.AddSprites(sprites, true);
             }
         }
 
+        /**
+         * Edit Menu Event Handlers
+         */
+
         void CommandBindingCut_CanExecute(object target, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (sheetCanvas.Selections > 0);
+            e.CanExecute = (sheetCanvas.SelectionCount > 0);
         }
 
         void CommandBindingCut_Executed(object target, ExecutedRoutedEventArgs e)
@@ -235,7 +280,7 @@ namespace SpriteMapGenerator
 
         void CommandBindingCopy_CanExecute(object target, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (sheetCanvas.Selections > 0);
+            e.CanExecute = (sheetCanvas.SelectionCount > 0);
         }
 
         void CommandBindingCopy_Executed(object target, ExecutedRoutedEventArgs e)
@@ -251,18 +296,12 @@ namespace SpriteMapGenerator
         void CommandBindingPaste_Executed(object target, ExecutedRoutedEventArgs e)
         {
             Sprite[] sprites = Sprite.CreateFromClipboard();
-            foreach (Sprite sprite in sprites)
-            {
-                if (null != sprite)
-                {
-                    sheetCanvas.AddSprite(sprite);
-                }
-            }
+            sheetCanvas.AddSprites(sprites, true);
         }
 
         void CommandBindingDelete_CanExecute(object target, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (sheetCanvas.Selections > 0);
+            e.CanExecute = (sheetCanvas.SelectionCount > 0);
         }
 
         void CommandBindingDelete_Executed(object target, ExecutedRoutedEventArgs e)
@@ -272,12 +311,32 @@ namespace SpriteMapGenerator
 
         void CommandBindingSelectAll_CanExecute(object target, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (sheetCanvas.Sprites > 0);
+            e.CanExecute = (sheetCanvas.SpriteCount > 0);
         }
 
         void CommandBindingSelectAll_Executed(object target, ExecutedRoutedEventArgs e)
         {
             sheetCanvas.SelectAll();
+        }
+
+        void CommandBindingSelectNone_CanExecute(object target, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (sheetCanvas.SelectionCount > 0);
+        }
+
+        void CommandBindingSelectNone_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            sheetCanvas.SelectNone();
+        }
+
+        void CommandBindingSelectInverse_CanExecute(object target, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = (sheetCanvas.SpriteCount > 0);
+        }
+
+        void CommandBindingSelectInverse_Executed(object target, ExecutedRoutedEventArgs e)
+        {
+            sheetCanvas.SelectInverse();
         }
 
         /**
@@ -286,7 +345,7 @@ namespace SpriteMapGenerator
 
         void CommandBindingRearrange_CanExecute(object target, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (sheetCanvas.Sprites > 0);
+            e.CanExecute = (sheetCanvas.SpriteCount > 0);
         }
 
         void CommandBindingRearrange_Executed(object target, ExecutedRoutedEventArgs e)
@@ -300,23 +359,23 @@ namespace SpriteMapGenerator
             //autoArrangeMenuItem.IsChecked = sheetCanvas.AutoArrange;
         }
 
+        // Scroll up or down through sprite layout options
         void CommandBindingArrangeShapeDown_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            switch (sheetCanvas.Shape)
+            switch (sheetCanvas.SpriteLayout)
             {
-                case SpriteBin.BinShape.Square: sheetCanvas.Shape = SpriteBin.BinShape.Tall; break;
-                case SpriteBin.BinShape.Tall: sheetCanvas.Shape = SpriteBin.BinShape.Wide; break;
-                default: sheetCanvas.Shape = SpriteBin.BinShape.Square; break;
+                case SpriteBin.BinShape.Square: sheetCanvas.SpriteLayout = SpriteBin.BinShape.Tall; break;
+                case SpriteBin.BinShape.Tall: sheetCanvas.SpriteLayout = SpriteBin.BinShape.Wide; break;
+                default: sheetCanvas.SpriteLayout = SpriteBin.BinShape.Square; break;
             }
         }
-
         void CommandBindingArrangeShapeUp_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            switch (sheetCanvas.Shape)
+            switch (sheetCanvas.SpriteLayout)
             {
-                case SpriteBin.BinShape.Square: sheetCanvas.Shape = SpriteBin.BinShape.Wide; break;
-                case SpriteBin.BinShape.Wide: sheetCanvas.Shape = SpriteBin.BinShape.Tall; break;
-                default: sheetCanvas.Shape = SpriteBin.BinShape.Square; break;
+                case SpriteBin.BinShape.Square: sheetCanvas.SpriteLayout = SpriteBin.BinShape.Wide; break;
+                case SpriteBin.BinShape.Wide: sheetCanvas.SpriteLayout = SpriteBin.BinShape.Tall; break;
+                default: sheetCanvas.SpriteLayout = SpriteBin.BinShape.Square; break;
             }
         }
     }

@@ -1,4 +1,15 @@
-﻿using System;
+﻿/******************************************************************************
+ * File:               AnimatedPattern.cs
+ * Author:             Elizabeth Lowry
+ * Date Created:       May 7, 2014
+ * Description:        Static class with a function for generating the type of
+ *                      animated pattern I use for outlining sprites on the
+ *                      sheet.
+ * Last Modified:      May 14, 2014
+ * Last Modification:  Adding header comment.
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +19,8 @@ using System.Windows.Media.Animation;
 
 namespace SpriteMapGenerator
 {
+    // static class for generating the type of animated pattern I use for sprite
+    // outlines.
     public static class AnimatedPattern
     {
         public static DrawingBrush Create(Color color1, Color color2,

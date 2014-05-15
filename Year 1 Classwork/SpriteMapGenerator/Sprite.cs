@@ -1,8 +1,18 @@
-﻿using System;
+﻿/******************************************************************************
+ * File:               Sprite.cs
+ * Author:             Elizabeth Lowry
+ * Date Created:       May 6, 2014
+ * Description:        Class representing a single sprite.
+ * Last Modified:      May 14, 2014
+ * Last Modification:  Adding header comment.
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -11,10 +21,31 @@ using System.Xml;
 
 namespace SpriteMapGenerator
 {
+    // Manages a single sprite image on a sheet
     public class Sprite
     {
 
-        // Accessors for sprite image data source
+        // Name
+        protected const string DEFAULT_NAME = "sprite";
+        protected const string COPY_SUFFIX = " - copy";
+        protected string name;
+        public string Name
+        {
+            get
+            {
+                if (null == name || 0 == name.Length)
+                {
+                    name = DEFAULT_NAME;
+                }
+                return name;
+            }
+            set
+            {
+                name = Regex.Replace(value, @"[\s-[ ]]", "").Trim();
+            }
+        }
+
+        // Image data source
         BitmapSource source;
         public BitmapSource Source
         {
@@ -62,39 +93,8 @@ namespace SpriteMapGenerator
 
         // sprite boundary rectangle
         public Rect Boundary { get { return new Rect(Location, Size); } }
-        public static Rect UnionBoundary(ICollection<Sprite> members)
-        {
-            Rect boundary = new Rect();
-            bool hasBoundary = false;
-            foreach (Sprite sprite in members)
-            {
-                if (hasBoundary)
-                {
-                    boundary.Union(sprite.Boundary);
-                }
-                else
-                {
-                    boundary = sprite.Boundary;
-                    hasBoundary = true;
-                }
-            }
-            return boundary;
-        }
-
-        // Name
-        public string Name { get; set; }
-        public void AdjustName()
-        {
-            //TODO - add/increment number to name to avoid duplicates
-        }
 
         // constructors
-        private void Setup(string name)
-        {
-            X = 0;
-            Y = 0;
-            Name = name;
-        }
         public Sprite(int width = 0, int height = 0, string name = "")
         {
             Setup(name);
@@ -126,11 +126,11 @@ namespace SpriteMapGenerator
             Setup(name);
             LoadXml(node);
         }
-
-        // Does this sprite collide with another?
-        public bool IntersectsWith(Sprite sprite)
+        private void Setup(string name)
         {
-            return Boundary.IntersectsWith(sprite.Boundary);
+            X = 0;
+            Y = 0;
+            Name = name;
         }
 
         // load image from file
@@ -265,28 +265,42 @@ namespace SpriteMapGenerator
             return element;
         }
 
+        // Add a suffix indicating that the sprite is a copy of another sprite
+        // with the same name or add/increment a number to the end of the name.
+        public void AdjustName()
+        {
+            if (Name == DEFAULT_NAME ||
+                Name.Substring(Name.Length - COPY_SUFFIX.Length) == COPY_SUFFIX)
+            {
+                Name += " 2";
+            }
+            else if (Regex.IsMatch(Name, "^(" + DEFAULT_NAME + " |.*" + COPY_SUFFIX + " )[0-9]+$"))
+            {
+                string firstPart = Regex.Replace(Name, "[0-9]+$", "");
+                int i;
+                if (int.TryParse(Name.Substring(firstPart.Length), out i))
+                {
+                    Name = firstPart + (i + 1).ToString();
+                }
+            }
+            else
+            {
+                Name += COPY_SUFFIX;
+            }
+        }
+
         // does the clipboard contain data that can be converted to a sprite?
         public static bool CanCreateFromClipboard()
         {
-            if (Clipboard.ContainsText(TextDataFormat.Xaml))
+            if (Clipboard.ContainsText(TextDataFormat.Xaml) || Clipboard.ContainsText())
             {
+                string xml = Clipboard.ContainsText(TextDataFormat.Xaml)
+                             ? Clipboard.GetText(TextDataFormat.Xaml)
+                             : Clipboard.GetText();
                 XmlDocument document = new XmlDocument();
                 try
                 {
-                    document.LoadXml(Clipboard.GetText(TextDataFormat.Xaml));
-                    if (document.SelectNodes("//sprite").Count > 0)
-                    {
-                        return true;
-                    }
-                }
-                catch { }
-            }
-            if (Clipboard.ContainsText())
-            {
-                XmlDocument document = new XmlDocument();
-                try
-                {
-                    document.LoadXml(Clipboard.GetText());
+                    document.LoadXml(xml);
                     if (document.SelectNodes("//sprite").Count > 0)
                     {
                         return true;
@@ -304,13 +318,17 @@ namespace SpriteMapGenerator
         // return a sprite created from data on the clipboad
         public static Sprite[] CreateFromClipboard()
         {
+            // Try for XML first, since it'll have position data
             List<Sprite> sprites = new List<Sprite>();
-            if (Clipboard.ContainsText(TextDataFormat.Xaml))
+            if (Clipboard.ContainsText(TextDataFormat.Xaml) || Clipboard.ContainsText())
             {
+                string xml = Clipboard.ContainsText(TextDataFormat.Xaml)
+                             ? Clipboard.GetText(TextDataFormat.Xaml)
+                             : Clipboard.GetText();
                 XmlDocument document = new XmlDocument();
                 try
                 {
-                    document.LoadXml(Clipboard.GetText(TextDataFormat.Xaml));
+                    document.LoadXml(xml);
                     XmlNodeList nodes = document.SelectNodes("//sprite");
                     if (nodes.Count > 0)
                     {
@@ -323,24 +341,9 @@ namespace SpriteMapGenerator
                 }
                 catch { }
             }
-            if (Clipboard.ContainsText())
-            {
-                XmlDocument document = new XmlDocument();
-                try
-                {
-                    document.LoadXml(Clipboard.GetText());
-                    XmlNodeList nodes = document.SelectNodes("//sprite");
-                    if (nodes.Count > 0)
-                    {
-                        foreach (XmlNode sprite in nodes)
-                        {
-                            sprites.Add(new Sprite(sprite));
-                        }
-                        return sprites.ToArray();
-                    }
-                }
-                catch { }
-            }
+
+            // If XML doesn't work, try PNG data (the default image format messes
+            // with transparency)
             if (Clipboard.ContainsData("PNG"))
             {
                 Object pngObject = Clipboard.GetData("PNG");
@@ -361,11 +364,36 @@ namespace SpriteMapGenerator
                     return sprites.ToArray();
                 }
             }
+
+            // If there wasn't any PNG data, try regular image data
             if (Clipboard.ContainsImage())
             {
                 return new Sprite[] { new Sprite(ClipboardDibDecoder.GetBitmapFrame()) };
             }
+
+            // If nothing works, return an empty list.
             return new Sprite[0];
         }
+
+        // Calculate a boundary that contains all the given sprites
+        public static Rect UnionBoundary(ICollection<Sprite> members)
+        {
+            Rect boundary = new Rect();
+            bool hasBoundary = false;
+            foreach (Sprite sprite in members)
+            {
+                if (hasBoundary)
+                {
+                    boundary.Union(sprite.Boundary);
+                }
+                else
+                {
+                    boundary = sprite.Boundary;
+                    hasBoundary = true;
+                }
+            }
+            return boundary;
+        }
+
     }
 }

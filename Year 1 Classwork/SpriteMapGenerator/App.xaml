@@ -1,4 +1,12 @@
-﻿<Application x:Class="SpriteMapGenerator.App"
+﻿<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ - File:               App.xaml
+ - Author:             Elizabeth Lowry
+ - Date Created:       May 5, 2014
+ - Description:        Sprite map generator app.
+ - Last Modified:      May 14, 2014
+ - Last Modification:  Adding header comment.
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<Application x:Class="SpriteMapGenerator.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
