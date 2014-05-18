@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       May 6, 2014
  * Description:        Canvas representing the sprite sheet as a whole.
- * Last Modified:      May 14, 2014
- * Last Modification:  Adding header comment.
+ * Last Modified:      May 17, 2014
+ * Last Modification:  Minor tweaks.
  ******************************************************************************/
 
 using System;
@@ -61,7 +61,7 @@ namespace SpriteMapGenerator
                 Height = (int)value.Height;
             }
         }
-        public int Width
+        new public int Width
         {
             get { return (int)base.Width; }
             protected set
@@ -75,7 +75,7 @@ namespace SpriteMapGenerator
                 }
             }
         }
-        public int Height
+        new public int Height
         {
             get { return (int)base.Height; }
             protected set
@@ -87,6 +87,54 @@ namespace SpriteMapGenerator
                     NotifyPropertyChanged("Height");
                     InvalidateVisual();
                 }
+            }
+        }
+
+        // Initial size, unlike regular size, can be set by others, but doing so
+        // will only change the actual size of there's nothing currently on the
+        // canvas
+        int initialWidth, initialHeight;
+        public int InitialWidth
+        {
+            get { return initialWidth; }
+            set
+            {
+                if (value != initialWidth)
+                {
+                    initialWidth = value;
+                    NotifyPropertyChanged("InitialSize");
+                    NotifyPropertyChanged("InitialWidth");
+                }
+                if (0 == SpriteCount)
+                {
+                    Width = value;
+                }
+            }
+        }
+        public int InitialHeight
+        {
+            get { return initialHeight; }
+            set
+            {
+                if (value != Height)
+                {
+                    initialHeight = value;
+                    NotifyPropertyChanged("InitialSize");
+                    NotifyPropertyChanged("InitialHeight");
+                }
+                if (0 == SpriteCount)
+                {
+                    Height = value;
+                }
+            }
+        }
+        public Size InitialSize
+        {
+            get { return new Size(InitialWidth, InitialHeight); }
+            set
+            {
+                InitialWidth = (int)value.Width;
+                InitialHeight = (int)value.Height;
             }
         }
 

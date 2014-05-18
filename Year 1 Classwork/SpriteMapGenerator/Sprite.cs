@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       May 6, 2014
  * Description:        Class representing a single sprite.
- * Last Modified:      May 14, 2014
- * Last Modification:  Adding header comment.
+ * Last Modified:      May 17, 2014
+ * Last Modification:  Minor tweaks.
  ******************************************************************************/
 
 using System;
@@ -27,7 +27,8 @@ namespace SpriteMapGenerator
 
         // Name
         protected const string DEFAULT_NAME = "sprite";
-        protected const string COPY_SUFFIX = " - copy";
+        protected const string COPY_SUFFIX = " copy";
+        protected static int autoNamedSprites = 0;
         protected string name;
         public string Name
         {
@@ -35,7 +36,8 @@ namespace SpriteMapGenerator
             {
                 if (null == name || 0 == name.Length)
                 {
-                    name = DEFAULT_NAME;
+                    ++autoNamedSprites;
+                    name = DEFAULT_NAME + " " + autoNamedSprites.ToString();
                 }
                 return name;
             }
@@ -44,6 +46,7 @@ namespace SpriteMapGenerator
                 name = Regex.Replace(value, @"[\s-[ ]]", "").Trim();
             }
         }
+        public static void ResetAutoNamedSpriteCount() { autoNamedSprites = 0; }
 
         // Image data source
         BitmapSource source;

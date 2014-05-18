@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       May 5, 2014
  * Description:        C# backend for the main window of the WPF App.
- * Last Modified:      May 14, 2014
- * Last Modification:  Adding header comment.
+ * Last Modified:      May 17, 2014
+ * Last Modification:  Minor tweaks.
  ******************************************************************************/
 
 using System;
@@ -99,6 +99,7 @@ namespace SpriteMapGenerator
         {
             fileUri = null;
             sheetCanvas.ClearAll();
+            Sprite.ResetAutoNamedSpriteCount();
             this.Title = "new - Sprite Map Generator";
         }
 
@@ -129,6 +130,7 @@ namespace SpriteMapGenerator
                     {
                         // load sprites
                         sheetCanvas.ClearAll();
+                        Sprite.ResetAutoNamedSpriteCount();
                         sheetCanvas.LoadXml(sheet);
 
                         // update window title
@@ -216,7 +218,7 @@ namespace SpriteMapGenerator
                     // Export to PNG
                     else
                     {
-                        FileStream stream = new FileStream(uri.LocalPath, FileMode.Create)
+                        FileStream stream = new FileStream(uri.LocalPath, FileMode.Create);
                         PngBitmapEncoder encoder = new PngBitmapEncoder();
                         encoder.Frames.Add(sheetCanvas.ToBitmap());
                         encoder.Save(stream);
@@ -296,7 +298,7 @@ namespace SpriteMapGenerator
         void CommandBindingPaste_Executed(object target, ExecutedRoutedEventArgs e)
         {
             Sprite[] sprites = Sprite.CreateFromClipboard();
-            sheetCanvas.AddSprites(sprites, true);
+            sheetCanvas.AddSprites(sprites, true, Keyboard.Modifiers & ~ModifierKeys.Control);
         }
 
         void CommandBindingDelete_CanExecute(object target, CanExecuteRoutedEventArgs e)
