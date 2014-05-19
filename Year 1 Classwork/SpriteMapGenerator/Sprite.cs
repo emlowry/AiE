@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       May 6, 2014
  * Description:        Class representing a single sprite.
- * Last Modified:      May 17, 2014
- * Last Modification:  Minor tweaks.
+ * Last Modified:      May 18, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 using System;
@@ -111,7 +111,7 @@ namespace SpriteMapGenerator
         }
         public Sprite(string filename, string name = "")
         {
-            Setup(name.Length > 0 ? name : filename);
+            Setup(name.Length > 0 ? name : Path.GetFileNameWithoutExtension(filename));
             LoadFile(filename);
         }
         public Sprite(byte[] pngData, string name = "")

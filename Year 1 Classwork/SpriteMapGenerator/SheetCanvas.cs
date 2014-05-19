@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       May 6, 2014
  * Description:        Canvas representing the sprite sheet as a whole.
- * Last Modified:      May 17, 2014
- * Last Modification:  Minor tweaks.
+ * Last Modified:      May 18, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 using System;
@@ -418,7 +418,8 @@ namespace SpriteMapGenerator
                 // with this one.
                 foreach (Sprite otherSprite in sprites)
                 {
-                    if (sprite.Boundary.IntersectsWith(otherSprite.Boundary))
+                    if (sprite != otherSprite &&
+                        BoundariesCollide(sprite.Boundary, otherSprite.Boundary))
                     {
                         colliding.Add(sprite);
                         colliding.Add(otherSprite);
@@ -451,19 +452,47 @@ namespace SpriteMapGenerator
             {
                 modifiers = Keyboard.Modifiers;
             }
+            if (null == spritesToAdd || 0 == spritesToAdd.Count())
+            {
+                Select(null, modifiers);
+                return;
+            }
 
             // Add each sprite.
             foreach (Sprite sprite in spritesToAdd)
             {
-                AddSprite(sprite, select, modifiers);
+                if (null != sprite)
+                {
+                    sprites.Add(sprite);
+                }
 
                 // If selecting, add a shift to the modifiers so that all of the
                 // added sprites will be selected.
                 if (select)
                 {
+                    Select(sprite, modifiers);
                     modifiers = (ModifierKeys)modifiers | ModifierKeys.Shift;
                 }
             }
+            NotifyPropertyChanged("SpriteCount");
+
+            // Adjust canvas dimensions
+            if (AutoArrange)
+            {
+                spriteBin = SpriteBin.Pack(spriteBin, spritesToAdd, SpriteLayout);
+                this.Size = spriteBin.Size;
+            }
+            else
+            {
+                CheckCollisions();
+                this.Width = Math.Max(
+                    (SpriteCount > spritesToAdd.Count() ? this.Width : 0),
+                    spritesToAdd.Max(sprite => (null == sprite ? 0 : sprite.Right)));
+                this.Height = Math.Max(
+                    (SpriteCount > spritesToAdd.Count() ? this.Height : 0),
+                    spritesToAdd.Max(sprite => (null == sprite ? 0 : sprite.Bottom)));
+            }
+            InvalidateVisual();
         }
 
         // Select the given sprite
@@ -637,7 +666,7 @@ namespace SpriteMapGenerator
                         }
 
                         // Test
-                        if (boundary1.IntersectsWith(boundary2))
+                        if (BoundariesCollide(boundary1, boundary2))
                         {
                             colliding.Add(toCheck[i]);
                             colliding.Add(toCheck[j]);
@@ -652,6 +681,13 @@ namespace SpriteMapGenerator
                 NotifyPropertyChanged("CollisionCount");
             }
             InvalidateVisual();
+        }
+
+        protected static bool BoundariesCollide(Rect boundary1, Rect boundary2)
+        {
+            Rect intersection = Rect.Intersect(boundary1, boundary2);
+            return (null != intersection && !intersection.IsEmpty &&
+                    intersection.Width * intersection.Height > 0);
         }
 
         // Adjust canvas size to fit all sprites
@@ -736,10 +772,12 @@ namespace SpriteMapGenerator
         // Load sprites from the descendents of the given XML node.
         public void LoadXml(XmlNode node)
         {
+            List<Sprite> spritesToAdd = new List<Sprite>();
             foreach (XmlNode sprite in node.SelectNodes(".//sprite"))
             {
-                AddSprite(new Sprite(sprite));
+                spritesToAdd.Add(new Sprite(sprite));
             }
+            AddSprites(spritesToAdd);
         }
 
         // Generate an XML element containing all the sprites.
