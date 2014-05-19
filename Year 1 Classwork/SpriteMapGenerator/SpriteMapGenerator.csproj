@@ -57,9 +57,15 @@
     </ApplicationDefinition>
     <Compile Include="AnimatedPattern.cs" />
     <Compile Include="ClipboardDibDecoder.cs" />
+    <Compile Include="MainWindow_FileMenu.cs" />
     <Compile Include="SheetCanvas.cs" />
+    <Compile Include="SheetCanvas_Arrange.cs" />
+    <Compile Include="SheetCanvas_Drag.cs" />
+    <Compile Include="SheetCanvas_AddClearSelect.cs" />
+    <Compile Include="SheetCanvas_Geometry.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteBin.cs" />
+    <Compile Include="Sprite_Create.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

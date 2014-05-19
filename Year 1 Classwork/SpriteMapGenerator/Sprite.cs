@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       May 6, 2014
  * Description:        Class representing a single sprite.
- * Last Modified:      May 18, 2014
- * Last Modification:  Debugging.
+ * Last Modified:      May 19, 2014
+ * Last Modification:  Splitting into separate files.
  ******************************************************************************/
 
 using System;
@@ -22,7 +22,7 @@ using System.Xml;
 namespace SpriteMapGenerator
 {
     // Manages a single sprite image on a sheet
-    public class Sprite
+    public partial class Sprite
     {
 
         // Name
@@ -97,131 +97,27 @@ namespace SpriteMapGenerator
         // sprite boundary rectangle
         public Rect Boundary { get { return new Rect(Location, Size); } }
 
-        // constructors
-        public Sprite(int width = 0, int height = 0, string name = "")
+        // Add a suffix indicating that the sprite is a copy of another sprite
+        // with the same name or add/increment a number to the end of the name.
+        public void AdjustName()
         {
-            Setup(name);
-            Source = null;
-            Size = new Size(width, height);
-        }
-        public Sprite(BitmapSource source, string name = "")
-        {
-            Setup(name);
-            Source = source;
-        }
-        public Sprite(string filename, string name = "")
-        {
-            Setup(name.Length > 0 ? name : Path.GetFileNameWithoutExtension(filename));
-            LoadFile(filename);
-        }
-        public Sprite(byte[] pngData, string name = "")
-        {
-            Setup(name);
-            LoadPngData(pngData);
-        }
-        public Sprite(Stream pngStream, string name = "")
-        {
-            Setup(name);
-            LoadPngStream(pngStream);
-        }
-        public Sprite(XmlNode node, string name = "")
-        {
-            Setup(name);
-            LoadXml(node);
-        }
-        private void Setup(string name)
-        {
-            X = 0;
-            Y = 0;
-            Name = name;
-        }
-
-        // load image from file
-        public void LoadFile(string filename)
-        {
-            Source = new BitmapImage(new Uri(filename));
-        }
-
-        // load image from a stream containing PNG data
-        public void LoadPngStream(Stream pngStream)
-        {
-            PngBitmapDecoder decoder =
-                new PngBitmapDecoder(pngStream,
-                                     BitmapCreateOptions.None,
-                                     BitmapCacheOption.Default);
-            if (decoder.Frames.Count > 0 && decoder.Frames[0] != null)
+            if (Name == DEFAULT_NAME ||
+                Name.Substring(Name.Length - COPY_SUFFIX.Length) == COPY_SUFFIX)
             {
-                Source = decoder.Frames[0];
+                Name += " 2";
             }
-        }
-
-        // load image from raw PNG bytes
-        public void LoadPngData(byte[] pngData)
-        {
-            if (null == pngData)
+            else if (Regex.IsMatch(Name, "^(" + DEFAULT_NAME + " |.*" + COPY_SUFFIX + " )[0-9]+$"))
             {
-                Source = null;
-                return;
-            }
-            LoadPngStream(new MemoryStream(pngData));
-        }
-
-        // load image and location from xml node
-        public void LoadXml(XmlNode node)
-        {
-            int i;
-
-            // load name
-            if ((null == Name || Name.Length == 0) &&
-                node.Attributes["name"] != null &&
-                node.Attributes["name"].Value.Length > 0)
-            {
-                Name = node.Attributes["name"].Value;
-            }
-
-            // load image file or data
-            if (node.Attributes["src"] != null &&
-                node.Attributes["src"].Value.Length > 0)
-            {
-                LoadFile(node.Attributes["src"].Value);
-                if (null == Name || Name.Length == 0)
+                string firstPart = Regex.Replace(Name, "[0-9]+$", "");
+                int i;
+                if (int.TryParse(Name.Substring(firstPart.Length), out i))
                 {
-                    Name = node.Attributes["src"].Value;
+                    Name = firstPart + (i + 1).ToString();
                 }
             }
-            else if (node.InnerText.Length > 0)
-            {
-                LoadPngData(Convert.FromBase64String(node.InnerText));
-            }
-
-            // load image dimensions, if no data is available
             else
             {
-                Source = null;
-                Size size = new Size(0,0);
-                if (node.Attributes["w"] != null &&
-                    int.TryParse(node.Attributes["w"].Value, out i))
-                {
-                    size.Width = i;
-                }
-                if (node.Attributes["h"] != null &&
-                    int.TryParse(node.Attributes["h"].Value, out i))
-                {
-                    size.Height = i;
-                }
-                this.Size = size;
-            }
-
-            // update position
-            if (node.Attributes["x"] != null &&
-                int.TryParse(node.Attributes["x"].Value, out i))
-            {
-                X = i;
-            }
-            if (node.Attributes["y"] != null &&
-                int.TryParse(node.Attributes["y"].Value, out i))
-            {
-                Y = i;
+                Name += COPY_SUFFIX;
             }
         }
 
@@ -268,118 +164,8 @@ namespace SpriteMapGenerator
             return element;
         }
 
-        // Add a suffix indicating that the sprite is a copy of another sprite
-        // with the same name or add/increment a number to the end of the name.
-        public void AdjustName()
-        {
-            if (Name == DEFAULT_NAME ||
-                Name.Substring(Name.Length - COPY_SUFFIX.Length) == COPY_SUFFIX)
-            {
-                Name += " 2";
-            }
-            else if (Regex.IsMatch(Name, "^(" + DEFAULT_NAME + " |.*" + COPY_SUFFIX + " )[0-9]+$"))
-            {
-                string firstPart = Regex.Replace(Name, "[0-9]+$", "");
-                int i;
-                if (int.TryParse(Name.Substring(firstPart.Length), out i))
-                {
-                    Name = firstPart + (i + 1).ToString();
-                }
-            }
-            else
-            {
-                Name += COPY_SUFFIX;
-            }
-        }
-
-        // does the clipboard contain data that can be converted to a sprite?
-        public static bool CanCreateFromClipboard()
-        {
-            if (Clipboard.ContainsText(TextDataFormat.Xaml) || Clipboard.ContainsText())
-            {
-                string xml = Clipboard.ContainsText(TextDataFormat.Xaml)
-                             ? Clipboard.GetText(TextDataFormat.Xaml)
-                             : Clipboard.GetText();
-                XmlDocument document = new XmlDocument();
-                try
-                {
-                    document.LoadXml(xml);
-                    if (document.SelectNodes("//sprite").Count > 0)
-                    {
-                        return true;
-                    }
-                }
-                catch { }
-            }
-            if (Clipboard.ContainsData("PNG") || Clipboard.ContainsImage())
-            {
-                return true;
-            }
-            return false;
-        }
-
-        // return a sprite created from data on the clipboad
-        public static Sprite[] CreateFromClipboard()
-        {
-            // Try for XML first, since it'll have position data
-            List<Sprite> sprites = new List<Sprite>();
-            if (Clipboard.ContainsText(TextDataFormat.Xaml) || Clipboard.ContainsText())
-            {
-                string xml = Clipboard.ContainsText(TextDataFormat.Xaml)
-                             ? Clipboard.GetText(TextDataFormat.Xaml)
-                             : Clipboard.GetText();
-                XmlDocument document = new XmlDocument();
-                try
-                {
-                    document.LoadXml(xml);
-                    XmlNodeList nodes = document.SelectNodes("//sprite");
-                    if (nodes.Count > 0)
-                    {
-                        foreach (XmlNode sprite in nodes)
-                        {
-                            sprites.Add(new Sprite(sprite));
-                        }
-                        return sprites.ToArray();
-                    }
-                }
-                catch { }
-            }
-
-            // If XML doesn't work, try PNG data (the default image format messes
-            // with transparency)
-            if (Clipboard.ContainsData("PNG"))
-            {
-                Object pngObject = Clipboard.GetData("PNG");
-                if (pngObject is MemoryStream)
-                {
-                    PngBitmapDecoder decoder =
-                        new PngBitmapDecoder(pngObject as MemoryStream,
-                                             BitmapCreateOptions.None,
-                                             BitmapCacheOption.Default);
-                    foreach (BitmapFrame sprite in decoder.Frames)
-                    {
-                        if (null != sprite)
-                        {
-                            sprites.Add(new Sprite(sprite));
-                        }
-                    }
-                    SpriteBin.Pack(sprites, SpriteBin.BinShape.Square);
-                    return sprites.ToArray();
-                }
-            }
-
-            // If there wasn't any PNG data, try regular image data
-            if (Clipboard.ContainsImage())
-            {
-                return new Sprite[] { new Sprite(ClipboardDibDecoder.GetBitmapFrame()) };
-            }
-
-            // If nothing works, return an empty list.
-            return new Sprite[0];
-        }
-
         // Calculate a boundary that contains all the given sprites
-        public static Rect UnionBoundary(ICollection<Sprite> members)
+        public static Rect UnionBoundary(IEnumerable<Sprite> members)
         {
             Rect boundary = new Rect();
             bool hasBoundary = false;
