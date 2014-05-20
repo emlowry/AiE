@@ -30,12 +30,24 @@ namespace SpriteMapGenerator
         Uri fileUri = null;
 
         // Save to a file
-        void Save(Uri uri, bool includeImages = true)
+        void Save(Uri uri, bool export = false)
         {
             if (uri != null && uri.IsFile)
             {
                 XmlDocument document = new XmlDocument();
-                document.AppendChild(sheetCanvas.ToXml(document, includeImages));
+                XmlElement sheet = sheetCanvas.ToXml(document, !export);
+                if (export)
+                {
+                    Uri imageUri = new Uri(Path.ChangeExtension(uri.LocalPath, "png"));
+                    FileStream stream = new FileStream(imageUri.LocalPath, FileMode.Create);
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(sheetCanvas.ToBitmap());
+                    encoder.Save(stream);
+                    XmlAttribute srcAttribute = document.CreateAttribute("src");
+                    srcAttribute.Value = uri.MakeRelativeUri(imageUri).ToString();
+                    sheet.Attributes.Append(srcAttribute);
+                }
+                document.AppendChild(sheet);
                 document.Save(uri.LocalPath);
             }
         }
@@ -97,7 +109,14 @@ namespace SpriteMapGenerator
 
         void CommandBindingSave_Executed(object target, ExecutedRoutedEventArgs e)
         {
-            Save(fileUri);
+            if (fileUri != null && fileUri.IsFile)
+            {
+                Save(fileUri);
+            }
+            else
+            {
+                CommandBindingSaveAs_Executed(target, e);
+            }
         }
 
         void CommandBindingSaveAs_Executed(object target, ExecutedRoutedEventArgs e)
@@ -136,8 +155,25 @@ namespace SpriteMapGenerator
         // embedded base64 PNG image data
         void CommandBindingExport_Executed(object target, ExecutedRoutedEventArgs e)
         {
+            // Warn the user if there are colliding sprites
+            if (sheetCanvas.CollisionCount > 0)
+            {
+                MessageBoxResult warningResult =
+                    MessageBox.Show(
+                        "There are sprites in this sprite map that overlap." +
+                        "\n\nIf you export the map as an image, some of the " +
+                        "sprites will be obscured by others.",
+                        "Sprite collisions detected!",
+                        MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (MessageBoxResult.OK != warningResult)
+                {
+                    return;
+                }
+            }
+
+            // Create dialog for saving as PNG or XML
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.Title = "Export sprite map to another format";
+            dlg.Title = "Export sprite map to XML and PNG image";
             if (null == fileUri)
             {
                 dlg.FileName = "new"; // Default file name 
@@ -148,7 +184,7 @@ namespace SpriteMapGenerator
                 dlg.FileName = Path.GetFileNameWithoutExtension(fileUri.LocalPath);
                 dlg.DefaultExt = ".xml"; // Default file extension 
             }
-            dlg.Filter = "Sprite map XML|*.xml|Portable Network Graphics|*.png"; // Filter files by extension
+            dlg.Filter = "Sprite map XML and PNG|*.xml"; // Filter files by extension
 
             // Show save file dialog box 
             Nullable<bool> result = dlg.ShowDialog();
@@ -159,19 +195,7 @@ namespace SpriteMapGenerator
                 Uri uri = new Uri(dlg.FileName);
                 if (uri != null && uri.IsFile)
                 {
-                    // Export to image-free xml
-                    if (dlg.FilterIndex == 1)
-                    {
-                        Save(uri, false);
-                    }
-                    // Export to PNG
-                    else
-                    {
-                        FileStream stream = new FileStream(uri.LocalPath, FileMode.Create);
-                        PngBitmapEncoder encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(sheetCanvas.ToBitmap());
-                        encoder.Save(stream);
-                    }
+                    Save(uri, true);
                 }
             }
         }

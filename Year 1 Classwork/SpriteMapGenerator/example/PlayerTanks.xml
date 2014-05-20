@@ -1,4 +1,4 @@
-<sheet>
+<sheet src="PlayerTanks.png">
   <sprite name="helicopter" x="99" y="0" w="55" h="127" />
   <sprite name="helicopter_blades" x="0" y="128" w="99" h="99" />
   <sprite name="helicopter_with_blades" x="0" y="0" w="99" h="128" />
