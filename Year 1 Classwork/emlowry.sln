@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlotPoints", "PlotPoints\Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpriteMapGenerator", "SpriteMapGenerator\SpriteMapGenerator.csproj", "{37AC3799-0434-41C2-89D0-4C4177AAD0D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThudPrototype", "ThudPrototype\ThudPrototype.csproj", "{D906493D-D63B-4E6D-8B7F-BFF2166E659F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -209,6 +211,18 @@ Global
 		{37AC3799-0434-41C2-89D0-4C4177AAD0D3}.Release|x64.ActiveCfg = Release|x86
 		{37AC3799-0434-41C2-89D0-4C4177AAD0D3}.Release|x86.ActiveCfg = Release|x86
 		{37AC3799-0434-41C2-89D0-4C4177AAD0D3}.Release|x86.Build.0 = Release|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Debug|Win32.ActiveCfg = Debug|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Debug|x64.ActiveCfg = Debug|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Debug|x86.ActiveCfg = Debug|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Debug|x86.Build.0 = Debug|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Release|Mixed Platforms.Build.0 = Release|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Release|Win32.ActiveCfg = Release|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Release|x64.ActiveCfg = Release|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Release|x86.ActiveCfg = Release|x86
+		{D906493D-D63B-4E6D-8B7F-BFF2166E659F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
