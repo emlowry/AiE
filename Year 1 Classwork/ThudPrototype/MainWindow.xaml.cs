@@ -22,11 +22,19 @@ namespace ThudPrototype
         public MainWindow()
         {
             InitializeComponent();
+            for (int i = 0; i < ThudTile.InitialBoardSideLength; ++i)
+            {
+                gameBoard.ColumnDefinitions.Add(new ColumnDefinition());
+                gameBoard.RowDefinitions.Add(new RowDefinition());
+            }
+            ThudTile.NewBoard(gameBoard);
+            ThudTile.SetPlayer(gameBoard, ThudTile.GamePiece.Dwarf);
         }
 
         void CommandBindingNewGame_Executed(object target, ExecutedRoutedEventArgs e)
         {
             ThudTile.NewBoard(gameBoard);
+            ThudTile.SetPlayer(gameBoard, ThudTile.GamePiece.Dwarf);
         }
 
         void CommandBindingQuit_Executed(object target, ExecutedRoutedEventArgs e)

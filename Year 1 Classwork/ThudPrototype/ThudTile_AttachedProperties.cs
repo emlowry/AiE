@@ -10,48 +10,11 @@ namespace ThudPrototype
 {
     public partial class ThudTile
     {
-        // default dwarf and troll piece drawings
-        public static DrawingBrush DefaultDwarfFill;
-        public static DrawingBrush DefaultTrollFill;
-        public static DrawingBrush DefaultSelectedDwarfFill;
-        public static DrawingBrush DefaultSelectedTrollFill;
-        static ThudTile()
-        {
-            Geometry DwarfGeometry =
-                new PathGeometry( new PathFigure[] {
-                    new PathFigure(new Point(12, 0),
-                        new PathSegment[] {
-                            new LineSegment(new Point(24, 24), true),
-                            new LineSegment(new Point(0, 24), true),
-                            new LineSegment(new Point(12, 0), true)
-                        }, true) });
-            DefaultDwarfFill = new DrawingBrush(
-                new GeometryDrawing(Brushes.Red, new Pen(Brushes.Magenta, 4),
-                                    DwarfGeometry));
-            DefaultDwarfFill.Stretch = Stretch.Uniform;
-            DefaultDwarfFill.TileMode = TileMode.None;
-            DefaultSelectedDwarfFill = new DrawingBrush(
-                new GeometryDrawing(Brushes.Red, new Pen(Brushes.Yellow, 4),
-                                    DwarfGeometry));
-            DefaultSelectedDwarfFill.Stretch = Stretch.Uniform;
-            DefaultSelectedDwarfFill.TileMode = TileMode.None;
-            DefaultTrollFill = new DrawingBrush(
-                new GeometryDrawing(Brushes.Blue, new Pen(Brushes.Aqua, 4),
-                                    new RectangleGeometry(new Rect(0, 6, 24, 18))));
-            DefaultTrollFill.Stretch = Stretch.Uniform;
-            DefaultTrollFill.TileMode = TileMode.None;
-            DefaultSelectedTrollFill = new DrawingBrush(
-                new GeometryDrawing(Brushes.Blue, new Pen(Brushes.Lime, 4),
-                                    new RectangleGeometry(new Rect(0, 6, 24, 18))));
-            DefaultSelectedTrollFill.Stretch = Stretch.Uniform;
-            DefaultSelectedTrollFill.TileMode = TileMode.None;
-        }
-
         // For setting the size of Dwarf pieces
         public static readonly DependencyProperty DwarfRectProperty =
             DependencyProperty.RegisterAttached("DwarfRect", typeof(Rect), typeof(Panel),
                                                 new FrameworkPropertyMetadata(
-                                                    new Rect(0.125, 0.125, 0.875, 0.875),
+                                                    new Rect(0.125, 0.125, 0.75, 0.75),
                                                     FrameworkPropertyMetadataOptions.Inherits));
         public static void SetDwarfRect(Panel panel, Rect rect)
         {
@@ -89,7 +52,7 @@ namespace ThudPrototype
         }
         public static readonly DependencyProperty DwarfFillProperty =
             DependencyProperty.RegisterAttached("DwarfFill", typeof(Brush), typeof(Panel),
-                                                new FrameworkPropertyMetadata(DefaultDwarfFill,
+                                                new FrameworkPropertyMetadata(MakeDefaultDwarfFill(),
                                                     FrameworkPropertyMetadataOptions.Inherits));
         public static void SetDwarfFill(Panel panel, Brush fill)
         {
@@ -115,7 +78,7 @@ namespace ThudPrototype
         }
         public static readonly DependencyProperty SelectedDwarfFillProperty =
             DependencyProperty.RegisterAttached("SelectedDwarfFill", typeof(Brush), typeof(Panel),
-                                                new FrameworkPropertyMetadata(DefaultSelectedDwarfFill,
+                                                new FrameworkPropertyMetadata(MakeDefaultSelectedDwarfFill(),
                                                     FrameworkPropertyMetadataOptions.Inherits));
         public static void SetSelectedDwarfFill(Panel panel, Brush fill)
         {
@@ -131,52 +94,68 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("DwarfTargetStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(new Pen(Brushes.Yellow, 3),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetDwarfTargetStroke(Panel panel, Pen stroke)
+        public static void SetDwarfTargetStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(DwarfTargetStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(DwarfTargetStrokeProperty, stroke);
+            }
         }
-        public static Pen GetDwarfTargetStroke(Panel panel)
+        public static Pen GetDwarfTargetStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(DwarfTargetStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(DwarfTargetStrokeProperty)
+                                : (Pen)DwarfTargetStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty DwarfTargetFillProperty =
             DependencyProperty.RegisterAttached("DwarfTargetFill", typeof(Brush), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetDwarfTargetFill(Panel panel, Brush fill)
+        public static void SetDwarfTargetFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(DwarfTargetFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(DwarfTargetFillProperty, fill);
+            }
         }
-        public static Brush GetDwarfTargetFill(Panel panel)
+        public static Brush GetDwarfTargetFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(DwarfTargetFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(DwarfTargetFillProperty)
+                                : (Brush)DwarfTargetFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the size of Troll pieces
         public static readonly DependencyProperty TrollRectProperty =
             DependencyProperty.RegisterAttached("TrollRect", typeof(Rect), typeof(Panel),
                                                 new FrameworkPropertyMetadata(
-                                                    new Rect(0.125, 0.125, 0.875, 0.875),
+                                                    new Rect(0.125, 0.125, 0.75, 0.75),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetTrollRect(Panel panel, Rect rect)
+        public static void SetTrollRect(DependencyObject d, Rect rect)
         {
-            panel.SetValue(TrollRectProperty, rect);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(TrollRectProperty, rect);
+            }
         }
-        public static Rect GetTrollRect(Panel panel)
+        public static Rect GetTrollRect(DependencyObject d)
         {
-            return (Rect)panel.GetValue(TrollRectProperty);
+            return (d is Panel) ? (Rect)(d as Panel).GetValue(TrollRectProperty)
+                                : (Rect)TrollRectProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty TrollRectIsAbsoluteProperty =
             DependencyProperty.RegisterAttached("TrollRectIsAbsolute", typeof(bool), typeof(Panel),
                                                 new FrameworkPropertyMetadata(false,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetTrollRectIsAbsolute(Panel panel, bool absolute)
+        public static void SetTrollRectIsAbsolute(DependencyObject d, bool absolute)
         {
-            panel.SetValue(TrollRectIsAbsoluteProperty, absolute);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(TrollRectIsAbsoluteProperty, absolute);
+            }
         }
-        public static bool GetTrollRectIsAbsolute(Panel panel)
+        public static bool GetTrollRectIsAbsolute(DependencyObject d)
         {
-            return (bool)panel.GetValue(TrollRectIsAbsoluteProperty);
+            return (d is Panel) ? (bool)(d as Panel).GetValue(TrollRectIsAbsoluteProperty)
+                                : (bool)TrollRectIsAbsoluteProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board uses for Troll pieces
@@ -184,25 +163,33 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("TrollStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetTrollStroke(Panel panel, Pen stroke)
+        public static void SetTrollStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(TrollStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(TrollStrokeProperty, stroke);
+            }
         }
-        public static Pen GetTrollStroke(Panel panel)
+        public static Pen GetTrollStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(TrollStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(TrollStrokeProperty)
+                                : (Pen)TrollStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty TrollFillProperty =
             DependencyProperty.RegisterAttached("TrollFill", typeof(Brush), typeof(Panel),
-                                                new FrameworkPropertyMetadata(DefaultTrollFill,
+                                                new FrameworkPropertyMetadata(MakeDefaultTrollFill(),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetTrollFill(Panel panel, Brush fill)
+        public static void SetTrollFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(TrollFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(TrollFillProperty, fill);
+            }
         }
-        public static Brush GetTrollFill(Panel panel)
+        public static Brush GetTrollFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(TrollFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(TrollFillProperty)
+                                : (Brush)TrollFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board uses for selected Troll pieces
@@ -210,51 +197,67 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("SelectedTrollStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetSelectedTrollStroke(Panel panel, Pen stroke)
+        public static void SetSelectedTrollStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(SelectedTrollStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(SelectedTrollStrokeProperty, stroke);
+            }
         }
-        public static Pen GetSelectedTrollStroke(Panel panel)
+        public static Pen GetSelectedTrollStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(SelectedTrollStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(SelectedTrollStrokeProperty)
+                                : (Pen)SelectedTrollStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty SelectedTrollFillProperty =
             DependencyProperty.RegisterAttached("SelectedTrollFill", typeof(Brush), typeof(Panel),
-                                                new FrameworkPropertyMetadata(DefaultSelectedTrollFill,
+                                                new FrameworkPropertyMetadata(MakeDefaultSelectedTrollFill(),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetSelectedTrollFill(Panel panel, Brush fill)
+        public static void SetSelectedTrollFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(SelectedTrollFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(SelectedTrollFillProperty, fill);
+            }
         }
-        public static Brush GetSelectedTrollFill(Panel panel)
+        public static Brush GetSelectedTrollFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(SelectedTrollFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(SelectedTrollFillProperty)
+                                : (Brush)SelectedTrollFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board overlays on tiles targeted by Troll pieces
         public static readonly DependencyProperty TrollTargetStrokeProperty =
             DependencyProperty.RegisterAttached("TrollTargetStroke", typeof(Pen), typeof(Panel),
-                                                new FrameworkPropertyMetadata(new Pen(Brushes.Yellow, 3),
+                                                new FrameworkPropertyMetadata(new Pen(Brushes.Lime, 3),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetTrollTargetStroke(Panel panel, Pen stroke)
+        public static void SetTrollTargetStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(TrollTargetStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(TrollTargetStrokeProperty, stroke);
+            }
         }
-        public static Pen GetTrollTargetStroke(Panel panel)
+        public static Pen GetTrollTargetStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(TrollTargetStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(TrollTargetStrokeProperty)
+                                : (Pen)TrollTargetStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty TrollTargetFillProperty =
             DependencyProperty.RegisterAttached("TrollTargetFill", typeof(Brush), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetTrollTargetFill(Panel panel, Brush fill)
+        public static void SetTrollTargetFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(TrollTargetFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(TrollTargetFillProperty, fill);
+            }
         }
-        public static Brush GetTrollTargetFill(Panel panel)
+        public static Brush GetTrollTargetFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(TrollTargetFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(TrollTargetFillProperty)
+                                : (Brush)TrollTargetFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board uses for tiles where GridX + GridY is even
@@ -262,25 +265,33 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("EvenTileStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetEvenTileStroke(Panel panel, Pen stroke)
+        public static void SetEvenTileStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(EvenTileStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(EvenTileStrokeProperty, stroke);
+            }
         }
-        public static Pen GetEvenTileStroke(Panel panel)
+        public static Pen GetEvenTileStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(EvenTileStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(EvenTileStrokeProperty)
+                                : (Pen)EvenTileStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty EvenTileFillProperty =
             DependencyProperty.RegisterAttached("EvenTileFill", typeof(Brush), typeof(Panel),
                                                 new FrameworkPropertyMetadata(Brushes.White,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetEvenTileFill(Panel panel, Brush fill)
+        public static void SetEvenTileFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(EvenTileFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(EvenTileFillProperty, fill);
+            }
         }
-        public static Brush GetEvenTileFill(Panel panel)
+        public static Brush GetEvenTileFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(EvenTileFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(EvenTileFillProperty)
+                                : (Brush)EvenTileFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board uses for tiles where GridX + GridY is odd
@@ -288,25 +299,33 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("OddTileStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetOddTileStroke(Panel panel, Pen stroke)
+        public static void SetOddTileStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(OddTileStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(OddTileStrokeProperty, stroke);
+            }
         }
-        public static Pen GetOddTileStroke(Panel panel)
+        public static Pen GetOddTileStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(OddTileStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(OddTileStrokeProperty)
+                                : (Pen)OddTileStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty OddTileFillProperty =
             DependencyProperty.RegisterAttached("OddTileFill", typeof(Brush), typeof(Panel),
                                                 new FrameworkPropertyMetadata(Brushes.Black,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetOddTileFill(Panel panel, Brush fill)
+        public static void SetOddTileFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(OddTileFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(OddTileFillProperty, fill);
+            }
         }
-        public static Brush GetOddTileFill(Panel panel)
+        public static Brush GetOddTileFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(OddTileFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(OddTileFillProperty)
+                                : (Brush)OddTileFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting a board's current player
@@ -314,14 +333,19 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("Player", typeof(GamePiece), typeof(Panel),
                                                 new FrameworkPropertyMetadata(GamePiece.None,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetPlayer(Panel panel, GamePiece playerPiece)
+        public static void SetPlayer(DependencyObject d, GamePiece playerPiece)
         {
-            panel.SetValue(PlayerProperty, playerPiece);
-            panel.RaiseEvent(new RoutedEventArgs(PlayerChangedEvent));
+            if (d is Panel)
+            {
+                Panel panel = d as Panel;
+                panel.SetValue(PlayerProperty, playerPiece);
+                panel.RaiseEvent(new RoutedEventArgs(PlayerChangedEvent));
+            }
         }
-        public static GamePiece GetPlayer(Panel panel)
+        public static GamePiece GetPlayer(DependencyObject d)
         {
-            return (GamePiece)panel.GetValue(PlayerProperty);
+            return (d is Panel) ? (GamePiece)(d as Panel).GetValue(PlayerProperty)
+                                : (GamePiece)PlayerProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly RoutedEvent PlayerChangedEvent =
             EventManager.RegisterRoutedEvent("PlayerChanged", RoutingStrategy.Bubble,

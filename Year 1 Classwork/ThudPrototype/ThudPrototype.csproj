@@ -57,7 +57,9 @@
     </ApplicationDefinition>
     <Compile Include="ThudTile.cs" />
     <Compile Include="ThudTile_AttachedProperties.cs" />
-    <Compile Include="ThudTile_InitialLayout.cs" />
+    <Compile Include="ThudTile_GamePlay.cs" />
+    <Compile Include="ThudTile_MakeInitialLayout.cs" />
+    <Compile Include="ThudTile_Static.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
