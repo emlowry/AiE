@@ -54,6 +54,9 @@ namespace ThudPrototype
             }
         }
 
+        // Was a troll just shoved onto this tile?  If so, it must capture at least one dwarf.
+        protected bool captureRequired = false;
+
         // tile with a piece that can be moved to this tile
         protected ThudTile targetedBy;
         public ThudTile TargetedBy
@@ -116,15 +119,18 @@ namespace ThudPrototype
         {
             get
             {
-                List<ThudTile> neighbors = new List<ThudTile>;
+                List<ThudTile> neighbors = new List<ThudTile>();
                 for (int i = -1; i <= 1; ++i)
                 {
                     for (int j = -1; j <= 1; ++j)
                     {
-                        ThudTile neighbor = Get(Parent, i, j);
-                        if (null != neighbor)
+                        if (i != 0 || j != 0)
                         {
-                            neighbors.Add(neighbor);
+                            ThudTile neighbor = Get(Parent, Column + i, Row + j);
+                            if (null != neighbor)
+                            {
+                                neighbors.Add(neighbor);
+                            }
                         }
                     }
                 }
@@ -189,7 +195,6 @@ namespace ThudPrototype
             {
                 return;
             }
-            Panel board = Parent as Panel;
             bool troll = (GamePiece.Troll == Piece);
             bool selected = (this == TargetedBy);
             Rect rect = troll ? GetTrollRect(this) : GetDwarfRect(this);

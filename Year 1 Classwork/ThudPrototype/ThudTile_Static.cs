@@ -20,9 +20,6 @@ namespace ThudPrototype
         public static readonly Brush DefaultSelectedDwarfFill = MakeDefaultSelectedDwarfFill();
         public static readonly Brush DefaultSelectedTrollFill = MakeDefaultSelectedTrollFill();
 
-        // initial layout of a thud board
-        public static readonly GamePiece?[][] InitialLayout = MakeInitialLayout();
-
         // Make default dwarf brushes
         protected static Geometry MakeDefaultDwarfGeometry()
         {
@@ -77,55 +74,32 @@ namespace ThudPrototype
             return fill;
         }
 
-        // Pick the next tile from the current one in a given direction
-        protected static ThudTile GetNextInDirection(ThudTile tile, int xDir, int yDir)
+        // Are the given coordinates within bounds of the board?
+        protected static bool WithinBoard(int column, int row)
         {
-            if (null == tile)
+            // if the coordinates in the initial layout are for a non-null tile
+            // or for the thudstone, return true.
+            return ((column == ThudstoneLocation.X && row == ThudstoneLocation.Y) ||
+                (0 <= column && column < BoardSideLength &&
+                 0 <= row && row < BoardSideLength && null != Layout[column][row]));
+        }
+
+        // Pick the next tile from the current one in a given direction
+        protected static ThudTile GetNextInDirection(DependencyObject parent,
+                                                     ref int column, ref int row,
+                                                     int xDir, int yDir)
+        {
+            if (xDir != 0)
             {
-                return null;
+                xDir /= Math.Abs(xDir);
             }
-            if (yDir > 0)
+            if (yDir != 0)
             {
-                if (xDir < 0)
-                {
-                    return tile.UpLeftTile;
-                }
-                if (xDir == 0)
-                {
-                    return tile.UpTile;
-                }
-                else if (xDir > 0)
-                {
-                    return tile.UpRightTile;
-                }
+                yDir /= Math.Abs(yDir);
             }
-            if (yDir == 0)
-            {
-                if (xDir < 0)
-                {
-                    return tile.LeftTile;
-                }
-                if (xDir > 0)
-                {
-                    return tile.RightTile;
-                }
-            }
-            if (yDir < 0)
-            {
-                if (xDir < 0)
-                {
-                    return tile.DownLeftTile;
-                }
-                if (xDir == 0)
-                {
-                    return tile.DownTile;
-                }
-                if (xDir > 0)
-                {
-                    return tile.DownRightTile;
-                }
-            }
-            return null;
+            column += xDir;
+            row += yDir;
+            return WithinBoard(column, row) ? Get(parent, column, row) : null;
         }
 
         // search for the tile child of the given panel with the given location,
@@ -139,6 +113,21 @@ namespace ThudPrototype
             return ((parent as Panel).Children).OfType<ThudTile>()
                     .FirstOrDefault(tile => (Grid.GetColumn(tile) == X &&
                                              Grid.GetRow(tile) == Y));
+        }
+
+        // get all the tiles with the given content (if not specified, just get all tiles)
+        public static IEnumerable<ThudTile> GetAll(DependencyObject parent, GamePiece? piece)
+        {
+            if (null == parent || !(parent is Panel))
+            {
+                return new List<ThudTile>();
+            }
+            if (null == piece)
+            {
+                return (parent as Panel).Children.OfType<ThudTile>();
+            }
+            return (parent as Panel).Children.OfType<ThudTile>()
+                    .Where(tile => (GamePiece)piece == tile.Piece);
         }
 
         // get the number of pieces of a given type on the given panel
@@ -175,6 +164,21 @@ namespace ThudPrototype
             }
         }
 
+        // set all the tile children of the given panel to not end the turn when targeted
+        public static void ClearCaptureRequired(DependencyObject parent)
+        {
+            if (null == parent || !(parent is Panel))
+            {
+                return;
+            }
+            foreach (ThudTile tile in ((parent as Panel).Children as IEnumerable)
+                                        .OfType<ThudTile>()
+                                        .Where(tile => tile.captureRequired))
+            {
+                tile.captureRequired = false;
+            }
+        }
+
         // clear all tiles from the panel and set up a new set in the start layout
         public static void NewBoard(DependencyObject parent)
         {
@@ -193,14 +197,14 @@ namespace ThudPrototype
             }
 
             // make new set of tiles
-            for (int i = 0; i < InitialLayout.Length; ++i)
+            for (int i = 0; i < Layout.Length; ++i)
             {
-                for (int j = 0; j < InitialLayout[0].Length; ++j)
+                for (int j = 0; j < Layout[0].Length; ++j)
                 {
-                    if (null != InitialLayout[i][j])
+                    if (null != Layout[i][j])
                     {
                         board.Children.Add(
-                            new ThudTile(i, j, (GamePiece)InitialLayout[i][j]));
+                            new ThudTile(i, j, (GamePiece)Layout[i][j]));
                     }
                 }
             }

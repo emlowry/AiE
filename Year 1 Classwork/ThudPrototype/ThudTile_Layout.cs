@@ -10,16 +10,18 @@ namespace ThudPrototype
 {
     public partial class ThudTile
     {
-        public const int InitialBoardSideLength = 15;
-        protected static GamePiece?[][] MakeInitialLayout()
+        // The board is roughly octagonal, with the center square blocked by
+        // the "thud stone". There are eight troll pieces surrounding the
+        // thud stone, and 32 dwarf pieces along the diagonal sides of the
+        // board.  http://en.wikipedia.org/wiki/Games_of_the_Discworld#Thud
+        public const int BoardSideLength = 15;
+        public static readonly Point ThudstoneLocation = new Point(7, 7);
+        public static readonly GamePiece?[][] Layout = MakeLayout();
+        protected static GamePiece?[][] MakeLayout()
         {
-            // The board is roughly octagonal, with the center square blocked by
-            // the "thud stone". There are eight troll pieces surrounding the
-            // thud stone, and 32 dwarf pieces along the diagonal sides of the
-            // board.  http://en.wikipedia.org/wiki/Games_of_the_Discworld#Thud
-            return new GamePiece?[InitialBoardSideLength][]
+            return new GamePiece?[BoardSideLength][]
             {
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -37,7 +39,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -55,7 +57,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -73,7 +75,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -91,7 +93,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     GamePiece.Dwarf,
@@ -109,7 +111,7 @@ namespace ThudPrototype
                     GamePiece.Dwarf,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     GamePiece.Dwarf,
                     GamePiece.None,
@@ -127,7 +129,7 @@ namespace ThudPrototype
                     GamePiece.None,
                     GamePiece.Dwarf
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     GamePiece.Dwarf,
                     GamePiece.None,
@@ -145,7 +147,7 @@ namespace ThudPrototype
                     GamePiece.None,
                     GamePiece.Dwarf
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     GamePiece.None,
                     GamePiece.None,
@@ -163,7 +165,7 @@ namespace ThudPrototype
                     GamePiece.None,
                     GamePiece.None
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     GamePiece.Dwarf,
                     GamePiece.None,
@@ -181,7 +183,7 @@ namespace ThudPrototype
                     GamePiece.None,
                     GamePiece.Dwarf
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     GamePiece.Dwarf,
                     GamePiece.None,
@@ -199,7 +201,7 @@ namespace ThudPrototype
                     GamePiece.None,
                     GamePiece.Dwarf
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     GamePiece.Dwarf,
@@ -217,7 +219,7 @@ namespace ThudPrototype
                     GamePiece.Dwarf,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -235,7 +237,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -253,7 +255,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,
@@ -271,7 +273,7 @@ namespace ThudPrototype
                     null,
                     null
                 },
-                new GamePiece?[InitialBoardSideLength]
+                new GamePiece?[BoardSideLength]
                 {
                     null,
                     null,

@@ -17,118 +17,157 @@ namespace ThudPrototype
             {
                 Capture();
             }
-            else if (null != Parent && Parent is Panel && GetPlayer(Parent as Panel) == Piece)
+            else
             {
                 Select();
             }
         }
 
-        // Can this tile be captured by the piece targeting it, if there is one?
-        protected bool captureToEndTurn = false;
+        // Can this tile be captured by another piece targeting it, if there is one?
         protected bool CanBeCaptured()
         {
-            return (captureToEndTurn ||
-                    (null != TargetedBy && this != TargetedBy &&
-                     Piece != TargetedBy.Piece &&
-                     GamePiece.None != TargetedBy.Piece));
+            return (null != TargetedBy && this != TargetedBy &&
+                    Piece != TargetedBy.Piece &&
+                    GamePiece.None != TargetedBy.Piece);
         }
 
         // Make the piece targeting this tile, if any, capture this tile
         protected void Capture()
         {
-            // If capturing this piece ends the turn, do so
-            if (captureToEndTurn)
-            {
-                // TODO
-            }
-
             // if this tile isn't being targeted by anything, don't bother
-            if (null == TargetedBy || GamePiece.None == TargetedBy.Piece)
+            if (!CanBeCaptured())
             {
                 return;
             }
 
+            // Otherwise, the piece targeting this tile captures it
             switch (Piece)
             {
-                case GamePiece.Dwarf:
-                    if (GamePiece.Troll == TargetedBy.Piece)
-                    {
-                        Piece = GamePiece.None;
-                        TargetedBy = null;
-                    }
-                    break;
-                case GamePiece.Troll:
-                    if (GamePiece.Dwarf == TargetedBy.Piece)
-                    {
-                        Piece = GamePiece.Dwarf;
-                        TargetedBy.Piece = GamePiece.None;
-                        TargetedBy = null;
-                    }
-                    break;
-                case GamePiece.None:
-                    Piece = TargetedBy.Piece;
-                    TargetedBy.Piece = GamePiece.None;
-                    if (GamePiece.Troll == Piece)
-                    {
-                        foreach (ThudTile tile in Neighbors.Where(tile => GamePiece.Dwarf == tile.Piece))
-                        {
-                            tile.TargetedBy = this;
-                        }
-                        if (Neighbors.Contains(TargetedBy))
-                        {
-                            TargetedBy = this;
-                            captureToEndTurn = true;
-                        }
-                    }
-                    if (this != TargetedBy)
-                    {
-                        TargetedBy = null;
-                    }
-                    break;
+                case GamePiece.Dwarf: CaptureDwarf(); break;
+                case GamePiece.Troll: CaptureTroll(); break;
+                case GamePiece.None: CaptureNone(); break;
             }
+        }
 
-            // move piece
+        // An empty tile targeted by another tile swaps contents with that tile
+        private void CaptureNone()
+        {
             Piece = TargetedBy.Piece;
             TargetedBy.Piece = GamePiece.None;
-            ClearTargeting(Parent);
 
-            // Trolls smash adjacent dwarves
-            if (GamePiece.Troll == Piece)
+            // If this tile isn't now occupied by a troll, nothing more needs doing
+            if (GamePiece.Troll != Piece)
             {
-                foreach (ThudTile tile in Neighbors.Where(tile => GamePiece.Dwarf == tile.Piece))
-                {
-                    tile.Piece = GamePiece.None;
-                }
+                EndTurn();
             }
-
-            // Update whose turn it is
-            if (null != Parent && Parent is Panel)
+            else
             {
-                if (CountPieces(Parent, GamePiece.Troll) == 0 ||
-                    CountPieces(Parent, GamePiece.Dwarf) == 0)
+                // Check for surrounding dwarves
+                IEnumerable<ThudTile> dwarves =
+                    Neighbors.Where(tile => GamePiece.Dwarf == tile.Piece);
+
+                // if there aren't any, end the turn
+                if (null == dwarves || dwarves.Count() == 0)
                 {
-                    SetPlayer(Parent as Panel, GamePiece.None);
+                    EndTurn();
                 }
-                else if (GetPlayer(this) != GamePiece.None)
+                else
                 {
-                    SetPlayer(Parent as Panel,
-                                   (GetPlayer(this) == GamePiece.Troll
-                                    ? GamePiece.Dwarf : GamePiece.Troll));
+                    // If the troll was shoved here, then it must capture at least one dwarf
+                    captureRequired = !Neighbors.Contains(TargetedBy);
+
+                    // Target the surrounding dwarves
+                    ClearTargeting(Parent);
+                    foreach (ThudTile tile in dwarves)
+                    {
+                        tile.TargetedBy = this;
+                    }
+                    TargetedBy = this;
                 }
             }
         }
 
+        // A troll targeted by a dwarf is replaced with said dwarf
+        private void CaptureTroll()
+        {
+            Piece = GamePiece.Dwarf;
+            TargetedBy.Piece = GamePiece.None;
+            EndTurn();
+        }
+
+        // A dwarf targeted by a troll is removed
+        protected void CaptureDwarf()
+        {
+            Piece = GamePiece.None;
+
+            // If no more dwarves can be targeted by the troll, end the turn
+            if (TargetedBy.Neighbors.Count(tile => (this != tile &&
+                                                    this.TargetedBy == tile.TargetedBy)) == 0)
+            {
+                EndTurn();
+                return;
+            }
+
+            // Otherwise, no more captures are required and the turn can be ended by clicking elsewhere
+            if (TargetedBy.captureRequired)
+            {
+                TargetedBy.captureRequired = false;
+            }
+            TargetedBy = null;
+        }
+
+        // End the current turn
         protected void EndTurn()
         {
-            captureToEndTurn = false;
+            // Clear targeting and capturing to end turn
+            if (null == Parent)
+            {
+                TargetedBy = null;
+                captureRequired = false;
+                return;
+            }
             ClearTargeting(Parent);
+            ClearCaptureRequired(Parent);
+
+            // If one side runs out of pieces, the game ends
+            if (CountPieces(Parent, GamePiece.Troll) == 0 ||
+                CountPieces(Parent, GamePiece.Dwarf) == 0)
+            {
+                SetPlayer(Parent, GamePiece.None);
+            }
+
+            // Otherwise, as long as it's some player's turn, switch sides
+            else if (GetPlayer(Parent) != GamePiece.None)
+            {
+                SetPlayer(Parent, (GetPlayer(Parent) == GamePiece.Troll
+                                  ? GamePiece.Dwarf : GamePiece.Troll));
+            }
         }
 
         // Select the piece on this tile, if any
         protected void Select()
         {
+            // Are there dwarves being targeted by a troll?
+            IEnumerable<ThudTile> targetedDwarves =
+                GetAll(Parent, GamePiece.Dwarf)
+                .Where(tile => (null != tile.TargetedBy &&
+                                GamePiece.Troll == tile.TargetedBy.Piece));
+            if (targetedDwarves.Count() > 0)
+            {
+                // if the troll doesn't need to capture any of them, end the
+                // turn.
+                if (targetedDwarves.Count(tile => tile.TargetedBy.captureRequired) == 0)
+                {
+                    EndTurn();
+                }
+
+                // either way, don't continue
+                return;
+            }
+
+            // Select this piece, if any
             ClearTargeting(Parent);
-            if (GamePiece.None == Piece)
+            if (GamePiece.None == Piece || GetPlayer(Parent) != Piece)
             {
                 return;
             }
@@ -139,15 +178,19 @@ namespace ThudPrototype
             {
                 for (int j = -1; j <= 1; ++j)
                 {
-                    // Check launchability
-                    MarkTargets(i, j);
+                    if (i != 0 || j != 0)
+                    {
+                        // mark movement targets
+                        MarkMovementTargets(i, j);
+                    }
                 }
             }
         }
 
         // Mark targets for movement of a game piece from this tile in the given direction
-        protected void MarkTargets(int xDir, int yDir)
+        protected void MarkMovementTargets(int xDir, int yDir)
         {
+            // if no direction is given or if this tile is empty, no movement is possible.
             if ((0 == xDir && 0 == yDir) || GamePiece.None == Piece)
             {
                 return;
@@ -155,38 +198,46 @@ namespace ThudPrototype
 
             // if there's another piece of the same type in front of this one in the
             // given direction, then it can't move in that direction.
-            ThudTile inFront = GetNextInDirection(this, xDir, yDir);
-            if (null != inFront && Piece == inFront.Piece)
+            int row = Row, column = Column;
+            ThudTile inFront = GetNextInDirection(Parent, ref column, ref row, xDir, yDir);
+            if ((null != inFront && Piece == inFront.Piece) || !WithinBoard(column, row))
             {
                 return;
             }
 
-            // set xDir and yDir to 1, 0, or -1 and save values as increment amounts
-            xDir /= (0 == xDir ? 1 : Math.Abs(xDir));
-            int xInc = xDir;
-            yDir /= (0 == yDir ? 1 : Math.Abs(yDir));
-            int yInc = yDir;
-
             // Calculate potential assisted move distance
-            ThudTile assister = GetNextInDirection(this, -xDir, -yDir);
-            int assistPlaces = 1;
-            while (null != assister && GamePiece.Dwarf == assister.Piece)
+            int backRow = Row, backColumn = Column;
+            ThudTile assister =
+                GetNextInDirection(Parent, ref backColumn, ref backRow, -xDir, -yDir);
+            int assistRange = 1;
+            bool assistPossible = (GamePiece.Troll == Piece ||
+                (null != inFront && GamePiece.Troll == inFront.Piece));
+            while (null != assister && Piece == assister.Piece &&
+                   WithinBoard(column, row) && WithinBoard(backColumn, backRow))
             {
-                ++assistPlaces;
-                assister = GetNextInDirection(assister, -xDir, -yDir);
+                ++assistRange;
+                assister = GetNextInDirection(Parent, ref backColumn, ref backRow, -xDir, -yDir);
+                inFront = GetNextInDirection(Parent, ref column, ref row, xDir, yDir);
+                if (!assistPossible && null != inFront &&
+                    GamePiece.Troll == inFront.Piece)
+                {
+                    assistPossible = true;
+                }
+            }
+            if (!assistPossible)
+            {
+                assistRange = 0;
             }
 
-            ThudTile target = GetNextInDirection(this, xDir, yDir);
+            // target tiles for movement
+            int targetColumn = Column, targetRow = Row;
+            ThudTile target =
+                GetNextInDirection(Parent, ref targetColumn, ref targetRow, xDir, yDir);
             bool blocked = false;
-            bool assistCanCapture = (GamePiece.Troll == Piece);
-            do
+            while ((!blocked || assistRange > 0) && WithinBoard(targetColumn, targetRow))
             {
-                // If the tile is empty and (if this piece is a troll) has adjacent
-                // dwarves, or (if this piece is a dwarf) contains a troll, target it.
-                if (null != target && Piece != target.Piece &&
-                    GamePiece.Dwarf != target.Piece &&
-                    (GamePiece.Dwarf == Piece ||
-                     target.Neighbors.Count(tile => GamePiece.Dwarf == tile.Piece) > 0))
+                // If this piece can move to the target tile, mark it.
+                if (CanMoveTo(target, assistRange, blocked))
                 {
                     target.TargetedBy = this;
                 }
@@ -200,18 +251,42 @@ namespace ThudPrototype
                     blocked = true;
                 }
 
-                // If this piece is a dwarf and the tile contains a troll and is
-                // within hurling distance, then hurling is allowed.
-                if (!assistCanCapture && GamePiece.Dwarf == Piece && null != target &&
-                    GamePiece.Troll == target.Piece && assistPlaces > 0)
-                {
-                    assistCanCapture = true;
-                }
-
                 // get ready to check the next tile
-                --assistPlaces;
-                target = GetNextInDirection(target, xDir, yDir);
-            } while (!blocked || (assistCanCapture && assistPlaces > 0));
+                --assistRange;
+                target = GetNextInDirection(Parent, ref targetColumn, ref targetRow, xDir, yDir);
+            }
+        }
+
+        // Can this piece move to the given tile?
+        protected bool CanMoveTo(ThudTile target, int assistRange, bool blocked)
+        {
+            // if the tile doesn't exist or is occupied by the same piece as this
+            // or by a dwarf, then this piece can't move to it.
+            if (null == target || Piece == target.Piece || GamePiece.Dwarf == target.Piece)
+            {
+                return false;
+            }
+
+            // if this piece is a troll, then it can move to the tile if not
+            // blocked or if the tile is within shove distance and is adjacent
+            // to at least one dwarf
+            if (GamePiece.Troll == Piece)
+            {
+                return (GamePiece.None == target.Piece &&
+                    (!blocked ||
+                    (assistRange > 0 &&
+                     target.Neighbors.Count(tile => GamePiece.Dwarf == tile.Piece) > 0)));
+            }
+
+            // if this piece is a dwarf, then it can move to the tile if not
+            // blocked or if the tile is within hurling distance
+            if (GamePiece.Dwarf == Piece)
+            {
+                return ((!blocked && GamePiece.None == target.Piece) || assistRange > 0);
+            }
+
+            // if this tile is empty, then it can't target anything.
+            return false;
         }
     }
 }

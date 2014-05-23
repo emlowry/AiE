@@ -22,7 +22,7 @@ namespace ThudPrototype
         public MainWindow()
         {
             InitializeComponent();
-            for (int i = 0; i < ThudTile.InitialBoardSideLength; ++i)
+            for (int i = 0; i < ThudTile.BoardSideLength; ++i)
             {
                 gameBoard.ColumnDefinitions.Add(new ColumnDefinition());
                 gameBoard.RowDefinitions.Add(new RowDefinition());

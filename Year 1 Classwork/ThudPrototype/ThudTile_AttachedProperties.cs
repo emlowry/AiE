@@ -16,25 +16,33 @@ namespace ThudPrototype
                                                 new FrameworkPropertyMetadata(
                                                     new Rect(0.125, 0.125, 0.75, 0.75),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetDwarfRect(Panel panel, Rect rect)
+        public static void SetDwarfRect(DependencyObject d, Rect rect)
         {
-            panel.SetValue(DwarfRectProperty, rect);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(DwarfRectProperty, rect);
+            }
         }
-        public static Rect GetDwarfRect(Panel panel)
+        public static Rect GetDwarfRect(DependencyObject d)
         {
-            return (Rect)panel.GetValue(DwarfRectProperty);
+            return (d is Panel) ? (Rect)(d as Panel).GetValue(DwarfRectProperty)
+                                : (Rect)DwarfRectProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty DwarfRectIsAbsoluteProperty =
             DependencyProperty.RegisterAttached("DwarfRectIsAbsolute", typeof(bool), typeof(Panel),
                                                 new FrameworkPropertyMetadata(false,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetDwarfRectIsAbsolute(Panel panel, bool absolute)
+        public static void SetDwarfRectIsAbsolute(DependencyObject d, bool absolute)
         {
-            panel.SetValue(DwarfRectIsAbsoluteProperty, absolute);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(DwarfRectIsAbsoluteProperty, absolute);
+            }
         }
-        public static bool GetDwarfRectIsAbsolute(Panel panel)
+        public static bool GetDwarfRectIsAbsolute(DependencyObject d)
         {
-            return (bool)panel.GetValue(DwarfRectIsAbsoluteProperty);
+            return (d is Panel) ? (bool)(d as Panel).GetValue(DwarfRectIsAbsoluteProperty)
+                                : (bool)DwarfRectIsAbsoluteProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board uses for Dwarf pieces
@@ -42,25 +50,33 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("DwarfStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetDwarfStroke(Panel panel, Pen stroke)
+        public static void SetDwarfStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(DwarfStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(DwarfStrokeProperty, stroke);
+            }
         }
-        public static Pen GetDwarfStroke(Panel panel)
+        public static Pen GetDwarfStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(DwarfStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(DwarfStrokeProperty)
+                                : (Pen)DwarfStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty DwarfFillProperty =
             DependencyProperty.RegisterAttached("DwarfFill", typeof(Brush), typeof(Panel),
                                                 new FrameworkPropertyMetadata(MakeDefaultDwarfFill(),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetDwarfFill(Panel panel, Brush fill)
+        public static void SetDwarfFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(DwarfFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(DwarfFillProperty, fill);
+            }
         }
-        public static Brush GetDwarfFill(Panel panel)
+        public static Brush GetDwarfFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(DwarfFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(DwarfFillProperty)
+                                : (Brush)DwarfFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board uses for selected Dwarf pieces
@@ -68,25 +84,33 @@ namespace ThudPrototype
             DependencyProperty.RegisterAttached("SelectedDwarfStroke", typeof(Pen), typeof(Panel),
                                                 new FrameworkPropertyMetadata(null,
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetSelectedDwarfStroke(Panel panel, Pen stroke)
+        public static void SetSelectedDwarfStroke(DependencyObject d, Pen stroke)
         {
-            panel.SetValue(SelectedDwarfStrokeProperty, stroke);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(SelectedDwarfStrokeProperty, stroke);
+            }
         }
-        public static Pen GetSelectedDwarfStroke(Panel panel)
+        public static Pen GetSelectedDwarfStroke(DependencyObject d)
         {
-            return (Pen)panel.GetValue(SelectedDwarfStrokeProperty);
+            return (d is Panel) ? (Pen)(d as Panel).GetValue(SelectedDwarfStrokeProperty)
+                                : (Pen)SelectedDwarfStrokeProperty.GetMetadata(d).DefaultValue;
         }
         public static readonly DependencyProperty SelectedDwarfFillProperty =
             DependencyProperty.RegisterAttached("SelectedDwarfFill", typeof(Brush), typeof(Panel),
                                                 new FrameworkPropertyMetadata(MakeDefaultSelectedDwarfFill(),
                                                     FrameworkPropertyMetadataOptions.Inherits));
-        public static void SetSelectedDwarfFill(Panel panel, Brush fill)
+        public static void SetSelectedDwarfFill(DependencyObject d, Brush fill)
         {
-            panel.SetValue(SelectedDwarfFillProperty, fill);
+            if (d is Panel)
+            {
+                (d as Panel).SetValue(SelectedDwarfFillProperty, fill);
+            }
         }
-        public static Brush GetSelectedDwarfFill(Panel panel)
+        public static Brush GetSelectedDwarfFill(DependencyObject d)
         {
-            return (Brush)panel.GetValue(SelectedDwarfFillProperty);
+            return (d is Panel) ? (Brush)(d as Panel).GetValue(SelectedDwarfFillProperty)
+                                : (Brush)SelectedDwarfFillProperty.GetMetadata(d).DefaultValue;
         }
 
         // For setting the graphics a board overlays on tiles targeted by Dwarf pieces
