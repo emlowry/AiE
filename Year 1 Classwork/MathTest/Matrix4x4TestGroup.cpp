@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       January 5, 2014
  * Description:        4x4 Matrix tests.
- * Last Modified:      February 5, 2014
- * Last Modification:  Refactoring.
+ * Last Modified:      June 26, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "Matrix4x4TestGroup.h"
@@ -39,7 +39,7 @@ UnitTest::Result Matrix4x4TestGroup::Project()
                               HVector3D( 1, 2, -1 ),
                               HVector3D( 1, 2, 2 ),
                               HVector3D( 2, 4, -4, 2 ) };
-    Transform3D oTransform = PerspectiveProjection( 2, 6, Point2D( 2, 2 ) );
+    Transform3D oTransform = PerspectiveProjection( 2, 6, Point2D( 4, 4 ) );
     HVector3D aoExpected1[6] = { HVector3D( 0.0625, 0.125, 1.125 ),
                                  HVector3D( 0.125, 0.25, 0.75 ),
                                  HVector3D( 0.25, 0.5, 0 ),
@@ -75,7 +75,7 @@ UnitTest::Result Matrix4x4TestGroup::Project()
         {
             std::ostringstream oOut;
             oOut << "Parallel projection of " << aoPoints[i]
-                 << " other than " << aoExpected1[i];
+                 << " other than " << aoExpected2[i];
                  return UnitTest::Fail( oOut.str() );
         }
     }

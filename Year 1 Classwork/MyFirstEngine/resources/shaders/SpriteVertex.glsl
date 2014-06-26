@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 12, 2014
  * Description:        Vertex shader for a Sprite.
- * Last Modified:      March 17, 2014
+ * Last Modified:      June 26, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -19,7 +19,7 @@ out vec2 v_v2TexCoordinate;
 
 void main()
 {
-    gl_Position = u_dm4ModelViewProjection * vec4( i_v2Position, 0.0, 1.0 );
+    gl_Position = vec4( u_dm4ModelViewProjection * vec4( i_v2Position, 0.0, 1.0 ));
     dvec3 dv3TexCoordinate = u_dm3TexTransform * dvec3( i_v2TexCoordinate, 1.0 );
-    v_v2TexCoordinate = dv3TexCoordinate.xy;
+    v_v2TexCoordinate = vec2(dv3TexCoordinate.xy);
 }

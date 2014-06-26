@@ -4,8 +4,8 @@
  * Date Created:       January 5, 2014
  * Description:        Inline function implementations for Transform.h.
  *                      Remember that this library uses row vectors, not column.
- * Last Modified:      February 10, 2014
- * Last Modification:  Templatizing PointVector.
+ * Last Modified:      June 26, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #ifndef TRANSFORM__INL
@@ -59,7 +59,7 @@ INLINE Transform
                            const Point2D& ac_roScreenSize,
                            const Point2D& ac_roScreenCenter)
 {
-    const Point2D& roSize = ac_roScreenSize / 2;
+    const Point2D& roSize = ac_roScreenSize / a_dNearDistance;
     const Point2D& roCenter = ac_roScreenCenter;
     // x' = x/sizeX + centerX*z
     // y' = y/sizeY + centerY*z
@@ -88,7 +88,7 @@ INLINE Transform
                         const Point2D& ac_roScreenSize,
                         const Point2D& ac_roScreenCenter)
 {
-    const Point2D& roSize = ac_roScreenSize / 2;
+    const Point2D& roSize = ac_roScreenSize;
     const Point2D& roCenter = ac_roScreenCenter;
     // x' = x'/w' = x/sizeX - centerX
     // y' = y'/w' = y/sizeY - centerY

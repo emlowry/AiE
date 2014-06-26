@@ -3,8 +3,8 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 22, 2014
  * Description:        Class for managing the projection matrix.
- * Last Modified:      March 22, 2014
- * Last Modification:  Creation.
+ * Last Modified:      June 26, 2014
+ * Last Modification:  Debugging.
  ******************************************************************************/
 
 #include "../Declarations/Camera.h"
@@ -64,7 +64,7 @@ void Camera::UseDefault3D()
 // Control what coordinates on the camera's zero plane become on the screen
 void Camera::UseWindowPixelScreenSize()  // Use window pixel sized screen
 {
-    SetScreenSize( GameWindow::Current().GetSize() );
+    SetScreenSize( GameWindow::Current().GetSize() / 2 );
 }
 void Camera::UseDefaultScreenSize()  // Use default 2x2 screen
 {
@@ -77,7 +77,7 @@ void Camera::SetScreenSize( double a_dWidth, double a_dHeight )
 }
 void Camera::SetScreenSize( const Point2D& ac_roSize )
 {
-    if( ac_roSize != Instance().m_oScreenSize )
+    if( ac_roSize / 2 != Instance().m_oScreenSize )
     {
         Instance().m_oScreenSize = ac_roSize;
         Instance().m_bUpdateProjectionMatrix = true;

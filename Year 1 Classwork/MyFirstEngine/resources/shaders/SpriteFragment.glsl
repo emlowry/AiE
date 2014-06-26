@@ -3,7 +3,7 @@
  * Author:             Elizabeth Lowry
  * Date Created:       March 12, 2014
  * Description:        Fragment shader for a Sprite.
- * Last Modified:      March 17, 2014
+ * Last Modified:      June 26, 2014
  * Last Modification:  Debugging.
  ******************************************************************************/
 
@@ -25,18 +25,18 @@ float ScaleUV( in float a_fValue, in double a_dOffset,
     {
         if( a_fValue < 0.0 )
         {
-            return a_dOffset;
+            return float( a_dOffset );
         }
         if( a_fValue > 1.0 )
         {
-            return a_dOffset + a_dSize;
+            return float( a_dOffset + a_dSize );
         }
-        return a_dOffset + ( a_fValue * a_dSize );
+        return float( a_dOffset + ( a_fValue * a_dSize ) );
     }
 
     int iSteps = int( a_fValue );
     double dPosition = a_fValue - double( iSteps );
-    return double( iSteps ) + a_dOffset + ( a_dSize * dPosition );
+    return float( double( iSteps ) + a_dOffset + ( a_dSize * dPosition ) );
 }
 
 void main()
